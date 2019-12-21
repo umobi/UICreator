@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'UICreator'
   s.version          = '1.0.0-alpha.1'
-  s.summary          = 'A short description of UICreator.'
+  s.summary          = 'Creating view using declarative statements'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
+UICreator is a replacement for storyboard and xib files. Like Fluter, ReactNative and SwiftUI, but keeping the same structure used in MVC projects.
                        DESC
 
   s.homepage         = 'https://github.com/umobi/UICreator'
@@ -29,11 +29,12 @@ TODO: Add long description of the pod here.
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '10.0'
+  s.swift_version = '5.1'
 
   s.source_files = 'UICreator/Classes/**/*'
 
-  s.dependency 'UIContainer'
-  s.dependency 'SnapKit'
+  s.dependency 'UIContainer', '~> 1.2.0-beta.1'
+  s.dependency 'SnapKit', '~> 5.0.1'
   # s.resource_bundles = {
   #   'UICreator' => ['UICreator/Assets/*.png']
   # }
