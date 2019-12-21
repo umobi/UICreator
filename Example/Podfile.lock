@@ -1,0 +1,16 @@
+PODS:
+  - UICreator (0.1.0)
+
+DEPENDENCIES:
+  - UICreator (from `../`)
+
+EXTERNAL SOURCES:
+  UICreator:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  UICreator: 2820e75c434ed8ed154b3993133608d0c0242a8c
+
+PODFILE CHECKSUM: a8ad1abe043bea82e99aff60d82c80001333c69a
+
+COCOAPODS: 1.8.4

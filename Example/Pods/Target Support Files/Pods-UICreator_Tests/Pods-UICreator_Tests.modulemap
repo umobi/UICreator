@@ -1,0 +1,6 @@
+framework module Pods_UICreator_Tests {
+  umbrella header "Pods-UICreator_Tests-umbrella.h"
+
+  export *
+  module * { export * }
+}

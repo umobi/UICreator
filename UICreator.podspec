@@ -28,10 +28,12 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/brennobemoura/UICreator.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '11.0'
 
   s.source_files = 'UICreator/Classes/**/*'
-  
+
+  s.dependency 'UIContainer'
+  s.dependency 'SnapKit'
   # s.resource_bundles = {
   #   'UICreator' => ['UICreator/Assets/*.png']
   # }

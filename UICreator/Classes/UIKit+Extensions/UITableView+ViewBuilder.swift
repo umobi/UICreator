@@ -1,0 +1,151 @@
+//
+//  UITableView+ViewBuilder.swift
+//  UIBuilder
+//
+//  Created by brennobemoura on 21/12/19.
+//
+
+import Foundation
+import UIKit
+
+public extension ViewBuilder where Self: UITableView {
+    init(style: Style) {
+        self.init(frame: .zero, style: style)
+    }
+
+    func addCell(for identifier: String, _ cellClass: AnyClass?) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.register(cellClass, forCellReuseIdentifier: identifier)
+        }
+    }
+
+    func addCell(for identifier: String, _ uiNib: UINib?) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.register(uiNib, forCellReuseIdentifier: identifier)
+        }
+    }
+
+    func addHeaderOrFooter(for identifier: String, _ aClass: AnyClass?) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.register(aClass, forHeaderFooterViewReuseIdentifier: identifier)
+        }
+    }
+
+    func addHeaderOrFooter(for identifier: String, _ uiNib: UINib?) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.register(uiNib, forHeaderFooterViewReuseIdentifier: identifier)
+        }
+    }
+
+    func row(height: CGFloat) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.rowHeight = height
+        }
+    }
+
+    func row(estimatedHeight: CGFloat) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.estimatedRowHeight = estimatedHeight
+        }
+    }
+
+    func header(height: CGFloat) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.sectionHeaderHeight = height
+        }
+    }
+
+    func header(estimatedHeight: CGFloat) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.estimatedSectionHeaderHeight = estimatedHeight
+        }
+    }
+
+    func footer(height: CGFloat) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.sectionFooterHeight = height
+        }
+    }
+
+    func footer(estimatedHeight: CGFloat) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.estimatedSectionFooterHeight = estimatedHeight
+        }
+    }
+
+    func allowsMultipleSelection(_ flag: Bool) -> Self {
+        self.appendRendered {
+            ($0 as? Self)?.allowsMultipleSelection = flag
+        }
+    }
+
+    func allowsSelection(_ flag: Bool) -> Self {
+        self.appendRendered {
+            ($0 as? Self)?.allowsSelection = flag
+        }
+    }
+
+    func allowsSelectionDuringEditing(_ flag: Bool) -> Self {
+        self.appendRendered {
+            ($0 as? Self)?.allowsSelectionDuringEditing = flag
+        }
+    }
+
+    func allowsMultipleSelectionDuringEditing(_ flag: Bool) -> Self {
+        self.appendRendered {
+            ($0 as? Self)?.allowsMultipleSelectionDuringEditing = flag
+        }
+    }
+
+    func insetsContentViews(toSafeArea flag: Bool) -> Self {
+        self.appendInTheScene {
+            ($0 as? Self)?.insetsContentViewsToSafeArea = flag
+        }
+    }
+
+    func background(_ content: @escaping () -> UIView) -> Self {
+        return self.add(Host(content))
+    }
+
+    func separator(effect: UIVisualEffect) -> Self {
+        self.appendRendered {
+            ($0 as? Self)?.separatorEffect = effect
+        }
+    }
+
+    func separator(color: UIColor?) -> Self {
+        self.appendRendered {
+            ($0 as? Self)?.separatorColor = color
+        }
+    }
+
+    func separator(insets: UIEdgeInsets) -> Self {
+        self.appendRendered {
+            ($0 as? Self)?.separatorInset = insets
+        }
+    }
+
+    func separator(insetReference: SeparatorInsetReference) -> Self {
+        self.appendRendered {
+            ($0 as? Self)?.separatorInsetReference = insetReference
+        }
+    }
+
+    func separator(style: UITableViewCell.SeparatorStyle) -> Self {
+        self.appendRendered {
+            ($0 as? Self)?.separatorStyle = style
+        }
+    }
+
+    func header(_ content: @escaping () -> UIView) -> Self {
+        return self.appendRendered {
+            ($0 as? Self)?.tableHeaderView = Host(content)
+        }
+    }
+
+    func footer(_ content: @escaping () -> UIView) -> Self {
+        return self.appendRendered {
+            ($0 as? Self)?.tableFooterView = Host(content)
+        }
+    }
+}
