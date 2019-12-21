@@ -97,6 +97,7 @@ public extension ViewBuilder where Self: UITableView {
         }
     }
 
+    @available(iOS 11.0, *)
     func insetsContentViews(toSafeArea flag: Bool) -> Self {
         self.appendInTheScene {
             ($0 as? Self)?.insetsContentViewsToSafeArea = flag
@@ -125,6 +126,7 @@ public extension ViewBuilder where Self: UITableView {
         }
     }
 
+    @available(iOS 11.0, *)
     func separator(insetReference: SeparatorInsetReference) -> Self {
         self.appendRendered {
             ($0 as? Self)?.separatorInsetReference = insetReference
