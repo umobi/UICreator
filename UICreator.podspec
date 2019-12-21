@@ -21,11 +21,11 @@ Pod::Spec.new do |s|
 TODO: Add long description of the pod here.
                        DESC
 
-  s.homepage         = 'https://github.com/brennobemoura/UICreator'
+  s.homepage         = 'https://github.com/umobi/UICreator'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'brennobemoura' => 'brenno@umobi.com.br' }
-  s.source           = { :git => 'https://github.com/brennobemoura/UICreator.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/umobi/UICreator.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '11.0'

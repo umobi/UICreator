@@ -32,7 +32,7 @@ private var kSystemReserved: UInt = 0
 
 private var kAllEvents: UInt = 0
 
-fileprivate extension Control where Self: UIControl & ViewBuilder {
+fileprivate extension UIControl {
 
     var touchDown: Handler? {
         get { objc_getAssociatedObject(self, &kTouchDown) as? Handler }
@@ -135,7 +135,7 @@ fileprivate extension Control where Self: UIControl & ViewBuilder {
     }
 }
 
-fileprivate extension UIControl: Control {
+fileprivate extension UIControl {
     @objc func onTouchDown() {
         self.touchDown?.commit(in: self)
     }
@@ -218,8 +218,65 @@ fileprivate extension UIControl: Control {
     }
 }
 
-public extension Control where Self: UIControl & ViewBuilder {
-    func removeEvent(_ event: UIControl.Event) {
+extension UIControl: Control {
+    public func onEvent(_ event: UIControl.Event, _ handler: @escaping (UIView) -> Void) -> Self {
+        self.appendEvent(event, handler)
+
+        self.addTarget(self, action: {
+            switch event {
+            case .touchDown:
+                return #selector(self.onTouchDown)
+            case .touchDownRepeat:
+                return #selector(self.onTouchDownRepeat)
+            case .touchDragInside:
+                return #selector(self.onTouchDragInside)
+            case .touchDragOutside:
+                return #selector(self.onTouchDragOutside)
+            case .touchDragEnter:
+                return #selector(self.onTouchDragEnter)
+            case .touchDragExit:
+                return #selector(self.onTouchDragExit)
+            case .touchUpInside:
+                return #selector(self.onTouchUpInside)
+            case .touchUpOutside:
+                return #selector(self.onTouchUpOutside)
+            case .touchCancel:
+                return #selector(self.onTouchCancel)
+
+            case .valueChanged:
+                return #selector(self.onValueChanged)
+            case .primaryActionTriggered:
+                return #selector(self.onPrimaryActionTriggered)
+
+            case .editingDidBegin:
+                return #selector(self.onEditingDidBegin)
+            case .editingChanged:
+                return #selector(self.onEditingChanged)
+            case .editingDidEnd:
+                return #selector(self.onEditingDidEnd)
+            case .editingDidEndOnExit:
+                return #selector(self.onEditingDidEndOnExit)
+
+            case .allTouchEvents:
+                return #selector(self.onAllTouchEvents)
+            case .allEditingEvents:
+                return #selector(self.onAllEditingEvents)
+            case .applicationReserved:
+                return #selector(self.onApplicationReserved)
+            case .systemReserved:
+                return #selector(self.onSystemReserved)
+            case .allEvents:
+                return #selector(self.onAllEvents)
+
+            default:
+                return #selector(self.onAllEvents)
+            }
+        }(), for: event)
+
+        return self
+    }
+
+    public func removeEvent(_ event: UIControl.Event) {
         self.removeTarget(self, action: nil, for: event)
 
         switch event {
@@ -405,62 +462,5 @@ public extension Control where Self: UIControl & ViewBuilder {
                   old?.commit(in: $0)
               }
         }
-    }
-
-    func onEvent(_ event: UIControl.Event, _ handler: @escaping (UIView) -> Void) -> Self {
-        self.appendEvent(event, handler)
-
-        self.addTarget(self, action: {
-            switch event {
-            case .touchDown:
-                return #selector(self.onTouchDown)
-            case .touchDownRepeat:
-                return #selector(self.onTouchDownRepeat)
-            case .touchDragInside:
-                return #selector(self.onTouchDragInside)
-            case .touchDragOutside:
-                return #selector(self.onTouchDragOutside)
-            case .touchDragEnter:
-                return #selector(self.onTouchDragEnter)
-            case .touchDragExit:
-                return #selector(self.onTouchDragExit)
-            case .touchUpInside:
-                return #selector(self.onTouchUpInside)
-            case .touchUpOutside:
-                return #selector(self.onTouchUpOutside)
-            case .touchCancel:
-                return #selector(self.onTouchCancel)
-
-            case .valueChanged:
-                return #selector(self.onValueChanged)
-            case .primaryActionTriggered:
-                return #selector(self.onPrimaryActionTriggered)
-
-            case .editingDidBegin:
-                return #selector(self.onEditingDidBegin)
-            case .editingChanged:
-                return #selector(self.onEditingChanged)
-            case .editingDidEnd:
-                return #selector(self.onEditingDidEnd)
-            case .editingDidEndOnExit:
-                return #selector(self.onEditingDidEndOnExit)
-
-            case .allTouchEvents:
-                return #selector(self.onAllTouchEvents)
-            case .allEditingEvents:
-                return #selector(self.onAllEditingEvents)
-            case .applicationReserved:
-                return #selector(self.onApplicationReserved)
-            case .systemReserved:
-                return #selector(self.onSystemReserved)
-            case .allEvents:
-                return #selector(self.onAllEvents)
-
-            default:
-                return #selector(self.onAllEvents)
-            }
-        }(), for: event)
-
-        return self
     }
 }

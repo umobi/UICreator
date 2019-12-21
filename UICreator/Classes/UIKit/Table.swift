@@ -8,15 +8,15 @@
 import Foundation
 import UIKit
 
-class Table: UITableView, ViewBuilder, HasViewDelegate, HasViewDataSource {
+public class Table: UITableView, ViewBuilder, HasViewDelegate, HasViewDataSource {
 
-    func delegate(_ delegate: UITableViewDelegate?) -> Self {
+    public func delegate(_ delegate: UITableViewDelegate?) -> Self {
         return self.appendBeforeRendering {
             ($0 as? Self)?.delegate = delegate
         }
     }
 
-    func dataSource(_ dataSource: UITableViewDataSource?) -> Self {
+    public func dataSource(_ dataSource: UITableViewDataSource?) -> Self {
         self.appendBeforeRendering {
             ($0 as? Self)?.dataSource = dataSource
         }

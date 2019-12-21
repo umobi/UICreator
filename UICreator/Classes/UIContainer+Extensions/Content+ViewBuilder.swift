@@ -8,38 +8,35 @@
 import Foundation
 import UIKit
 import UIContainer
+import SnapKit
 
-public extension Content: ViewBuilder {
+extension Content: ViewBuilder {
 
-    convenience init(mode: ContentMode = .center, content: @escaping () -> UIView) {
+    public convenience init(mode: ContentMode = .center, content: @escaping () -> UIView) {
         self.init(content(), contentMode: mode)
     }
 
-    override func willMove(toSuperview newSuperview: UIView?) {
+    override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
     }
 
-    override func didMoveToSuperview() {
+    override public func didMoveToSuperview() {
         super.didMoveToSuperview()
         self.commitRendered()
     }
 
-    override func didMoveToWindow() {
+    override public func didMoveToWindow() {
         super.didMoveToWindow()
         self.commitInTheScene()
     }
 
-    public var body: UIView {
-        return self
-    }
-
-    func content(mode: UIView.ContentMode) -> Content {
+    public func content(mode: UIView.ContentMode) -> Content {
         self.apply(contentMode: mode)
         return self
     }
 
-    func fitting(priority: ConstraintPriority) -> Content {
+    public func fitting(priority: ConstraintPriority) -> Content {
         self.apply(priority: priority)
         return self
     }

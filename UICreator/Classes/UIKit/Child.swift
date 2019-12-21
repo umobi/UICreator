@@ -22,6 +22,17 @@ public class Child: UIView, ViewBuilder {
         }
     }
 
+    public convenience init(_ views: UIView...) {
+        self.init()
+
+        views.forEach {
+            self.addSubview($0)
+            $0.snp.makeConstraints {
+                $0.edges.equalTo(0).priority(.low)
+            }
+        }
+    }
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()

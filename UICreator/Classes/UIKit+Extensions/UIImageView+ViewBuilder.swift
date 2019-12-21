@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-extension ViewBuilder where Self: UIImageView {
+public extension ViewBuilder where Self: UIImageView {
     init(image: UIImage?, highlightedImage: UIImage?) {
         self.init(image: image, highlightedImage: highlightedImage)
     }

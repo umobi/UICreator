@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import UIContainer
 
 public protocol NavigationRepresentable: TemplateView {
     var navigationLoader: (UIViewController) -> UINavigationController { get }

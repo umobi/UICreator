@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-extension Text where Self: UILabel {
+public extension Text where Self: UILabel {
     func text(_ string: String?) -> Self {
         return self.appendBeforeRendering {
             ($0 as? Self)?.text = string

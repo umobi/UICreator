@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import UIKit
+import UIContainer
 
 public class Container<View: UIViewController>: UIContainer.Container<View>, ViewBuilder {
     public var watchingViews: [UIView] {

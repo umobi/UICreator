@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class Label: UILabel & Text {
+public class Label: UILabel & Text {
 
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)

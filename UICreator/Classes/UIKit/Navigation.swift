@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import UIContainer
 
 public class Navigation: View, NavigationRepresentable {
 

@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 public extension ViewBuilder where Self: UIButton {
-    convenience init(_ title: String?, type: UIButton.ButtonType? = nil) {
+    init(_ title: String?, type: UIButton.ButtonType? = nil) {
         if let type = type {
             self.init(type: type)
             _ = self.title(title)
@@ -45,7 +45,9 @@ public extension ViewBuilder where Self: UIButton {
             ($0 as? Self)?.titleLabel?.isDynamicTextSize = isDynamicTextSize
         }
     }
+}
 
+public extension ViewBuilder where Self: UIButton {
     func onTouchInside(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.appendRendered {
             _ = ($0 as? Self)?.onEvent(.touchUpInside, handler)

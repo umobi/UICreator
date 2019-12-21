@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-extension ViewBuilder where Self: UIScrollView {
+public extension ViewBuilder where Self: UIScrollView {
     func insets(behavior: UIScrollView.ContentInsetAdjustmentBehavior) -> Self {
         self.appendBeforeRendering {
             ($0 as? Self)?.contentInsetAdjustmentBehavior = behavior

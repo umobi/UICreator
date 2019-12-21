@@ -9,27 +9,27 @@ import Foundation
 import UIKit
 import UIContainer
 
-public extension Scroll: ViewBuilder, HasViewDelegate {
-    func delegate(_ delegate: UIScrollViewDelegate?) -> Self {
+extension Scroll: ViewBuilder, HasViewDelegate {
+    public func delegate(_ delegate: UIScrollViewDelegate?) -> Self {
         self.delegate = delegate
         return self
     }
 
-    convenience init(axis: Axis = .vertical, content: @escaping () -> UIView) {
+    convenience public init(axis: Axis = .vertical, content: @escaping () -> UIView) {
         self.init(content(), axis: axis)
     }
 
-    override func willMove(toSuperview newSuperview: UIView?) {
+    override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
     }
 
-    override func didMoveToSuperview() {
+    override public func didMoveToSuperview() {
         super.didMoveToSuperview()
         self.commitRendered()
     }
 
-    override func didMoveToWindow() {
+    override public func didMoveToWindow() {
         super.didMoveToWindow()
         self.commitInTheScene()
     }

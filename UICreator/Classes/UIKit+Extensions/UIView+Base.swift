@@ -35,7 +35,7 @@ public extension UIView {
     }
 
     @discardableResult
-    func present(animated: Bool, onCompletion: (() -> Void)? = nil, _ content: UIView & ViewControllerType) -> Self {
+    func present<View: ViewControllerType>(animated: Bool, onCompletion: (() -> Void)? = nil, _ content: View) -> Self {
         guard let uiView = self as? ViewBuilder else {
             fatalError("You shouldn't call present on view that is not of ViewBuilder type")
         }

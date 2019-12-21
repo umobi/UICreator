@@ -9,28 +9,25 @@ import Foundation
 import UIKit
 import UIContainer
 
-public class View: UIContainer.View, ViewBuilder {
-    public func didLoad() {}
+private var kViewDidLoad: UInt = 0
 
-    public required init() {
-        super.init(frame: .zero)
-        self.prepare()
+@objc extension UIContainer.View {
+    open func viewDidLoad() {
+        self.didViewLoad = true
+    }
+}
+
+extension UIContainer.View: ViewBuilder {
+
+    private var didViewLoad: Bool {
+        get { (objc_getAssociatedObject(self, &kViewDidLoad) as? Bool) ?? false }
+        set { (objc_setAssociatedObject(self, &kViewDidLoad, newValue, .OBJC_ASSOCIATION_RETAIN)) }
     }
 
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    private lazy var _didLoad: (() -> Void)? = {
-        { [weak self] in
-            self?.didLoad()
-            self?._didLoad = nil
-        }
-    }()
 
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        if self.subviews.isEmpty, let template = (self as? TemplateView) {
+        if let template = (self as? TemplateView), self.subviews.isEmpty {
             _ = self.add(template.body)
         }
         self.commitNotRendered()
@@ -44,6 +41,9 @@ public class View: UIContainer.View, ViewBuilder {
     override public func didMoveToWindow() {
         super.didMoveToWindow()
         self.commitInTheScene()
-        self._didLoad?()
+
+        if !self.didViewLoad {
+            self.viewDidLoad()
+        }
     }
 }

@@ -8,6 +8,6 @@
 import Foundation
 import UIKit
 
-private protocol Control: UIControl {
+public protocol Control: UIControl {
     func onEvent(_ event: UIControl.Event, _ handler: @escaping (UIView) -> Void) -> Self
 }

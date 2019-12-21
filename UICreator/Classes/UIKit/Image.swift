@@ -7,7 +7,7 @@
 
 import Foundation
 
-class Image: UIImageView, ViewBuilder {
+public class Image: UIImageView, ViewBuilder {
     
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)

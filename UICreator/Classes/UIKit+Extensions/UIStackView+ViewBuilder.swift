@@ -9,6 +9,11 @@ import Foundation
 import UIKit
 
 public extension ViewBuilder where Self: UIStackView {
+    init(axis: NSLayoutConstraint.Axis = .vertical, _ subview: Subview) {
+        self.init(arrangedSubviews: subview.views)
+        _ = self.axis(axis)
+    }
+
     init(axis: NSLayoutConstraint.Axis = .vertical, _ views: UIView...) {
         self.init(arrangedSubviews: views)
         _ = self.axis(axis)

@@ -8,8 +8,8 @@
 import Foundation
 import UIKit
 
-class TextField: UITextField & Text, HasViewDelegate {
-    func delegate(_ delegate: UITextFieldDelegate?) -> Self {
+public class TextField: UITextField & Text, HasViewDelegate {
+    public func delegate(_ delegate: UITextFieldDelegate?) -> Self {
         self.delegate = delegate
         return self
     }
