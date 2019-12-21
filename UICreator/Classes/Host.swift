@@ -10,8 +10,8 @@ import UIKit
 import UIContainer
 
 public class Host: UIContainer.View, ViewControllerType {
-    init(_ content: () -> UIView) {
-        super.init(frame: .zero)
+    init(size: CGSize = .zero, _ content: () -> UIView) {
+        super.init(frame: .init(origin: .zero, size: size))
         _ = self.add(content())
     }
 

@@ -139,15 +139,15 @@ public extension ViewBuilder where Self: UITableView {
         }
     }
 
-    func header(_ content: @escaping () -> UIView) -> Self {
+    func header(size: CGSize = .zero, _ content: @escaping () -> UIView) -> Self {
         return self.appendRendered {
-            ($0 as? Self)?.tableHeaderView = Host(content)
+            ($0 as? Self)?.tableHeaderView = Host(size: size, content)
         }
     }
 
-    func footer(_ content: @escaping () -> UIView) -> Self {
+    func footer(size: CGSize = .zero, _ content: @escaping () -> UIView) -> Self {
         return self.appendRendered {
-            ($0 as? Self)?.tableFooterView = Host(content)
+            ($0 as? Self)?.tableFooterView = Host(size: size, content)
         }
     }
 }

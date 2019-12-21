@@ -9,7 +9,7 @@ import Foundation
 
 internal extension ViewBuilder {
     weak var viewController: UIViewController! {
-        return sequence(first: self as UIResponder, next: { $0?.next }).first(where: {
+        return sequence(first: self as UIResponder, next: { $0.next }).first(where: {
             $0 is UIViewController
         }) as? UIViewController
     }
