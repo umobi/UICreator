@@ -61,6 +61,12 @@ public extension ViewBuilder where Self: UICollectionView {
             ($0 as? Self)?.backgroundView = Host(content)
         }
     }
+
+    func isPaged(_ flag: Bool) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.isPagingEnabled = flag
+        }
+    }
 }
 
 public extension ViewBuilder where Self: CollectionLayout, Self.Layout: UICollectionViewFlowLayout {
@@ -79,6 +85,46 @@ public extension ViewBuilder where Self: CollectionLayout, Self.Layout: UICollec
     func item(size: CGSize) -> Self {
         return self.appendRendered {
             ($0 as? Self)?.dynamicCollectionViewLayout.itemSize = size
+        }
+    }
+
+    func item(relativeHeight height: CGFloat) -> Self {
+        return self.appendLayout {
+            guard let itemSize = ($0 as? Self)?.dynamicCollectionViewLayout.itemSize else {
+                return
+            }
+
+            ($0 as? Self)?.dynamicCollectionViewLayout.itemSize = .init(width: itemSize.width, height: $0.bounds.height * height)
+        }
+    }
+
+    func item(relativeWidth width: CGFloat) -> Self {
+        return self.appendLayout {
+            guard let itemSize = ($0 as? Self)?.dynamicCollectionViewLayout.itemSize else {
+                return
+            }
+
+            ($0 as? Self)?.dynamicCollectionViewLayout.itemSize = .init(width: $0.bounds.width * width, height: itemSize.height)
+        }
+    }
+
+    func item(height: CGFloat) -> Self {
+        return self.appendLayout {
+            guard let itemSize = ($0 as? Self)?.dynamicCollectionViewLayout.itemSize else {
+                return
+            }
+
+            ($0 as? Self)?.dynamicCollectionViewLayout.itemSize = .init(width: itemSize.width, height: height)
+        }
+    }
+
+    func item(width: CGFloat) -> Self {
+        return self.appendLayout {
+            guard let itemSize = ($0 as? Self)?.dynamicCollectionViewLayout.itemSize else {
+                return
+            }
+
+            ($0 as? Self)?.dynamicCollectionViewLayout.itemSize = .init(width: width, height: itemSize.height)
         }
     }
 
@@ -129,51 +175,5 @@ public extension ViewBuilder where Self: CollectionLayout, Self.Layout: UICollec
         return self.appendRendered {
             ($0 as? Self)?.dynamicCollectionViewLayout.sectionFootersPinToVisibleBounds = flag
         }
-    }
-}
-
-public class Collection: UICollectionView, ViewBuilder, HasViewDelegate, HasViewDataSource {
-    public func delegate(_ delegate: UICollectionViewDelegate?) -> Self {
-        self.delegate = delegate
-        return self
-    }
-
-    public func dataSource(_ dataSource: UICollectionViewDataSource?) -> Self {
-        self.dataSource = dataSource
-        return self
-    }
-
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
-    }
-
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        self.commitRendered()
-    }
-
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        self.commitInTheScene()
-    }
-}
-
-public class FlowCollection: Collection, CollectionLayout {
-    public convenience init() {
-        self.init {
-            UICollectionViewFlowLayout()
-        }
-    }
-
-    public var dynamicCollectionViewLayout: UICollectionViewFlowLayout {
-        return self.collectionViewLayout as! UICollectionViewFlowLayout
-    }
-}
-
-@available(iOS 13.0, *)
-public class CompositionalCollection: Collection, CollectionLayout {
-    public var dynamicCollectionViewLayout: UICollectionViewCompositionalLayout {
-        return self.collectionViewLayout as! UICollectionViewCompositionalLayout
     }
 }

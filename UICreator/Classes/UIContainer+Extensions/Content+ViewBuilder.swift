@@ -31,6 +31,11 @@ extension Content: ViewBuilder {
         self.commitInTheScene()
     }
 
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        self.commitLayout()
+    }
+
     public func content(mode: UIView.ContentMode) -> Content {
         self.apply(contentMode: mode)
         return self

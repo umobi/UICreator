@@ -36,4 +36,9 @@ public class Table: UITableView, ViewBuilder, HasViewDelegate, HasViewDataSource
         super.didMoveToWindow()
         self.commitInTheScene()
     }
+
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        self.commitLayout()
+    }
 }

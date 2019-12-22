@@ -35,4 +35,9 @@ public class Container<View: UIViewController>: UIContainer.Container<View>, Vie
         super.didMoveToWindow()
         self.commitInTheScene()
     }
+
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        self.commitLayout()
+    }
 }

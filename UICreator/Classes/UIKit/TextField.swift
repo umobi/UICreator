@@ -28,4 +28,9 @@ public class TextField: UITextField & Text, HasViewDelegate {
         super.didMoveToWindow()
         self.commitInTheScene()
     }
+
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        self.commitLayout()
+    }
 }

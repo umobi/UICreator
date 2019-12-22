@@ -51,6 +51,7 @@
 		0C93471823AE7D8600A9E112 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346F023AE7D8600A9E112 /* Button.swift */; };
 		0C93471923AE7D8600A9E112 /* ViewBuilder+Constraints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346F123AE7D8600A9E112 /* ViewBuilder+Constraints.swift */; };
 		0C93471A23AE7D8600A9E112 /* UIView+Mode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346F223AE7D8600A9E112 /* UIView+Mode.swift */; };
+		0CF7EE6823AFEABC005EDC6A /* Collection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF7EE6623AFEA9E005EDC6A /* Collection.swift */; };
 		10A720BC38C4767848A52520B0E80DEA /* UICreator-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E7C1E1B5D136F5CB635DDE8786A868 /* UICreator-dummy.m */; };
 		1B2E5E9DD86C13AD483990487E4E4D76 /* Pods-UICreator_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = DADD9F6084F3910855908ABF70C37894 /* Pods-UICreator_Tests-dummy.m */; };
 		2D45A3531A9DAC1937364ADF21B7C96A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
@@ -125,6 +126,7 @@
 		0C9346F023AE7D8600A9E112 /* Button.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
 		0C9346F123AE7D8600A9E112 /* ViewBuilder+Constraints.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "ViewBuilder+Constraints.swift"; path = "UICreator/Classes/ViewBuilder+Constraints.swift"; sourceTree = "<group>"; };
 		0C9346F223AE7D8600A9E112 /* UIView+Mode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UIView+Mode.swift"; path = "UICreator/Classes/UIView+Mode.swift"; sourceTree = "<group>"; };
+		0CF7EE6623AFEA9E005EDC6A /* Collection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Collection.swift; sourceTree = "<group>"; };
 		14CB1E5FF33F6496D92F2D453F554956 /* UICreator.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = UICreator.modulemap; sourceTree = "<group>"; };
 		16EDA50CD75EDCD98EFADB0BD963864C /* UICreator-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UICreator-prefix.pch"; sourceTree = "<group>"; };
 		17713BC37052DDF97BB9C03D326E26B5 /* UICreator.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; path = UICreator.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -230,6 +232,7 @@
 		0C9346E423AE7D8600A9E112 /* UIKit */ = {
 			isa = PBXGroup;
 			children = (
+				0CF7EE6623AFEA9E005EDC6A /* Collection.swift */,
 				0C9346E523AE7D8600A9E112 /* Label.swift */,
 				0C9346E623AE7D8600A9E112 /* Scroll.swift */,
 				0C9346E723AE7D8600A9E112 /* Stack.swift */,
@@ -555,6 +558,7 @@
 				0C93470823AE7D8600A9E112 /* Spacer+ViewBuilder.swift in Sources */,
 				0C93471523AE7D8600A9E112 /* TextField.swift in Sources */,
 				0C93471723AE7D8600A9E112 /* TextView.swift in Sources */,
+				0CF7EE6823AFEABC005EDC6A /* Collection.swift in Sources */,
 				0C93470923AE7D8600A9E112 /* ViewControllerType+ViewBuilder.swift in Sources */,
 				0C93470523AE7D8600A9E112 /* Host.swift in Sources */,
 				0C93470F23AE7D8600A9E112 /* Stack.swift in Sources */,

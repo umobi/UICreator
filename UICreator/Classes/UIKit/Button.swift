@@ -24,4 +24,9 @@ public class Button: UIButton, ViewBuilder {
         super.didMoveToWindow()
         self.commitInTheScene()
     }
+
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        self.commitLayout()
+    }
 }

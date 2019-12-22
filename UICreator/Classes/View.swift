@@ -45,4 +45,9 @@ extension UIContainer.View: ViewBuilder {
             self.viewDidLoad()
         }
     }
+
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        self.commitLayout()
+    }
 }
