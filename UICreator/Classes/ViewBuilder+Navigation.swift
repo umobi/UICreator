@@ -85,4 +85,98 @@ public extension ViewBuilder {
                 }, animated: false)
         }
     }
+
+    @available(iOS 11.0, *)
+    func navigation(searchController: UISearchController) -> Self {
+        return self.appendInTheScene {
+            ($0 as? Self)?.navigationItem.searchController = searchController
+        }
+    }
+}
+
+public extension ViewBuilder {
+    func navigation(title color: UIColor) -> Self {
+        return self.appendInTheScene {
+                guard let view = ($0 as? Self) else {
+                    return
+                }
+
+                view.navigation?.navigationBar.titleTextAttributes = (view.navigation?.navigationBar.titleTextAttributes ?? [:]).merging(
+                    [NSAttributedString.Key.foregroundColor: color],
+                    uniquingKeysWith: { $1 }
+                )
+            }
+    }
+
+    func navigation(title font: UIFont) -> Self {
+        return self.appendInTheScene {
+                guard let view = ($0 as? Self) else {
+                    return
+                }
+
+                view.navigation?.navigationBar.titleTextAttributes = (view.navigation?.navigationBar.titleTextAttributes ?? [:]).merging(
+                    [NSAttributedString.Key.font: font],
+                    uniquingKeysWith: { $1 }
+                )
+            }
+    }
+}
+
+public extension ViewBuilder {
+    @available(iOS 11.0, *)
+    func navigation(largeTitleMode mode: UINavigationItem.LargeTitleDisplayMode) -> Self {
+        return self.appendInTheScene {
+            ($0 as? Self)?.navigationItem.largeTitleDisplayMode = mode
+        }
+    }
+
+    @available(iOS 11.0, *)
+    func navigation(prefersLargeTitles: Bool) -> Self {
+        return self.appendInTheScene {
+            ($0 as? Self)?.navigation?.navigationBar.prefersLargeTitles = prefersLargeTitles
+        }
+    }
+
+    @available(iOS 11.0, *)
+    func navigation(largeTitle color: UIColor) -> Self {
+        return self.appendInTheScene {
+            guard let view = ($0 as? Self) else {
+                return
+            }
+
+            view.navigation?.navigationBar.largeTitleTextAttributes = (view.navigation?.navigationBar.largeTitleTextAttributes ?? [:]).merging(
+                [NSAttributedString.Key.foregroundColor: color],
+                uniquingKeysWith: { $1 }
+            )
+        }
+    }
+
+    @available(iOS 11.0, *)
+    func navigation(largeTitle font: UIFont) -> Self {
+        return self.appendInTheScene {
+            guard let view = ($0 as? Self) else {
+                return
+            }
+
+            view.navigation?.navigationBar.largeTitleTextAttributes = (view.navigation?.navigationBar.largeTitleTextAttributes ?? [:]).merging(
+                [NSAttributedString.Key.font: font],
+                uniquingKeysWith: { $1 }
+            )
+        }
+    }
+
+    @available(iOS 13.0, *)
+    func navigation(largeContent image: UIImage?) -> Self {
+        return self.appendInTheScene {
+            ($0 as? Self)?.navigation?.navigationBar.largeContentImage = image
+        }
+    }
+
+    @available(iOS 13.0, *)
+    func navigation(largeContent title: String?) -> Self {
+        return self.appendInTheScene {
+            ($0 as? Self)?.navigation?.navigationBar.largeContentTitle = title
+        }
+    }
+
 }

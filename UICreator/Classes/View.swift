@@ -24,7 +24,6 @@ extension UIContainer.View: ViewBuilder {
         set { (objc_setAssociatedObject(self, &kViewDidLoad, newValue, .OBJC_ASSOCIATION_RETAIN)) }
     }
 
-
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         if let template = (self as? TemplateView), self.subviews.isEmpty {

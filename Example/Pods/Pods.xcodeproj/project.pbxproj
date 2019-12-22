@@ -77,6 +77,7 @@
 
 /* Begin PBXFileReference section */
 		051CEEAE560163C1A234E8374E31A0E2 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		0C08841423AEDC9A000C2AE3 /* Blur+ViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Blur+ViewBuilder.swift"; sourceTree = "<group>"; };
 		0C9346C823AE7D8500A9E112 /* ViewBuild+UIKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "ViewBuild+UIKit.swift"; path = "UICreator/Classes/ViewBuild+UIKit.swift"; sourceTree = "<group>"; };
 		0C9346C923AE7D8500A9E112 /* ViewBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewBuilder.swift; path = UICreator/Classes/ViewBuilder.swift; sourceTree = "<group>"; };
 		0C9346CA23AE7D8500A9E112 /* View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = View.swift; path = UICreator/Classes/View.swift; sourceTree = "<group>"; };
@@ -206,6 +207,7 @@
 		0C9346DE23AE7D8600A9E112 /* UIContainer+Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				0C08841423AEDC9A000C2AE3 /* Blur+ViewBuilder.swift */,
 				0C9346DF23AE7D8600A9E112 /* Spacer+ViewBuilder.swift */,
 				0C9346E023AE7D8600A9E112 /* ViewControllerType+ViewBuilder.swift */,
 				0C9346E123AE7D8600A9E112 /* Content+ViewBuilder.swift */,
