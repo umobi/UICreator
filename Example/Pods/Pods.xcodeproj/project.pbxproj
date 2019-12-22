@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C28B82023AFB2E500C9E48B /* Dashed+ViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C28B81C23AFB03700C9E48B /* Dashed+ViewBuilder.swift */; };
+		0C28B82123AFB2E900C9E48B /* Gradient+ViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C28B81A23AFABC200C9E48B /* Gradient+ViewBuilder.swift */; };
+		0C28B82223AFB2EF00C9E48B /* Blur+ViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C08841423AEDC9A000C2AE3 /* Blur+ViewBuilder.swift */; };
 		0C9346F323AE7D8600A9E112 /* ViewBuild+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346C823AE7D8500A9E112 /* ViewBuild+UIKit.swift */; };
 		0C9346F423AE7D8600A9E112 /* ViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346C923AE7D8500A9E112 /* ViewBuilder.swift */; };
 		0C9346F523AE7D8600A9E112 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346CA23AE7D8500A9E112 /* View.swift */; };
@@ -78,6 +81,8 @@
 /* Begin PBXFileReference section */
 		051CEEAE560163C1A234E8374E31A0E2 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		0C08841423AEDC9A000C2AE3 /* Blur+ViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Blur+ViewBuilder.swift"; sourceTree = "<group>"; };
+		0C28B81A23AFABC200C9E48B /* Gradient+ViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Gradient+ViewBuilder.swift"; sourceTree = "<group>"; };
+		0C28B81C23AFB03700C9E48B /* Dashed+ViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dashed+ViewBuilder.swift"; sourceTree = "<group>"; };
 		0C9346C823AE7D8500A9E112 /* ViewBuild+UIKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "ViewBuild+UIKit.swift"; path = "UICreator/Classes/ViewBuild+UIKit.swift"; sourceTree = "<group>"; };
 		0C9346C923AE7D8500A9E112 /* ViewBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewBuilder.swift; path = UICreator/Classes/ViewBuilder.swift; sourceTree = "<group>"; };
 		0C9346CA23AE7D8500A9E112 /* View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = View.swift; path = UICreator/Classes/View.swift; sourceTree = "<group>"; };
@@ -208,6 +213,8 @@
 			isa = PBXGroup;
 			children = (
 				0C08841423AEDC9A000C2AE3 /* Blur+ViewBuilder.swift */,
+				0C28B81A23AFABC200C9E48B /* Gradient+ViewBuilder.swift */,
+				0C28B81C23AFB03700C9E48B /* Dashed+ViewBuilder.swift */,
 				0C9346DF23AE7D8600A9E112 /* Spacer+ViewBuilder.swift */,
 				0C9346E023AE7D8600A9E112 /* ViewControllerType+ViewBuilder.swift */,
 				0C9346E123AE7D8600A9E112 /* Content+ViewBuilder.swift */,
@@ -462,6 +469,9 @@
 				LastSwiftUpdateCheck = 1100;
 				LastUpgradeCheck = 1100;
 				TargetAttributes = {
+					1E4F04B02445F1E1E693328A2F47A2E5 = {
+						LastSwiftMigration = 1110;
+					};
 					CDB4BC381631A4B34A5AC514FC50B673 = {
 						LastSwiftMigration = 1110;
 					};
@@ -545,6 +555,7 @@
 				0C93470923AE7D8600A9E112 /* ViewControllerType+ViewBuilder.swift in Sources */,
 				0C93470523AE7D8600A9E112 /* Host.swift in Sources */,
 				0C93470F23AE7D8600A9E112 /* Stack.swift in Sources */,
+				0C28B82223AFB2EF00C9E48B /* Blur+ViewBuilder.swift in Sources */,
 				0C93470423AE7D8600A9E112 /* ViewBuilder+Navigation.swift in Sources */,
 				10A720BC38C4767848A52520B0E80DEA /* UICreator-dummy.m in Sources */,
 				0C9346FF23AE7D8600A9E112 /* UIControl+Control.swift in Sources */,
@@ -555,6 +566,7 @@
 				0C93470C23AE7D8600A9E112 /* Text.swift in Sources */,
 				0C93471923AE7D8600A9E112 /* ViewBuilder+Constraints.swift in Sources */,
 				0C9346F423AE7D8600A9E112 /* ViewBuilder.swift in Sources */,
+				0C28B82023AFB2E500C9E48B /* Dashed+ViewBuilder.swift in Sources */,
 				0C93471023AE7D8600A9E112 /* Navigation.swift in Sources */,
 				0C9346FC23AE7D8600A9E112 /* UILabel+Text.swift in Sources */,
 				0C93471123AE7D8600A9E112 /* UIButton+ViewBuilder.swift in Sources */,
@@ -562,6 +574,7 @@
 				0C93470D23AE7D8600A9E112 /* Label.swift in Sources */,
 				0C93471223AE7D8600A9E112 /* Image.swift in Sources */,
 				0C93471423AE7D8600A9E112 /* Child.swift in Sources */,
+				0C28B82123AFB2E900C9E48B /* Gradient+ViewBuilder.swift in Sources */,
 				0C93471823AE7D8600A9E112 /* Button.swift in Sources */,
 				0C93470A23AE7D8600A9E112 /* Content+ViewBuilder.swift in Sources */,
 			);
@@ -697,6 +710,7 @@
 			baseConfigurationReference = 2165A98611A14EED20F08E4D9A0AF728 /* Pods-UICreator_Example.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -719,6 +733,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -888,6 +903,7 @@
 			baseConfigurationReference = AB7E662490321D945418902B19127CFA /* Pods-UICreator_Example.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -910,6 +926,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
