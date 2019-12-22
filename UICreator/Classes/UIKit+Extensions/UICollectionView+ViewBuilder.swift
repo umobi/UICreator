@@ -128,6 +128,18 @@ public extension ViewBuilder where Self: CollectionLayout, Self.Layout: UICollec
         }
     }
 
+    func item(aspectRatioHeight constant: CGFloat) -> Self {
+        return self.appendLayout {
+            ($0 as? Self)?.dynamicCollectionViewLayout.itemSize = .init(width: $0.bounds.height * constant, height: $0.bounds.height)
+        }
+    }
+
+    func item(aspectRatioWidth constant: CGFloat) -> Self {
+        return self.appendLayout {
+            ($0 as? Self)?.dynamicCollectionViewLayout.itemSize = .init(width: $0.bounds.width, height: $0.bounds.width * constant)
+        }
+    }
+
     func item(estimatedSize: CGSize) -> Self {
         return self.appendRendered {
             ($0 as? Self)?.dynamicCollectionViewLayout.estimatedItemSize = estimatedSize

@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import UIContainer
 
-extension Dashed: ViewBuilder {
+extension Dashed {
     public convenience init(color: UIColor, pattern: [NSNumber] = [2, 3], _ content: () -> UIView) {
         self.init(content(), dash: pattern)
         _ = self.dash(color: color)
@@ -35,25 +35,5 @@ extension Dashed: ViewBuilder {
             _ = ($0 as? Self)?.apply(dashPattern: pattern)
                 .refresh()
         }
-    }
-
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
-    }
-
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        self.commitRendered()
-    }
-
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        self.commitInTheScene()
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        self.commitLayout()
     }
 }

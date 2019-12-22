@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import UIContainer
 
-extension Spacer: ViewBuilder {
+extension Spacer {
 
     public convenience init(top: CGFloat, bottom: CGFloat, leading: CGFloat, trailing: CGFloat, content: @escaping () -> UIView) {
         self.init(content(), top: top, bottom: bottom, leading: leading, trailing: trailing)
@@ -45,25 +45,5 @@ extension Spacer: ViewBuilder {
 
     public convenience init() {
         self.init(UIView(), spacing: 0)
-    }
-
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
-    }
-
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        self.commitRendered()
-    }
-
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        self.commitInTheScene()
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        self.commitLayout()
     }
 }

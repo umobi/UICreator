@@ -9,28 +9,8 @@ import Foundation
 import UIKit
 import UIContainer
 
-extension Rounder: ViewBuilder {
+extension Rounder {
     convenience public init(radius: CGFloat, content: @escaping () -> UIView) {
         self.init(content(), radius: radius)
-    }
-
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
-    }
-
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        self.commitRendered()
-    }
-
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        self.commitInTheScene()
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        self.commitLayout()
     }
 }
