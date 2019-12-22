@@ -95,7 +95,7 @@ public extension ViewBuilder {
 }
 
 public extension ViewBuilder {
-    func navigation(title color: UIColor) -> Self {
+    func navigation(titleColor color: UIColor) -> Self {
         return self.appendInTheScene {
                 guard let view = ($0 as? Self) else {
                     return
@@ -108,7 +108,7 @@ public extension ViewBuilder {
             }
     }
 
-    func navigation(title font: UIFont) -> Self {
+    func navigation(titleFont font: UIFont) -> Self {
         return self.appendInTheScene {
                 guard let view = ($0 as? Self) else {
                     return
@@ -138,7 +138,7 @@ public extension ViewBuilder {
     }
 
     @available(iOS 11.0, *)
-    func navigation(largeTitle color: UIColor) -> Self {
+    func navigation(largeTitleColor color: UIColor) -> Self {
         return self.appendInTheScene {
             guard let view = ($0 as? Self) else {
                 return
@@ -152,7 +152,7 @@ public extension ViewBuilder {
     }
 
     @available(iOS 11.0, *)
-    func navigation(largeTitle font: UIFont) -> Self {
+    func navigation(largeTitleFont font: UIFont) -> Self {
         return self.appendInTheScene {
             guard let view = ($0 as? Self) else {
                 return
@@ -166,14 +166,14 @@ public extension ViewBuilder {
     }
 
     @available(iOS 13.0, *)
-    func navigation(largeContent image: UIImage?) -> Self {
+    func navigation(largeContentImage image: UIImage?) -> Self {
         return self.appendInTheScene {
             ($0 as? Self)?.navigation?.navigationBar.largeContentImage = image
         }
     }
 
     @available(iOS 13.0, *)
-    func navigation(largeContent title: String?) -> Self {
+    func navigation(largeContentTitle title: String?) -> Self {
         return self.appendInTheScene {
             ($0 as? Self)?.navigation?.navigationBar.largeContentTitle = title
         }
