@@ -105,7 +105,9 @@ public extension ViewBuilder where Self: UITableView {
     }
 
     func background(_ content: @escaping () -> UIView) -> Self {
-        return self.add(Host(content))
+        self.appendInTheScene {
+            ($0 as? Self)?.backgroundView = Host(content)
+        }
     }
 
     func separator(effect: UIVisualEffect) -> Self {

@@ -47,7 +47,7 @@ public extension NavigationRepresentable {
         }) as? Container<UIViewController>)?.view as? UINavigationController
     }
 
-    public var navigationBar: UINavigationBar {
+    var navigationBar: UINavigationBar {
         return self.navigationController.navigationBar
     }
 

@@ -15,3 +15,29 @@ public class Host: UIContainer.View, ViewControllerType {
         _ = self.add(content())
     }
 }
+
+extension Host: ViewControllerAppearStates {
+    public func viewWillAppear(_ animated: Bool) {
+       self.subviews.forEach {
+           ($0 as? ViewControllerAppearStates)?.viewWillAppear(animated)
+       }
+    }
+
+    public func viewDidAppear(_ animated: Bool) {
+       self.subviews.forEach {
+           ($0 as? ViewControllerAppearStates)?.viewDidAppear(animated)
+       }
+    }
+
+    public func viewWillDisappear(_ animated: Bool) {
+       self.subviews.forEach {
+           ($0 as? ViewControllerAppearStates)?.viewWillDisappear(animated)
+       }
+    }
+
+    public func viewDidDisappear(_ animated: Bool) {
+       self.subviews.forEach {
+           ($0 as? ViewControllerAppearStates)?.viewDidDisappear(animated)
+       }
+    }
+}
