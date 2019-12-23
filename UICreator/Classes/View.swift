@@ -11,8 +11,6 @@ import UIContainer
 
 private var kViewDidLoad: UInt = 0
 
-public typealias View = UIContainer.View
-
 @objc extension UIContainer.View {
 
     private var didViewLoad: Bool {
