@@ -105,7 +105,9 @@ public extension ViewBuilder where Self: UITableView {
     }
 
     func background(_ content: @escaping () -> UIView) -> Self {
-        return self.add(Host(content))
+        self.appendBeforeRendering {
+            ($0 as? Self)?.backgroundView = Host(content)
+        }
     }
 
     func separator(effect: UIVisualEffect) -> Self {
@@ -139,15 +141,15 @@ public extension ViewBuilder where Self: UITableView {
         }
     }
 
-    func header(_ content: @escaping () -> UIView) -> Self {
+    func header(size: CGSize = .zero, _ content: @escaping () -> UIView) -> Self {
         return self.appendRendered {
-            ($0 as? Self)?.tableHeaderView = Host(content)
+            ($0 as? Self)?.tableHeaderView = Host(size: size, content)
         }
     }
 
-    func footer(_ content: @escaping () -> UIView) -> Self {
+    func footer(size: CGSize = .zero, _ content: @escaping () -> UIView) -> Self {
         return self.appendRendered {
-            ($0 as? Self)?.tableFooterView = Host(content)
+            ($0 as? Self)?.tableFooterView = Host(size: size, content)
         }
     }
 }

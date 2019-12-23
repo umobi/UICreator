@@ -11,6 +11,8 @@ import UIContainer
 
 public protocol NavigationRepresentable: TemplateView {
     var navigationLoader: (UIViewController) -> UINavigationController { get }
+    var navigationBar: UINavigationBar { get }
+
     init(_ content: @escaping () -> UIView)
 
     @discardableResult
@@ -39,10 +41,14 @@ class ContentHandler {
 }
 
 public extension NavigationRepresentable {
-    weak var navigationController: UINavigationController! {
+    internal weak var navigationController: UINavigationController! {
         return (self.subviews.first(where: {
             $0 is Container<UIViewController>
         }) as? Container<UIViewController>)?.view as? UINavigationController
+    }
+
+    var navigationBar: UINavigationBar {
+        return self.navigationController.navigationBar
     }
 
     private var content: ContentHandler? {

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C28B81F23AFB2E000C9E48B /* UICollectionView+ViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C28B81E23AFB2E000C9E48B /* UICollectionView+ViewBuilder.swift */; };
+		0C28B82023AFB2E500C9E48B /* Dashed+ViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C28B81C23AFB03700C9E48B /* Dashed+ViewBuilder.swift */; };
+		0C28B82123AFB2E900C9E48B /* Gradient+ViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C28B81A23AFABC200C9E48B /* Gradient+ViewBuilder.swift */; };
+		0C28B82223AFB2EF00C9E48B /* Blur+ViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C08841423AEDC9A000C2AE3 /* Blur+ViewBuilder.swift */; };
 		0C9346F323AE7D8600A9E112 /* ViewBuild+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346C823AE7D8500A9E112 /* ViewBuild+UIKit.swift */; };
 		0C9346F423AE7D8600A9E112 /* ViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346C923AE7D8500A9E112 /* ViewBuilder.swift */; };
 		0C9346F523AE7D8600A9E112 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346CA23AE7D8500A9E112 /* View.swift */; };
@@ -47,6 +51,7 @@
 		0C93471823AE7D8600A9E112 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346F023AE7D8600A9E112 /* Button.swift */; };
 		0C93471923AE7D8600A9E112 /* ViewBuilder+Constraints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346F123AE7D8600A9E112 /* ViewBuilder+Constraints.swift */; };
 		0C93471A23AE7D8600A9E112 /* UIView+Mode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346F223AE7D8600A9E112 /* UIView+Mode.swift */; };
+		0CF7EE6823AFEABC005EDC6A /* Collection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF7EE6623AFEA9E005EDC6A /* Collection.swift */; };
 		10A720BC38C4767848A52520B0E80DEA /* UICreator-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E7C1E1B5D136F5CB635DDE8786A868 /* UICreator-dummy.m */; };
 		1B2E5E9DD86C13AD483990487E4E4D76 /* Pods-UICreator_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = DADD9F6084F3910855908ABF70C37894 /* Pods-UICreator_Tests-dummy.m */; };
 		2D45A3531A9DAC1937364ADF21B7C96A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
@@ -77,6 +82,10 @@
 
 /* Begin PBXFileReference section */
 		051CEEAE560163C1A234E8374E31A0E2 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		0C08841423AEDC9A000C2AE3 /* Blur+ViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Blur+ViewBuilder.swift"; sourceTree = "<group>"; };
+		0C28B81A23AFABC200C9E48B /* Gradient+ViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Gradient+ViewBuilder.swift"; sourceTree = "<group>"; };
+		0C28B81C23AFB03700C9E48B /* Dashed+ViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dashed+ViewBuilder.swift"; sourceTree = "<group>"; };
+		0C28B81E23AFB2E000C9E48B /* UICollectionView+ViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView+ViewBuilder.swift"; sourceTree = "<group>"; };
 		0C9346C823AE7D8500A9E112 /* ViewBuild+UIKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "ViewBuild+UIKit.swift"; path = "UICreator/Classes/ViewBuild+UIKit.swift"; sourceTree = "<group>"; };
 		0C9346C923AE7D8500A9E112 /* ViewBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewBuilder.swift; path = UICreator/Classes/ViewBuilder.swift; sourceTree = "<group>"; };
 		0C9346CA23AE7D8500A9E112 /* View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = View.swift; path = UICreator/Classes/View.swift; sourceTree = "<group>"; };
@@ -117,6 +126,7 @@
 		0C9346F023AE7D8600A9E112 /* Button.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
 		0C9346F123AE7D8600A9E112 /* ViewBuilder+Constraints.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "ViewBuilder+Constraints.swift"; path = "UICreator/Classes/ViewBuilder+Constraints.swift"; sourceTree = "<group>"; };
 		0C9346F223AE7D8600A9E112 /* UIView+Mode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UIView+Mode.swift"; path = "UICreator/Classes/UIView+Mode.swift"; sourceTree = "<group>"; };
+		0CF7EE6623AFEA9E005EDC6A /* Collection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Collection.swift; sourceTree = "<group>"; };
 		14CB1E5FF33F6496D92F2D453F554956 /* UICreator.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = UICreator.modulemap; sourceTree = "<group>"; };
 		16EDA50CD75EDCD98EFADB0BD963864C /* UICreator-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UICreator-prefix.pch"; sourceTree = "<group>"; };
 		17713BC37052DDF97BB9C03D326E26B5 /* UICreator.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; path = UICreator.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -191,6 +201,7 @@
 				0C9346CD23AE7D8500A9E112 /* UIStackView+ViewBuilder.swift */,
 				0C9346CE23AE7D8500A9E112 /* UITextField+Text.swift */,
 				0C9346CF23AE7D8500A9E112 /* UIScrollView+ViewBuilder.swift */,
+				0C28B81E23AFB2E000C9E48B /* UICollectionView+ViewBuilder.swift */,
 				0C9346D023AE7D8500A9E112 /* UITableView+ViewBuilder.swift */,
 				0C9346D123AE7D8500A9E112 /* UITextView+Text.swift */,
 				0C9346D223AE7D8500A9E112 /* UILabel+Text.swift */,
@@ -206,6 +217,9 @@
 		0C9346DE23AE7D8600A9E112 /* UIContainer+Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				0C08841423AEDC9A000C2AE3 /* Blur+ViewBuilder.swift */,
+				0C28B81A23AFABC200C9E48B /* Gradient+ViewBuilder.swift */,
+				0C28B81C23AFB03700C9E48B /* Dashed+ViewBuilder.swift */,
 				0C9346DF23AE7D8600A9E112 /* Spacer+ViewBuilder.swift */,
 				0C9346E023AE7D8600A9E112 /* ViewControllerType+ViewBuilder.swift */,
 				0C9346E123AE7D8600A9E112 /* Content+ViewBuilder.swift */,
@@ -218,6 +232,7 @@
 		0C9346E423AE7D8600A9E112 /* UIKit */ = {
 			isa = PBXGroup;
 			children = (
+				0CF7EE6623AFEA9E005EDC6A /* Collection.swift */,
 				0C9346E523AE7D8600A9E112 /* Label.swift */,
 				0C9346E623AE7D8600A9E112 /* Scroll.swift */,
 				0C9346E723AE7D8600A9E112 /* Stack.swift */,
@@ -460,6 +475,9 @@
 				LastSwiftUpdateCheck = 1100;
 				LastUpgradeCheck = 1100;
 				TargetAttributes = {
+					1E4F04B02445F1E1E693328A2F47A2E5 = {
+						LastSwiftMigration = 1110;
+					};
 					CDB4BC381631A4B34A5AC514FC50B673 = {
 						LastSwiftMigration = 1110;
 					};
@@ -540,9 +558,11 @@
 				0C93470823AE7D8600A9E112 /* Spacer+ViewBuilder.swift in Sources */,
 				0C93471523AE7D8600A9E112 /* TextField.swift in Sources */,
 				0C93471723AE7D8600A9E112 /* TextView.swift in Sources */,
+				0CF7EE6823AFEABC005EDC6A /* Collection.swift in Sources */,
 				0C93470923AE7D8600A9E112 /* ViewControllerType+ViewBuilder.swift in Sources */,
 				0C93470523AE7D8600A9E112 /* Host.swift in Sources */,
 				0C93470F23AE7D8600A9E112 /* Stack.swift in Sources */,
+				0C28B82223AFB2EF00C9E48B /* Blur+ViewBuilder.swift in Sources */,
 				0C93470423AE7D8600A9E112 /* ViewBuilder+Navigation.swift in Sources */,
 				10A720BC38C4767848A52520B0E80DEA /* UICreator-dummy.m in Sources */,
 				0C9346FF23AE7D8600A9E112 /* UIControl+Control.swift in Sources */,
@@ -553,6 +573,7 @@
 				0C93470C23AE7D8600A9E112 /* Text.swift in Sources */,
 				0C93471923AE7D8600A9E112 /* ViewBuilder+Constraints.swift in Sources */,
 				0C9346F423AE7D8600A9E112 /* ViewBuilder.swift in Sources */,
+				0C28B82023AFB2E500C9E48B /* Dashed+ViewBuilder.swift in Sources */,
 				0C93471023AE7D8600A9E112 /* Navigation.swift in Sources */,
 				0C9346FC23AE7D8600A9E112 /* UILabel+Text.swift in Sources */,
 				0C93471123AE7D8600A9E112 /* UIButton+ViewBuilder.swift in Sources */,
@@ -560,8 +581,10 @@
 				0C93470D23AE7D8600A9E112 /* Label.swift in Sources */,
 				0C93471223AE7D8600A9E112 /* Image.swift in Sources */,
 				0C93471423AE7D8600A9E112 /* Child.swift in Sources */,
+				0C28B82123AFB2E900C9E48B /* Gradient+ViewBuilder.swift in Sources */,
 				0C93471823AE7D8600A9E112 /* Button.swift in Sources */,
 				0C93470A23AE7D8600A9E112 /* Content+ViewBuilder.swift in Sources */,
+				0C28B81F23AFB2E000C9E48B /* UICollectionView+ViewBuilder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -695,6 +718,7 @@
 			baseConfigurationReference = 2165A98611A14EED20F08E4D9A0AF728 /* Pods-UICreator_Example.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -717,6 +741,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -886,6 +911,7 @@
 			baseConfigurationReference = AB7E662490321D945418902B19127CFA /* Pods-UICreator_Example.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -908,6 +934,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";

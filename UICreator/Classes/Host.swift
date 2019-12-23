@@ -10,27 +10,34 @@ import UIKit
 import UIContainer
 
 public class Host: UIContainer.View, ViewControllerType {
-    init(_ content: () -> UIView) {
-        super.init(frame: .zero)
+    convenience public init(size: CGSize = .zero, _ content: () -> UIView) {
+        self.init(frame: .init(origin: .zero, size: size))
         _ = self.add(content())
     }
+}
 
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
+extension Host: ViewControllerAppearStates {
+    public func viewWillAppear(_ animated: Bool) {
+       self.subviews.forEach {
+           ($0 as? ViewControllerAppearStates)?.viewWillAppear(animated)
+       }
     }
 
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        self.commitRendered()
+    public func viewDidAppear(_ animated: Bool) {
+       self.subviews.forEach {
+           ($0 as? ViewControllerAppearStates)?.viewDidAppear(animated)
+       }
     }
 
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        self.commitInTheScene()
+    public func viewWillDisappear(_ animated: Bool) {
+       self.subviews.forEach {
+           ($0 as? ViewControllerAppearStates)?.viewWillDisappear(animated)
+       }
     }
 
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    public func viewDidDisappear(_ animated: Bool) {
+       self.subviews.forEach {
+           ($0 as? ViewControllerAppearStates)?.viewDidDisappear(animated)
+       }
     }
 }

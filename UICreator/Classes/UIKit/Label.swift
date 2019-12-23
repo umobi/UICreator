@@ -24,4 +24,9 @@ public class Label: UILabel & Text {
         super.didMoveToWindow()
         self.commitInTheScene()
     }
+
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        self.commitLayout()
+    }
 }

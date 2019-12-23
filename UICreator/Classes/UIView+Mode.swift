@@ -11,6 +11,7 @@ import UIKit
 private var kNotRenderedHandler: UInt = 0
 private var kRenderedHandler: UInt = 0
 private var kInTheSceneHandler: UInt = 0
+private var kOnLayoutHandler: UInt = 0
 
 internal extension UIView {
 
@@ -69,6 +70,11 @@ internal extension UIView {
         set { objc_setAssociatedObject(self, &kInTheSceneHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
+    var layoutHandler: Handler? {
+        get { objc_getAssociatedObject(self, &kOnLayoutHandler) as? Handler }
+        set { objc_setAssociatedObject(self, &kOnLayoutHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    }
+
     /// This create the `Handler` for callback associated to`UIView.Mode.notRendered`
     private func beforeRendering(_ handler: @escaping (UIView) -> Void) -> Self {
         self.notRenderedHandler = .init(handler)
@@ -84,6 +90,11 @@ internal extension UIView {
     /// This create the `Handler` for callback associated to `UIView.Mode.inTheScene`
     private func inTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
         self.inTheSceneHandler = .init(handler)
+        return self
+    }
+
+    private func layout(_ handler: @escaping (UIView) -> Void) -> Self {
+        self.layoutHandler = .init(handler)
         return self
     }
 
@@ -141,6 +152,14 @@ internal extension UIView {
         return self.inTheScene {
             handler($0)
             allinTheScene?.commit(in: $0)
+        }
+    }
+
+    func appendLayout(_ handler: @escaping (UIView) -> Void) -> Self {
+        let allLayout = self.layoutHandler
+        return self.layout {
+            handler($0)
+            allLayout?.commit(in: $0)
         }
     }
 }

@@ -10,23 +10,35 @@ import SnapKit
 
 extension UIView {
     fileprivate var realSuperview: UIView? {
-        return sequence(state: self.superview, next: { $0?.superview }).first(where: {
+        guard let superview = self.superview else {
+            return nil
+        }
+
+        return sequence(first: superview, next: { $0.superview }).first(where: {
             !($0 is Host)
         })
     }
 }
 
 public extension ViewBuilder {
-    func safeArea(topEqualTo constant: CGFloat = 0, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func safeArea(topEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
         return self.appendInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
             }
 
-            $0.snp.makeConstraints {
-                $0.top.equalTo(view.snp.topMargin)
-                    .offset(constant)
-                    .priority(priority)
+            if #available(iOS 11, *) {
+                $0.snp.makeConstraints {
+                    $0.top.equalTo(view.safeAreaLayoutGuide.snp.topMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
+            } else {
+                $0.snp.makeConstraints {
+                    $0.top.equalTo(view.snp.topMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
             }
         }
     }
@@ -37,10 +49,18 @@ public extension ViewBuilder {
                 return
             }
 
-            $0.snp.makeConstraints {
-                $0.top.greaterThanOrEqualTo(view.snp.topMargin)
-                    .offset(constant)
-                    .priority(priority)
+            if #available(iOS 11, *) {
+                $0.snp.makeConstraints {
+                    $0.top.greaterThanOrEqualTo(view.safeAreaLayoutGuide.snp.topMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
+            } else {
+                $0.snp.makeConstraints {
+                    $0.top.greaterThanOrEqualTo(view.snp.topMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
             }
         }
     }
@@ -51,25 +71,42 @@ public extension ViewBuilder {
                 return
             }
 
-            $0.snp.makeConstraints {
-                $0.top.lessThanOrEqualTo(view.snp.topMargin)
-                    .offset(constant)
-                    .priority(priority)
+            if #available(iOS 11, *) {
+                $0.snp.makeConstraints {
+                    $0.top.lessThanOrEqualTo(view.safeAreaLayoutGuide.snp.topMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
+            } else {
+                $0.snp.makeConstraints {
+                    $0.top.lessThanOrEqualTo(view.snp.topMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
             }
         }
     }
 
-    func safeArea(bottomEqualTo constant: CGFloat = 0, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func safeArea(bottomEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
         return self.appendInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
             }
 
-            $0.snp.makeConstraints {
-                $0.bottom.equalTo(view.snp.bottomMargin)
-                    .offset(constant)
-                    .priority(priority)
+            if #available(iOS 11, *) {
+                $0.snp.makeConstraints {
+                    $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottomMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
+            } else {
+                $0.snp.makeConstraints {
+                    $0.bottom.equalTo(view.snp.bottomMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
             }
+
         }
     }
 
@@ -79,10 +116,18 @@ public extension ViewBuilder {
                 return
             }
 
-            $0.snp.makeConstraints {
-                $0.bottom.greaterThanOrEqualTo(view.snp.bottomMargin)
-                    .offset(-constant)
-                    .priority(priority)
+            if #available(iOS 11, *) {
+                $0.snp.makeConstraints {
+                    $0.bottom.greaterThanOrEqualTo(view.safeAreaLayoutGuide.snp.bottomMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
+            } else {
+                $0.snp.makeConstraints {
+                    $0.bottom.greaterThanOrEqualTo(view.snp.bottomMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
             }
         }
     }
@@ -93,24 +138,40 @@ public extension ViewBuilder {
                 return
             }
 
-            $0.snp.makeConstraints {
-                $0.bottom.lessThanOrEqualTo(view.snp.bottomMargin)
-                    .offset(-constant)
-                    .priority(priority)
+            if #available(iOS 11, *) {
+                $0.snp.makeConstraints {
+                    $0.bottom.lessThanOrEqualTo(view.safeAreaLayoutGuide.snp.bottomMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
+            } else {
+                $0.snp.makeConstraints {
+                    $0.bottom.lessThanOrEqualTo(view.snp.bottomMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
             }
         }
     }
 
-    func safeArea(leadingEqualTo constant: CGFloat = 0, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func safeArea(leadingEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
         return self.appendInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
             }
 
-            $0.snp.makeConstraints {
-                $0.leading.equalTo(view.snp.leadingMargin)
-                    .offset(constant)
-                    .priority(priority)
+            if #available(iOS 11, *) {
+                $0.snp.makeConstraints {
+                    $0.leading.lessThanOrEqualTo(view.safeAreaLayoutGuide.snp.leadingMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
+            } else {
+                $0.snp.makeConstraints {
+                    $0.leading.lessThanOrEqualTo(view.snp.leadingMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
             }
         }
     }
@@ -121,10 +182,18 @@ public extension ViewBuilder {
                 return
             }
 
-            $0.snp.makeConstraints {
-                $0.leading.greaterThanOrEqualTo(view.snp.leadingMargin)
-                    .offset(constant)
-                    .priority(priority)
+            if #available(iOS 11, *) {
+                $0.snp.makeConstraints {
+                    $0.leading.greaterThanOrEqualTo(view.safeAreaLayoutGuide.snp.leadingMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
+            } else {
+                $0.snp.makeConstraints {
+                    $0.leading.greaterThanOrEqualTo(view.snp.leadingMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
             }
         }
     }
@@ -135,24 +204,40 @@ public extension ViewBuilder {
                 return
             }
 
-            $0.snp.makeConstraints {
-                $0.leading.lessThanOrEqualTo(view.snp.leadingMargin)
-                    .offset(constant)
-                    .priority(priority)
+            if #available(iOS 11, *) {
+                $0.snp.makeConstraints {
+                    $0.leading.lessThanOrEqualTo(view.safeAreaLayoutGuide.snp.leadingMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
+            } else {
+                $0.snp.makeConstraints {
+                    $0.leading.lessThanOrEqualTo(view.snp.leadingMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
             }
         }
     }
 
-    func safeArea(trailingEqualTo constant: CGFloat = 0, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func safeArea(trailingEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
         return self.appendInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
             }
 
-            $0.snp.makeConstraints {
-                $0.trailing.equalTo(view.snp.trailingMargin)
-                    .offset(constant)
-                    .priority(priority)
+            if #available(iOS 11, *) {
+                $0.snp.makeConstraints {
+                    $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailingMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
+            } else {
+                $0.snp.makeConstraints {
+                    $0.trailing.equalTo(view.snp.trailingMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
             }
         }
     }
@@ -163,10 +248,18 @@ public extension ViewBuilder {
                 return
             }
 
-            $0.snp.makeConstraints {
-                $0.trailing.greaterThanOrEqualTo(view.snp.trailingMargin)
-                    .offset(-constant)
-                    .priority(priority)
+            if #available(iOS 11, *) {
+                $0.snp.makeConstraints {
+                    $0.trailing.greaterThanOrEqualTo(view.safeAreaLayoutGuide.snp.trailingMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
+            } else {
+                $0.snp.makeConstraints {
+                    $0.trailing.greaterThanOrEqualTo(view.snp.trailingMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
             }
         }
     }
@@ -177,10 +270,18 @@ public extension ViewBuilder {
                 return
             }
 
-            $0.snp.makeConstraints {
-                $0.trailing.lessThanOrEqualTo(view.snp.trailingMargin)
-                    .offset(-constant)
-                    .priority(priority)
+            if #available(iOS 11, *) {
+                $0.snp.makeConstraints {
+                    $0.trailing.lessThanOrEqualTo(view.safeAreaLayoutGuide.snp.trailingMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
+            } else {
+                $0.snp.makeConstraints {
+                    $0.trailing.lessThanOrEqualTo(view.snp.trailingMargin)
+                        .offset(constant)
+                        .priority(priority)
+                }
             }
         }
     }

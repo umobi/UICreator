@@ -36,25 +36,32 @@ public protocol ViewBuilder: UIView {
     /// It is executed in `didMoveToWindow()` and depends of superview to call the `commitInTheScene()`.
     func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self
 
+    func onLayout(_ handler: @escaping (UIView) -> Void) -> Self
+
     /// Subviews that has commits that needs to be done.
     var watchingViews: [UIView] { get }
 }
 
 public extension ViewBuilder {
-    func onRendered(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.appendBeforeRendering(handler)
-    }
-
-    func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.appendRendered(handler)
-    }
 
     func onNotRendered(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.appendBeforeRendering(handler)
     }
+    
+    func onRendered(_ handler: @escaping (UIView) -> Void) -> Self {
+        return self.appendRendered(handler)
+    }
+
+    func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
+        return self.appendInTheScene(handler)
+    }
+
+    func onLayout(_ handler: @escaping (UIView) -> Void) -> Self {
+        return self.appendLayout(handler)
+    }
 
     func commitNotRendered() {
-        self.subviews.forEach {
+        self.watchingViews.forEach {
             ($0 as? ViewBuilder)?.notRenderedHandler?.commit(in: $0)
             ($0 as? ViewBuilder)?.notRenderedHandler = nil
         }
@@ -76,9 +83,15 @@ public extension ViewBuilder {
             return
         }
 
-        self.subviews.forEach {
+        self.watchingViews.forEach {
             ($0 as? ViewBuilder)?.inTheSceneHandler?.commit(in: $0)
             ($0 as? ViewBuilder)?.inTheSceneHandler = nil
+        }
+    }
+
+    func commitLayout() {
+        self.watchingViews.forEach {
+            ($0 as? ViewBuilder)?.layoutHandler?.commit(in: $0)
         }
     }
 
