@@ -43,16 +43,17 @@ public protocol ViewBuilder: UIView {
 }
 
 public extension ViewBuilder {
-    func onRendered(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.appendBeforeRendering(handler)
-    }
-
-    func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.appendRendered(handler)
-    }
 
     func onNotRendered(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.appendBeforeRendering(handler)
+    }
+    
+    func onRendered(_ handler: @escaping (UIView) -> Void) -> Self {
+        return self.appendRendered(handler)
+    }
+
+    func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
+        return self.appendInTheScene(handler)
     }
 
     func onLayout(_ handler: @escaping (UIView) -> Void) -> Self {

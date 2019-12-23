@@ -15,6 +15,12 @@ public extension ViewBuilder {
         }
     }
 
+    func zIndex(_ zIndex: CGFloat) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.layer.zPosition = zIndex
+        }
+    }
+
     func border(color: UIColor?) -> Self {
         return self.appendBeforeRendering {
             $0.layer.borderColor = color?.cgColor
