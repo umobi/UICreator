@@ -46,4 +46,10 @@ public extension Text where Self: UILabel {
             ($0 as? Self)?.textAlignment = alignment
         }
     }
+
+    func number(ofLines number: Int) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.numberOfLines = number
+        }
+    }
 }

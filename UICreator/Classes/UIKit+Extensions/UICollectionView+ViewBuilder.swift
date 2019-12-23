@@ -57,7 +57,7 @@ public extension ViewBuilder where Self: UICollectionView {
     }
 
     func background(_ content: @escaping () -> UIView) -> Self {
-        self.appendInTheScene {
+        self.appendBeforeRendering {
             ($0 as? Self)?.backgroundView = Host(content)
         }
     }
