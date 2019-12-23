@@ -406,7 +406,7 @@ fileprivate extension UIView {
     }
 }
 
-public extension UIView {
+public extension ViewBuilder {
     func onTapMaker(_ tapConfigurator: (TapGesture) -> TapGesture) -> Self {
         self.addGestureRecognizer(tapConfigurator(tapConfigurator(TapGesture(target: self))))
         return self
@@ -449,7 +449,7 @@ public extension UIView {
     }
 }
 
-public extension UIView {
+public extension ViewBuilder {
 
     func onTap(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onTapMaker { [unowned self] in
