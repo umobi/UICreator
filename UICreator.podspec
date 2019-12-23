@@ -33,7 +33,7 @@ UICreator is a replacement for storyboard and xib files. Like Fluter, ReactNativ
 
   s.source_files = 'UICreator/Classes/**/*'
 
-  s.dependency 'UIContainer', '~> 1.2.0-beta.1'
+  s.dependency 'UIContainer', '~> 1.2.0-beta.2'
   s.dependency 'SnapKit', '~> 5.0.1'
   # s.resource_bundles = {
   #   'UICreator' => ['UICreator/Assets/*.png']
