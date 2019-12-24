@@ -33,11 +33,11 @@ public class Content: ContentView, ViewBuilder {
 }
 
 public func Center(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
-    return .init(mode: .top, priority: priority, content: content)
+    return .init(mode: .center, priority: priority, content: content)
 }
 
 public func TopLeft(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
-    return .init(mode: .top, priority: priority, content: content)
+    return .init(mode: .topLeft, priority: priority, content: content)
 }
 
 public func Top(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
