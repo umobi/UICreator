@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import UIContainer
 
-public class Host: UIContainer.View, ViewControllerType {
+public class Host: RootView, ViewControllerType {
     convenience public init(size: CGSize = .zero, _ content: () -> UIView) {
         self.init(frame: .init(origin: .zero, size: size))
         _ = self.add(content())
