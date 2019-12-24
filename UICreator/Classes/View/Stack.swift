@@ -30,20 +30,47 @@ public class Stack: UIStackView, ViewBuilder {
     }
 }
 
+public func HStack(spacing: CGFloat = 0, _ subviews: Subview) -> Stack {
+    return .init(axis: .horizontal, spacing: spacing, subviews)
+}
+
+public func VStack(spacing: CGFloat = 0, _ subviews: Subview) -> Stack {
+    return .init(axis: .vertical, spacing: spacing, subviews)
+}
+
+public func HStack(spacing: CGFloat = 0, _ subviews: UIView...) -> Stack {
+    return .init(axis: .horizontal, spacing: spacing, subviews)
+}
+
+public func VStack(spacing: CGFloat = 0, _ subviews: UIView...) -> Stack {
+    return .init(axis: .vertical, spacing: spacing, subviews)
+}
+
+public func HStack(spacing: CGFloat = 0, _ subviews: [UIView]) -> Stack {
+    return .init(axis: .horizontal, spacing: spacing, subviews)
+}
+
+public func VStack(spacing: CGFloat = 0, _ subviews: [UIView]) -> Stack {
+    return .init(axis: .vertical, spacing: spacing, subviews)
+}
+
 public extension ViewBuilder where Self: UIStackView {
-    init(axis: NSLayoutConstraint.Axis = .vertical, _ subview: Subview) {
+    init(axis: NSLayoutConstraint.Axis = .vertical, spacing: CGFloat = 0, _ subview: Subview) {
         self.init(arrangedSubviews: subview.views)
-        _ = self.axis(axis)
+        self.axis = axis
+        self.spacing = spacing
     }
 
-    init(axis: NSLayoutConstraint.Axis = .vertical, _ views: UIView...) {
+    init(axis: NSLayoutConstraint.Axis = .vertical, spacing: CGFloat = 0, _ views: UIView...) {
         self.init(arrangedSubviews: views)
-        _ = self.axis(axis)
+        self.axis = axis
+        self.spacing = spacing
     }
 
-    init(axis: NSLayoutConstraint.Axis = .vertical, _ views: [UIView]) {
+    init(axis: NSLayoutConstraint.Axis = .vertical, spacing: CGFloat = 0, _ views: [UIView]) {
         self.init(arrangedSubviews: views)
-        _ = self.axis(axis)
+        self.axis = axis
+        self.spacing = spacing
     }
 
     var watchingViews: [UIView] {

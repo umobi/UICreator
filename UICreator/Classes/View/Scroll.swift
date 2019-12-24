@@ -41,6 +41,15 @@ public class Scroll: ScrollView, ViewBuilder, HasViewDelegate {
         self.commitLayout()
     }
 }
+
+public func VScroll(_ content: @escaping () -> UIView) -> Scroll {
+    return .init(axis: .vertical, content: content)
+}
+
+public func HScroll(_ content: @escaping () -> UIView) -> Scroll {
+    return .init(axis: .horizontal, content: content)
+}
+
 public extension ViewBuilder where Self: UIScrollView {
     @available(iOS 11.0, *)
     func insets(behavior: UIScrollView.ContentInsetAdjustmentBehavior) -> Self {

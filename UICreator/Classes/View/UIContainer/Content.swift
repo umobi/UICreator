@@ -32,46 +32,50 @@ public class Content: ContentView, ViewBuilder {
     }
 }
 
-public func Center(content: @escaping () -> UIView) -> Content {
-    return .init(mode: .top, content: content)
+public func Center(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+    return .init(mode: .top, priority: priority, content: content)
 }
 
-public func TopLeft(content: @escaping () -> UIView) -> Content {
-    return .init(mode: .top, content: content)
+public func TopLeft(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+    return .init(mode: .top, priority: priority, content: content)
 }
 
-public func Top(content: @escaping () -> UIView) -> Content {
-    return .init(mode: .top, content: content)
+public func Top(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+    return .init(mode: .top, priority: priority, content: content)
 }
 
-public func TopRight(content: @escaping () -> UIView) -> ContentView {
-    return .init(mode: .topRight, content: content)
+public func TopRight(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+    return .init(mode: .topRight, priority: priority, content: content)
 }
 
-public func Left(content: @escaping () -> UIView) -> ContentView {
-    return .init(mode: .left, content: content)
+public func Left(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+    return .init(mode: .left, priority: priority, content: content)
 }
 
-public func Right(content: @escaping () -> UIView) -> ContentView {
-    return .init(mode: .right, content: content)
+public func Right(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+    return .init(mode: .right, priority: priority, content: content)
 }
 
-public func BottomLeft(content: @escaping () -> UIView) -> ContentView {
-    return .init(mode: .bottomLeft, content: content)
+public func BottomLeft(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+    return .init(mode: .bottomLeft, priority: priority, content: content)
 }
 
-public func Bottom(content: @escaping () -> UIView) -> ContentView {
-    return .init(mode: .bottom, content: content)
+public func Bottom(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+    return .init(mode: .bottom, priority: priority, content: content)
 }
 
-public func BottomRight(content: @escaping () -> UIView) -> ContentView {
-    return .init(mode: .bottomRight, content: content)
+public func BottomRight(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+    return .init(mode: .bottomRight, priority: priority, content: content)
 }
 
 public extension ViewBuilder where Self: ContentView {
 
     init(mode: ContentMode = .center, content: @escaping () -> UIView) {
         self.init(content(), contentMode: mode)
+    }
+
+    init(mode: ContentMode = .center, priority: ConstraintPriority = .required, content: @escaping () -> UIView) {
+        self.init(content(), contentMode: mode, priority: priority)
     }
 
     func content(mode: UIView.ContentMode) -> Self {
