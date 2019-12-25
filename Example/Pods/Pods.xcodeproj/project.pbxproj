@@ -16,6 +16,7 @@
 		0C0FACF723B258FD00E6B2FC /* TapGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACEF23B258FD00E6B2FC /* TapGesture.swift */; };
 		0C0FACF823B258FD00E6B2FC /* HoverGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACF023B258FD00E6B2FC /* HoverGesture.swift */; };
 		0C0FACF923B258FD00E6B2FC /* PinchGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACF123B258FD00E6B2FC /* PinchGesture.swift */; };
+		0C6760FF23B3E8690037EC98 /* Switch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6760FE23B3E8690037EC98 /* Switch.swift */; };
 		0C9346F323AE7D8600A9E112 /* ViewBuilder+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346C823AE7D8500A9E112 /* ViewBuilder+UIKit.swift */; };
 		0C9346F423AE7D8600A9E112 /* ViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346C923AE7D8500A9E112 /* ViewBuilder.swift */; };
 		0C9346F523AE7D8600A9E112 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346CA23AE7D8500A9E112 /* RootView.swift */; };
@@ -92,6 +93,7 @@
 		0C0FACEF23B258FD00E6B2FC /* TapGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TapGesture.swift; sourceTree = "<group>"; };
 		0C0FACF023B258FD00E6B2FC /* HoverGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HoverGesture.swift; sourceTree = "<group>"; };
 		0C0FACF123B258FD00E6B2FC /* PinchGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinchGesture.swift; sourceTree = "<group>"; };
+		0C6760FE23B3E8690037EC98 /* Switch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Switch.swift; sourceTree = "<group>"; };
 		0C9346C823AE7D8500A9E112 /* ViewBuilder+UIKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "ViewBuilder+UIKit.swift"; path = "UICreator/Classes/ViewBuilder+UIKit.swift"; sourceTree = "<group>"; };
 		0C9346C923AE7D8500A9E112 /* ViewBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewBuilder.swift; path = UICreator/Classes/ViewBuilder.swift; sourceTree = "<group>"; };
 		0C9346CA23AE7D8500A9E112 /* RootView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RootView.swift; path = UICreator/Classes/RootView.swift; sourceTree = "<group>"; };
@@ -236,6 +238,7 @@
 		0C9346E423AE7D8600A9E112 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				0C6760FE23B3E8690037EC98 /* Switch.swift */,
 				0CAA4BF923B267C300DD5DDF /* UIContainer */,
 				0CAA4BED23B267A200DD5DDF /* Collection */,
 				0CAA4BF123B267A200DD5DDF /* Navigation */,
@@ -584,6 +587,7 @@
 				0C93470123AE7D8600A9E112 /* TemplateView.swift in Sources */,
 				0C93470323AE7D8600A9E112 /* Control.swift in Sources */,
 				0C9346F623AE7D8600A9E112 /* HasViewDataSource.swift in Sources */,
+				0C6760FF23B3E8690037EC98 /* Switch.swift in Sources */,
 				0C93471A23AE7D8600A9E112 /* UIView+Mode.swift in Sources */,
 				0C9346FD23AE7D8600A9E112 /* Gesture.swift in Sources */,
 				0C93471623AE7D8600A9E112 /* Rounder.swift in Sources */,
