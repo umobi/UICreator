@@ -15,6 +15,12 @@ public extension ViewBuilder {
         }
     }
 
+    func tintColor(_ color: UIColor?) -> Self {
+        self.appendBeforeRendering {
+            $0.tintColor = color
+        }
+    }
+
     func zIndex(_ zIndex: CGFloat) -> Self {
         self.appendBeforeRendering {
             ($0 as? Self)?.layer.zPosition = zIndex

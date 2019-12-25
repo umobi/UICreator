@@ -72,9 +72,7 @@ public extension ViewBuilder where Self: UIButton {
 
 public extension ViewBuilder where Self: UIButton & Control {
     func onTouchInside(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.appendRendered {
-            _ = ($0 as? Self)?.onEvent(.touchUpInside, handler)
-        }
+        self.onEvent(.touchUpInside, handler)
     }
 }
 

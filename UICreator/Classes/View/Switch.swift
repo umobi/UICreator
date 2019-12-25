@@ -70,9 +70,7 @@ public extension ViewBuilder where Self: Switch {
 
 public extension ViewBuilder where Self: UISwitch & Control {
     func onValueChanged(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.appendRendered {
-            _ = ($0 as? Self)?.onEvent(.valueChanged, handler)
-        }
+        return self.onEvent(.valueChanged, handler)
     }
 }
 #endif

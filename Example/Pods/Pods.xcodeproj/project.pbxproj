@@ -18,6 +18,8 @@
 		0C0FACF923B258FD00E6B2FC /* PinchGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACF123B258FD00E6B2FC /* PinchGesture.swift */; };
 		0C6760FF23B3E8690037EC98 /* Switch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6760FE23B3E8690037EC98 /* Switch.swift */; };
 		0C7E8A9623B3FA5D007E480B /* TextKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7E8A9523B3FA5D007E480B /* TextKeyboard.swift */; };
+		0C7E8A9823B403B3007E480B /* DatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7E8A9723B403B3007E480B /* DatePicker.swift */; };
+		0C7E8A9A23B40AFF007E480B /* Input.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7E8A9923B40AFF007E480B /* Input.swift */; };
 		0C9346F323AE7D8600A9E112 /* ViewBuilder+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346C823AE7D8500A9E112 /* ViewBuilder+UIKit.swift */; };
 		0C9346F423AE7D8600A9E112 /* ViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346C923AE7D8500A9E112 /* ViewBuilder.swift */; };
 		0C9346F523AE7D8600A9E112 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346CA23AE7D8500A9E112 /* RootView.swift */; };
@@ -96,6 +98,8 @@
 		0C0FACF123B258FD00E6B2FC /* PinchGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinchGesture.swift; sourceTree = "<group>"; };
 		0C6760FE23B3E8690037EC98 /* Switch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Switch.swift; sourceTree = "<group>"; };
 		0C7E8A9523B3FA5D007E480B /* TextKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TextKeyboard.swift; path = UICreator/Classes/TextKeyboard.swift; sourceTree = "<group>"; };
+		0C7E8A9723B403B3007E480B /* DatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePicker.swift; sourceTree = "<group>"; };
+		0C7E8A9923B40AFF007E480B /* Input.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Input.swift; sourceTree = "<group>"; };
 		0C9346C823AE7D8500A9E112 /* ViewBuilder+UIKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "ViewBuilder+UIKit.swift"; path = "UICreator/Classes/ViewBuilder+UIKit.swift"; sourceTree = "<group>"; };
 		0C9346C923AE7D8500A9E112 /* ViewBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewBuilder.swift; path = UICreator/Classes/ViewBuilder.swift; sourceTree = "<group>"; };
 		0C9346CA23AE7D8500A9E112 /* RootView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RootView.swift; path = UICreator/Classes/RootView.swift; sourceTree = "<group>"; };
@@ -240,6 +244,8 @@
 		0C9346E423AE7D8600A9E112 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				0C7E8A9723B403B3007E480B /* DatePicker.swift */,
+				0C7E8A9923B40AFF007E480B /* Input.swift */,
 				0C6760FE23B3E8690037EC98 /* Switch.swift */,
 				0CAA4BF923B267C300DD5DDF /* UIContainer */,
 				0CAA4BED23B267A200DD5DDF /* Collection */,
@@ -610,6 +616,7 @@
 				0C93470423AE7D8600A9E112 /* ViewBuilder+Navigation.swift in Sources */,
 				10A720BC38C4767848A52520B0E80DEA /* UICreator-dummy.m in Sources */,
 				0C9346FF23AE7D8600A9E112 /* UIControl+Control.swift in Sources */,
+				0C7E8A9823B403B3007E480B /* DatePicker.swift in Sources */,
 				0C0FACF323B258FD00E6B2FC /* PanGesture.swift in Sources */,
 				0C0FACF223B258FD00E6B2FC /* LongPressGesture.swift in Sources */,
 				0C93470E23AE7D8600A9E112 /* Scroll.swift in Sources */,
@@ -628,6 +635,7 @@
 				0C93471823AE7D8600A9E112 /* Button.swift in Sources */,
 				0C93470A23AE7D8600A9E112 /* Content.swift in Sources */,
 				0CAA4BFD23B267C300DD5DDF /* Blur.swift in Sources */,
+				0C7E8A9A23B40AFF007E480B /* Input.swift in Sources */,
 				0C0FACF423B258FD00E6B2FC /* SwipeGesture.swift in Sources */,
 				0C07F76C23B17C5600A7A65B /* Previewer.swift in Sources */,
 			);
