@@ -27,10 +27,12 @@ extension Gesture where Self: UITapGestureRecognizer {
         return self
     }
 
+    #if os(iOS)
     func number(ofTouchesRequired number: Int) -> Self {
         self.numberOfTouchesRequired = number
         return self
     }
+    #endif
 }
 
 fileprivate extension UIView {

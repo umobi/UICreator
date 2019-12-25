@@ -21,6 +21,7 @@ public class PanGesture: UIPanGestureRecognizer, Gesture, HasViewDelegate {
     }
 }
 
+#if os(iOS)
 extension Gesture where Self: UIPanGestureRecognizer {
     func maximumNumber(ofTouches number: Int) -> Self {
         self.maximumNumberOfTouches = number
@@ -32,6 +33,7 @@ extension Gesture where Self: UIPanGestureRecognizer {
         return self
     }
 }
+#endif
 
 fileprivate extension UIView {
 

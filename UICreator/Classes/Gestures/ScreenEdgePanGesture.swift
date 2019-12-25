@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+#if os(iOS)
 public class ScreenEdgePanGesture: UIScreenEdgePanGestureRecognizer, Gesture, HasViewDelegate {
 
     required public init(target: UIView!) {
@@ -29,7 +30,6 @@ fileprivate extension UIView {
 }
 
 public extension ViewBuilder {
-
     func onScreenEdgePanMaker(_ screenEdgePanConfigurator: (ScreenEdgePanGesture) -> ScreenEdgePanGesture) -> Self {
         self.addGestureRecognizer(screenEdgePanConfigurator(ScreenEdgePanGesture(target: self)))
         return self
@@ -43,3 +43,4 @@ public extension ViewBuilder {
         }
     }
 }
+#endif

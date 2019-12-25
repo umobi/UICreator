@@ -19,6 +19,8 @@ public protocol Text: ViewBuilder {
 
     init(_ text: String?)
     init(_ attributedText: NSAttributedString?)
+
+    func adjustsFont(forContentSizeCategory flag: Bool) -> Self
 }
 
 public extension Text {

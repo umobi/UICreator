@@ -72,6 +72,16 @@ internal extension Gesture {
 }
 
 public extension Gesture {
+    func allowedPress(types pressTypes: Set<UIPress.PressType>) -> Self {
+        self.allowedPressTypes = pressTypes.map { NSNumber(value: $0.rawValue) }
+        return self
+    }
+
+    func allowedTouch(types touchTypes: Set<UITouch.TouchType>) -> Self {
+        self.allowedTouchTypes = touchTypes.map { NSNumber(value: $0.rawValue) }
+        return self
+    }
+
     func cancelsTouches(inView flag: Bool) -> Self {
         self.cancelsTouchesInView = flag
         return self
@@ -92,6 +102,7 @@ public extension Gesture {
         return self
     }
 
+    @available(tvOS 11.0, *)
     @available(iOS 11, *)
     func name(_ string: String?) -> Self {
         self.name = string

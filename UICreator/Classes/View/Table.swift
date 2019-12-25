@@ -132,6 +132,7 @@ public extension ViewBuilder where Self: UITableView {
         }
     }
 
+    @available(tvOS 11.0, *)
     @available(iOS 11.0, *)
     func insetsContentViews(toSafeArea flag: Bool) -> Self {
         self.appendInTheScene {
@@ -145,6 +146,7 @@ public extension ViewBuilder where Self: UITableView {
         }
     }
 
+    #if os(iOS)
     func separator(effect: UIVisualEffect) -> Self {
         self.appendRendered {
             ($0 as? Self)?.separatorEffect = effect
@@ -157,22 +159,24 @@ public extension ViewBuilder where Self: UITableView {
         }
     }
 
+    func separator(style: UITableViewCell.SeparatorStyle) -> Self {
+        self.appendRendered {
+            ($0 as? Self)?.separatorStyle = style
+        }
+    }
+    #endif
+
     func separator(insets: UIEdgeInsets) -> Self {
         self.appendRendered {
             ($0 as? Self)?.separatorInset = insets
         }
     }
 
+    @available(tvOS 11.0, *)
     @available(iOS 11.0, *)
     func separator(insetReference: SeparatorInsetReference) -> Self {
         self.appendRendered {
             ($0 as? Self)?.separatorInsetReference = insetReference
-        }
-    }
-
-    func separator(style: UITableViewCell.SeparatorStyle) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.separatorStyle = style
         }
     }
 

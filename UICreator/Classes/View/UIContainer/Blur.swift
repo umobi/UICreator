@@ -45,6 +45,7 @@ extension ViewBuilder where Self: BlurView  {
     }
 }
 
+#if os(iOS)
 @available(iOS 13, *)
 extension ViewBuilder where Self: BlurView {
     func vibrancy(effect: UIVibrancyEffectStyle) -> Self {
@@ -59,3 +60,4 @@ extension ViewBuilder where Self: BlurView {
         }
     }
 }
+#endif

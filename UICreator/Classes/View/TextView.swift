@@ -68,3 +68,11 @@ public extension Text where Self: UITextView {
         }
     }
 }
+
+public extension Text where Self: UITextView {
+    func adjustsFont(forContentSizeCategory flag: Bool) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.adjustsFontForContentSizeCategory = flag
+        }
+    }
+}

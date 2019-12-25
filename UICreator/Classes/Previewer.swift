@@ -11,6 +11,7 @@ import Foundation
 import SwiftUI
 
 @available(iOS 13, *)
+@available(tvOS 13, *)
 public struct LivePreview<View: ViewBuilder>: SwiftUI.View {
     public init() {}
     
@@ -20,6 +21,7 @@ public struct LivePreview<View: ViewBuilder>: SwiftUI.View {
 }
 
 @available(iOS 13, *)
+@available(tvOS 13, *)
 public struct Previewer<View: ViewBuilder>: UIViewRepresentable {
     public init() {}
     

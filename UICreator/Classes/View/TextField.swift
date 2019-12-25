@@ -105,6 +105,26 @@ public extension Text where Self: UITextField {
 }
 
 public extension Text where Self: UITextField {
+    func adjustsFont(forContentSizeCategory flag: Bool) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.adjustsFontForContentSizeCategory = flag
+        }
+    }
+
+    func adjustsFontSize(toFitWidth flag: Bool) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.adjustsFontSizeToFitWidth = flag
+        }
+    }
+
+    func allowsEditing(textAttributes flag: Bool) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.allowsEditingTextAttributes = flag
+        }
+    }
+}
+
+public extension Text where Self: UITextField {
 
     init(placeholder text: String?) {
         self.init()

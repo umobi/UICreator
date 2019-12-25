@@ -94,4 +94,10 @@ public extension ViewBuilder where Self: UIStackView {
             ($0 as? Self)?.distribution = distribution
         }
     }
+
+    func alignment(_ alignment: Alignment) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.alignment = alignment
+        }
+    }
 }

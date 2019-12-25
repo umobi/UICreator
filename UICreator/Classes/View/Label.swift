@@ -77,3 +77,16 @@ public extension Text where Self: UILabel {
     }
 }
 
+public extension Text where Self: UILabel {
+    func adjustsFont(forContentSizeCategory flag: Bool) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.adjustsFontForContentSizeCategory = flag
+        }
+    }
+
+    func adjustsFontSize(toFitWidth flag: Bool) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.adjustsFontSizeToFitWidth = flag
+        }
+    }
+}

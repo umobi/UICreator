@@ -93,9 +93,11 @@ public extension ViewBuilder where Self: UICollectionView {
         }
     }
 
+    #if os(iOS)
     func isPaged(_ flag: Bool) -> Self {
         self.appendBeforeRendering {
             ($0 as? Self)?.isPagingEnabled = flag
         }
     }
+    #endif
 }

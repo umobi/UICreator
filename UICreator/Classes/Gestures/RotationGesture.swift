@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+#if os(iOS)
 public class RotationGesture: UIRotationGestureRecognizer, Gesture, HasViewDelegate {
 
     required public init(target: UIView!) {
@@ -44,3 +45,4 @@ public extension ViewBuilder {
         }
     }
 }
+#endif

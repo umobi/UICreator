@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+#if os(iOS)
 public class PinchGesture: UIPinchGestureRecognizer, Gesture, HasViewDelegate {
 
     required public init(target: UIView!) {
@@ -45,3 +46,4 @@ public extension ViewBuilder {
     }
     
 }
+#endif

@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+#if os(iOS)
 @available(iOS 13.0, *)
 public class HoverGesture: UIHoverGestureRecognizer, Gesture, HasViewDelegate {
 
@@ -47,3 +48,4 @@ public extension ViewBuilder {
         }
     }
 }
+#endif

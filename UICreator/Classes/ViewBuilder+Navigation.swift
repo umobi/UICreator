@@ -44,6 +44,7 @@ public extension ViewBuilder {
         }
     }
 
+    #if os(iOS)
     func navigation(backButton item: @escaping () -> UIView) -> Self {
         return self.appendInTheScene {
             ($0 as? Self)?.navigationItem.backBarButtonItem = .init(title: "", style: .plain, target: nil, action: nil)
@@ -55,6 +56,7 @@ public extension ViewBuilder {
             ($0 as? Self)?.navigationItem.setLeftBarButton(.init(customView: Host(item)), animated: false)
         }
     }
+    #endif
 
     func navigation(leftButton item: @escaping () -> UIView) -> Self {
         return self.appendInTheScene {
@@ -86,12 +88,14 @@ public extension ViewBuilder {
         }
     }
 
+    #if os(iOS)
     @available(iOS 11.0, *)
     func navigation(searchController: UISearchController) -> Self {
         return self.appendInTheScene {
             ($0 as? Self)?.navigationItem.searchController = searchController
         }
     }
+    #endif
 }
 
 public extension ViewBuilder {
@@ -122,6 +126,7 @@ public extension ViewBuilder {
     }
 }
 
+#if os(iOS)
 public extension ViewBuilder {
     @available(iOS 11.0, *)
     func navigation(largeTitleMode mode: UINavigationItem.LargeTitleDisplayMode) -> Self {
@@ -178,5 +183,5 @@ public extension ViewBuilder {
             ($0 as? Self)?.navigation?.navigationBar.largeContentTitle = title
         }
     }
-
 }
+#endif

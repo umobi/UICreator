@@ -51,6 +51,7 @@ public func HScroll(_ content: @escaping () -> UIView) -> Scroll {
 }
 
 public extension ViewBuilder where Self: UIScrollView {
+    @available(tvOS 11.0, *)
     @available(iOS 11.0, *)
     func insets(behavior: UIScrollView.ContentInsetAdjustmentBehavior) -> Self {
         self.appendBeforeRendering {
@@ -70,6 +71,7 @@ public extension ViewBuilder where Self: UIScrollView {
         }
     }
 
+    @available(tvOS 13.0, *)
     @available(iOS 13, *)
     func automaticallyAdjustsScroll(indicatorInsets flag: Bool) -> Self {
         self.appendBeforeRendering {
@@ -101,11 +103,13 @@ public extension ViewBuilder where Self: UIScrollView {
         }
     }
 
+    #if os(iOS)
     func isPagingEnabled(_ flag: Bool) -> Self {
         self.appendBeforeRendering {
             ($0 as? Self)?.isPagingEnabled = flag
         }
     }
+    #endif
 
     func isDirectionalLockEnabled(_ flag: Bool) -> Self {
         self.appendBeforeRendering {
@@ -137,6 +141,7 @@ public extension ViewBuilder where Self: UIScrollView {
         }
     }
 
+    @available(tvOS 11.1, *)
     @available(iOS 11.1, *)
     func verticalScroll(indicatorInsets: UIEdgeInsets) -> Self {
         self.appendInTheScene {
@@ -144,6 +149,7 @@ public extension ViewBuilder where Self: UIScrollView {
         }
     }
 
+    @available(tvOS 11.1, *)
     @available(iOS 11.1, *)
     func horizontalScroll(indicatorInsets: UIEdgeInsets) -> Self {
         self.appendInTheScene {

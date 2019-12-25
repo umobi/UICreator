@@ -120,6 +120,7 @@ public extension ViewBuilder where Self: CollectionLayout, Self.Layout: UICollec
         }
     }
 
+    @available(tvOS 11.0, *)
     @available(iOS 11.0, *)
     func section(insetReference: Layout.SectionInsetReference) -> Self {
         return self.appendRendered {
