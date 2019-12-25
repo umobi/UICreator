@@ -28,6 +28,7 @@ public protocol TextKeyboard: ViewBuilder {
     func smartInsertDelete(type: UITextSmartInsertDeleteType) -> Self
 
     func textContent(type: UITextContentType) -> Self
+    func inputAccessoryView(content: @escaping () -> UIInputView) -> Self
     func inputView(content: @escaping () -> UIInputView) -> Self
     func input(delegate: UITextInputDelegate) -> Self
 

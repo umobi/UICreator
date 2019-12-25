@@ -178,9 +178,15 @@ public extension TextKeyboard where Self: UITextView {
     }
 
     func inputView(content: @escaping () -> UIInputView) -> Self {
-       self.appendRendered {
-           ($0 as? Self)?.inputView = content()
-       }
+        self.appendRendered {
+            ($0 as? Self)?.inputView = content()
+        }
+    }
+
+    func inputAccessoryView(content: @escaping () -> UIInputView) -> Self {
+        self.appendRendered {
+            ($0 as? Self)?.inputAccessoryView = content()
+        }
     }
 
     func input(delegate: UITextInputDelegate) -> Self {

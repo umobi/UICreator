@@ -292,11 +292,11 @@ public extension ViewBuilder {
         }
     }
 
-    func safeAreaInsets() -> Self {
-        return self.safeArea(topEqualTo: 0, priority: .required)
-            .safeArea(bottomEqualTo: 0, priority: .required)
-            .safeArea(leadingEqualTo: 0, priority: .required)
-            .safeArea(trailingEqualTo: 0, priority: .required)
+    func safeAreaInsets(equalTo value: CGFloat = 0, priority: ConstraintPriority = .high) -> Self {
+        return self.safeArea(topEqualTo: value, priority: priority)
+            .safeArea(bottomEqualTo: value, priority: priority)
+            .safeArea(leadingEqualTo: value, priority: priority)
+            .safeArea(trailingEqualTo: value, priority: priority)
     }
 
     func top(equalTo constant: CGFloat = 0, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
@@ -553,11 +553,11 @@ public extension ViewBuilder {
 }
 
 public extension ViewBuilder {
-    func insets(priority: ConstraintPriority = .high) -> Self {
-        return self.top(priority: priority)
-            .bottom(priority: priority)
-            .leading(priority: priority)
-            .trailing(priority: priority)
+    func insets(equalTo value: CGFloat = 0, priority: ConstraintPriority = .high) -> Self {
+        return self.top(equalTo: value, priority: priority)
+            .bottom(equalTo: value, priority: priority)
+            .leading(equalTo: value, priority: priority)
+            .trailing(equalTo: value, priority: priority)
     }
 }
 
