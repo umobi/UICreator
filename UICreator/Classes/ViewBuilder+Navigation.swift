@@ -15,15 +15,87 @@ internal extension ViewBuilder {
     }
 }
 
+#if os(iOS)
 public extension ViewBuilder {
-//    fileprivate var host: Host? {
-//        var ref: UIView? = self
-//        while let host = ref, !(host is Host) {
-//            ref = host.superview
-//        }
-//
-//        return ref as? Host
-//    }
+    func toolbar(_ views: UIView...) -> Self {
+        self.appendInTheScene {
+            ($0 as? Self)?.viewController.toolbarItems = views.map { view in
+                UIBarButtonItem(customView: Host {
+                    view
+                })
+            }
+        }
+    }
+
+    func toolbar(_ views: [UIView]) -> Self {
+        self.appendInTheScene {
+            ($0 as? Self)?.viewController.toolbarItems = views.map { view in
+                UIBarButtonItem(customView: Host {
+                    view
+                })
+            }
+        }
+    }
+
+    func toolbar(isHidden flag: Bool) -> Self {
+        self.appendInTheScene {
+            ($0 as? Self)?.navigation?.navigationController.isToolbarHidden = flag
+        }
+    }
+
+    func toolbar(style: UIBarStyle) -> Self {
+        self.appendInTheScene {
+            ($0 as? Self)?.navigation?.navigationController.toolbar.barStyle = style
+        }
+    }
+
+    func toolbar(tintColor color: UIColor?) -> Self {
+        self.appendInTheScene {
+            ($0 as? Self)?.navigation?.navigationController.toolbar.tintColor = color
+        }
+    }
+
+    func toolbar(barTintColor color: UIColor?) -> Self {
+        self.appendInTheScene {
+            ($0 as? Self)?.navigation?.navigationController.toolbar.barTintColor = color
+        }
+    }
+
+    func toolbar(delegate: UIToolbarDelegate?) -> Self {
+        self.appendInTheScene {
+            ($0 as? Self)?.navigation?.navigationController.toolbar.delegate = delegate
+        }
+    }
+
+    func toolbar(isTranslucent flag: Bool) -> Self {
+        self.appendInTheScene {
+            ($0 as? Self)?.navigation?.navigationController.toolbar.isTranslucent = flag
+        }
+    }
+
+    @available(iOS 13.0, *)
+    func toolbar(standardAppearance appearance: UIToolbarAppearance) -> Self {
+        self.appendInTheScene {
+            ($0 as? Self)?.navigation?.navigationController.toolbar.standardAppearance = appearance
+        }
+    }
+
+    @available(iOS 13.0, *)
+    func toolbar(compactAppearance appearance: UIToolbarAppearance?) -> Self {
+        self.appendInTheScene {
+            ($0 as? Self)?.navigation?.navigationController.toolbar.compactAppearance = appearance
+        }
+    }
+}
+#endif
+
+public extension ViewBuilder {
+
+    func navigation(isHidden flag: Bool) -> Self {
+        self.appendInTheScene {
+            ($0 as? Self)?.navigation?.navigationController.isNavigationBarHidden = flag
+        }
+    }
 
     func navigation(title: String?) -> Self {
         return self.appendInTheScene {
