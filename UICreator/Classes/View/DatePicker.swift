@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+#if os(iOS)
 public class DatePicker: UIDatePicker, Control, ViewBuilder {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
@@ -90,3 +91,5 @@ public extension Control where Self: UIDatePicker & Control {
         return self.onEvent(.valueChanged, handler)
     }
 }
+
+#endif
