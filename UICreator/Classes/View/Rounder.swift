@@ -36,3 +36,7 @@ public class Rounder: RounderView, ViewBuilder {
         self.commitLayout()
     }
 }
+
+public func Circle(content: @escaping () -> UIView) -> Rounder {
+    return .init(radius: 0.5, content: content)
+}

@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class TextView: UITextView, Text, HasViewDelegate {
+class TextView: UITextView, Text, TextKeyboard, HasViewDelegate {
     func delegate(_ delegate: UITextViewDelegate?) -> Self {
         self.delegate = delegate
         return self
@@ -33,6 +33,22 @@ class TextView: UITextView, Text, HasViewDelegate {
         super.layoutSubviews()
         self.commitLayout()
     }
+}
+
+public extension ViewBuilder where Self: UITextView {
+    func isSelectable(_ flag: Bool) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.isSelectable = flag
+        }
+    }
+
+    #if os(iOS)
+    func isEditable(_ flag: Bool) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.isEditable = flag
+        }
+    }
+    #endif
 }
 
 public extension Text where Self: UITextView {
@@ -67,6 +83,12 @@ public extension Text where Self: UITextView {
             ($0 as? Self)?.textAlignment = alignment
         }
     }
+
+    func textContainer(insets: UIEdgeInsets) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.textContainerInset = insets
+        }
+    }
 }
 
 public extension Text where Self: UITextView {
@@ -76,3 +98,101 @@ public extension Text where Self: UITextView {
         }
     }
 }
+
+public extension TextKeyboard where Self: UITextView {
+    func autocapitalization(type: UITextAutocapitalizationType) -> Self {
+        return self.appendBeforeRendering {
+            ($0 as? Self)?.autocapitalizationType = type
+        }
+    }
+
+    func autocorrection(type: UITextAutocorrectionType) -> Self {
+        return self.appendBeforeRendering {
+            ($0 as? Self)?.autocorrectionType = type
+        }
+    }
+
+
+    func keyboard(type: UIKeyboardType) -> Self {
+        return self.appendBeforeRendering {
+            ($0 as? Self)?.keyboardType = type
+        }
+    }
+
+    func keyboard(appearance: UIKeyboardAppearance) -> Self {
+        return self.appendBeforeRendering {
+            ($0 as? Self)?.keyboardAppearance = appearance
+        }
+    }
+}
+
+public extension TextKeyboard where Self: UITextView {
+
+    func returnKey(type: UIReturnKeyType) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.returnKeyType = type
+        }
+    }
+
+    func secureText(_ flag: Bool = true) -> Self {
+        return self.appendBeforeRendering {
+            ($0 as? Self)?.isSecureTextEntry = flag
+        }
+    }
+
+    @available(iOS 12, tvOS 12, *)
+    func passwordRules(_ passwordRules: UITextInputPasswordRules?) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.passwordRules = passwordRules
+        }
+    }
+}
+
+@available(iOS 11, tvOS 11, *)
+public extension TextKeyboard where Self: UITextView {
+
+    func smartDashes(type: UITextSmartDashesType) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.smartDashesType = type
+        }
+    }
+
+    func smartQuotes(type: UITextSmartQuotesType) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.smartQuotesType = type
+        }
+    }
+
+    func smartInsertDelete(type: UITextSmartInsertDeleteType) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.smartInsertDeleteType = type
+        }
+    }
+}
+
+public extension TextKeyboard where Self: UITextView {
+    func textContent(type: UITextContentType) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.textContentType = type
+        }
+    }
+
+    func inputView(content: @escaping () -> UIView) -> Self {
+       self.appendRendered {
+           ($0 as? Self)?.inputView = Host(content)
+       }
+    }
+
+    func input(delegate: UITextInputDelegate) -> Self {
+        self.appendInTheScene {
+            ($0 as? Self)?.inputDelegate = delegate
+        }
+    }
+
+    func typing(attributes: [NSAttributedString.Key : Any]?) -> Self {
+       self.appendBeforeRendering {
+            ($0 as? Self)?.typingAttributes = attributes ?? [:]
+       }
+   }
+}
+

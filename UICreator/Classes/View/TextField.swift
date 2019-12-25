@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-public class TextField: UITextField & Text, Control, HasViewDelegate {
+public class TextField: UITextField, Text, TextKeyboard, Control, HasViewDelegate {
     public func delegate(_ delegate: UITextFieldDelegate?) -> Self {
         self.delegate = delegate
         return self
@@ -104,7 +104,7 @@ public extension Text where Self: UITextField {
     }
 }
 
-public extension Text where Self: UITextField {
+public extension ViewBuilder where Self: UITextField {
     func adjustsFont(forContentSizeCategory flag: Bool) -> Self {
         self.appendBeforeRendering {
             ($0 as? Self)?.adjustsFontForContentSizeCategory = flag
@@ -124,7 +124,7 @@ public extension Text where Self: UITextField {
     }
 }
 
-public extension Text where Self: UITextField {
+public extension ViewBuilder where Self: UITextField {
 
     init(placeholder text: String?) {
         self.init()
@@ -155,18 +155,7 @@ public extension Text where Self: UITextField {
     }
 }
 
-public extension Text where Self: UITextField {
-    func autocapitalization(type: UITextAutocapitalizationType) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.autocapitalizationType = type
-        }
-    }
-
-    func autocorrection(type: UITextAutocorrectionType) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.autocorrectionType = type
-        }
-    }
+public extension ViewBuilder where Self: UITextField {
 
     func clearButton(mode: ViewMode) -> Self {
         return self.appendBeforeRendering {
@@ -185,27 +174,9 @@ public extension Text where Self: UITextField {
             ($0 as? Self)?.clearsOnInsertion = flag
         }
     }
-
-    func keyboard(_ type: UIKeyboardType) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.keyboardType = type
-        }
-    }
-
-    func keyboard(appearance: UIKeyboardAppearance) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.keyboardAppearance = appearance
-        }
-    }
-
-    func secureText(_ flag: Bool = true) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.isSecureTextEntry = flag
-        }
-    }
 }
 
-public extension Text where Self: UITextField & Control {
+public extension ViewBuilder where Self: UITextField & Control {
     func onEditingDidBegin(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onEvent(.editingDidBegin, handler)
     }
@@ -227,7 +198,7 @@ public extension Text where Self: UITextField & Control {
     }
 }
 
-public extension Text where Self: UITextField {
+public extension ViewBuilder where Self: UITextField {
     func leftView(_ mode: ViewMode = .always, content: @escaping () -> UIView) -> Self {
         return self.appendRendered {
             ($0 as? Self)?.leftView = Host(content)
@@ -241,4 +212,101 @@ public extension Text where Self: UITextField {
             ($0 as? Self)?.rightViewMode = mode
         }
     }
+}
+
+public extension TextKeyboard where Self: UITextField {
+    func autocapitalization(type: UITextAutocapitalizationType) -> Self {
+        return self.appendBeforeRendering {
+            ($0 as? Self)?.autocapitalizationType = type
+        }
+    }
+
+    func autocorrection(type: UITextAutocorrectionType) -> Self {
+        return self.appendBeforeRendering {
+            ($0 as? Self)?.autocorrectionType = type
+        }
+    }
+
+
+    func keyboard(type: UIKeyboardType) -> Self {
+        return self.appendBeforeRendering {
+            ($0 as? Self)?.keyboardType = type
+        }
+    }
+
+    func keyboard(appearance: UIKeyboardAppearance) -> Self {
+        return self.appendBeforeRendering {
+            ($0 as? Self)?.keyboardAppearance = appearance
+        }
+    }
+}
+
+public extension TextKeyboard where Self: UITextField {
+
+    func returnKey(type: UIReturnKeyType) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.returnKeyType = type
+        }
+    }
+
+    func secureText(_ flag: Bool = true) -> Self {
+        return self.appendBeforeRendering {
+            ($0 as? Self)?.isSecureTextEntry = flag
+        }
+    }
+
+    @available(iOS 12, tvOS 12, *)
+    func passwordRules(_ passwordRules: UITextInputPasswordRules?) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.passwordRules = passwordRules
+        }
+    }
+}
+
+@available(iOS 11, tvOS 11, *)
+public extension TextKeyboard where Self: UITextField {
+
+    func smartDashes(type: UITextSmartDashesType) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.smartDashesType = type
+        }
+    }
+
+    func smartQuotes(type: UITextSmartQuotesType) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.smartQuotesType = type
+        }
+    }
+
+    func smartInsertDelete(type: UITextSmartInsertDeleteType) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.smartInsertDeleteType = type
+        }
+    }
+}
+
+public extension TextKeyboard where Self: UITextField {
+    func textContent(type: UITextContentType) -> Self {
+        self.appendBeforeRendering {
+            ($0 as? Self)?.textContentType = type
+        }
+    }
+
+    func inputView(content: @escaping () -> UIView) -> Self {
+       self.appendRendered {
+           ($0 as? Self)?.inputView = Host(content)
+       }
+    }
+
+    func input(delegate: UITextInputDelegate) -> Self {
+        self.appendInTheScene {
+            ($0 as? Self)?.inputDelegate = delegate
+        }
+    }
+
+    func typing(attributes: [NSAttributedString.Key : Any]?) -> Self {
+       self.appendBeforeRendering {
+           ($0 as? Self)?.typingAttributes = attributes
+       }
+   }
 }

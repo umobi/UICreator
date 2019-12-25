@@ -17,6 +17,7 @@
 		0C0FACF823B258FD00E6B2FC /* HoverGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACF023B258FD00E6B2FC /* HoverGesture.swift */; };
 		0C0FACF923B258FD00E6B2FC /* PinchGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACF123B258FD00E6B2FC /* PinchGesture.swift */; };
 		0C6760FF23B3E8690037EC98 /* Switch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6760FE23B3E8690037EC98 /* Switch.swift */; };
+		0C7E8A9623B3FA5D007E480B /* TextKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7E8A9523B3FA5D007E480B /* TextKeyboard.swift */; };
 		0C9346F323AE7D8600A9E112 /* ViewBuilder+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346C823AE7D8500A9E112 /* ViewBuilder+UIKit.swift */; };
 		0C9346F423AE7D8600A9E112 /* ViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346C923AE7D8500A9E112 /* ViewBuilder.swift */; };
 		0C9346F523AE7D8600A9E112 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346CA23AE7D8500A9E112 /* RootView.swift */; };
@@ -94,6 +95,7 @@
 		0C0FACF023B258FD00E6B2FC /* HoverGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HoverGesture.swift; sourceTree = "<group>"; };
 		0C0FACF123B258FD00E6B2FC /* PinchGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinchGesture.swift; sourceTree = "<group>"; };
 		0C6760FE23B3E8690037EC98 /* Switch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Switch.swift; sourceTree = "<group>"; };
+		0C7E8A9523B3FA5D007E480B /* TextKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TextKeyboard.swift; path = UICreator/Classes/TextKeyboard.swift; sourceTree = "<group>"; };
 		0C9346C823AE7D8500A9E112 /* ViewBuilder+UIKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "ViewBuilder+UIKit.swift"; path = "UICreator/Classes/ViewBuilder+UIKit.swift"; sourceTree = "<group>"; };
 		0C9346C923AE7D8500A9E112 /* ViewBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewBuilder.swift; path = UICreator/Classes/ViewBuilder.swift; sourceTree = "<group>"; };
 		0C9346CA23AE7D8500A9E112 /* RootView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RootView.swift; path = UICreator/Classes/RootView.swift; sourceTree = "<group>"; };
@@ -318,6 +320,7 @@
 		23482E1745BD744A1B8DC0CDFA317DBA /* UICreator */ = {
 			isa = PBXGroup;
 			children = (
+				0C7E8A9523B3FA5D007E480B /* TextKeyboard.swift */,
 				0C07F76B23B17C5600A7A65B /* Previewer.swift */,
 				0C0FACE923B2584100E6B2FC /* Gestures */,
 				0C0FACFA23B25BF800E6B2FC /* Control */,
@@ -610,6 +613,7 @@
 				0C0FACF323B258FD00E6B2FC /* PanGesture.swift in Sources */,
 				0C0FACF223B258FD00E6B2FC /* LongPressGesture.swift in Sources */,
 				0C93470E23AE7D8600A9E112 /* Scroll.swift in Sources */,
+				0C7E8A9623B3FA5D007E480B /* TextKeyboard.swift in Sources */,
 				0C93470C23AE7D8600A9E112 /* Text.swift in Sources */,
 				0CAA4BF623B267A200DD5DDF /* CompositionalCollection.swift in Sources */,
 				0C93471923AE7D8600A9E112 /* ViewBuilder+Constraints.swift in Sources */,
