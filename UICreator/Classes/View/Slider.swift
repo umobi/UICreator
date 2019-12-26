@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+#if os(iOS)
 public class Slider: UISlider, ViewBuilder, Control {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
@@ -103,5 +104,4 @@ public extension ViewBuilder where Self: UISlider & Control {
         self.onEvent(.valueChanged, handler)
     }
 }
-
-
+#endif
