@@ -21,6 +21,12 @@ public extension ViewBuilder {
         }
     }
 
+    func contentScaleFactor(_ scale: CGFloat) -> Self {
+        self.appendBeforeRendering {
+            $0.contentScaleFactor = scale
+        }
+    }
+
     func zIndex(_ zIndex: CGFloat) -> Self {
         self.appendBeforeRendering {
             ($0 as? Self)?.layer.zPosition = zIndex

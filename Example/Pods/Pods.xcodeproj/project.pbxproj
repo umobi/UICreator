@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		0C07F76C23B17C5600A7A65B /* Previewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C07F76B23B17C5600A7A65B /* Previewer.swift */; };
+		0C0B0B9123B4E54100FAF1E6 /* Slider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0B0B9023B4E54100FAF1E6 /* Slider.swift */; };
+		0C0B0B9323B4E56200FAF1E6 /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0B0B9223B4E56200FAF1E6 /* ActivityIndicator.swift */; };
 		0C0FACF223B258FD00E6B2FC /* LongPressGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACEA23B258FD00E6B2FC /* LongPressGesture.swift */; };
 		0C0FACF323B258FD00E6B2FC /* PanGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACEB23B258FD00E6B2FC /* PanGesture.swift */; };
 		0C0FACF423B258FD00E6B2FC /* SwipeGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACEC23B258FD00E6B2FC /* SwipeGesture.swift */; };
@@ -88,6 +90,8 @@
 /* Begin PBXFileReference section */
 		051CEEAE560163C1A234E8374E31A0E2 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		0C07F76B23B17C5600A7A65B /* Previewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Previewer.swift; path = UICreator/Classes/Previewer.swift; sourceTree = "<group>"; };
+		0C0B0B9023B4E54100FAF1E6 /* Slider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Slider.swift; sourceTree = "<group>"; };
+		0C0B0B9223B4E56200FAF1E6 /* ActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
 		0C0FACEA23B258FD00E6B2FC /* LongPressGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LongPressGesture.swift; sourceTree = "<group>"; };
 		0C0FACEB23B258FD00E6B2FC /* PanGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PanGesture.swift; sourceTree = "<group>"; };
 		0C0FACEC23B258FD00E6B2FC /* SwipeGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeGesture.swift; sourceTree = "<group>"; };
@@ -246,6 +250,8 @@
 			children = (
 				0C7E8A9723B403B3007E480B /* DatePicker.swift */,
 				0C7E8A9923B40AFF007E480B /* Input.swift */,
+				0C0B0B9023B4E54100FAF1E6 /* Slider.swift */,
+				0C0B0B9223B4E56200FAF1E6 /* ActivityIndicator.swift */,
 				0C6760FE23B3E8690037EC98 /* Switch.swift */,
 				0CAA4BF923B267C300DD5DDF /* UIContainer */,
 				0CAA4BED23B267A200DD5DDF /* Collection */,
@@ -618,6 +624,7 @@
 				0C9346FF23AE7D8600A9E112 /* UIControl+Control.swift in Sources */,
 				0C7E8A9823B403B3007E480B /* DatePicker.swift in Sources */,
 				0C0FACF323B258FD00E6B2FC /* PanGesture.swift in Sources */,
+				0C0B0B9323B4E56200FAF1E6 /* ActivityIndicator.swift in Sources */,
 				0C0FACF223B258FD00E6B2FC /* LongPressGesture.swift in Sources */,
 				0C93470E23AE7D8600A9E112 /* Scroll.swift in Sources */,
 				0C7E8A9623B3FA5D007E480B /* TextKeyboard.swift in Sources */,
@@ -625,6 +632,7 @@
 				0CAA4BF623B267A200DD5DDF /* CompositionalCollection.swift in Sources */,
 				0C93471923AE7D8600A9E112 /* ViewBuilder+Constraints.swift in Sources */,
 				0C9346F423AE7D8600A9E112 /* ViewBuilder.swift in Sources */,
+				0C0B0B9123B4E54100FAF1E6 /* Slider.swift in Sources */,
 				0C0FACF823B258FD00E6B2FC /* HoverGesture.swift in Sources */,
 				0C93470D23AE7D8600A9E112 /* Label.swift in Sources */,
 				0CAA4C0223B2696B00DD5DDF /* Gradient.swift in Sources */,
