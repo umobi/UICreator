@@ -9,35 +9,41 @@ import Foundation
 import UIKit
 import UIContainer
 
-public class Host: RootView, ViewControllerType {
-    convenience public init(size: CGSize = .zero, _ content: () -> UIView) {
-        self.init(frame: .init(origin: .zero, size: size))
-        _ = self.add(content())
+public class Host: Root, ViewControllerType, UIViewCreator {
+//    let contentHosted: ViewCreator
+    public init(size: CGSize = .zero, content: @escaping () -> ViewCreator) {
+//        self.contentHosted = content()
+        super.init(loader: nil)
+        _ = self.uiView.add(content().uiView)
+    }
+
+    public required init(_ view: View!) {
+        fatalError("init(_:) has not been implemented")
+    }
+
+    public required init(loader: (() -> View)? = nil) {
+        fatalError("init(loader:) has not been implemented")
     }
 }
 
 extension Host: ViewControllerAppearStates {
+    var hosted: ViewCreator? {
+        return (self.uiView.subviews.first(where: { $0.ViewCreator != nil }))?.ViewCreator
+    }
+
     public func viewWillAppear(_ animated: Bool) {
-       self.subviews.forEach {
-           ($0 as? ViewControllerAppearStates)?.viewWillAppear(animated)
-       }
+        (self.hosted as? ViewControllerAppearStates)?.viewWillAppear(animated)
     }
 
     public func viewDidAppear(_ animated: Bool) {
-       self.subviews.forEach {
-           ($0 as? ViewControllerAppearStates)?.viewDidAppear(animated)
-       }
+        (self.hosted as? ViewControllerAppearStates)?.viewDidAppear(animated)
     }
 
     public func viewWillDisappear(_ animated: Bool) {
-       self.subviews.forEach {
-           ($0 as? ViewControllerAppearStates)?.viewWillDisappear(animated)
-       }
+        (self.hosted as? ViewControllerAppearStates)?.viewWillDisappear(animated)
     }
 
     public func viewDidDisappear(_ animated: Bool) {
-       self.subviews.forEach {
-           ($0 as? ViewControllerAppearStates)?.viewDidDisappear(animated)
-       }
+        (self.hosted as? ViewControllerAppearStates)?.viewDidDisappear(animated)
     }
 }

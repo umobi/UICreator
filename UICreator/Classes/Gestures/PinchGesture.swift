@@ -30,17 +30,17 @@ fileprivate extension UIView {
 
 }
 
-public extension ViewBuilder {
+public extension UIViewCreator {
 
     func onPinchMaker(_ pinchConfigurator: (PinchGesture) -> PinchGesture) -> Self {
-        self.addGestureRecognizer(pinchConfigurator(PinchGesture(target: self)))
+        self.uiView.addGestureRecognizer(pinchConfigurator(PinchGesture(target: self.uiView)))
         return self
     }
 
     func onPinch(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onPinchMaker { [unowned self] in
+        return self.onPinchMaker {
             $0.onRecognized { _ in
-                handler(self)
+                handler(self.uiView)
             }
         }
     }

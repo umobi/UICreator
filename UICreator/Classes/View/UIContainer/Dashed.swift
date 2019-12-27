@@ -1,5 +1,5 @@
 //
-//  Dashed+ViewBuilder.swift
+//  Dashed+ViewCreator.swift
 //  Pods-UICreator_Example
 //
 //  Created by brennobemoura on 22/12/19.
@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import UIContainer
 
-public class Dashed: DashedView, ViewBuilder {
+public class _DashedView: DashedView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -31,30 +31,35 @@ public class Dashed: DashedView, ViewBuilder {
     }
 }
 
-extension ViewBuilder where Self: DashedView {
-    public init(color: UIColor, pattern: [NSNumber] = [2, 3], _ content: () -> UIView) {
-        self.init(content(), dash: pattern)
-        _ = self.dash(color: color)
-            .dash(lineWidth: 1)
+public class Dashed: UIViewCreator {
+    public typealias View = _DashedView
+
+    public init(color: UIColor, pattern: [NSNumber] = [2, 3], content: () -> Content) {
+        self.uiView = View.init(content().uiView, dash: pattern)
+            .apply(strokeColor: color)
+            .apply(lineWidth: 1)
     }
+}
+
+extension UIViewCreator where View: DashedView {
 
     public func dash(color: UIColor) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.apply(strokeColor: color)
+        self.onNotRendered {
+            ($0 as? View)?.apply(strokeColor: color)
                 .refresh()
         }
     }
 
     public func dash(lineWidth width: CGFloat) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.apply(lineWidth: width)
+        self.onNotRendered {
+            ($0 as? View)?.apply(lineWidth: width)
                 .refresh()
         }
     }
 
     public func dash(pattern: [NSNumber]) -> Self {
-        self.appendBeforeRendering {
-            _ = ($0 as? Self)?.apply(dashPattern: pattern)
+        self.onNotRendered {
+            _ = ($0 as? View)?.apply(dashPattern: pattern)
                 .refresh()
         }
     }

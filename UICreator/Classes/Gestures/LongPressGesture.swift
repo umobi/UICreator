@@ -40,17 +40,17 @@ fileprivate extension UIView {
     }
 }
 
-public extension ViewBuilder {
+public extension UIViewCreator {
 
     func onLongPressMaker(_ longPressConfigurator: (LongPressGesture) -> LongPressGesture) -> Self {
-        self.addGestureRecognizer(longPressConfigurator(LongPressGesture(target: self)))
+        self.uiView.addGestureRecognizer(longPressConfigurator(LongPressGesture(target: self.uiView)))
         return self
     }
 
     func onLongPress(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onLongPressMaker { [unowned self] in
+        return self.onLongPressMaker {
             $0.onRecognized { _ in
-                handler(self)
+                handler(self.uiView)
             }
         }
     }

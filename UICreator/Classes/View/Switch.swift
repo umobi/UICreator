@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 #if os(iOS)
-public class Switch: UISwitch, ViewBuilder, Control {
+public class _Switch: UISwitch {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -31,44 +31,49 @@ public class Switch: UISwitch, ViewBuilder, Control {
     }
 }
 
-public extension ViewBuilder where Self: Switch {
-    init(on: Bool) {
-        self.init()
-        self.isOn = on
+public class Switch: UIViewCreator, Control {
+    public typealias View = _Switch
+
+    public init(on: Bool) {
+        self.uiView = View.init(builder: self)
+        (self.uiView as? View)?.isOn = on
     }
+}
+
+public extension UIViewCreator where View: UISwitch {
 
     func isOn(_ flag: Bool) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.isOn = flag
+        self.onNotRendered {
+            ($0 as? View)?.isOn = flag
         }
     }
 
     func offImage(_ image: UIImage?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.offImage = image
+        self.onNotRendered {
+            ($0 as? View)?.offImage = image
         }
     }
 
     func onImage(_ image: UIImage?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.onImage = image
+        self.onNotRendered {
+            ($0 as? View)?.onImage = image
         }
     }
 
     func onTintColor(_ color: UIColor?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.onTintColor = color
+        self.onNotRendered {
+            ($0 as? View)?.onTintColor = color
         }
     }
 
     func thumbTintColor(_ color: UIColor?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.thumbTintColor = color
+        self.onNotRendered {
+            ($0 as? View)?.thumbTintColor = color
         }
     }
 }
 
-public extension ViewBuilder where Self: UISwitch & Control {
+public extension UIViewCreator where Self: Control, View: UISwitch {
     func onValueChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onEvent(.valueChanged, handler)
     }

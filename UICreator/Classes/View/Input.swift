@@ -8,19 +8,7 @@
 import Foundation
 import UIKit
 
-public class Input: UIInputView, ViewBuilder {
-    required override init(frame: CGRect, inputViewStyle: UIInputView.Style) {
-        super.init(frame: frame, inputViewStyle: inputViewStyle)
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    public var watchingViews: [UIView] {
-        return self.subviews
-    }
-
+public class InputView: UIInputView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -42,14 +30,18 @@ public class Input: UIInputView, ViewBuilder {
     }
 }
 
-public extension ViewBuilder where Self: Input {
-    init(size: CGSize = .zero, style: UIInputView.Style = .keyboard, content: () -> UIView) {
-        self.init(frame: .init(origin: .zero, size: size), inputViewStyle: style)
-        _ = self.add(content())
-    }
+public class Input: UIViewCreator {
+    public typealias View = InputView
 
+    public init(size: CGSize = .zero, style: UIInputView.Style = .keyboard, content: () -> ViewCreator) {
+        self.uiView = View.init(frame: .init(origin: .zero, size: size), inputViewStyle: style)
+        _ = self.uiView.add(content().uiView)
+    }
+}
+
+public extension UIViewCreator where View: UIInputView {
     func allowsSelfsSizing(_ flag: Bool) -> Self {
-        self.allowsSelfSizing = flag
+        (self.uiView as? View)?.allowsSelfSizing = flag
         return self
     }
 }

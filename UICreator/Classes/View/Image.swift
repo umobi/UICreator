@@ -7,8 +7,7 @@
 
 import Foundation
 
-public class Image: UIImageView, ViewBuilder {
-    
+public class ImageView: UIImageView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -30,63 +29,70 @@ public class Image: UIImageView, ViewBuilder {
     }
 }
 
-public extension ViewBuilder where Self: UIImageView {
-    init(mode: ContentMode = .scaleToFill) {
-        self.init(image: nil, highlightedImage: nil)
-        self.contentMode = mode
+public class Image: UIViewCreator {
+    public typealias View = ImageView
+
+    public init(mode: View.ContentMode = .scaleToFill) {
+        self.uiView = View.init(image: nil, highlightedImage: nil)
+        self.uiView.contentMode = mode
     }
 
-    init(_ image: UIImage?, highlightedImage: UIImage?) {
-        self.init(image: image, highlightedImage: highlightedImage)
+    public init(image: UIImage?, highlightedImage: UIImage? = nil) {
+        self.uiView = View.init(image: image, highlightedImage: nil)
     }
 
-    @available(tvOS 13.0, *)
-    @available(iOS 13, *)
+    public init() {
+        self.uiView = View.init(image: nil, highlightedImage: nil)
+    }
+}
+
+public extension UIViewCreator where View: UIImageView {
+
+    @available(iOS 13, tvOS 13.0, *)
     func applySymbolConfiguration(_ configuration: UIImage.SymbolConfiguration) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.image = ($0 as? Self)?.image?.applyingSymbolConfiguration(configuration)
+        self.onNotRendered {
+            ($0 as? View)?.image = ($0 as? View)?.image?.applyingSymbolConfiguration(configuration)
         }
     }
 
-    @available(tvOS 13.0, *)
-    @available(iOS 13, *)
+    @available(iOS 13, tvOS 13.0, *)
     func preferredSymbolConfiguration(_ configuration: UIImage.SymbolConfiguration) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.preferredSymbolConfiguration = configuration
+        self.onNotRendered {
+            ($0 as? View)?.preferredSymbolConfiguration = configuration
         }
     }
 
-    func content(mode: ContentMode) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.contentMode = mode
+    func content(mode: View.ContentMode) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.contentMode = mode
         }
     }
 
     func image(_ image: UIImage?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.image = image
+        self.onNotRendered {
+            ($0 as? View)?.image = image
         }
     }
 
     func tint(color: UIColor?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.tintColor = color
+        self.onNotRendered {
+            ($0 as? View)?.tintColor = color
         }
     }
 
     func rendering(mode: UIImage.RenderingMode) -> Self {
-        return self.appendRendered {
-            ($0 as? Self)?.image = ($0 as? Self)?.image?.withRenderingMode(mode)
+        return self.onRendered {
+            ($0 as? View)?.image = ($0 as? View)?.image?.withRenderingMode(mode)
         }
     }
 }
 
 #if os(tvOS)
-public extension ViewBuilder where Self: UIImageView {
+public extension UIViewCreator where View: UIImageView {
     @available(tvOS 13, *)
     func adjustsImageWhenAncestorFocused(_ flag: Bool) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.adjustsImageWhenAncestorFocused = flag
+        self.onNotRendered {
+            ($0 as? View)?.adjustsImageWhenAncestorFocused = flag
         }
     }
 }

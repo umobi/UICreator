@@ -1,5 +1,5 @@
 //
-//  Content+ViewBuilder.swift
+//  Content+ViewCreator.swift
 //  UIBuilder
 //
 //  Created by brennobemoura on 21/12/19.
@@ -10,7 +10,7 @@ import UIKit
 import UIContainer
 import SnapKit
 
-public class Content: ContentView, ViewBuilder {
+public class _ContentView: ContentView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -32,59 +32,59 @@ public class Content: ContentView, ViewBuilder {
     }
 }
 
-public func Center(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+public class Content: UIViewCreator {
+    public typealias View = _ContentView
+
+    public init(mode: View.ContentMode = .center, priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) {
+        self.uiView = View(content().uiView, contentMode: mode, priority: priority)
+    }
+}
+
+public func Center(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
     return .init(mode: .center, priority: priority, content: content)
 }
 
-public func TopLeft(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+public func TopLeft(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
     return .init(mode: .topLeft, priority: priority, content: content)
 }
 
-public func Top(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+public func Top(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
     return .init(mode: .top, priority: priority, content: content)
 }
 
-public func TopRight(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+public func TopRight(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
     return .init(mode: .topRight, priority: priority, content: content)
 }
 
-public func Left(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+public func Left(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
     return .init(mode: .left, priority: priority, content: content)
 }
 
-public func Right(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+public func Right(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
     return .init(mode: .right, priority: priority, content: content)
 }
 
-public func BottomLeft(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+public func BottomLeft(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
     return .init(mode: .bottomLeft, priority: priority, content: content)
 }
 
-public func Bottom(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+public func Bottom(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
     return .init(mode: .bottom, priority: priority, content: content)
 }
 
-public func BottomRight(priority: ConstraintPriority = .required, content: @escaping () -> UIView) -> Content {
+public func BottomRight(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
     return .init(mode: .bottomRight, priority: priority, content: content)
 }
 
-public extension ViewBuilder where Self: ContentView {
-
-    init(mode: ContentMode = .center, content: @escaping () -> UIView) {
-        self.init(content(), contentMode: mode)
-    }
-
-    init(mode: ContentMode = .center, priority: ConstraintPriority = .required, content: @escaping () -> UIView) {
-        self.init(content(), contentMode: mode, priority: priority)
-    }
+public extension UIViewCreator where View: ContentView {
 
     func content(mode: UIView.ContentMode) -> Self {
-        self.apply(contentMode: mode)
+        (self.uiView as? View)?.apply(contentMode: mode)
         return self
     }
 
     func fitting(priority: ConstraintPriority) -> Self {
-        self.apply(priority: priority)
+        (self.uiView as? View)?.apply(priority: priority)
         return self
     }
 }

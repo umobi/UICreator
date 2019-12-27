@@ -9,16 +9,9 @@ import Foundation
 import UIKit
 import UIContainer
 
-public class Container<View: UIViewController>: UIContainer.Container<View>, ViewBuilder {
-    public var watchingViews: [UIView] {
+public class _Container<View: UIViewController>: UIContainer.Container<View> {
+    override var watchingViews: [UIView] {
         return []
-    }
-
-    convenience init(_ content: @escaping () -> View) {
-        self.init()
-        _ = self.appendInTheScene {
-            ($0 as? Self)?.prepareContainer(inside: ($0 as? Self)?.viewController, loadHandler: content)
-        }
     }
 
     override public func willMove(toSuperview newSuperview: UIView?) {
@@ -39,5 +32,20 @@ public class Container<View: UIViewController>: UIContainer.Container<View>, Vie
     override public func layoutSubviews() {
         super.layoutSubviews()
         self.commitLayout()
+    }
+}
+
+public class Container<ViewController: UIViewController>: UIViewCreator {
+    public typealias View = _Container<ViewController>
+
+    required init(_ content: @escaping () -> ViewController) {
+        self.uiView = View.init(builder: self)
+        _ = self.onInTheScene {
+            ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: content)
+        }
+    }
+
+    deinit {
+        print("Killed")
     }
 }

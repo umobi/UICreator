@@ -28,17 +28,17 @@ fileprivate extension UIView {
     }
 }
 
-public extension ViewBuilder {
+public extension UIViewCreator {
 
     func onSwipeMaker(_ swipeConfigurator: (SwipeGesture) -> SwipeGesture) -> Self {
-        self.addGestureRecognizer(swipeConfigurator(SwipeGesture(target: self)))
+        self.uiView.addGestureRecognizer(swipeConfigurator(SwipeGesture(target: self.uiView)))
         return self
     }
 
     func onSwipe(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onSwipeMaker { [unowned self] in
+        return self.onSwipeMaker {
             $0.onRecognized { _ in
-                handler(self)
+                handler(self.uiView)
             }
         }
     }

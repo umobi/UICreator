@@ -9,7 +9,5 @@ import Foundation
 
 public protocol HasViewDelegate {
     associatedtype Delegate
-    var delegate: Delegate { get set }
-
     func delegate(_ delegate: Delegate) -> Self
 }

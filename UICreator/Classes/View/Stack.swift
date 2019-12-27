@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-public class Stack: UIStackView, ViewBuilder {
+public class StackView: UIStackView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -28,6 +28,38 @@ public class Stack: UIStackView, ViewBuilder {
         super.layoutSubviews()
         self.commitLayout()
     }
+
+    public override var watchingViews: [UIView] {
+        return self.arrangedSubviews
+    }
+}
+
+public class Stack: UIViewCreator {
+    public typealias View = StackView
+
+    public init(axis: NSLayoutConstraint.Axis, spacing: CGFloat = 0,_ subviews: Subview) {
+        self.uiView = View.init(arrangedSubviews: subviews.views.map {
+            $0.uiView
+        })
+        (self.uiView as? View)?.axis = axis
+        (self.uiView as? View)?.spacing = spacing
+    }
+
+    public init(axis: NSLayoutConstraint.Axis = .vertical, spacing: CGFloat = 0, _ views: ViewCreator...) {
+        self.uiView = View.init(arrangedSubviews: views.map {
+            $0.uiView
+        })
+        (self.uiView as? View)?.axis = axis
+        (self.uiView as? View)?.spacing = spacing
+    }
+
+    public init(axis: NSLayoutConstraint.Axis = .vertical, spacing: CGFloat = 0, _ views: [ViewCreator]) {
+        self.uiView = View.init(arrangedSubviews: views.map {
+            $0.uiView
+        })
+        (self.uiView as? View)?.axis = axis
+        (self.uiView as? View)?.spacing = spacing
+    }
 }
 
 public func HStack(spacing: CGFloat = 0, _ subviews: Subview) -> Stack {
@@ -38,66 +70,45 @@ public func VStack(spacing: CGFloat = 0, _ subviews: Subview) -> Stack {
     return .init(axis: .vertical, spacing: spacing, subviews)
 }
 
-public func HStack(spacing: CGFloat = 0, _ subviews: UIView...) -> Stack {
+public func HStack(spacing: CGFloat = 0, _ subviews: ViewCreator...) -> Stack {
     return .init(axis: .horizontal, spacing: spacing, subviews)
 }
 
-public func VStack(spacing: CGFloat = 0, _ subviews: UIView...) -> Stack {
+public func VStack(spacing: CGFloat = 0, _ subviews: ViewCreator...) -> Stack {
     return .init(axis: .vertical, spacing: spacing, subviews)
 }
 
-public func HStack(spacing: CGFloat = 0, _ subviews: [UIView]) -> Stack {
+public func HStack(spacing: CGFloat = 0, _ subviews: [ViewCreator]) -> Stack {
     return .init(axis: .horizontal, spacing: spacing, subviews)
 }
 
-public func VStack(spacing: CGFloat = 0, _ subviews: [UIView]) -> Stack {
+public func VStack(spacing: CGFloat = 0, _ subviews: [ViewCreator]) -> Stack {
     return .init(axis: .vertical, spacing: spacing, subviews)
 }
 
-public extension ViewBuilder where Self: UIStackView {
-    init(axis: NSLayoutConstraint.Axis = .vertical, spacing: CGFloat = 0, _ subview: Subview) {
-        self.init(arrangedSubviews: subview.views)
-        self.axis = axis
-        self.spacing = spacing
-    }
-
-    init(axis: NSLayoutConstraint.Axis = .vertical, spacing: CGFloat = 0, _ views: UIView...) {
-        self.init(arrangedSubviews: views)
-        self.axis = axis
-        self.spacing = spacing
-    }
-
-    init(axis: NSLayoutConstraint.Axis = .vertical, spacing: CGFloat = 0, _ views: [UIView]) {
-        self.init(arrangedSubviews: views)
-        self.axis = axis
-        self.spacing = spacing
-    }
-
-    var watchingViews: [UIView] {
-        return self.arrangedSubviews
-    }
+public extension UIViewCreator where View: UIStackView {
 
     func spacing(_ constant: CGFloat) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.spacing = constant
+        return self.onNotRendered {
+            ($0 as? View)?.spacing = constant
         }
     }
 
     func axis(_ axis: NSLayoutConstraint.Axis) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.axis = axis
+        return self.onNotRendered {
+            ($0 as? View)?.axis = axis
         }
     }
 
-    func distribution(_ distribution: Distribution) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.distribution = distribution
+    func distribution(_ distribution: View.Distribution) -> Self {
+        return self.onNotRendered {
+            ($0 as? View)?.distribution = distribution
         }
     }
 
-    func alignment(_ alignment: Alignment) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.alignment = alignment
+    func alignment(_ alignment: View.Alignment) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.alignment = alignment
         }
     }
 }

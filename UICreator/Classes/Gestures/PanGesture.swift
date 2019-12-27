@@ -43,17 +43,17 @@ fileprivate extension UIView {
 
 }
 
-public extension ViewBuilder {
+public extension UIViewCreator {
 
     func onPanMaker(_ panConfigurator: (PanGesture) -> PanGesture) -> Self {
-        self.addGestureRecognizer(panConfigurator(PanGesture(target: self)))
+        self.uiView.addGestureRecognizer(panConfigurator(PanGesture(target: self.uiView)))
         return self
     }
 
     func onPan(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onPanMaker { [unowned self] in
+        return self.onPanMaker {
             $0.onRecognized { _ in
-                handler(self)
+                handler(self.uiView)
             }
         }
     }

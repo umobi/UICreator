@@ -11,6 +11,6 @@ import UIKit
 @available(iOS 13.0, tvOS 13.0, *)
 public class CompositionalCollection: Collection, CollectionLayout {
     public var dynamicCollectionViewLayout: UICollectionViewCompositionalLayout {
-        return self.collectionViewLayout as! UICollectionViewCompositionalLayout
+        return (self.uiView as? View)?.collectionViewLayout as! UICollectionViewCompositionalLayout
     }
 }

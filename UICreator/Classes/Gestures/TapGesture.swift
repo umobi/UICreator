@@ -41,16 +41,16 @@ fileprivate extension UIView {
     }
 }
 
-public extension ViewBuilder {
+public extension UIViewCreator {
     func onTapMaker(_ tapConfigurator: (TapGesture) -> TapGesture) -> Self {
-        self.addGestureRecognizer(tapConfigurator(tapConfigurator(TapGesture(target: self))))
+        self.uiView.addGestureRecognizer(tapConfigurator(tapConfigurator(TapGesture(target: self.uiView))))
         return self
     }
 
     func onTap(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onTapMaker { [unowned self] in
+        return self.onTapMaker {
             $0.onRecognized { _ in
-                handler(self)
+                handler(self.uiView)
             }
         }
     }

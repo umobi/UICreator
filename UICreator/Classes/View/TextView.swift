@@ -8,12 +8,7 @@
 import Foundation
 import UIKit
 
-class TextView: UITextView, Text, TextKeyboard, HasViewDelegate {
-    func delegate(_ delegate: UITextViewDelegate?) -> Self {
-        self.delegate = delegate
-        return self
-    }
-
+public class TextView: UITextView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -35,169 +30,188 @@ class TextView: UITextView, Text, TextKeyboard, HasViewDelegate {
     }
 }
 
-public extension ViewBuilder where Self: UITextView {
+public class Text: UIViewCreator, TextElement, TextKeyboard, HasViewDelegate {
+    public typealias View = TextView
+
+    public func delegate(_ delegate: UITextViewDelegate?) -> Self {
+        (self.uiView as? View)?.delegate = delegate
+        return self
+    }
+
+    required public init(_ text: String?) {
+        self.uiView = View.init(builder: self)
+        (self.uiView as? View)?.text = text
+    }
+
+    required public init(_ attributedText: NSAttributedString?) {
+        self.uiView = .init()
+        (self.uiView as? View)?.attributedText = attributedText
+    }
+}
+
+public extension UIViewCreator where View: UITextView {
     func isSelectable(_ flag: Bool) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.isSelectable = flag
+        self.onNotRendered {
+            ($0 as? View)?.isSelectable = flag
         }
     }
 
     #if os(iOS)
     func isEditable(_ flag: Bool) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.isEditable = flag
+        self.onNotRendered {
+            ($0 as? View)?.isEditable = flag
         }
     }
     #endif
 }
 
-public extension Text where Self: UITextView {
+public extension TextElement where View: UITextView {
 
     func text(_ string: String?) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.text = string
+        return self.onNotRendered {
+            ($0 as? View)?.text = string
         }
     }
 
     func text(_ attributedText: NSAttributedString?) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.attributedText = attributedText
+        return self.onNotRendered {
+            ($0 as? View)?.attributedText = attributedText
         }
     }
 
     func text(color: UIColor?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.textColor = color
+        self.onNotRendered {
+            ($0 as? View)?.textColor = color
         }
     }
 
     func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.font = font
-            ($0 as? Self)?.adjustsFontForContentSizeCategory = isDynamicTextSize
+        return self.onNotRendered {
+            ($0 as? View)?.font = font
+            ($0 as? View)?.adjustsFontForContentSizeCategory = isDynamicTextSize
         }
     }
 
     func text(alignment: NSTextAlignment) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.textAlignment = alignment
+        return self.onNotRendered {
+            ($0 as? View)?.textAlignment = alignment
         }
     }
 
     func textContainer(insets: UIEdgeInsets) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.textContainerInset = insets
+        self.onNotRendered {
+            ($0 as? View)?.textContainerInset = insets
         }
     }
 }
 
-public extension Text where Self: UITextView {
+public extension TextElement where View: UITextView {
     func adjustsFont(forContentSizeCategory flag: Bool) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.adjustsFontForContentSizeCategory = flag
+        self.onNotRendered {
+            ($0 as? View)?.adjustsFontForContentSizeCategory = flag
         }
     }
 }
 
-public extension TextKeyboard where Self: UITextView {
+public extension TextKeyboard where View: UITextView {
     func autocapitalization(type: UITextAutocapitalizationType) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.autocapitalizationType = type
+        return self.onNotRendered {
+            ($0 as? View)?.autocapitalizationType = type
         }
     }
 
     func autocorrection(type: UITextAutocorrectionType) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.autocorrectionType = type
+        return self.onNotRendered {
+            ($0 as? View)?.autocorrectionType = type
         }
     }
 
 
     func keyboard(type: UIKeyboardType) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.keyboardType = type
+        return self.onNotRendered {
+            ($0 as? View)?.keyboardType = type
         }
     }
 
     func keyboard(appearance: UIKeyboardAppearance) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.keyboardAppearance = appearance
+        return self.onNotRendered {
+            ($0 as? View)?.keyboardAppearance = appearance
         }
     }
 }
 
-public extension TextKeyboard where Self: UITextView {
+public extension TextKeyboard where View: UITextView {
 
     func returnKey(type: UIReturnKeyType) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.returnKeyType = type
+        self.onNotRendered {
+            ($0 as? View)?.returnKeyType = type
         }
     }
 
     func secureText(_ flag: Bool = true) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.isSecureTextEntry = flag
+        return self.onNotRendered {
+            ($0 as? View)?.isSecureTextEntry = flag
         }
     }
 
     @available(iOS 12, tvOS 12, *)
     func passwordRules(_ passwordRules: UITextInputPasswordRules?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.passwordRules = passwordRules
+        self.onNotRendered {
+            ($0 as? View)?.passwordRules = passwordRules
         }
     }
 }
 
 @available(iOS 11, tvOS 11, *)
-public extension TextKeyboard where Self: UITextView {
+public extension TextKeyboard where View: UITextView {
 
     func smartDashes(type: UITextSmartDashesType) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.smartDashesType = type
+        self.onNotRendered {
+            ($0 as? View)?.smartDashesType = type
         }
     }
 
     func smartQuotes(type: UITextSmartQuotesType) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.smartQuotesType = type
+        self.onNotRendered {
+            ($0 as? View)?.smartQuotesType = type
         }
     }
 
     func smartInsertDelete(type: UITextSmartInsertDeleteType) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.smartInsertDeleteType = type
+        self.onNotRendered {
+            ($0 as? View)?.smartInsertDeleteType = type
         }
     }
 }
 
-public extension TextKeyboard where Self: UITextView {
+public extension TextKeyboard where View: UITextView {
     func textContent(type: UITextContentType) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.textContentType = type
+        self.onNotRendered {
+            ($0 as? View)?.textContentType = type
         }
     }
 
-    func inputView(content: @escaping () -> UIInputView) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.inputView = content()
+    func inputView(content: @escaping () -> ViewCreator) -> Self {
+        self.onRendered {
+            ($0 as? View)?.inputView = content().uiView
         }
     }
 
-    func inputAccessoryView(content: @escaping () -> UIInputView) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.inputAccessoryView = content()
+    func inputAccessoryView(content: @escaping () -> ViewCreator) -> Self {
+        self.onRendered {
+            ($0 as? View)?.inputAccessoryView = content().uiView
         }
     }
 
     func input(delegate: UITextInputDelegate) -> Self {
-        self.appendInTheScene {
-            ($0 as? Self)?.inputDelegate = delegate
+        self.onInTheScene {
+            ($0 as? View)?.inputDelegate = delegate
         }
     }
 
     func typing(attributes: [NSAttributedString.Key : Any]?) -> Self {
-       self.appendBeforeRendering {
-            ($0 as? Self)?.typingAttributes = attributes ?? [:]
+       self.onNotRendered {
+            ($0 as? View)?.typingAttributes = attributes ?? [:]
        }
    }
 }

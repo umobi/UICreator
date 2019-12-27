@@ -9,7 +9,5 @@ import Foundation
 
 public protocol HasViewDataSource {
     associatedtype DataSource
-    var dataSource: DataSource { get set }
-
     func dataSource(_ dataSource: DataSource) -> Self
 }

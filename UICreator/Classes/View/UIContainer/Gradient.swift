@@ -1,5 +1,5 @@
 //
-//  Gradient+ViewBuilder.swift
+//  Gradient+ViewCreator.swift
 //  Pods-UICreator_Example
 //
 //  Created by brennobemoura on 22/12/19.
@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import UIContainer
 
-public class Gradient: GradientView, ViewBuilder {
+public class _GradientView: GradientView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -31,40 +31,43 @@ public class Gradient: GradientView, ViewBuilder {
     }
 }
 
-public extension ViewBuilder where Self: GradientView {
-    init(_ colors: [UIColor], direction: Direction = .right) {
-        self.init()
-        _ = self.colors(colors)
-            .direction(direction)
+public class Gradient: UIViewCreator {
+    public typealias View = _GradientView
+
+    public init(_ colors: [UIColor], direction: View.Direction = .right) {
+        self.uiView = View.init(builder: self)
+        (self.uiView as? View)?.colors = colors
+        (self.uiView as? View)?.direction = direction
     }
 
-    init(_ colors: UIColor..., direction: Direction = .right) {
-        self.init()
-        _ = self.colors(colors)
-            .direction(direction)
+    public convenience init(_ colors: UIColor..., direction: View.Direction = .right) {
+        self.init(colors, direction: direction)
     }
+}
+
+public extension UIViewCreator where View: GradientView {
 
     func colors(_ colors: UIColor...) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.colors = colors
+        self.onNotRendered {
+            ($0 as? View)?.colors = colors
         }
     }
 
     func colors(_ colors: [UIColor]) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.colors = colors
+        self.onNotRendered {
+            ($0 as? View)?.colors = colors
         }
     }
 
-    func direction(_ direction: Direction) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.direction = direction
+    func direction(_ direction: View.Direction) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.direction = direction
         }
     }
 
     func animation(_ layerHandler: @escaping (CAGradientLayer) -> Void) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.animates {
+        self.onRendered {
+            ($0 as? View)?.animates {
                 layerHandler($0)
             }
         }

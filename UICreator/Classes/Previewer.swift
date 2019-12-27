@@ -10,26 +10,34 @@ import Foundation
 #if canImport(SwiftUI)
 import SwiftUI
 
-@available(iOS 13, *)
-@available(tvOS 13, *)
-public struct LivePreview<View: ViewBuilder>: SwiftUI.View {
-    public init() {}
-    
+@available(iOS 13, tvOS 13, *)
+public struct LivePreview<View: ViewCreator>: SwiftUI.View {
+
+    let view: View
+    init(_ initClass: View) {
+        self.view = initClass
+    }
+
     public var body: some SwiftUI.View {
-        Previewer<View>()
+        Previewer<View>(view)
     }
 }
 
-@available(iOS 13, *)
-@available(tvOS 13, *)
-public struct Previewer<View: ViewBuilder>: UIViewRepresentable {
-    public init() {}
-    
-    public func makeUIView(context: Context) -> View {
-        return View()
+@available(iOS 13, tvOS 13, *)
+public struct Previewer<View: ViewCreator>: UIViewRepresentable {
+    public func makeUIView(context: UIViewRepresentableContext<Previewer<View>>) -> UIView {
+        return self.view.uiView
     }
 
-    public func updateUIView(_ uiView: View, context: Context) {}
+    public typealias UIViewType = UIView
+
+    let view: View
+
+    public init(_ initClass: View) {
+        self.view = initClass
+    }
+
+    public func updateUIView(_ uiView: UIView, context: Context) {}
 }
 
 #endif

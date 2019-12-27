@@ -7,22 +7,12 @@
 
 import Foundation
 
-public protocol CollectionLayout: UICollectionView {
+public protocol CollectionLayout {
     associatedtype Layout: UICollectionViewLayout
     var dynamicCollectionViewLayout: Layout { get }
 }
 
-public class Collection: UICollectionView, ViewBuilder, HasViewDelegate, HasViewDataSource {
-    public func delegate(_ delegate: UICollectionViewDelegate?) -> Self {
-        self.delegate = delegate
-        return self
-    }
-
-    public func dataSource(_ dataSource: UICollectionViewDataSource?) -> Self {
-        self.dataSource = dataSource
-        return self
-    }
-
+public class CollectionView: UICollectionView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -44,59 +34,71 @@ public class Collection: UICollectionView, ViewBuilder, HasViewDelegate, HasView
     }
 }
 
-public extension ViewBuilder where Self: UICollectionView {
+public class Collection: UIViewCreator, HasViewDelegate, HasViewDataSource {
+    public typealias View = CollectionView
     init(layout: () -> UICollectionViewLayout) {
-        self.init(frame: .zero, collectionViewLayout: layout())
+        self.uiView = View(frame: .zero, collectionViewLayout: layout())
+    }
+
+    public func delegate(_ delegate: UICollectionViewDelegate?) -> Self {
+        (self.uiView as? View)?.delegate = delegate
+        return self
+    }
+
+    public func dataSource(_ dataSource: UICollectionViewDataSource?) -> Self {
+        (self.uiView as? View)?.dataSource = dataSource
+        return self
     }
 }
 
-public extension ViewBuilder where Self: UICollectionView {
+
+public extension UIViewCreator where View: UICollectionView {
     func addCell(for identifier: String, _ cellClass: AnyClass?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.register(cellClass, forCellWithReuseIdentifier: identifier)
+        self.onNotRendered {
+            ($0 as? View)?.register(cellClass, forCellWithReuseIdentifier: identifier)
         }
     }
 
     func addCell(for identifier: String, _ uiNib: UINib?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.register(uiNib, forCellWithReuseIdentifier: identifier)
+        self.onNotRendered {
+            ($0 as? View)?.register(uiNib, forCellWithReuseIdentifier: identifier)
         }
     }
 
     func addSupplementary(for identifier: String, viewOfKind kind: String, _ cellClass: AnyClass?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.register(cellClass, forSupplementaryViewOfKind: kind, withReuseIdentifier: identifier)
+        self.onNotRendered {
+            ($0 as? View)?.register(cellClass, forSupplementaryViewOfKind: kind, withReuseIdentifier: identifier)
         }
     }
 
     func addSupplementary(for identifier: String, viewOfKind kind: String, _ uiNib: UINib?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.register(uiNib, forSupplementaryViewOfKind: kind, withReuseIdentifier: identifier)
+        self.onNotRendered {
+            ($0 as? View)?.register(uiNib, forSupplementaryViewOfKind: kind, withReuseIdentifier: identifier)
         }
     }
 
     func allowsMultipleSelection(_ flag: Bool) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.allowsMultipleSelection = flag
+        self.onRendered {
+            ($0 as? View)?.allowsMultipleSelection = flag
         }
     }
 
     func allowsSelection(_ flag: Bool) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.allowsSelection = flag
+        self.onRendered {
+            ($0 as? View)?.allowsSelection = flag
         }
     }
 
-    func background(_ content: @escaping () -> UIView) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.backgroundView = Host(content)
+    func background<Background: ViewCreator>(_ content: @escaping () -> Background) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.backgroundView = Host(content: content).uiView
         }
     }
 
     #if os(iOS)
     func isPaged(_ flag: Bool) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.isPagingEnabled = flag
+        self.onNotRendered {
+            ($0 as? View)?.isPagingEnabled = flag
         }
     }
     #endif

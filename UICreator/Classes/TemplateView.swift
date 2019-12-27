@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
-public protocol TemplateView: UIView {
-    var body: UIView { get }
+public protocol TemplateView: class, ViewCreator {
+    var body: ViewCreator { get }
+    init()
 }

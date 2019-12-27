@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 #if os(iOS)
-public class Slider: UISlider, ViewBuilder, Control {
+public class _Slider: UISlider {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -31,75 +31,83 @@ public class Slider: UISlider, ViewBuilder, Control {
     }
 }
 
-public extension ViewBuilder where Self: Slider {
+public class Slider: UIViewCreator, Control {
+    public typealias View = _Slider
+
+    init() {
+        self.uiView = .init()
+    }
+}
+
+public extension UIViewCreator where View: UISlider {
     func maximumValue(_ value: Float) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.maximumValue = value
+        self.self.onNotRendered {
+            ($0 as? View)?.maximumValue = value
         }
     }
 
     func minimumValue(_ value: Float) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.minimumValue = value
+        self.self.onNotRendered {
+            ($0 as? View)?.minimumValue = value
         }
     }
 
     func isContinuous(_ flag: Bool) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.isContinuous = flag
+        self.self.onNotRendered {
+            ($0 as? View)?.isContinuous = flag
         }
     }
 
     func maximumTrackTintColor(_ tintColor: UIColor) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.maximumTrackTintColor = tintColor
+        self.self.onNotRendered {
+            ($0 as? View)?.maximumTrackTintColor = tintColor
         }
     }
 
     func minimumTrackTintColor(_ tintColor: UIColor) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.minimumTrackTintColor = tintColor
+        self.self.onNotRendered {
+            ($0 as? View)?.minimumTrackTintColor = tintColor
         }
     }
 
     func maximumValueImage(_ image: UIImage?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.maximumValueImage = image
+        self.self.onNotRendered {
+            ($0 as? View)?.maximumValueImage = image
         }
     }
 
     func minimumValueImage(_ image: UIImage?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.minimumValueImage = image
+        self.self.onNotRendered {
+            ($0 as? View)?.minimumValueImage = image
         }
     }
 
-    func maximumTrackImage(_ image: UIImage?, for state: State = .normal) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.setMaximumTrackImage(image, for: state)
+    func maximumTrackImage(_ image: UIImage?, for state: UIControl.State = .normal) -> Self {
+        self.onRendered {
+            ($0 as? View)?.setMaximumTrackImage(image, for: state)
         }
     }
 
-    func minimumTrackImage(_ image: UIImage?, for state: State = .normal) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.setMinimumTrackImage(image, for: state)
+    func minimumTrackImage(_ image: UIImage?, for state: UIControl.State = .normal) -> Self {
+        self.onRendered {
+            ($0 as? View)?.setMinimumTrackImage(image, for: state)
         }
     }
 
-    func thumbImage(_ image: UIImage?, for state: State = .normal) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.setThumbImage(image, for: state)
+    func thumbImage(_ image: UIImage?, for state: UIControl.State = .normal) -> Self {
+        self.onRendered {
+            ($0 as? View)?.setThumbImage(image, for: state)
         }
     }
 
     func value(_ value: Float) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.value = value
+        self.self.onNotRendered {
+            ($0 as? View)?.value = value
         }
     }
 }
 
-public extension ViewBuilder where Self: UISlider & Control {
+public extension UIViewCreator where Self: Control, View: UISlider {
     func onValueChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onEvent(.valueChanged, handler)
     }

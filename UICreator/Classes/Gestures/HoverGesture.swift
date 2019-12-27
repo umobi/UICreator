@@ -31,19 +31,19 @@ fileprivate extension UIView {
     }
 }
 
-public extension ViewBuilder {
+public extension UIViewCreator {
 
     @available(iOS 13.0, *)
     func onHoverMaker(_ hoverConfigurator: (HoverGesture) -> HoverGesture) -> Self {
-        self.addGestureRecognizer(hoverConfigurator(HoverGesture(target: self)))
+        self.uiView.addGestureRecognizer(hoverConfigurator(HoverGesture(target: self.uiView)))
         return self
     }
 
     @available(iOS 13.0, *)
     func onHover(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onHoverMaker { [unowned self] in
+        return self.onHoverMaker { 
             $0.onRecognized { _ in
-                handler(self)
+                handler(self.uiView)
             }
         }
     }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C03E9A923B6521300521AAB /* ContainerBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C03E9A823B6521300521AAB /* ContainerBuilder.swift */; };
 		0C07F76C23B17C5600A7A65B /* Previewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C07F76B23B17C5600A7A65B /* Previewer.swift */; };
 		0C0B0B9123B4E54100FAF1E6 /* Slider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0B0B9023B4E54100FAF1E6 /* Slider.swift */; };
 		0C0B0B9323B4E56200FAF1E6 /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0B0B9223B4E56200FAF1E6 /* ActivityIndicator.swift */; };
@@ -89,6 +90,7 @@
 
 /* Begin PBXFileReference section */
 		051CEEAE560163C1A234E8374E31A0E2 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		0C03E9A823B6521300521AAB /* ContainerBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerBuilder.swift; sourceTree = "<group>"; };
 		0C07F76B23B17C5600A7A65B /* Previewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Previewer.swift; path = UICreator/Classes/Previewer.swift; sourceTree = "<group>"; };
 		0C0B0B9023B4E54100FAF1E6 /* Slider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Slider.swift; sourceTree = "<group>"; };
 		0C0B0B9223B4E56200FAF1E6 /* ActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
@@ -298,6 +300,7 @@
 				0CAA4C0023B2696B00DD5DDF /* Spacer.swift */,
 				0C9346E123AE7D8600A9E112 /* Content.swift */,
 				0CAA4BFA23B267C300DD5DDF /* Container.swift */,
+				0C03E9A823B6521300521AAB /* ContainerBuilder.swift */,
 				0CAA4BFB23B267C300DD5DDF /* Blur.swift */,
 			);
 			path = UIContainer;
@@ -594,6 +597,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C93470723AE7D8600A9E112 /* Subview.swift in Sources */,
+				0C03E9A923B6521300521AAB /* ContainerBuilder.swift in Sources */,
 				0CAA4C0323B2696B00DD5DDF /* Spacer.swift in Sources */,
 				0C0FACF923B258FD00E6B2FC /* PinchGesture.swift in Sources */,
 				0C9346F523AE7D8600A9E112 /* RootView.swift in Sources */,

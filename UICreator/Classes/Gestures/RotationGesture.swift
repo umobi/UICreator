@@ -30,17 +30,17 @@ fileprivate extension UIView {
 
 }
 
-public extension ViewBuilder {
+public extension UIViewCreator {
 
     func onRotationMaker(_ rotationConfigurator: (RotationGesture) -> RotationGesture) -> Self {
-        self.addGestureRecognizer(rotationConfigurator(RotationGesture(target: self)))
+        self.uiView.addGestureRecognizer(rotationConfigurator(RotationGesture(target: self.uiView)))
         return self
     }
 
     func onRotation(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onRotationMaker { [unowned self] in
+        return self.onRotationMaker {
             $0.onRecognized { _ in
-                handler(self)
+                handler(self.uiView)
             }
         }
     }

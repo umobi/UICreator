@@ -13,10 +13,10 @@ public protocol NavigationRepresentable: TemplateView {
     var navigationLoader: (UIViewController) -> UINavigationController { get }
     var navigationBar: UINavigationBar { get }
 
-    init(_ content: @escaping () -> UIView)
+//    init(_ content: @escaping () -> ViewCreator)
 
     @discardableResult
-    func push(animated: Bool, _ content: () -> UIView) -> Self
+    func push(animated: Bool, content: @escaping () -> ViewCreator) -> Self
 
     @discardableResult
     func push(animated: Bool, _ viewController: UIViewController) -> Self
@@ -28,53 +28,48 @@ public protocol NavigationRepresentable: TemplateView {
     func popToRoot(animated: Bool) -> Self
 
     @discardableResult
-    func popTo(view: UIView, animated: Bool) -> Self
+    func popTo(view: ViewCreator, animated: Bool) -> Self
 }
 
-private var kContentHandler: UInt = 0
-
 class ContentHandler {
-    let content: () -> UIView
-    init(_ content: @escaping () -> UIView) {
+    let content: () -> ViewCreator
+    init(_ content: @escaping () -> ViewCreator) {
         self.content = content
     }
 }
 
+private var kContentHandler: UInt = 0
+private var kNavigationController: UInt = 0
 public extension NavigationRepresentable {
     internal weak var navigationController: UINavigationController! {
-        return (self.subviews.first(where: {
-            $0 is Container<UIViewController>
-        }) as? Container<UIViewController>)?.view as? UINavigationController
+        return (self.uiView.subviews.first(where: {
+            $0 is _Container<UIViewController>
+        }) as? _Container<UIViewController>)?.view as? UINavigationController
     }
 
     var navigationBar: UINavigationBar {
         return self.navigationController.navigationBar
     }
 
-    private var content: ContentHandler? {
+    internal var content: ContentHandler? {
         get { objc_getAssociatedObject(self, &kContentHandler) as? ContentHandler }
         set { objc_setAssociatedObject(self, &kContentHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
-    init(_ content: @escaping () -> UIView) {
-        self.init()
-        self.content = .init(content)
-    }
-
-    var body: UIView {
+    var body: ViewCreator {
         Container {
             guard let content = self.content?.content else {
                 fatalError()
             }
 
             self.content = nil
-            return self.navigationLoader(ContainerController(Host(content)))
+            return self.navigationLoader(ContainerController(Host(content: content)))
         }
     }
 
     @discardableResult
-    func push(animated: Bool, _ content: () -> UIView) -> Self {
-        self.navigationController.pushViewController(ContainerController(Host(content)), animated: animated)
+    func push(animated: Bool, content: @escaping () -> ViewCreator) -> Self {
+        self.navigationController.pushViewController(ContainerController(Host(content: content)), animated: animated)
         return self
     }
 
@@ -97,10 +92,14 @@ public extension NavigationRepresentable {
     }
 
     @discardableResult
-    func popTo(view: UIView, animated: Bool) -> Self {
+    func popTo(view: ViewCreator, animated: Bool) -> Self {
         guard let viewController = self.navigationController.viewControllers.first(where: {
-            ($0 as? ContainerController<Host>)?.contentView?.subviews.first(where: {
-                $0 === view
+            guard let controller = $0 as? ContainerController<Host> else {
+                return false
+            }
+
+            return controller.contentView.uiView.subviews.first(where: {
+                $0 === view.uiView
             }) != nil
         }) else {
             fatalError("\(type(of: view)) is not on first hierarchy")

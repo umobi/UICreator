@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-public protocol TextKeyboard: ViewBuilder {
+public protocol TextKeyboard: UIViewCreator {
     func autocapitalization(type: UITextAutocapitalizationType) -> Self
     func autocorrection(type: UITextAutocorrectionType) -> Self
 
@@ -28,8 +28,8 @@ public protocol TextKeyboard: ViewBuilder {
     func smartInsertDelete(type: UITextSmartInsertDeleteType) -> Self
 
     func textContent(type: UITextContentType) -> Self
-    func inputAccessoryView(content: @escaping () -> UIInputView) -> Self
-    func inputView(content: @escaping () -> UIInputView) -> Self
+    func inputAccessoryView(content: @escaping () -> ViewCreator) -> Self
+    func inputView(content: @escaping () -> ViewCreator) -> Self
     func input(delegate: UITextInputDelegate) -> Self
 
     func typing(attributes: [NSAttributedString.Key : Any]?) -> Self

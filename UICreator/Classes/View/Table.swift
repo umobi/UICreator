@@ -8,20 +8,7 @@
 import Foundation
 import UIKit
 
-public class Table: UITableView, ViewBuilder, HasViewDelegate, HasViewDataSource {
-
-    public func delegate(_ delegate: UITableViewDelegate?) -> Self {
-        return self.appendBeforeRendering {
-            ($0 as? Self)?.delegate = delegate
-        }
-    }
-
-    public func dataSource(_ dataSource: UITableViewDataSource?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.dataSource = dataSource
-        }
-    }
-
+public class TableView: UITableView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -43,152 +30,167 @@ public class Table: UITableView, ViewBuilder, HasViewDelegate, HasViewDataSource
     }
 }
 
-public extension ViewBuilder where Self: UITableView {
-    init(style: Style) {
-        self.init(frame: .zero, style: style)
+public class Table: UIViewCreator, HasViewDelegate, HasViewDataSource {
+    public typealias View = TableView
+
+    public func delegate(_ delegate: UITableViewDelegate?) -> Self {
+        return self.onNotRendered {
+            ($0 as? View)?.delegate = delegate
+        }
     }
 
+    public func dataSource(_ dataSource: UITableViewDataSource?) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.dataSource = dataSource
+        }
+    }
+
+    public init(style: UITableView.Style) {
+        self.uiView = View.init(frame: .zero, style: style)
+    }
+}
+
+public extension UIViewCreator where View: UITableView {
+
     func addCell(for identifier: String, _ cellClass: AnyClass?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.register(cellClass, forCellReuseIdentifier: identifier)
+        self.onNotRendered {
+            ($0 as? View)?.register(cellClass, forCellReuseIdentifier: identifier)
         }
     }
 
     func addCell(for identifier: String, _ uiNib: UINib?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.register(uiNib, forCellReuseIdentifier: identifier)
+        self.onNotRendered {
+            ($0 as? View)?.register(uiNib, forCellReuseIdentifier: identifier)
         }
     }
 
     func addHeaderOrFooter(for identifier: String, _ aClass: AnyClass?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.register(aClass, forHeaderFooterViewReuseIdentifier: identifier)
+        self.onNotRendered {
+            ($0 as? View)?.register(aClass, forHeaderFooterViewReuseIdentifier: identifier)
         }
     }
 
     func addHeaderOrFooter(for identifier: String, _ uiNib: UINib?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.register(uiNib, forHeaderFooterViewReuseIdentifier: identifier)
+        self.onNotRendered {
+            ($0 as? View)?.register(uiNib, forHeaderFooterViewReuseIdentifier: identifier)
         }
     }
 
     func row(height: CGFloat) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.rowHeight = height
+        self.onNotRendered {
+            ($0 as? View)?.rowHeight = height
         }
     }
 
     func row(estimatedHeight: CGFloat) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.estimatedRowHeight = estimatedHeight
+        self.onNotRendered {
+            ($0 as? View)?.estimatedRowHeight = estimatedHeight
         }
     }
 
     func header(height: CGFloat) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.sectionHeaderHeight = height
+        self.onNotRendered {
+            ($0 as? View)?.sectionHeaderHeight = height
         }
     }
 
     func header(estimatedHeight: CGFloat) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.estimatedSectionHeaderHeight = estimatedHeight
+        self.onNotRendered {
+            ($0 as? View)?.estimatedSectionHeaderHeight = estimatedHeight
         }
     }
 
     func footer(height: CGFloat) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.sectionFooterHeight = height
+        self.onNotRendered {
+            ($0 as? View)?.sectionFooterHeight = height
         }
     }
 
     func footer(estimatedHeight: CGFloat) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.estimatedSectionFooterHeight = estimatedHeight
+        self.onNotRendered {
+            ($0 as? View)?.estimatedSectionFooterHeight = estimatedHeight
         }
     }
 
     func allowsMultipleSelection(_ flag: Bool) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.allowsMultipleSelection = flag
+        self.onRendered {
+            ($0 as? View)?.allowsMultipleSelection = flag
         }
     }
 
     func allowsSelection(_ flag: Bool) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.allowsSelection = flag
+        self.onRendered {
+            ($0 as? View)?.allowsSelection = flag
         }
     }
 
     func allowsSelectionDuringEditing(_ flag: Bool) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.allowsSelectionDuringEditing = flag
+        self.onRendered {
+            ($0 as? View)?.allowsSelectionDuringEditing = flag
         }
     }
 
     func allowsMultipleSelectionDuringEditing(_ flag: Bool) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.allowsMultipleSelectionDuringEditing = flag
+        self.onRendered {
+            ($0 as? View)?.allowsMultipleSelectionDuringEditing = flag
         }
     }
 
-    @available(tvOS 11.0, *)
-    @available(iOS 11.0, *)
+    @available(iOS 11.0,tvOS 11.0 , *)
     func insetsContentViews(toSafeArea flag: Bool) -> Self {
-        self.appendInTheScene {
-            ($0 as? Self)?.insetsContentViewsToSafeArea = flag
+        self.onInTheScene {
+            ($0 as? View)?.insetsContentViewsToSafeArea = flag
         }
     }
 
-    func background(_ content: @escaping () -> UIView) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.backgroundView = Host(content)
+    func background(_ content: @escaping () -> ViewCreator) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.backgroundView = Host(content: content).uiView
         }
     }
 
     #if os(iOS)
     func separator(effect: UIVisualEffect) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.separatorEffect = effect
+        self.onRendered {
+            ($0 as? View)?.separatorEffect = effect
         }
     }
 
     func separator(color: UIColor?) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.separatorColor = color
+        self.onRendered {
+            ($0 as? View)?.separatorColor = color
         }
     }
 
     func separator(style: UITableViewCell.SeparatorStyle) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.separatorStyle = style
+        self.onRendered {
+            ($0 as? View)?.separatorStyle = style
         }
     }
     #endif
 
     func separator(insets: UIEdgeInsets) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.separatorInset = insets
+        self.onRendered {
+            ($0 as? View)?.separatorInset = insets
         }
     }
 
-    @available(tvOS 11.0, *)
-    @available(iOS 11.0, *)
-    func separator(insetReference: SeparatorInsetReference) -> Self {
-        self.appendRendered {
-            ($0 as? Self)?.separatorInsetReference = insetReference
+    @available(iOS 11.0, tvOS 11.0, *)
+    func separator(insetReference: UITableView.SeparatorInsetReference) -> Self {
+        self.onRendered {
+            ($0 as? View)?.separatorInsetReference = insetReference
         }
     }
 
-    func header(size: CGSize = .zero, _ content: @escaping () -> UIView) -> Self {
-        return self.appendRendered {
-            ($0 as? Self)?.tableHeaderView = Host(size: size, content)
+    func header(size: CGSize = .zero, _ content: @escaping () -> ViewCreator) -> Self {
+        return self.onRendered {
+            ($0 as? View)?.tableHeaderView = Host(size: size, content: content).uiView
         }
     }
 
-    func footer(size: CGSize = .zero, _ content: @escaping () -> UIView) -> Self {
-        return self.appendRendered {
-            ($0 as? Self)?.tableFooterView = Host(size: size, content)
+    func footer(size: CGSize = .zero, _ content: @escaping () -> ViewCreator) -> Self {
+        return self.onRendered {
+            ($0 as? View)?.tableFooterView = Host(size: size, content: content).uiView
         }
     }
 }

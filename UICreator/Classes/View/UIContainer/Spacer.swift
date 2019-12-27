@@ -1,5 +1,5 @@
 //
-//  Spacer+ViewBuilder.swift
+//  Spacer+ViewCreator.swift
 //  UIBuilder
 //
 //  Created by brennobemoura on 21/12/19.
@@ -9,8 +9,7 @@ import Foundation
 import UIKit
 import UIContainer
 
-public class Spacer: SpacerView, ViewBuilder {
-
+public class _SpacerView: SpacerView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -32,49 +31,76 @@ public class Spacer: SpacerView, ViewBuilder {
     }
 }
 
-public extension ViewBuilder where Self: SpacerView {
+public class Spacer: UIViewCreator {
+    public typealias View = _SpacerView
 
-    init(top: CGFloat, bottom: CGFloat, leading: CGFloat, trailing: CGFloat, content: @escaping () -> UIView) {
-        self.init(content(), margin: .init(top: top, bottom: bottom, leading: leading, trailing: trailing))
+    public required init(margin: View.Margin, content: @escaping () -> ViewCreator) {
+        self.uiView = View.init(content().uiView, margin: margin)
+    }
+}
+
+public class Empty: ViewCreator {
+    public typealias View = UIView
+
+    public init() {
+        self.uiView = .init()
+    }
+}
+
+public extension Spacer {
+    convenience init(vertical: CGFloat, horizontal: CGFloat) {
+        self.init(margin: .init(vertical: vertical, horizontal: horizontal)) {
+            Empty()
+        }
     }
 
-    init(vertical: CGFloat, horizontal: CGFloat, content: @escaping () -> UIView) {
-        self.init(content(), margin: .init(vertical: vertical, horizontal: horizontal))
+    convenience init(vertical: CGFloat) {
+        self.init(margin: .init(vertical: vertical, horizontal: 0)) {
+            Empty()
+        }
     }
 
-    init(vertical: CGFloat, content: @escaping () -> UIView) {
-        self.init(vertical: vertical, horizontal: 0, content: content)
+    convenience init(horizontal: CGFloat) {
+        self.init(margin: .init(vertical: 0, horizontal: horizontal)) {
+           Empty()
+       }
     }
 
-    init(horizontal: CGFloat, content: @escaping () -> UIView) {
-        self.init(vertical: 0, horizontal: horizontal, content: content)
+    convenience init() {
+        self.init(margin: .init(spacing: 0)) {
+            Empty()
+        }
     }
 
-    init(vertical: CGFloat, horizontal: CGFloat) {
-        self.init(UIView(), margin: .init(vertical: vertical, horizontal: horizontal))
+    convenience init(spacing: CGFloat) {
+        self.init(margin: .init(spacing: spacing)) {
+            Empty()
+        }
+    }
+}
+
+public extension Spacer {
+    convenience init(top: CGFloat, bottom: CGFloat, leading: CGFloat, trailing: CGFloat, content: @escaping () -> Content) {
+        self.init(margin: .init(top: top, bottom: bottom, leading: leading, trailing: trailing), content: content)
     }
 
-    init(vertical: CGFloat) {
-        self.init(vertical: vertical, horizontal: 0)
+    convenience init(vertical: CGFloat, horizontal: CGFloat, content: @escaping () -> ViewCreator) {
+        self.init(margin: .init(vertical: vertical, horizontal: horizontal), content: content)
     }
 
-    init(horizontal: CGFloat) {
-        self.init(vertical: 0, horizontal: horizontal)
+    convenience init(vertical: CGFloat, content: @escaping () -> ViewCreator) {
+        self.init(margin: .init(vertical: vertical, horizontal: 0), content: content)
     }
 
-    init(spacing: CGFloat, content: @escaping () -> UIView) {
-        self.init(content(), margin: .init(spacing: spacing))
+    convenience init(horizontal: CGFloat, content: @escaping () -> ViewCreator) {
+        self.init(margin: .init(vertical: 0, horizontal: horizontal), content: content)
     }
 
-    init(spacing: CGFloat) {
-        self.init(UIView(), margin: .init(spacing: spacing))
+    convenience init(spacing: CGFloat, content: @escaping () -> ViewCreator) {
+        self.init(margin: .init(spacing: spacing), content: content)
     }
 
-    init(content: @escaping () -> UIView) {
-        self.init(content(), margin: .init(spacing: 0))
-    }
-
-    init() {
-        self.init(UIView(), margin: .init(spacing: 0))
+    convenience init(content: @escaping () -> ViewCreator) {
+        self.init(margin: .init(spacing: 0), content: content)
     }
 }

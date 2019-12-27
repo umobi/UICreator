@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-public class Activity: UIActivityIndicatorView, ViewBuilder {
+public class ActivityIndicatorView: UIActivityIndicatorView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -30,21 +30,26 @@ public class Activity: UIActivityIndicatorView, ViewBuilder {
     }
 }
 
-public extension ViewBuilder where Self: UIActivityIndicatorView {
-    init(style: Style) {
-        self.init(frame: .zero)
-        self.style = style
+public class Activity: UIViewCreator {
+    public typealias View = ActivityIndicatorView
+
+    public init(style: View.Style) {
+        self.uiView = View.init(builder: self)
+        (self.uiView as? View)?.style = style
     }
+}
+
+public extension UIViewCreator where View: UIActivityIndicatorView {
 
     func color(_ color: UIColor) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.color = color
+        self.onNotRendered {
+            ($0 as? View)?.color = color
         }
     }
 
     func hidesWhenStopped(_ flag: Bool) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.hidesWhenStopped = flag
+        self.onNotRendered {
+            ($0 as? View)?.hidesWhenStopped = flag
         }
     }
 }

@@ -17,15 +17,15 @@ internal extension UIView {
 
     /// `enum Mode` The view rendering mode. It is updated depending on the hierarchy of the view.
     /// To execute each state, the superview should call `commitNotRendered()`, `commitRendered()` and `commitInTheScene()`
-    /// provided by `protocol ViewBuilder` .
-    enum Mode {
+    /// provided by `protocol ViewCreator` .
+    enum RenderState {
         case notRendered
         case rendered
         case inTheScene
     }
 
     /// The current state of the view
-    var mode: Mode {
+    var renderState: RenderState {
         if self.superview == nil {
             return .notRendered
         }
@@ -39,7 +39,7 @@ internal extension UIView {
 
     /// `class Handler` is a wrap for callbacks used by Core to execute some of the style configurations and other callbacks.
     /// It always return the `self` view as a parameter, so you will not need to create memory dependency in callbacks.
-    /// As a tip, you may just cast like `$0 as? Self`, that may work.
+    /// As a tip, you may just cast like `$0 as? View`, that may work.
     class Handler {
         private let handler: (UIView) -> Void
 

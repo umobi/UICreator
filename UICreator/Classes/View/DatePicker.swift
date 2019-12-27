@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 #if os(iOS)
-public class DatePicker: UIDatePicker, Control, ViewBuilder {
+public class _DatePicker: UIDatePicker {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -31,62 +31,67 @@ public class DatePicker: UIDatePicker, Control, ViewBuilder {
     }
 }
 
-public extension ViewBuilder where Self: UIDatePicker {
-    init(calendar: Calendar? = nil) {
-        self.init(frame: .zero)
-        self.calendar = calendar ?? .current
+public class DatePicker: UIViewCreator, Control {
+    public typealias View = _DatePicker
+
+    public init(calendar: Calendar? = nil) {
+        self.uiView = View.init(builder: self)
+        (self.uiView as? View)?.calendar = calendar ?? .current
     }
+}
+
+public extension UIViewCreator where View: UIDatePicker {
 
     func date(_ date: Date) -> Self {
-        self.appendInTheScene {
-            ($0 as? Self)?.date = date
+        self.onInTheScene {
+            ($0 as? View)?.date = date
         }
     }
 
-    func mode(_ mode: Self.Mode) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.datePickerMode = mode
+    func mode(_ mode: UIDatePicker.Mode) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.datePickerMode = mode
         }
     }
 
     func locale(_ locale: Locale?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.locale = locale
+        self.onNotRendered {
+            ($0 as? View)?.locale = locale
         }
     }
 
     func maximumDate(_ maximumDate: Date?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.maximumDate = maximumDate
+        self.onNotRendered {
+            ($0 as? View)?.maximumDate = maximumDate
         }
     }
 
     func minimumDate(_ minimumDate: Date?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.minimumDate = minimumDate
+        self.onNotRendered {
+            ($0 as? View)?.minimumDate = minimumDate
         }
     }
 
     func countDownDuration(_ duration: TimeInterval) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.countDownDuration = duration
+        self.onNotRendered {
+            ($0 as? View)?.countDownDuration = duration
         }
     }
 
     func minuteInterval(_ interval: Int) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.minuteInterval = interval
+        self.onNotRendered {
+            ($0 as? View)?.minuteInterval = interval
         }
     }
 
     func timeZone(_ timeZone: TimeZone?) -> Self {
-        self.appendBeforeRendering {
-            ($0 as? Self)?.timeZone = timeZone
+        self.onNotRendered {
+            ($0 as? View)?.timeZone = timeZone
         }
     }
 }
 
-public extension Control where Self: UIDatePicker & Control {
+public extension UIViewCreator where Self: Control, View: UIDatePicker {
     func onValueChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onEvent(.valueChanged, handler)
     }

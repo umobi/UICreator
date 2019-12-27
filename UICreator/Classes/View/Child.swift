@@ -9,30 +9,7 @@ import Foundation
 import UIKit
 import SnapKit
 
-/// `class Child` is a view that holds more than one **subview**.
-public class Child: UIView, ViewBuilder {
-    public convenience init(_ subview: Subview) {
-        self.init()
-
-        subview.views.forEach {
-            self.addSubview($0)
-            $0.snp.makeConstraints {
-                $0.edges.equalTo(0).priority(.low)
-            }
-        }
-    }
-
-    public convenience init(_ views: UIView...) {
-        self.init()
-
-        views.forEach {
-            self.addSubview($0)
-            $0.snp.makeConstraints {
-                $0.edges.equalTo(0).priority(.low)
-            }
-        }
-    }
-
+public class ChildView: UIView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -51,5 +28,34 @@ public class Child: UIView, ViewBuilder {
     override public func layoutSubviews() {
         super.layoutSubviews()
         self.commitLayout()
+    }
+}
+
+/// `class Child` is a view that holds more than one **subview**.
+public class Child: UIViewCreator {
+    public typealias View = ChildView
+
+    public init(_ subview: Subview) {
+        self.uiView = View.init(builder: self)
+
+        subview.views.compactMap { $0 }
+            .forEach {
+                self.uiView.addSubview($0.uiView)
+                $0.uiView.snp.makeConstraints {
+                    $0.edges.equalTo(0).priority(.low)
+                }
+            }
+    }
+
+    public init(_ views: ViewCreator...) {
+        self.uiView = View.init(builder: self)
+
+        views.compactMap { $0 }
+            .forEach {
+                self.uiView.addSubview($0.uiView)
+                $0.uiView.snp.makeConstraints {
+                    $0.edges.equalTo(0).priority(.low)
+                }
+            }
     }
 }

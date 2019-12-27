@@ -1,5 +1,5 @@
 //
-//  Blur+ViewBuilder.swift
+//  Blur+ViewCreator.swift
 //  Pods
 //
 //  Created by brennobemoura on 21/12/19.
@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import UIContainer
 
-public class Blur: BlurView, ViewBuilder {
+public class _BlurView: BlurView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -31,32 +31,40 @@ public class Blur: BlurView, ViewBuilder {
     }
 }
 
-extension ViewBuilder where Self: BlurView  {
+public class Blur: ViewCreator {
+    public typealias View = _BlurView
+
+    init() {
+        self.uiView = View.init(blur: .regular)
+    }
+}
+
+public extension UIViewCreator where View: BlurView {
     func blur(style: UIBlurEffect.Style) -> Self {
-        return self.appendRendered {
-            ($0 as? Self)?.apply(blurEffect: style)
+        return self.onRendered {
+            ($0 as? View)?.apply(blurEffect: style)
         }
     }
 
     func blur(dynamic dynamicStyle: TraitObject<UIBlurEffect.Style>) -> Self {
-        return self.appendRendered {
-            ($0 as? Self)?.apply(dynamicBlur: dynamicStyle)
+        return self.onRendered {
+            ($0 as? View)?.apply(dynamicBlur: dynamicStyle)
         }
     }
 }
 
 #if os(iOS)
 @available(iOS 13, *)
-extension ViewBuilder where Self: BlurView {
+public extension UIViewCreator where View: BlurView {
     func vibrancy(effect: UIVibrancyEffectStyle) -> Self {
-        return self.appendRendered {
-            ($0 as? Self)?.apply(vibrancyEffect: effect)
+        return self.onRendered {
+            ($0 as? View)?.apply(vibrancyEffect: effect)
         }
     }
 
     func vibrancy(dynamic dynamicEffect: TraitObject<UIVibrancyEffectStyle>) -> Self {
-        return self.appendRendered {
-            ($0 as? Self)?.apply(dynamicVibrancy: dynamicEffect)
+        return self.onRendered {
+            ($0 as? View)?.apply(dynamicVibrancy: dynamicEffect)
         }
     }
 }

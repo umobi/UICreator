@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol Text: ViewBuilder {
+public protocol TextElement: UIViewCreator {
     func text(_ string: String?) -> Self
     func text(_ attributedText: NSAttributedString?) -> Self
 
@@ -23,17 +23,7 @@ public protocol Text: ViewBuilder {
     func adjustsFont(forContentSizeCategory flag: Bool) -> Self
 }
 
-public extension Text {
-    init(_ text: String?) {
-        self.init()
-        _ = self.text(text)
-    }
-
-    init(_ attributedText: NSAttributedString?) {
-        self.init()
-        _ = self.text(attributedText)
-    }
-
+public extension TextElement {
     func text(scale: CGFloat) -> Self {
         print("[warning] text(scale:) not implemented")
         return self

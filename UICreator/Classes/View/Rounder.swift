@@ -9,13 +9,7 @@ import Foundation
 import UIKit
 import UIContainer
 
-public extension ViewBuilder where Self: RounderView {
-    init(radius: CGFloat, content: @escaping () -> UIView) {
-        self.init(content(), radius: radius)
-    }
-}
-
-public class Rounder: RounderView, ViewBuilder {
+public class _RounderView: RounderView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -37,6 +31,14 @@ public class Rounder: RounderView, ViewBuilder {
     }
 }
 
-public func Circle(content: @escaping () -> UIView) -> Rounder {
+public class Rounder: UIViewCreator {
+    public typealias View = _RounderView
+
+    public init(radius: CGFloat, content: @escaping () -> ViewCreator) {
+        self.uiView = View.init(content().uiView, radius: radius)
+    }
+}
+
+public func Circle(content: @escaping () -> ViewCreator) -> Rounder {
     return .init(radius: 0.5, content: content)
 }

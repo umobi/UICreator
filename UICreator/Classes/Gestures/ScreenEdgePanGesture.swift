@@ -29,16 +29,16 @@ fileprivate extension UIView {
     }
 }
 
-public extension ViewBuilder {
+public extension UIViewCreator {
     func onScreenEdgePanMaker(_ screenEdgePanConfigurator: (ScreenEdgePanGesture) -> ScreenEdgePanGesture) -> Self {
-        self.addGestureRecognizer(screenEdgePanConfigurator(ScreenEdgePanGesture(target: self)))
+        self.uiView.addGestureRecognizer(screenEdgePanConfigurator(ScreenEdgePanGesture(target: self.uiView)))
         return self
     }
 
     func onScreenEdgePan(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onScreenEdgePanMaker { [unowned self] in
+        return self.onScreenEdgePanMaker {
             $0.onRecognized { _ in
-                handler(self)
+                handler(self.uiView)
             }
         }
     }
