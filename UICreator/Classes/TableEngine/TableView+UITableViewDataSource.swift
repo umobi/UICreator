@@ -21,9 +21,36 @@
 //
 
 import Foundation
-import UIKit
 
-public protocol TemplateView: class, ViewCreator {
-    var body: ViewCreator { get }
-    init()
+extension TableView: UITableViewDataSource {
+    public func numberOfSections(in tableView: UITableView) -> Int {
+        return self.group?.numberOfSections ?? 0
+    }
+
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        guard let group = self.group else {
+            return 0
+        }
+
+        let numberOfRows = group.numberOfRows(in: group.section(at: section))
+        if let creatorDataSource = self.creatorDataSource {
+            return creatorDataSource.numberOfRows(in: section, estimatedRows: numberOfRows)
+        }
+
+        return numberOfRows
+    }
+
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let row = self.group?.row(at: indexPath) else {
+            fatalError()
+        }
+
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: row.0, for: indexPath) as? TableViewCell else {
+            fatalError()
+        }
+
+        cell.prepareCell(content: row.1)
+        self.creatorDataSource?.cell(at: indexPath, cell, content: cell.builder)
+        return cell
+    }
 }

@@ -21,9 +21,18 @@
 //
 
 import Foundation
-import UIKit
 
-public protocol TemplateView: class, ViewCreator {
-    var body: ViewCreator { get }
-    init()
+public protocol TableDataSource {
+    func numberOfRows(in section: Int, estimatedRows: Int) -> Int
+
+    func cell(at indexPath: IndexPath, content: ViewCreator)
 }
+
+public extension TableDataSource {
+    func numberOfRows(in section: Int, estimatedRows: Int) -> Int {
+        return estimatedRows
+    }
+
+    func cell(at indexPath: IndexPath, content: ViewCreator) {}
+}
+

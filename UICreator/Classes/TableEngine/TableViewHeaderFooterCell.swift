@@ -22,9 +22,20 @@
 
 import Foundation
 import UIKit
-import UIContainer
 
-public class _BlurView: BlurView {
+internal class TableViewHeaderFooterCell: UITableViewHeaderFooterView {
+    private(set) var builder: ViewCreator! = nil
+
+    override init(reuseIdentifier: String?) {
+        super.init(reuseIdentifier: reuseIdentifier)
+        self.backgroundView = self.backgroundView ?? UIView()
+        self.backgroundView?.backgroundColor = .clear
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -44,43 +55,18 @@ public class _BlurView: BlurView {
         super.layoutSubviews()
         self.commitLayout()
     }
-}
 
-public class Blur: ViewCreator {
-    public typealias View = _BlurView
-
-    public init(blur: UIBlurEffect.Style = .regular) {
-        self.uiView = View.init(blur: blur)
-    }
-}
-
-public extension UIViewCreator where View: BlurView {
-    func blur(style: UIBlurEffect.Style) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.apply(blurEffect: style)
+    func prepareCell(content: @escaping () -> ViewCreator) {
+        guard self.builder == nil else {
+            return
         }
+
+        let builder = content()
+        self.builder = builder
+        _ = self.contentView.add(builder.uiView)
     }
 
-    func blur(dynamic dynamicStyle: TraitObject<UIBlurEffect.Style>) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.apply(dynamicBlur: dynamicStyle)
-        }
+    public override var watchingViews: [UIView] {
+        return self.contentView.subviews
     }
 }
-
-#if os(iOS)
-@available(iOS 13, *)
-public extension UIViewCreator where View: BlurView {
-    func vibrancy(effect: UIVibrancyEffectStyle) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.apply(vibrancyEffect: effect)
-        }
-    }
-
-    func vibrancy(dynamic dynamicEffect: TraitObject<UIVibrancyEffectStyle>) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.apply(dynamicVibrancy: dynamicEffect)
-        }
-    }
-}
-#endif

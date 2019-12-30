@@ -21,9 +21,13 @@
 //
 
 import Foundation
-import UIKit
 
-public protocol TemplateView: class, ViewCreator {
-    var body: ViewCreator { get }
-    init()
+extension Table {
+    public enum ContentType {
+        case header
+        case row
+        case footer
+        case section
+        case group
+    }
 }

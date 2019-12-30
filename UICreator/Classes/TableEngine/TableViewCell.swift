@@ -23,7 +23,40 @@
 import Foundation
 import UIKit
 
-public protocol TemplateView: class, ViewCreator {
-    var body: ViewCreator { get }
-    init()
+internal class TableViewCell: UITableViewCell {
+    private(set) var builder: ViewCreator! = nil
+
+    override public func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        self.commitNotRendered()
+    }
+
+    override public func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        self.commitRendered()
+    }
+
+    override public func didMoveToWindow() {
+        super.didMoveToWindow()
+        self.commitInTheScene()
+    }
+
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        self.commitLayout()
+    }
+
+    func prepareCell(content: @escaping () -> ViewCreator) {
+        guard self.builder == nil else {
+            return
+        }
+
+        let builder = content()
+        self.builder = builder
+        _ = self.contentView.add(builder.uiView)
+    }
+
+    public override var watchingViews: [UIView] {
+        return self.contentView.subviews
+    }
 }

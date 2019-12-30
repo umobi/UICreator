@@ -21,9 +21,15 @@
 //
 
 import Foundation
-import UIKit
 
-public protocol TemplateView: class, ViewCreator {
-    var body: ViewCreator { get }
-    init()
+public extension UIViewCreator where View: TableView {
+    func dynamicDataSource(_ dataSource: TableDataSource) -> Self {
+        (self.uiView as? View)?.creatorDataSource = dataSource
+        return self
+    }
+
+    func dynamicDelegate(_ delegate: TableDelegate) -> Self {
+        (self.uiView as? View)?.creatorDelegate = delegate
+        return self
+    }
 }
