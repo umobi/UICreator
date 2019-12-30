@@ -33,7 +33,7 @@ extension TableView: UITableViewDelegate {
         }
 
         cell.prepareCell(content: header.1)
-        self.creatorDelegate?.header(at: section, cell, content: cell.builder)
+        self.creatorDelegate?.header(at: section, content: cell.builder)
         return cell
     }
 }

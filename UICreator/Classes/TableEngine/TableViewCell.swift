@@ -26,6 +26,17 @@ import UIKit
 internal class TableViewCell: UITableViewCell {
     private(set) var builder: ViewCreator! = nil
 
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        self.selectionStyle = .none
+        self.backgroundColor = .clear
+        self.focusStyle = .custom
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()

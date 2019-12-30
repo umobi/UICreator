@@ -86,19 +86,19 @@ extension Table.Element {
 }
 
 extension Table.Element {
-    var asSection: Element.Section? {
+    var asSection: Section? {
         return Section(self)
     }
 
-    var asHeader: Element.Header? {
+    var asHeader: Header? {
         return Header(self)
     }
 
-    var asFooter: Element.Footer? {
+    var asFooter: Footer? {
         return Footer(self)
     }
 
-    var asRow: Element.Row? {
+    var asRow: Row? {
         return Row(self)
     }
 }
@@ -142,9 +142,9 @@ extension Table.Element {
 
 public extension Table.Element {
     class Section {
-        let group: Group
+        let group: Table.Group
 
-        fileprivate init?(_ element: Element) {
+        fileprivate init?(_ element: Table.Element) {
             guard case .section = element.type, case .group(let group) = element.content else {
                 return nil
             }
@@ -158,7 +158,7 @@ public extension Table.Element {
     class Header {
         let content: () -> ViewCreator
 
-        fileprivate init?(_ element: Element) {
+        fileprivate init?(_ element: Table.Element) {
             guard case .header = element.type, case .content(let content) = element.content else {
                 return nil
             }
@@ -172,7 +172,7 @@ public extension Table.Element {
     class Footer {
         let content: () -> ViewCreator
 
-        fileprivate init?(_ element: Element) {
+        fileprivate init?(_ element: Table.Element) {
             guard case .footer = element.type, case .content(let content) = element.content else {
                 return nil
             }
@@ -187,7 +187,7 @@ public extension Table.Element {
         let content: () -> ViewCreator
         let quantity: Int
 
-        fileprivate init?(_ element: Element) {
+        fileprivate init?(_ element: Table.Element) {
             guard case .row = element.type, case .content(let content) = element.content else {
                 return nil
             }

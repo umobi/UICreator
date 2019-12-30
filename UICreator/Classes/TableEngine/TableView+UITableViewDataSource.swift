@@ -50,7 +50,7 @@ extension TableView: UITableViewDataSource {
         }
 
         cell.prepareCell(content: row.1)
-        self.creatorDataSource?.cell(at: indexPath, cell, content: cell.builder)
+        self.creatorDataSource?.cell(at: indexPath, content: cell.builder)
         return cell
     }
 }

@@ -54,10 +54,10 @@ public protocol ViewCreator {
     func onLayout(_ handler: @escaping (UIView) -> Void) -> Self
 }
 
-private var kUIView: UInt = 0
+internal var kUIView: UInt = 0
 internal extension ViewCreator {
     var uiView: UIView! {
-        get { objc_getAssociatedObject(self, &kUIView) as? UIView }
+        get { (self as? UIViewMaker)?.makeView() ?? objc_getAssociatedObject(self, &kUIView) as? UIView }
         nonmutating
         set { setView(newValue, policity: newValue?.superview != nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
     }

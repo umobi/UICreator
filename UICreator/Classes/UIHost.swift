@@ -23,8 +23,33 @@
 import Foundation
 import UIKit
 
-public class UIHost<View: UIView>: UIViewCreator {
-    init() {
-        self.uiView = View.init()
+public protocol UIViewMaker: ViewCreator {
+    var loadView: UIView { get }
+}
+
+public protocol UIHost: UIViewCreator, UIViewMaker {
+    var uiView: View! { get }
+    func makeUIView() -> View
+}
+
+internal extension UIViewMaker {
+    func makeView() -> UIView {
+        if let view = objc_getAssociatedObject(self, &kUIView) as? UIView {
+            return view
+        }
+
+        let view = self.loadView
+        objc_setAssociatedObject(self, &kUIView, view, .OBJC_ASSOCIATION_RETAIN)
+        return view
+    }
+}
+
+public extension UIHost {
+    var loadView: UIView {
+        return self.makeUIView()
+    }
+
+    var uiView: View! {
+        return (self as ViewCreator).uiView as? View
     }
 }
