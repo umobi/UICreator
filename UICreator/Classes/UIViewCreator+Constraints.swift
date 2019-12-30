@@ -36,7 +36,7 @@ extension UIView {
 }
 
 public extension UIViewCreator {
-    func safeArea(topEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func safeArea(topEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -59,7 +59,7 @@ public extension UIViewCreator {
         }
     }
 
-    func safeArea(topGreaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func safeArea(topGreaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -82,7 +82,7 @@ public extension UIViewCreator {
         }
     }
 
-    func safeArea(topLessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func safeArea(topLessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -105,7 +105,7 @@ public extension UIViewCreator {
         }
     }
 
-    func safeArea(bottomEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func safeArea(bottomEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -129,7 +129,7 @@ public extension UIViewCreator {
         }
     }
 
-    func safeArea(bottomGreaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func safeArea(bottomGreaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -153,7 +153,7 @@ public extension UIViewCreator {
         }
     }
 
-    func safeArea(bottomLessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func safeArea(bottomLessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -175,7 +175,7 @@ public extension UIViewCreator {
         }
     }
 
-    func safeArea(leadingEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func safeArea(leadingEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -197,7 +197,7 @@ public extension UIViewCreator {
         }
     }
 
-    func safeArea(leadingGreaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func safeArea(leadingGreaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -219,7 +219,7 @@ public extension UIViewCreator {
         }
     }
 
-    func safeArea(leadingLessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func safeArea(leadingLessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -241,7 +241,7 @@ public extension UIViewCreator {
         }
     }
 
-    func safeArea(trailingEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func safeArea(trailingEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -263,7 +263,7 @@ public extension UIViewCreator {
         }
     }
 
-    func safeArea(trailingGreaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func safeArea(trailingGreaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -285,7 +285,7 @@ public extension UIViewCreator {
         }
     }
 
-    func safeArea(trailingLessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func safeArea(trailingLessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -307,14 +307,14 @@ public extension UIViewCreator {
         }
     }
 
-    func safeAreaInsets(equalTo value: CGFloat = 0, priority: ConstraintPriority = .high) -> Self {
+    func safeAreaInsets(equalTo value: CGFloat = 0, priority: ConstraintPriority = .required) -> Self {
         return self.safeArea(topEqualTo: value, priority: priority)
             .safeArea(bottomEqualTo: value, priority: priority)
             .safeArea(leadingEqualTo: value, priority: priority)
             .safeArea(trailingEqualTo: value, priority: priority)
     }
 
-    func top(equalTo constant: CGFloat = 0, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func top(equalTo constant: CGFloat = 0, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -328,7 +328,7 @@ public extension UIViewCreator {
         }
     }
 
-    func top(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func top(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -342,7 +342,7 @@ public extension UIViewCreator {
         }
     }
 
-    func top(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func top(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -356,7 +356,7 @@ public extension UIViewCreator {
         }
     }
 
-    func bottom(equalTo constant: CGFloat = 0, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func bottom(equalTo constant: CGFloat = 0, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -370,7 +370,7 @@ public extension UIViewCreator {
         }
     }
 
-    func bottom(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func bottom(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -384,7 +384,7 @@ public extension UIViewCreator {
         }
     }
 
-    func bottom(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func bottom(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -398,7 +398,7 @@ public extension UIViewCreator {
         }
     }
 
-    func leading(equalTo constant: CGFloat = 0, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func leading(equalTo constant: CGFloat = 0, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -412,7 +412,7 @@ public extension UIViewCreator {
         }
     }
 
-    func leading(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func leading(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -426,7 +426,7 @@ public extension UIViewCreator {
         }
     }
 
-    func leading(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func leading(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -440,7 +440,7 @@ public extension UIViewCreator {
         }
     }
 
-    func trailing(equalTo constant: CGFloat = 0, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func trailing(equalTo constant: CGFloat = 0, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -454,7 +454,7 @@ public extension UIViewCreator {
         }
     }
 
-    func trailing(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func trailing(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -468,7 +468,7 @@ public extension UIViewCreator {
         }
     }
 
-    func trailing(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high, toView view: UIView? = nil) -> Self {
+    func trailing(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -482,7 +482,7 @@ public extension UIViewCreator {
         }
     }
 
-    func height(equalToSuperview multiplier: CGFloat, priority: ConstraintPriority = .high, orRelatedView view: UIView? = nil) -> Self {
+    func height(equalToSuperview multiplier: CGFloat, priority: ConstraintPriority = .required, orRelatedView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -496,7 +496,7 @@ public extension UIViewCreator {
         }
     }
 
-    func height(greaterThanOrEqualToSuperview multiplier: CGFloat, priority: ConstraintPriority = .high, orRelatedView view: UIView? = nil) -> Self {
+    func height(greaterThanOrEqualToSuperview multiplier: CGFloat, priority: ConstraintPriority = .required, orRelatedView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -510,7 +510,7 @@ public extension UIViewCreator {
         }
     }
 
-    func height(lessThanOrEqualToSuperview multiplier: CGFloat, priority: ConstraintPriority = .high, orRelatedView view: UIView? = nil) -> Self {
+    func height(lessThanOrEqualToSuperview multiplier: CGFloat, priority: ConstraintPriority = .required, orRelatedView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -524,7 +524,7 @@ public extension UIViewCreator {
         }
     }
 
-    func width(equalToSuperview multiplier: CGFloat, priority: ConstraintPriority = .high, orRelatedView view: UIView? = nil) -> Self {
+    func width(equalToSuperview multiplier: CGFloat, priority: ConstraintPriority = .required, orRelatedView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -538,7 +538,7 @@ public extension UIViewCreator {
         }
     }
 
-    func width(greaterThanOrEqualToSuperview multiplier: CGFloat, priority: ConstraintPriority = .high, orRelatedView view: UIView? = nil) -> Self {
+    func width(greaterThanOrEqualToSuperview multiplier: CGFloat, priority: ConstraintPriority = .required, orRelatedView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -552,7 +552,7 @@ public extension UIViewCreator {
         }
     }
 
-    func width(lessThanOrEqualToSuperview multiplier: CGFloat, priority: ConstraintPriority = .high, orRelatedView view: UIView? = nil) -> Self {
+    func width(lessThanOrEqualToSuperview multiplier: CGFloat, priority: ConstraintPriority = .required, orRelatedView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
                 return
@@ -568,7 +568,7 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
-    func insets(equalTo value: CGFloat = 0, priority: ConstraintPriority = .high) -> Self {
+    func insets(equalTo value: CGFloat = 0, priority: ConstraintPriority = .required) -> Self {
         return self.top(equalTo: value, priority: priority)
             .bottom(equalTo: value, priority: priority)
             .leading(equalTo: value, priority: priority)
@@ -577,11 +577,11 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
-    func aspectRatio(equalTo multiplier: CGFloat = 1, priority: ConstraintPriority = .high) -> Self {
+    func aspectRatio(equalTo multiplier: CGFloat = 1, priority: ConstraintPriority = .required) -> Self {
         return self.aspectRatio(heightEqualTo: multiplier, priority: priority)
     }
 
-    func aspectRatio(heightEqualTo multiplier: CGFloat, priority: ConstraintPriority = .high) -> Self {
+    func aspectRatio(heightEqualTo multiplier: CGFloat, priority: ConstraintPriority = .required) -> Self {
         return self.onNotRendered { view in
             view.snp.makeConstraints {
                 $0.height.equalTo(view.snp.width)
@@ -591,7 +591,7 @@ public extension UIViewCreator {
         }
     }
 
-    func aspectRatio(heightGreaterThanOrEqualTo multiplier: CGFloat, priority: ConstraintPriority = .high) -> Self {
+    func aspectRatio(heightGreaterThanOrEqualTo multiplier: CGFloat, priority: ConstraintPriority = .required) -> Self {
         return self.onNotRendered { view in
             view.snp.makeConstraints {
                 $0.height.greaterThanOrEqualTo(view.snp.width)
@@ -601,7 +601,7 @@ public extension UIViewCreator {
         }
     }
 
-    func aspectRatio(heightLessThanOrEqualTo multiplier: CGFloat, priority: ConstraintPriority = .high) -> Self {
+    func aspectRatio(heightLessThanOrEqualTo multiplier: CGFloat, priority: ConstraintPriority = .required) -> Self {
         return self.onNotRendered { view in
             view.snp.makeConstraints {
                 $0.height.lessThanOrEqualTo(view.snp.width)
@@ -611,7 +611,7 @@ public extension UIViewCreator {
         }
     }
 
-    func aspectRatio(widthEqualTo multiplier: CGFloat, priority: ConstraintPriority = .high) -> Self {
+    func aspectRatio(widthEqualTo multiplier: CGFloat, priority: ConstraintPriority = .required) -> Self {
         return self.onNotRendered { view in
             view.snp.makeConstraints {
                 $0.width.equalTo(view.snp.height)
@@ -621,7 +621,7 @@ public extension UIViewCreator {
         }
     }
 
-    func aspectRatio(widthGreaterThanOrEqualTo multiplier: CGFloat, priority: ConstraintPriority = .high) -> Self {
+    func aspectRatio(widthGreaterThanOrEqualTo multiplier: CGFloat, priority: ConstraintPriority = .required) -> Self {
         return self.onNotRendered { view in
             view.snp.makeConstraints {
                 $0.width.greaterThanOrEqualTo(view.snp.height)
@@ -631,7 +631,7 @@ public extension UIViewCreator {
         }
     }
 
-    func aspectRatio(widthLessThanOrEqualTo multiplier: CGFloat, priority: ConstraintPriority = .high) -> Self {
+    func aspectRatio(widthLessThanOrEqualTo multiplier: CGFloat, priority: ConstraintPriority = .required) -> Self {
         return self.onNotRendered { view in
             view.snp.makeConstraints {
                 $0.width.lessThanOrEqualTo(view.snp.height)
@@ -643,7 +643,7 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
-    func height(equalTo constant: CGFloat, priority: ConstraintPriority = .high) -> Self {
+    func height(equalTo constant: CGFloat, priority: ConstraintPriority = .required) -> Self {
         return self.onNotRendered {
             $0.snp.makeConstraints {
                 $0.height.equalTo(constant)
@@ -652,7 +652,7 @@ public extension UIViewCreator {
         }
     }
 
-    func height(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high) -> Self {
+    func height(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required) -> Self {
         return self.onNotRendered {
             $0.snp.makeConstraints {
                 $0.height.greaterThanOrEqualTo(constant)
@@ -661,7 +661,7 @@ public extension UIViewCreator {
         }
     }
 
-    func height(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high) -> Self {
+    func height(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required) -> Self {
         return self.onNotRendered {
             $0.snp.makeConstraints {
                 $0.height.lessThanOrEqualTo(constant)
@@ -670,7 +670,7 @@ public extension UIViewCreator {
         }
     }
 
-    func width(equalTo constant: CGFloat, priority: ConstraintPriority = .high) -> Self {
+    func width(equalTo constant: CGFloat, priority: ConstraintPriority = .required) -> Self {
         return self.onNotRendered {
             $0.snp.makeConstraints {
                 $0.width.equalTo(constant)
@@ -679,7 +679,7 @@ public extension UIViewCreator {
         }
     }
 
-    func width(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high) -> Self {
+    func width(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required) -> Self {
         return self.onNotRendered {
             $0.snp.makeConstraints {
                 $0.width.greaterThanOrEqualTo(constant)
@@ -688,7 +688,7 @@ public extension UIViewCreator {
         }
     }
 
-    func width(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .high) -> Self {
+    func width(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required) -> Self {
         return self.onNotRendered {
             $0.snp.makeConstraints {
                 $0.width.lessThanOrEqualTo(constant)

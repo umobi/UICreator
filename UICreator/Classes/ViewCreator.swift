@@ -54,22 +54,7 @@ public protocol ViewCreator {
     func onLayout(_ handler: @escaping (UIView) -> Void) -> Self
 }
 
-public protocol UIViewCreator: ViewCreator {
-    associatedtype View: UIView
-}
-
-protocol UIViewRender: UIView {
-    func commitNotRendered()
-    func commitRendered()
-    func commitInTheScene()
-    func commitLayout()
-
-    /// Subviews that has commits that needs to be done.
-    var watchingViews: [UIView] { get }
-}
-
 private var kUIView: UInt = 0
-
 internal extension ViewCreator {
     var uiView: UIView! {
         get { objc_getAssociatedObject(self, &kUIView) as? UIView }
@@ -88,7 +73,7 @@ public extension ViewCreator {
         _ = self.uiView.appendBeforeRendering(handler)
         return self
     }
-    
+
     func onRendered(_ handler: @escaping (UIView) -> Void) -> Self {
         _ = self.uiView.appendRendered(handler)
         return self
@@ -102,66 +87,5 @@ public extension ViewCreator {
     func onLayout(_ handler: @escaping (UIView) -> Void) -> Self {
         _ = self.uiView.appendLayout(handler)
         return self
-    }
-}
-
-private var kViewBuilder: UInt = 0
-internal extension UIViewRender {
-    private(set) var ViewCreator: ViewCreator? {
-        get { objc_getAssociatedObject(self, &kViewBuilder) as? ViewCreator }
-        set { objc_setAssociatedObject(self, &kViewBuilder, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    init(builder: ViewCreator) {
-        self.init()
-        self.ViewCreator = builder
-    }
-
-    func updateBuilder(_ builder: ViewCreator) {
-        self.ViewCreator = builder
-    }
-}
-
-extension UIView: UIViewRender {
-    func commitNotRendered() {
-        self.watchingViews.forEach {
-            $0.notRenderedHandler?.commit(in: $0)
-            $0.notRenderedHandler = nil
-        }
-    }
-
-    func commitRendered() {
-        guard self.superview != nil else {
-            return
-        }
-
-        self.watchingViews.forEach {
-            $0.renderedHandler?.commit(in: $0)
-            $0.renderedHandler = nil
-        }
-
-        self.ViewCreator?.setView(self, policity: .OBJC_ASSOCIATION_ASSIGN)
-    }
-
-    func commitInTheScene() {
-        guard self.window != nil else {
-            return
-        }
-
-        self.watchingViews.forEach {
-            $0.inTheSceneHandler?.commit(in: $0)
-            $0.inTheSceneHandler = nil
-        }
-    }
-
-    func commitLayout() {
-        self.watchingViews.forEach {
-            $0.layoutHandler?.commit(in: $0)
-        }
-    }
-
-    @objc
-    var watchingViews: [UIView] {
-        return self.subviews
     }
 }
