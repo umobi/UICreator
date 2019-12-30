@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'UICreator'
-  s.version          = '1.0.0-alpha.2'
+  s.version          = '1.0.0-alpha.3'
   s.summary          = 'Creating view using declarative statements'
 
 # This description is used to generate tags and improve search results.
@@ -34,7 +34,7 @@ UICreator is a replacement for storyboard and xib files. Like Fluter, ReactNativ
 
   s.source_files = 'UICreator/Classes/**/*'
 
-  s.dependency 'UIContainer', '~> 1.2.0-beta.2'
+  s.dependency 'UIContainer', '~> 1.2.0-beta.3'
   s.dependency 'SnapKit', '~> 5.0.1'
   # s.resource_bundles = {
   #   'UICreator' => ['UICreator/Assets/*.png']

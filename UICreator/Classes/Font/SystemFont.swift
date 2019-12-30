@@ -34,10 +34,12 @@ private extension UIFont {
 }
 
 public extension UIFont {
+    #if os(iOS)
     @available(iOS 11.0, *)
     static var largeTitle: UIFont {
         return .stylizedFont(.largeTitle, .regular)
     }
+    #endif
 
     @available(iOS 9.0, *)
     static var title1: UIFont {
@@ -92,10 +94,12 @@ public extension UIFont {
 
 
 public extension UIFont {
+    #if os(iOS)
     @available(iOS 11.0, *)
     static func largeTitle(weight: Weight) -> UIFont {
         return .stylizedFont(.largeTitle, weight)
     }
+    #endif
 
     @available(iOS 9.0, *)
     static func title1(weight: Weight) -> UIFont {
