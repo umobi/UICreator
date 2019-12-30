@@ -8,6 +8,54 @@
 import Foundation
 import UIContainer
 
+internal class TableViewHeaderFooterCell: UITableViewHeaderFooterView {
+    private(set) var builder: ViewCreator! = nil
+
+    override init(reuseIdentifier: String?) {
+        super.init(reuseIdentifier: reuseIdentifier)
+        self.backgroundView = self.backgroundView ?? UIView()
+        self.backgroundView?.backgroundColor = .clear
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override public func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        self.commitNotRendered()
+    }
+
+    override public func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        self.commitRendered()
+    }
+
+    override public func didMoveToWindow() {
+        super.didMoveToWindow()
+        self.commitInTheScene()
+    }
+
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        self.commitLayout()
+    }
+
+    func prepareCell(content: @escaping () -> ViewCreator) {
+        guard self.builder == nil else {
+            return
+        }
+
+        let builder = content()
+        self.builder = builder
+        _ = self.contentView.add(builder.uiView)
+    }
+
+    public override var watchingViews: [UIView] {
+        return self.contentView.subviews
+    }
+}
+
 internal class TableViewCell: UITableViewCell {
     private(set) var builder: ViewCreator! = nil
 
@@ -75,7 +123,7 @@ extension Table {
             }
 
             if sections.isEmpty {
-                return [Element.section(self).asSection]
+                return [Element.section(self.elements).asSection!]
             }
 
             return sections
@@ -101,7 +149,7 @@ extension Table {
 
         func numberOfRows(in section: Element.Section) -> Int {
             return section.group.rows.reduce(0) {
-                $0 + $1.1.quantity
+                $0 + (($1.1.quantity == 0) ? 1 : $1.1.quantity)
             }
         }
 
@@ -111,13 +159,13 @@ extension Table {
                 return sections.count
             }
 
-            return self.numberOfRows(in: Element.section(self).asSection)
+            return self.numberOfRows(in: Element.section(self.elements).asSection!)
         }
 
         func section(at index: Int) -> Element.Section {
             let sections = self.sections
-            if !sections.isEmpty {
-                return Element.section(self).asSection
+            if sections.isEmpty {
+                return Element.section(self.elements).asSection!
             }
 
             return sections[index]
@@ -131,11 +179,27 @@ extension Table {
             }.reduce([]) { $0 + $1 }
         }
 
+        var headersIdentifier: [String] {
+            return self.sections.enumerated().map { section in
+                section.element.group.headers.map { header -> String in
+                    return "\(header.0).header"
+                }
+            }.reduce([]) { $0 + $1 }
+        }
+
+        var footersIdentifier: [String] {
+            return self.sections.enumerated().map { section in
+                section.element.group.footers.map { footer -> String in
+                    return "\(footer.0).footer"
+                }
+            }.reduce([]) { $0 + $1 }
+        }
+
         func row(at indexPath: IndexPath) -> (String, () -> ViewCreator)? {
             let section = self.section(at: indexPath.section)
             guard let row: (Int, Element.Row) = ({
                 if self.numberOfRows(in: section) <= indexPath.row {
-                    if let last = rows.last, last.1.quantity == 1, last.0 <= indexPath.row {
+                    if let last = section.group.rows.last, last.1.quantity == 0, last.0 <= indexPath.row {
                         return last
                     }
 
@@ -143,7 +207,7 @@ extension Table {
                 }
 
                 return section.group.rows.first(where: { row in
-                    if row.1.quantity > 1 {
+                    if row.1.quantity >= 1 {
                         return (row.0..<row.0+row.1.quantity).contains(indexPath.row)
                     }
                     return row.0 == indexPath.row
@@ -154,6 +218,26 @@ extension Table {
 
             return ("\(indexPath.section)-\(row.0)", row.1.content)
         }
+
+        func header(at section: Int) -> (String, () -> ViewCreator)? {
+            let section = self.section(at: section)
+
+            guard let header = section.group.headers.first else {
+                return nil
+            }
+            // 124
+            return ("\(header.0).header", header.1.content)
+        }
+
+        func footer(at section: Int) -> (String, () -> ViewCreator)? {
+            let section = self.section(at: section)
+
+            guard let footer = section.group.footers.first else {
+                return nil
+            }
+
+            return ("\(footer.0).footer", footer.1.content)
+        }
     }
     
     public enum ContentType {
@@ -162,12 +246,14 @@ extension Table {
 //        case rowSequence//(_ index: [Int], _ content: () -> ViewCreator)
         case footer//(_ content: () -> ViewCreator)
         case section//(Group)
+        case group
     }
 
     public enum Content {
         case group(Group)
         case content(_ content: () -> ViewCreator)
         case empty
+        case sections([Table.Element.Section])
     }
 
     public class Element {
@@ -175,7 +261,7 @@ extension Table {
         let content: Content
         let max: Int
 
-        private init(_ type: ContentType, content: Content, max: Int = 1) {
+        private init(_ type: ContentType, content: Content, max: Int = 0) {
             self.type = type
             self.content = content
             self.max = max
@@ -197,11 +283,19 @@ extension Table {
         }
 
         public static func rows(max: Int, content: @escaping () -> ViewCreator) -> Element {
-            return .init(.row, content: .content(content))
+            return .init(.row, content: .content(content), max: max)
         }
 
-        public static func section(_ group: Group) -> Element {
-            return .init(.section, content: .group(group))
+        public static func section(_ elements: Element...) -> Element {
+            return .init(.section, content: .group(.init(elements)))
+        }
+
+        public static func section(_ elements: [Element]) -> Element {
+            return .init(.section, content: .group(.init(elements)))
+        }
+
+        fileprivate static func group(_ sections: [Section]) -> Element {
+            return .init(.group, content: .sections(sections))
         }
 
         var isSection: Bool {
@@ -220,7 +314,7 @@ extension Table {
             return self.type == .header
         }
 
-        class Section {
+        public class Section {
             let group: Group
 
             fileprivate init?(_ element: Element) {
@@ -230,14 +324,10 @@ extension Table {
 
                 self.group = group
             }
-
-            fileprivate init(_ group: Group) {
-                self.group = group
-            }
         }
 
-        var asSection: Element.Section {
-            return Section(self) ?? Section(.init([self]))
+        var asSection: Element.Section? {
+            return Section(self)
         }
 
         class Header {
@@ -297,25 +387,31 @@ extension Table {
                     return false
                 }
 
-                return self.max == 1
+                return self.max == 0
             case .header:
                 guard case .content = self.content else {
                     return false
                 }
 
-                return self.max == 1
+                return self.max == 0
             case .row:
                 guard case .content = self.content else {
                     return false
                 }
 
-                return self.max >= 1
+                return self.max >= 0
             case .section:
                 guard case .group = self.content else {
                     return false
                 }
 
-                return self.max == 1
+                return self.max == 0
+            case .group:
+                guard case .sections = self.content else {
+                    return false
+                }
+
+                return self.max == 0
             }
         }
     }
@@ -323,6 +419,7 @@ extension Table {
 
 private var kTableGroup: UInt = 0
 private var kTableDataSource: UInt = 0
+private var kTableDelegate: UInt = 0
 
 extension TableView {
     var group: Table.Group? {
@@ -334,6 +431,11 @@ extension TableView {
         get { objc_getAssociatedObject(self, &kTableDataSource) as? TableDataSource }
         set { objc_setAssociatedObject(self, &kTableDataSource, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
+
+    var creatorDelegate: TableDelegate? {
+        get { objc_getAssociatedObject(self, &kTableDelegate) as? TableDelegate }
+        set { objc_setAssociatedObject(self, &kTableDelegate, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    }
 }
 
 public extension UIViewCreator where View: TableView {
@@ -341,6 +443,15 @@ public extension UIViewCreator where View: TableView {
         (self.uiView as? View)?.creatorDataSource = dataSource
         return self
     }
+
+    func dynamicDelegate(_ delegate: TableDelegate) -> Self {
+        (self.uiView as? View)?.creatorDelegate = delegate
+        return self
+    }
+}
+
+public protocol TableDelegate {
+    func header(at section: Int,_ cellView: UITableViewHeaderFooterView, content: ViewCreator)
 }
 
 public protocol TableDataSource {
@@ -355,6 +466,10 @@ public extension TableDataSource {
     }
 
     func cell(at indexPath: IndexPath,_ cellView: UITableViewCell, content: ViewCreator) {}
+}
+
+public extension TableDelegate {
+    func header(at section: Int, _ cellView: UITableViewHeaderFooterView, content: ViewCreator) {}
 }
 
 extension TableView: UITableViewDataSource {
@@ -390,10 +505,26 @@ extension TableView: UITableViewDataSource {
     }
 }
 
+extension TableView: UITableViewDelegate {
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let header = self.group?.header(at: section) else {
+            return nil
+        }
+
+        guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: header.0) as? TableViewHeaderFooterCell else {
+            fatalError()
+        }
+
+        cell.prepareCell(content: header.1)
+        self.creatorDelegate?.header(at: section, cell, content: cell.builder)
+        return cell
+    }
+}
+
 extension Table {
-    public convenience init(style: UITableView.Style,_ contentGroup: Element) {
-        self.init(style: .grouped)
-        let group = contentGroup.asSection.group
+    public convenience init(style: UITableView.Style,_ elements: Element...) {
+        self.init(style: style)
+        let group = Group(elements)
 
         if !self.isValid(content: group) {
             fatalError("Verify your content")
@@ -407,8 +538,13 @@ extension Table {
             tableView.register(TableViewCell.self, forCellReuseIdentifier: $0)
         }
 
+        group.headersIdentifier.forEach {
+            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
+        }
+
         tableView.group = group
         tableView.dataSource = tableView
+        tableView.delegate = tableView
     }
 
     func isValid(content group: Group, isInsideSection: Bool = false) -> Bool {

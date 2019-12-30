@@ -19,6 +19,7 @@
 		0C0FACF723B258FD00E6B2FC /* TapGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACEF23B258FD00E6B2FC /* TapGesture.swift */; };
 		0C0FACF823B258FD00E6B2FC /* HoverGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACF023B258FD00E6B2FC /* HoverGesture.swift */; };
 		0C0FACF923B258FD00E6B2FC /* PinchGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACF123B258FD00E6B2FC /* PinchGesture.swift */; };
+		0C3E8C1923BA68CA0045C86E /* SystemFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C1823BA68CA0045C86E /* SystemFont.swift */; };
 		0C6760FF23B3E8690037EC98 /* Switch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6760FE23B3E8690037EC98 /* Switch.swift */; };
 		0C7E8A9623B3FA5D007E480B /* TextKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7E8A9523B3FA5D007E480B /* TextKeyboard.swift */; };
 		0C7E8A9823B403B3007E480B /* DatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7E8A9723B403B3007E480B /* DatePicker.swift */; };
@@ -102,6 +103,7 @@
 		0C0FACEF23B258FD00E6B2FC /* TapGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TapGesture.swift; sourceTree = "<group>"; };
 		0C0FACF023B258FD00E6B2FC /* HoverGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HoverGesture.swift; sourceTree = "<group>"; };
 		0C0FACF123B258FD00E6B2FC /* PinchGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinchGesture.swift; sourceTree = "<group>"; };
+		0C3E8C1823BA68CA0045C86E /* SystemFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemFont.swift; sourceTree = "<group>"; };
 		0C6760FE23B3E8690037EC98 /* Switch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Switch.swift; sourceTree = "<group>"; };
 		0C7E8A9523B3FA5D007E480B /* TextKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TextKeyboard.swift; path = UICreator/Classes/TextKeyboard.swift; sourceTree = "<group>"; };
 		0C7E8A9723B403B3007E480B /* DatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePicker.swift; sourceTree = "<group>"; };
@@ -238,6 +240,15 @@
 			path = UICreator/Classes/Control;
 			sourceTree = "<group>";
 		};
+		0C3E8C1723BA68B70045C86E /* Font */ = {
+			isa = PBXGroup;
+			children = (
+				0C3E8C1823BA68CA0045C86E /* SystemFont.swift */,
+			);
+			name = Font;
+			path = UICreator/Classes/Font;
+			sourceTree = "<group>";
+		};
 		0C9346DE23AE7D8600A9E112 /* UIContainer+Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -335,6 +346,7 @@
 		23482E1745BD744A1B8DC0CDFA317DBA /* UICreator */ = {
 			isa = PBXGroup;
 			children = (
+				0C3E8C1723BA68B70045C86E /* Font */,
 				0C7E8A9523B3FA5D007E480B /* TextKeyboard.swift */,
 				0C07F76B23B17C5600A7A65B /* Previewer.swift */,
 				0C0FACE923B2584100E6B2FC /* Gestures */,
@@ -597,6 +609,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C93470723AE7D8600A9E112 /* Subview.swift in Sources */,
+				0C3E8C1923BA68CA0045C86E /* SystemFont.swift in Sources */,
 				0C03E9A923B6521300521AAB /* ContainerBuilder.swift in Sources */,
 				0CAA4C0323B2696B00DD5DDF /* Spacer.swift in Sources */,
 				0C0FACF923B258FD00E6B2FC /* PinchGesture.swift in Sources */,
