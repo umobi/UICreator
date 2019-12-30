@@ -34,7 +34,7 @@ public class _DashedView: DashedView {
 public class Dashed: UIViewCreator {
     public typealias View = _DashedView
 
-    public init(color: UIColor, pattern: [NSNumber] = [2, 3], content: () -> Content) {
+    public init(color: UIColor, pattern: [NSNumber] = [2, 3], content: () -> ViewCreator) {
         self.uiView = View.init(content().uiView, dash: pattern)
             .apply(strokeColor: color)
             .apply(lineWidth: 1)

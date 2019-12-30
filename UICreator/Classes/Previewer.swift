@@ -14,8 +14,12 @@ import SwiftUI
 public struct LivePreview<View: ViewCreator>: SwiftUI.View {
 
     let view: View
-    init(_ initClass: View) {
+    public init(_ initClass: View) {
         self.view = initClass
+    }
+
+    public init(content: () -> View) {
+        self.view = content()
     }
 
     public var body: some SwiftUI.View {

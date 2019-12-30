@@ -34,8 +34,8 @@ public class _BlurView: BlurView {
 public class Blur: ViewCreator {
     public typealias View = _BlurView
 
-    init() {
-        self.uiView = View.init(blur: .regular)
+    public init(blur: UIBlurEffect.Style = .regular) {
+        self.uiView = View.init(blur: blur)
     }
 }
 
