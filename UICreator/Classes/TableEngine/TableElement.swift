@@ -42,7 +42,7 @@ extension Table {
         }
 
         public static func footer(content: @escaping () -> ViewCreator) -> Element {
-            return .init(.header, content: .content(content))
+            return .init(.footer, content: .content(content))
         }
 
         public static func row(content: @escaping () -> ViewCreator) -> Element {

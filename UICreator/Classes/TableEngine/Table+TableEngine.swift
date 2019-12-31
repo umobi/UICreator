@@ -43,6 +43,10 @@ public extension Table {
             tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
         }
 
+        group.footersIdentifier.forEach {
+            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
+        }
+
         tableView.group = group
         tableView.dataSource = tableView
         tableView.delegate = tableView
@@ -70,7 +74,10 @@ public extension Table {
             return false
         }
 
-        let footers = group.footers
+        let footers = group.elements.enumerated().filter {
+            $0.element.isFooter
+        }
+        
         if !footers.isEmpty && (footers.count > 1 || footers.first?.0 != group.elements.count - 1) {
             return false
         }

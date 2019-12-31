@@ -24,8 +24,10 @@ import Foundation
 
 public protocol TableDelegate {
     func header(at section: Int, content: ViewCreator)
+    func footer(at section: Int, content: ViewCreator)
 }
 
 public extension TableDelegate {
     func header(at section: Int, content: ViewCreator) {}
+    func footer(at section: Int, content: ViewCreator) {}
 }

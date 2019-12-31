@@ -36,4 +36,35 @@ extension TableView: UITableViewDelegate {
         self.creatorDelegate?.header(at: section, content: cell.builder)
         return cell
     }
+
+    public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        guard let footer = self.group?.footer(at: section) else {
+            return nil
+        }
+
+        guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: footer.0) as? TableViewHeaderFooterCell else {
+            fatalError()
+        }
+
+        cell.prepareCell(content: footer.1)
+        self.creatorDelegate?.footer(at: section, content: cell.builder)
+        return cell
+    }
+
+
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        guard self.group?.header(at: section) != nil else {
+            return .zero
+        }
+
+        return UITableView.automaticDimension
+    }
+
+    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        guard self.group?.footer(at: section) != nil else {
+            return .zero
+        }
+
+        return UITableView.automaticDimension
+    }
 }

@@ -117,25 +117,28 @@ internal extension UIView {
     func add(_ view: UIView) -> Self {
         self.addSubview(view)
 
+        let priority: UILayoutPriority = (self as UIView) is RootView && view is RootView ? .required :
+            .init(rawValue: 751)
+
         view.translatesAutoresizingMaskIntoConstraints = false
         {
             $0.isActive = true
-            $0.priority = .init(rawValue: 751)
+            $0.priority = priority
         }(view.topAnchor.constraint(equalTo: self.topAnchor, constant: 0));
 
         {
             $0.isActive = true
-            $0.priority = .init(rawValue: 751)
+            $0.priority = priority
         }(view.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0));
 
         {
             $0.isActive = true
-            $0.priority = .init(rawValue: 751)
+            $0.priority = priority
         }(view.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 0));
 
         {
             $0.isActive = true
-            $0.priority = .init(rawValue: 751)
+            $0.priority = priority
         }(view.rightAnchor.constraint(equalTo: self.rightAnchor, constant: 0));
 
         return self
