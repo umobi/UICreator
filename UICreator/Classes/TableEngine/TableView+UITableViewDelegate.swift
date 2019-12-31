@@ -21,9 +21,19 @@
 //
 
 import Foundation
-import UIKit
 
-public protocol TemplateView: class, ViewCreator {
-    var body: ViewCreator { get }
-    init()
+extension TableView: UITableViewDelegate {
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let header = self.group?.header(at: section) else {
+            return nil
+        }
+
+        guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: header.0) as? TableViewHeaderFooterCell else {
+            fatalError()
+        }
+
+        cell.prepareCell(content: header.1)
+        self.creatorDelegate?.header(at: section, content: cell.builder)
+        return cell
+    }
 }

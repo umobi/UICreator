@@ -21,9 +21,16 @@
 //
 
 import Foundation
-import UIKit
+import UIContainer
 
-public protocol TemplateView: class, ViewCreator {
-    var body: ViewCreator { get }
-    init()
+public extension ViewControllerType where Self: ViewCreator {
+    var content: ViewControllerMaker {
+        return .dynamic {
+            $0.view.addSubview(self.uiView)
+            $0.view.backgroundColor = .clear
+            self.uiView.snp.makeConstraints {
+                $0.edges.equalTo(0)
+            }
+        }
+    }
 }

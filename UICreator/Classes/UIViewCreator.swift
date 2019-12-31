@@ -21,9 +21,7 @@
 //
 
 import Foundation
-import UIKit
 
-public protocol TemplateView: class, ViewCreator {
-    var body: ViewCreator { get }
-    init()
+public protocol UIViewCreator: ViewCreator {
+    associatedtype View: UIView
 }

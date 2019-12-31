@@ -21,9 +21,12 @@
 //
 
 import Foundation
-import UIKit
 
-public protocol TemplateView: class, ViewCreator {
-    var body: ViewCreator { get }
-    init()
+extension Table {
+    public enum Content {
+        case group(Group)
+        case content(_ content: () -> ViewCreator)
+        case empty
+        case sections([Table.Element.Section])
+    }
 }
