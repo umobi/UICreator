@@ -49,7 +49,7 @@ extension TableView: UITableViewDataSource {
             fatalError()
         }
 
-        cell.prepareCell(content: row.1)
+        cell.prepareCell(builder: row.1)
         self.creatorDataSource?.cell(at: indexPath, content: cell.builder)
         return cell
     }

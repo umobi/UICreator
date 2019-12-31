@@ -120,4 +120,16 @@ public extension UIViewCreator {
             $0.isHidden = flag
         }
     }
+
+    func isUserInteractionEnabled(_ flag: Bool) -> Self {
+        return self.onInTheScene {
+            $0.isUserInteractionEnabled = flag
+        }
+    }
+
+    func isExclusiveTouch(_ flag: Bool) -> Self {
+        return self.onInTheScene {
+            $0.isExclusiveTouch = flag
+        }
+    }
 }

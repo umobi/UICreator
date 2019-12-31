@@ -23,42 +23,38 @@
 import Foundation
 import UIKit
 
-public class LongPressGesture: UILongPressGestureRecognizer, Gesture, HasViewDelegate {
+public class LongPressGesture: UILongPressGestureRecognizer, GestureRecognizer {
 
     required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.longPress(_:)))
-    }
-
-    @discardableResult
-    public func delegate(_ delegate: UIGestureRecognizerDelegate?) -> Self {
-        self.delegate = delegate
-        return self
+        super.init(target: target, action: #selector(target.someGestureRecognized(_:)))
     }
 }
 
-extension Gesture where Self: UILongPressGestureRecognizer {
+public class LongPress: UIGesture {
+    public typealias Gesture = LongPressGesture
+
+    public required init(target view: UIView!) {
+        self.setGesture(Gesture.init(target: view))
+        self.gesture.parent = self
+    }
+}
+
+public extension UIGesture where Gesture: UILongPressGestureRecognizer {
     func maximumMovement(_ value: CGFloat) -> Self {
-        self.allowableMovement = value
+        (self.gesture as? Gesture)?.allowableMovement = value
         return self
     }
 
     func minimumPressDuration(_ duration: TimeInterval) -> Self {
-        self.minimumPressDuration = duration
+        (self.gesture as? Gesture)?.minimumPressDuration = duration
         return self
-    }
-}
-
-fileprivate extension UIView {
-
-    @objc func longPress(_ sender: LongPressGesture!) {
-        sender.commit(sender)
     }
 }
 
 public extension UIViewCreator {
 
-    func onLongPressMaker(_ longPressConfigurator: (LongPressGesture) -> LongPressGesture) -> Self {
-        self.uiView.addGestureRecognizer(longPressConfigurator(LongPressGesture(target: self.uiView)))
+    func onLongPressMaker(_ longPressConfigurator: (LongPress) -> LongPress) -> Self {
+        self.uiView.addGestureRecognizer(longPressConfigurator(LongPress(target: self.uiView)).gesture)
         return self
     }
 

@@ -24,29 +24,25 @@ import Foundation
 import UIKit
 
 #if os(iOS)
-public class ScreenEdgePanGesture: UIScreenEdgePanGestureRecognizer, Gesture, HasViewDelegate {
+public class ScreenEdgePanGesture: UIScreenEdgePanGestureRecognizer, GestureRecognizer {
 
     required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.screenEdgePan(_:)))
-    }
-
-    @discardableResult
-    public func delegate(_ delegate: UIGestureRecognizerDelegate?) -> Self {
-        self.delegate = delegate
-        return self
+        super.init(target: target, action: #selector(target.someGestureRecognized(_:)))
     }
 }
 
-fileprivate extension UIView {
+public class ScreenEdgePan: UIGesture {
+    public typealias Gesture = ScreenEdgePanGesture
 
-    @objc func screenEdgePan(_ sender: ScreenEdgePanGesture!) {
-        sender.commit(sender)
+    public required init(target view: UIView!) {
+        self.setGesture(Gesture.init(target: view))
+        self.gesture.parent = self
     }
 }
 
 public extension UIViewCreator {
-    func onScreenEdgePanMaker(_ screenEdgePanConfigurator: (ScreenEdgePanGesture) -> ScreenEdgePanGesture) -> Self {
-        self.uiView.addGestureRecognizer(screenEdgePanConfigurator(ScreenEdgePanGesture(target: self.uiView)))
+    func onScreenEdgePanMaker(_ screenEdgePanConfigurator: (ScreenEdgePan) -> ScreenEdgePan) -> Self {
+        self.uiView.addGestureRecognizer(screenEdgePanConfigurator(ScreenEdgePan(target: self.uiView)).gesture)
         return self
     }
 

@@ -25,32 +25,28 @@ import UIKit
 
 #if os(iOS)
 @available(iOS 13.0, *)
-public class HoverGesture: UIHoverGestureRecognizer, Gesture, HasViewDelegate {
+public class HoverGesture: UIHoverGestureRecognizer, GestureRecognizer {
 
     required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.hover(_:)))
-    }
-
-    @discardableResult
-    public func delegate(_ delegate: UIGestureRecognizerDelegate?) -> Self {
-        self.delegate = delegate
-        return self
+        super.init(target: target, action: #selector(target.someGestureRecognized(_:)))
     }
 }
 
-fileprivate extension UIView {
+@available(iOS 13.0, *)
+public class Hover: UIGesture {
+    public typealias Gesture = HoverGesture
 
-    @available(iOS 13.0, *)
-    @objc func hover(_ sender: HoverGesture!) {
-        sender.commit(sender)
+    public required init(target view: UIView!) {
+        self.setGesture(Gesture.init(target: view))
+        self.gesture.parent = self
     }
 }
 
 public extension UIViewCreator {
 
     @available(iOS 13.0, *)
-    func onHoverMaker(_ hoverConfigurator: (HoverGesture) -> HoverGesture) -> Self {
-        self.uiView.addGestureRecognizer(hoverConfigurator(HoverGesture(target: self.uiView)))
+    func onHoverMaker(_ hoverConfigurator: (Hover) -> Hover) -> Self {
+        self.uiView.addGestureRecognizer(hoverConfigurator(Hover(target: self.uiView)).gesture)
         return self
     }
 

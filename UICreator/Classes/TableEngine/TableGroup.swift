@@ -123,7 +123,7 @@ extension Table {
             }.reduce([]) { $0 + $1 }
         }
 
-        func row(at indexPath: IndexPath) -> (String, () -> ViewCreator)? {
+        func row(at indexPath: IndexPath) -> (String, Element.Builder)? {
             let section = self.section(at: indexPath.section)
             guard let row: (Int, Element.Row) = ({
                 if self.numberOfRows(in: section) <= indexPath.row {
@@ -147,17 +147,17 @@ extension Table {
             return ("\(indexPath.section)-\(row.0)", row.1.content)
         }
 
-        func header(at section: Int) -> (String, () -> ViewCreator)? {
+        func header(at section: Int) -> (String, Element.Builder)? {
             let section = self.section(at: section)
 
             guard let header = section.group.headers.first else {
                 return nil
             }
-            // 124
+            
             return ("\(header.0).header", header.1.content)
         }
 
-        func footer(at section: Int) -> (String, () -> ViewCreator)? {
+        func footer(at section: Int) -> (String, Element.Builder)? {
             let section = self.section(at: section)
 
             guard let footer = section.group.footers.first else {
@@ -167,4 +167,8 @@ extension Table {
             return ("\(footer.0).footer", footer.1.content)
         }
     }
+}
+
+extension Table.Element {
+    typealias Builder = () -> ViewCreator
 }

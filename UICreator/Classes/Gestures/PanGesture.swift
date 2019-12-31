@@ -23,45 +23,50 @@
 import Foundation
 import UIKit
 
-public class PanGesture: UIPanGestureRecognizer, Gesture, HasViewDelegate {
+public class PanGesture: UIPanGestureRecognizer, GestureRecognizer {
 
     required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.pan(_:)))
+        super.init(target: target, action: #selector(target.someGestureRecognized(_:)))
     }
+}
 
-    @discardableResult
-    public func delegate(_ delegate: UIGestureRecognizerDelegate?) -> Self {
-        self.delegate = delegate
-        return self
+public class Pan: UIGesture {
+    public typealias Gesture = PanGesture
+
+    public required init(target view: UIView!) {
+        self.setGesture(Gesture.init(target: view))
+        self.gesture.parent = self
     }
 }
 
 #if os(iOS)
-extension Gesture where Self: UIPanGestureRecognizer {
+extension UIGesture where Gesture: UIPanGestureRecognizer {
     func maximumNumber(ofTouches number: Int) -> Self {
-        self.maximumNumberOfTouches = number
+        (self.gesture as? Gesture)?.maximumNumberOfTouches = number
         return self
     }
 
     func minimumNumber(ofTouches number: Int) -> Self {
-        self.minimumNumberOfTouches = number
+        (self.gesture as? Gesture)?.minimumNumberOfTouches = number
         return self
     }
 }
 #endif
 
-fileprivate extension UIView {
+internal extension UIView {
+    @objc func someGestureRecognized(_ sender: UIGestureRecognizer) {
+        guard let sender = sender as? GestureRecognizer else {
+            return
+        }
 
-    @objc func pan(_ sender: PanGesture!) {
-        sender.commit(sender)
+        sender.parent?.commit(sender)
     }
-
 }
 
 public extension UIViewCreator {
 
-    func onPanMaker(_ panConfigurator: (PanGesture) -> PanGesture) -> Self {
-        self.uiView.addGestureRecognizer(panConfigurator(PanGesture(target: self.uiView)))
+    func onPanMaker(_ panConfigurator: (Pan) -> Pan) -> Self {
+        self.uiView.addGestureRecognizer(panConfigurator(Pan(target: self.uiView)).gesture)
         return self
     }
 

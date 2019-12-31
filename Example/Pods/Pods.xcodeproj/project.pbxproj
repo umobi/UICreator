@@ -18,6 +18,7 @@
 		0C0FACF723B258FD00E6B2FC /* TapGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACEF23B258FD00E6B2FC /* TapGesture.swift */; };
 		0C0FACF823B258FD00E6B2FC /* HoverGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACF023B258FD00E6B2FC /* HoverGesture.swift */; };
 		0C0FACF923B258FD00E6B2FC /* PinchGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACF123B258FD00E6B2FC /* PinchGesture.swift */; };
+		0C3883CB23BBB5FC009E6FF6 /* TouchGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3883CA23BBB5FC009E6FF6 /* TouchGesture.swift */; };
 		0C3E8C1923BA68CA0045C86E /* SystemFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C1823BA68CA0045C86E /* SystemFont.swift */; };
 		0C3E8C1C23BA7CC80045C86E /* TableViewHeaderFooterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C1B23BA7CC80045C86E /* TableViewHeaderFooterCell.swift */; };
 		0C3E8C1F23BA7CEA0045C86E /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C1E23BA7CEA0045C86E /* TableViewCell.swift */; };
@@ -117,6 +118,7 @@
 		0C0FACEF23B258FD00E6B2FC /* TapGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TapGesture.swift; sourceTree = "<group>"; };
 		0C0FACF023B258FD00E6B2FC /* HoverGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HoverGesture.swift; sourceTree = "<group>"; };
 		0C0FACF123B258FD00E6B2FC /* PinchGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinchGesture.swift; sourceTree = "<group>"; };
+		0C3883CA23BBB5FC009E6FF6 /* TouchGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchGesture.swift; sourceTree = "<group>"; };
 		0C3E8C1823BA68CA0045C86E /* SystemFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemFont.swift; sourceTree = "<group>"; };
 		0C3E8C1B23BA7CC80045C86E /* TableViewHeaderFooterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewHeaderFooterCell.swift; sourceTree = "<group>"; };
 		0C3E8C1E23BA7CEA0045C86E /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
@@ -246,6 +248,7 @@
 		0C0FACE923B2584100E6B2FC /* Gestures */ = {
 			isa = PBXGroup;
 			children = (
+				0C3883CA23BBB5FC009E6FF6 /* TouchGesture.swift */,
 				0C9346D323AE7D8500A9E112 /* Gesture.swift */,
 				0C0FACF023B258FD00E6B2FC /* HoverGesture.swift */,
 				0C0FACEA23B258FD00E6B2FC /* LongPressGesture.swift */,
@@ -697,6 +700,7 @@
 				0CAA4BF423B267A200DD5DDF /* Collection.swift in Sources */,
 				0C93470F23AE7D8600A9E112 /* Stack.swift in Sources */,
 				0C93470423AE7D8600A9E112 /* UIViewCreator+Navigation.swift in Sources */,
+				0C3883CB23BBB5FC009E6FF6 /* TouchGesture.swift in Sources */,
 				10A720BC38C4767848A52520B0E80DEA /* UICreator-dummy.m in Sources */,
 				0C9346FF23AE7D8600A9E112 /* UIControl+Control.swift in Sources */,
 				0C7E8A9823B403B3007E480B /* DatePicker.swift in Sources */,
