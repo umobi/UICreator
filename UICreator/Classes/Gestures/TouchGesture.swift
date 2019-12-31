@@ -47,6 +47,8 @@ public class TouchGesture: UIGestureRecognizer, GestureRecognizer {
 
             if self._numberOfTouches == numberOfTouchedRequired {
                 self.state = .began
+            } else {
+                self.state = .cancelled
             }
         }
     }
@@ -78,7 +80,7 @@ public class TouchGesture: UIGestureRecognizer, GestureRecognizer {
     }
 
     public override func canPrevent(_ preventedGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return [State]([.began, .changed]).first(where: { $0 == self.state }) != nil
+        return self.cancelsTouchesInView && [State]([.began, .changed]).first(where: { $0 == self.state }) != nil
     }
 }
 
