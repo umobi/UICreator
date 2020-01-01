@@ -23,15 +23,8 @@
 import Foundation
 import UIKit
 
-public class SwipeGesture: UISwipeGestureRecognizer, GestureRecognizer {
-
-    required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.someGestureRecognized(_:)))
-    }
-}
-
 public class Swipe: UIGesture {
-    public typealias Gesture = SwipeGesture
+    public typealias Gesture = UISwipeGestureRecognizer
 
     public required init(target view: UIView!) {
         self.setGesture(Gesture.init(target: view))

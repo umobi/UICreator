@@ -24,15 +24,8 @@ import Foundation
 import UIKit
 
 #if os(iOS)
-public class RotationGesture: UIRotationGestureRecognizer, GestureRecognizer {
-
-    required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.someGestureRecognized(_:)))
-    }
-}
-
 public class Rotation: UIGesture {
-    public typealias Gesture = RotationGesture
+    public typealias Gesture = UIRotationGestureRecognizer
 
     public required init(target view: UIView!) {
         self.setGesture(Gesture.init(target: view))

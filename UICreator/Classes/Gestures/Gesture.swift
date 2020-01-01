@@ -32,35 +32,35 @@ private var kOnPossible: UInt = 0
 private var kOnEnded: UInt = 0
 private var kOnAnyOther: UInt = 0
 
-public protocol GestureRecognizer: UIGestureRecognizer {
-    init(target view: UIView!)
-}
-
 public protocol Gesture {
     init(target view: UIView!)
 }
 
 public protocol UIGesture: Gesture {
-    associatedtype Gesture: GestureRecognizer
+    associatedtype Gesture: UIGestureRecognizer
 }
 
 private var kGesture: UInt = 0
-internal extension GestureRecognizer {
+internal extension UIGestureRecognizer {
     var parent: Gesture? {
         get { objc_getAssociatedObject(self, &kGesture) as? Gesture }
         set { objc_setAssociatedObject(self, &kGesture, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    }
+
+    convenience init(target view: UIView!) {
+        self.init(target: view, action: #selector(view.someGestureRecognized(_:)))
     }
 }
 
 private var kGestureRecognized: UInt = 0
 internal extension Gesture {
-    var gesture: GestureRecognizer! {
-        get { objc_getAssociatedObject(self, &kGestureRecognized) as? GestureRecognizer }
+    var gesture: UIGestureRecognizer! {
+        get { objc_getAssociatedObject(self, &kGestureRecognized) as? UIGestureRecognizer }
         nonmutating
         set { setGesture(newValue, policity: newValue?.view != nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
     }
 
-    func setGesture(_ uiGesture: GestureRecognizer, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN) {
+    func setGesture(_ uiGesture: UIGestureRecognizer, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN) {
         objc_setAssociatedObject(self, &kGestureRecognized, uiGesture, policity)
     }
 }
@@ -279,7 +279,7 @@ public extension UIGesture {
 }
 
 internal extension Gesture {
-    func commit(_ sender: GestureRecognizer) {
+    func commit(_ sender: UIGestureRecognizer) {
         switch sender.state {
         case .possible:
             (self.possible ?? self.recognized)?.handler(sender)

@@ -23,16 +23,12 @@
 import Foundation
 import UIKit
 
-public class TouchGesture: UIGestureRecognizer, GestureRecognizer {
+public class TouchGesture: UIGestureRecognizer {
     public var numberOfTouchedRequired: Int = 1
     private var _numberOfTouches: Int = 0
     private var lastDateTouched: Date? = nil
     public var cancelWhenTouchMoves: Bool = false
     public var lastLocation: CGPoint? = nil
-
-    required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.someGestureRecognized(_:)))
-    }
 
     public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
         if self.state == .possible {

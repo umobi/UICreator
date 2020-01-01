@@ -23,15 +23,8 @@
 import Foundation
 import UIKit
 
-public class PanGesture: UIPanGestureRecognizer, GestureRecognizer {
-
-    required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.someGestureRecognized(_:)))
-    }
-}
-
 public class Pan: UIGesture {
-    public typealias Gesture = PanGesture
+    public typealias Gesture = UIPanGestureRecognizer
 
     public required init(target view: UIView!) {
         self.setGesture(Gesture.init(target: view))
@@ -55,10 +48,6 @@ extension UIGesture where Gesture: UIPanGestureRecognizer {
 
 internal extension UIView {
     @objc func someGestureRecognized(_ sender: UIGestureRecognizer) {
-        guard let sender = sender as? GestureRecognizer else {
-            return
-        }
-
         sender.parent?.commit(sender)
     }
 }

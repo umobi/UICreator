@@ -23,15 +23,8 @@
 import Foundation
 import UIKit
 
-public class LongPressGesture: UILongPressGestureRecognizer, GestureRecognizer {
-
-    required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.someGestureRecognized(_:)))
-    }
-}
-
 public class LongPress: UIGesture {
-    public typealias Gesture = LongPressGesture
+    public typealias Gesture = UILongPressGestureRecognizer
 
     public required init(target view: UIView!) {
         self.setGesture(Gesture.init(target: view))

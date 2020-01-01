@@ -24,15 +24,8 @@ import Foundation
 import UIKit
 
 #if os(iOS)
-public class ScreenEdgePanGesture: UIScreenEdgePanGestureRecognizer, GestureRecognizer {
-
-    required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.someGestureRecognized(_:)))
-    }
-}
-
 public class ScreenEdgePan: UIGesture {
-    public typealias Gesture = ScreenEdgePanGesture
+    public typealias Gesture = UIScreenEdgePanGestureRecognizer
 
     public required init(target view: UIView!) {
         self.setGesture(Gesture.init(target: view))

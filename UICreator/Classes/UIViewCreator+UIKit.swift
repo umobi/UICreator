@@ -135,3 +135,17 @@ public extension UIViewCreator {
     }
     #endif
 }
+
+public extension ViewCreator {
+    func transform(_ transform3d: CATransform3D) -> Self {
+        self.onRendered {
+            $0.layer.transform = transform3d
+        }
+    }
+
+    func transform(_ transform: CGAffineTransform) -> Self {
+        self.onRendered {
+            $0.transform = transform
+        }
+    }
+}

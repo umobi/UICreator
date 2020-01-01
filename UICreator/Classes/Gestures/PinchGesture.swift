@@ -24,15 +24,9 @@ import Foundation
 import UIKit
 
 #if os(iOS)
-public class PinchGesture: UIPinchGestureRecognizer, GestureRecognizer {
-
-    required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.someGestureRecognized(_:)))
-    }
-}
 
 public class Pinch: UIGesture {
-    public typealias Gesture = PinchGesture
+    public typealias Gesture = UIPinchGestureRecognizer
 
     public required init(target view: UIView!) {
         self.setGesture(Gesture.init(target: view))

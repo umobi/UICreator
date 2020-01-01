@@ -24,17 +24,10 @@ import Foundation
 import UIKit
 
 #if os(iOS)
-@available(iOS 13.0, *)
-public class HoverGesture: UIHoverGestureRecognizer, GestureRecognizer {
-
-    required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.someGestureRecognized(_:)))
-    }
-}
 
 @available(iOS 13.0, *)
 public class Hover: UIGesture {
-    public typealias Gesture = HoverGesture
+    public typealias Gesture = UIHoverGestureRecognizer
 
     public required init(target view: UIView!) {
         self.setGesture(Gesture.init(target: view))
@@ -52,7 +45,7 @@ public extension UIViewCreator {
 
     @available(iOS 13.0, *)
     func onHover(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onHoverMaker { 
+        return self.onHoverMaker {
             $0.onRecognized { _ in
                 handler(self.uiView)
             }

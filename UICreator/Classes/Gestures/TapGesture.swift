@@ -23,14 +23,8 @@
 import Foundation
 import UIKit
 
-public class TapGesture: UITapGestureRecognizer, GestureRecognizer {
-    required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.someGestureRecognized(_:)))
-    }
-}
-
 public class Tap: UIGesture {
-    public typealias Gesture = TapGesture
+    public typealias Gesture = UITapGestureRecognizer
 
     public required init(target view: UIView!) {
         self.setGesture(Gesture.init(target: view))
