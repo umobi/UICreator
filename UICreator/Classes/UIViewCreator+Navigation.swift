@@ -22,11 +22,15 @@
 
 import Foundation
 
-internal extension UIView {
+public extension UIView {
     weak var viewController: UIViewController! {
         return sequence(first: self as UIResponder, next: { $0.next }).first(where: {
             $0 is UIViewController
         }) as? UIViewController
+    }
+
+    weak var navigationController: UINavigationController? {
+        return self.viewController.navigationController
     }
 }
 

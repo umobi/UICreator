@@ -53,7 +53,7 @@ public class _Container<View: UIViewController>: UIContainer.Container<View> {
 public class Container<ViewController: UIViewController>: UIViewCreator {
     public typealias View = _Container<ViewController>
 
-    required init(_ content: @escaping () -> ViewController) {
+    public required init(_ content: @escaping () -> ViewController) {
         self.uiView = View.init(builder: self)
         _ = self.onInTheScene {
             ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: content)
