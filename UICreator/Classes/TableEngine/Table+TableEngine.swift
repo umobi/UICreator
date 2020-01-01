@@ -25,7 +25,9 @@ import Foundation
 public extension Table {
     convenience init(style: UITableView.Style,_ elements: Element...) {
         self.init(style: style)
+        #if os(iOS)
         (self.uiView as? View)?.separatorStyle = .none
+        #endif
         let group = Group(elements)
 
         if !self.isValid(content: group) {

@@ -127,9 +127,11 @@ public extension UIViewCreator {
         }
     }
 
+    #if os(iOS)
     func isExclusiveTouch(_ flag: Bool) -> Self {
         return self.onInTheScene {
             $0.isExclusiveTouch = flag
         }
     }
+    #endif
 }
