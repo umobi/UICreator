@@ -36,6 +36,7 @@
 		0C3E8C3B23BA86220045C86E /* UIViewRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C3A23BA86220045C86E /* UIViewRender.swift */; };
 		0C3E8C3D23BA86590045C86E /* ViewCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C3C23BA86590045C86E /* ViewCreator.swift */; };
 		0C3E8C3F23BA86E10045C86E /* UIHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C3E23BA86E10045C86E /* UIHost.swift */; };
+		0C46815923BE1A3600BDC263 /* Segmented.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C46815823BE1A3600BDC263 /* Segmented.swift */; };
 		0C6760FF23B3E8690037EC98 /* Switch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6760FE23B3E8690037EC98 /* Switch.swift */; };
 		0C7E8A9623B3FA5D007E480B /* TextKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7E8A9523B3FA5D007E480B /* TextKeyboard.swift */; };
 		0C7E8A9823B403B3007E480B /* DatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7E8A9723B403B3007E480B /* DatePicker.swift */; };
@@ -136,6 +137,7 @@
 		0C3E8C3A23BA86220045C86E /* UIViewRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIViewRender.swift; path = UICreator/Classes/UIViewRender.swift; sourceTree = "<group>"; };
 		0C3E8C3C23BA86590045C86E /* ViewCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ViewCreator.swift; path = UICreator/Classes/ViewCreator.swift; sourceTree = "<group>"; };
 		0C3E8C3E23BA86E10045C86E /* UIHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIHost.swift; path = UICreator/Classes/UIHost.swift; sourceTree = "<group>"; };
+		0C46815823BE1A3600BDC263 /* Segmented.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segmented.swift; sourceTree = "<group>"; };
 		0C6760FE23B3E8690037EC98 /* Switch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Switch.swift; sourceTree = "<group>"; };
 		0C7E8A9523B3FA5D007E480B /* TextKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TextKeyboard.swift; path = UICreator/Classes/TextKeyboard.swift; sourceTree = "<group>"; };
 		0C7E8A9723B403B3007E480B /* DatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePicker.swift; sourceTree = "<group>"; };
@@ -316,6 +318,7 @@
 			isa = PBXGroup;
 			children = (
 				0C7E8A9723B403B3007E480B /* DatePicker.swift */,
+				0C46815823BE1A3600BDC263 /* Segmented.swift */,
 				0C7E8A9923B40AFF007E480B /* Input.swift */,
 				0C0B0B9023B4E54100FAF1E6 /* Slider.swift */,
 				0C0B0B9223B4E56200FAF1E6 /* ActivityIndicator.swift */,
@@ -703,6 +706,7 @@
 				0C3883CB23BBB5FC009E6FF6 /* TouchGesture.swift in Sources */,
 				10A720BC38C4767848A52520B0E80DEA /* UICreator-dummy.m in Sources */,
 				0C9346FF23AE7D8600A9E112 /* UIControl+Control.swift in Sources */,
+				0C46815923BE1A3600BDC263 /* Segmented.swift in Sources */,
 				0C7E8A9823B403B3007E480B /* DatePicker.swift in Sources */,
 				0C0FACF323B258FD00E6B2FC /* PanGesture.swift in Sources */,
 				0C0B0B9323B4E56200FAF1E6 /* ActivityIndicator.swift in Sources */,
