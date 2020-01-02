@@ -39,7 +39,7 @@ public extension UIViewCreator {
 
     @available(iOS 13.0, *)
     func onHoverMaker(_ hoverConfigurator: (Hover) -> Hover) -> Self {
-        self.uiView.addGestureRecognizer(hoverConfigurator(Hover(target: self.uiView)).gesture)
+        self.uiView.addGesture(hoverConfigurator(Hover(target: self.uiView)))
         return self
     }
 

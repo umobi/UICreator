@@ -65,7 +65,18 @@ internal extension Gesture {
     }
 }
 
-internal class Handler {
+internal extension UIView {
+    func addGesture(_ gesture: Gesture) {
+        guard let gestureRecognize = gesture.gesture else {
+            return
+        }
+
+        self.addGestureRecognizer(gestureRecognize)
+        gesture.setGesture(gestureRecognize, policity: .OBJC_ASSOCIATION_ASSIGN)
+    }
+}
+
+internal struct Handler {
     let handler: (UIGestureRecognizer) -> Void
 
     init(_ handler: @escaping (UIGestureRecognizer) -> Void) {

@@ -35,7 +35,7 @@ public class Swipe: UIGesture {
 public extension UIViewCreator {
 
     func onSwipeMaker(_ swipeConfigurator: (Swipe) -> Swipe) -> Self {
-        self.uiView.addGestureRecognizer(swipeConfigurator(Swipe(target: self.uiView)).gesture)
+        self.uiView.addGesture(swipeConfigurator(Swipe(target: self.uiView)))
         return self
     }
 

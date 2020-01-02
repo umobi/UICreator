@@ -137,9 +137,13 @@ public extension UIViewCreator {
 }
 
 public extension ViewCreator {
-    func transform(_ transform3d: CATransform3D) -> Self {
+    func transform3d(_ transform3d: CATransform3D) -> Self {
         self.onRendered {
-            $0.layer.transform = transform3d
+            if #available(iOS 12.0, *) {
+                $0.transform3D = transform3d
+            } else {
+                $0.layer.transform = transform3d
+            }
         }
     }
 
@@ -148,4 +152,126 @@ public extension ViewCreator {
             $0.transform = transform
         }
     }
+}
+
+public extension ViewCreator {
+    @available(iOS 13, *)
+    func userInterfaceStyle(_ style: UIUserInterfaceStyle) -> Self {
+        self.onNotRendered {
+            $0.overrideUserInterfaceStyle = style
+        }
+    }
+}
+
+public extension UIViewCreator {
+    func accessibily(_ handler: @escaping (UIAccessibilityCreator<Self>) -> UIAccessibilityCreator<Self>) -> Self {
+        _ = handler(.init(self))
+        return self
+    }
+}
+
+public struct UIAccessibilityCreator<UICreator: UIViewCreator> {
+    public typealias View = UICreator.View
+
+//    private let creator: UICreator
+    public weak var uiView: View!
+
+    init(_ view: UIView) {
+        self.uiView = view as? View
+    }
+
+    init(_ creator: ViewCreator) {
+        self.init(creator.uiView)
+    }
+}
+
+public extension UIAccessibilityCreator where View: UIView {
+    @available(iOS 11.0, tvOS 11.0, *)
+    func ignoresInvertColors(_ flag: Bool) -> Self {
+        self.uiView.accessibilityIgnoresInvertColors = flag
+        return self
+    }
+
+    func traits(_ traits: Set<UIAccessibilityTraits>) -> Self {
+        self.uiView.accessibilityTraits = .init(traits)
+        return self
+    }
+
+    func isEnabled(_ flag: Bool) -> Self {
+        self.uiView.isAccessibilityElement = flag
+        return self
+    }
+
+    func identifier(_ string: String) -> Self {
+        self.uiView.accessibilityIdentifier = string
+        return self
+    }
+
+    func label(_ string: String) -> Self {
+        self.uiView.accessibilityLabel = string
+        return self
+    }
+
+    func value(_ string: String) -> Self {
+        self.uiView.accessibilityValue = string
+        return self
+    }
+
+    func frame(_ frame: CGRect) -> Self {
+        self.uiView.accessibilityFrame = frame
+        return self
+    }
+
+    func hint(_ string: String) -> Self {
+        self.uiView.accessibilityHint = string
+        return self
+    }
+
+    func groupAccessibilityChildren(_ flag: Bool) -> Self {
+        self.uiView.shouldGroupAccessibilityChildren = flag
+        return self
+    }
+
+    @available(iOS 11.0, tvOS 11.0, *)
+    func containerType(_ type: UIAccessibilityContainerType) -> Self {
+        self.uiView.accessibilityContainerType = type
+        return self
+    }
+
+    @available(iOS 13.0, tvOS 13.0, *)
+    func respondsToUserInteraction(_ flag: Bool) -> Self {
+        self.uiView.accessibilityRespondsToUserInteraction = flag
+        return self
+    }
+
+    @available(iOS 11.0, tvOS 11, *)
+    func onVoiceOverChange(_ handler: @escaping (UIView) -> Void) -> Self {
+        NotificationCenter.default.addObserver(forName: UIAccessibility.voiceOverStatusDidChangeNotification, object: nil, queue: nil) { (_) in
+            handler(self.uiView)
+        }
+
+        return self
+    }
+
+    func onElementFocused(_ handler: @escaping (UIView) -> Void) -> Self {
+        var isFocused = false
+        NotificationCenter.default.addObserver(forName: UIAccessibility.elementFocusedNotification, object: nil, queue: nil) { notification in
+            if let focused = notification.userInfo?[UIAccessibility.focusedElementUserInfoKey] as? View, focused === self.uiView {
+                isFocused = true
+                handler(self.uiView)
+                return
+            }
+
+            if isFocused && !self.uiView.accessibilityElementIsFocused() {
+                isFocused = false
+                handler(self.uiView)
+            }
+        }
+
+        return self
+    }
+
+//    func a() {
+//        self.uiView.accessibilityRespondsToUserInteraction
+//    }
 }

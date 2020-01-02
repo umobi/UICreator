@@ -48,7 +48,7 @@ extension UIGesture where Gesture: UITapGestureRecognizer {
 
 public extension UIViewCreator {
     func onTapMaker(_ tapConfigurator: (Tap) -> Tap) -> Self {
-        self.uiView.addGestureRecognizer(tapConfigurator(Tap(target: self.uiView)).gesture)
+        self.uiView.addGesture(tapConfigurator(Tap(target: self.uiView)))
         return self
     }
 

@@ -197,7 +197,6 @@ public extension UIViewCreator where View: UISegmentedControl {
             let oldAttributes = ($0 as? View)?.titleTextAttributes(for: state) ?? [:]
             ($0 as? View)?.setTitleTextAttributes(oldAttributes.merging([.foregroundColor: color]) { $1 }, for: state)
         }
-//        UISegmentedControl().
     }
 
     func titleAttributes(_ attributes: [NSAttributedString.Key: Any], for state: UIControl.State = .normal) -> Self {
