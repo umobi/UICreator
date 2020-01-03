@@ -24,5 +24,70 @@ import Foundation
 import UIKit
 
 public class PageControl: UIPageControl {
+    override public func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        self.commitNotRendered()
+    }
 
+    override public func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        self.commitRendered()
+    }
+
+    override public func didMoveToWindow() {
+        super.didMoveToWindow()
+        self.commitInTheScene()
+    }
+
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        self.commitLayout()
+    }
+}
+
+public class Page: UIViewCreator, Control {
+    public typealias View = PageControl
+
+    public init(numberOfPages: Int) {
+        self.uiView = View.init(builder: self)
+        (self.uiView as? View)?.numberOfPages = numberOfPages
+    }
+}
+
+public extension UIViewCreator where View: UIPageControl {
+    func currentPage(_ page: Int) -> Self {
+        self.onInTheScene {
+            ($0 as? View)?.currentPage = page
+        }
+    }
+
+    func currentPage(indicatorTintColor: UIColor?) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.currentPageIndicatorTintColor = indicatorTintColor
+        }
+    }
+
+    func defersCurrentPageDisplay(_ flag: Bool) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.defersCurrentPageDisplay = flag
+        }
+    }
+
+    func hidesForSinglePage(_ flag: Bool) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.hidesForSinglePage = flag
+        }
+    }
+
+    func numberOfPages(_ pages: Int) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.numberOfPages = pages
+        }
+    }
+
+    func page(indicatorTintColor: UIColor?) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.pageIndicatorTintColor = indicatorTintColor
+        }
+    }
 }
