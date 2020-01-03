@@ -21,14 +21,15 @@
 //
 
 import Foundation
+import UIKit
 
-extension TableView: UITableViewDataSource {
-    public func numberOfSections(in tableView: UITableView) -> Int {
+extension CollectionView: UICollectionViewDataSource {
+    public func numberOfSections(in collectionView: UICollectionView) -> Int {
         let estimatedSections = self.group?.numberOfSections ?? 0
         return creatorDataSource?.numberOfSections(estimatedSections) ?? estimatedSections
     }
 
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard let group = self.group else {
             return 0
         }
@@ -41,12 +42,12 @@ extension TableView: UITableViewDataSource {
         return numberOfRows
     }
 
-    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let row = self.group?.row(at: indexPath) else {
             fatalError()
         }
 
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: row.0, for: indexPath) as? TableViewCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: row.0, for: indexPath) as? CollectionViewCell else {
             fatalError()
         }
 

@@ -96,6 +96,10 @@ extension Table {
                 return Element.section(self.elements).asSection!
             }
 
+            if sections.count <= index, let last = sections.last {
+                return last
+            }
+
             return sections[index]
         }
 
@@ -171,4 +175,43 @@ extension Table {
 
 extension Table.Element {
     typealias Builder = () -> ViewCreator
+}
+
+extension Table.Group {
+    public var isValid: Bool {
+        return self.isValid()
+    }
+
+    private func isValid(isInsideSection: Bool = false) -> Bool {
+        let isRoot = self.containsSection
+
+        if isRoot {
+            guard !isInsideSection else {
+                return false
+            }
+
+            if !self.containsOnlySection {
+                return false
+            }
+
+            return self.sections.allSatisfy {
+                $0.group.isValid(isInsideSection: true)
+            }
+        }
+
+        let headers = self.headers
+        if !headers.isEmpty && (headers.count > 1 || headers.first?.0 != 0) {
+            return false
+        }
+
+        let footers = self.elements.enumerated().filter {
+            $0.element.isFooter
+        }
+
+        if !footers.isEmpty && (footers.count > 1 || footers.first?.0 != self.elements.count - 1) {
+            return false
+        }
+
+        return !self.rows.isEmpty
+    }
 }

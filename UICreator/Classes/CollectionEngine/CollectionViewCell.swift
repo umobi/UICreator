@@ -21,37 +21,51 @@
 //
 
 import Foundation
+import UIKit
 
-public extension Table {
-    convenience init(style: UITableView.Style,_ elements: Element...) {
-        self.init(style: style)
-        #if os(iOS)
-        (self.uiView as? View)?.separatorStyle = .none
-        #endif
-        let group = Group(elements)
+public class CollectionViewCell: UICollectionViewCell {
+    private(set) var builder: ViewCreator! = nil
 
-        if !group.isValid {
-            fatalError("Verify your content")
-        }
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.backgroundColor = .clear
+    }
 
-        guard let tableView = self.uiView as? View else {
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override public func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        self.commitNotRendered()
+    }
+
+    override public func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        self.commitRendered()
+    }
+
+    override public func didMoveToWindow() {
+        super.didMoveToWindow()
+        self.commitInTheScene()
+    }
+
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        self.commitLayout()
+    }
+
+    func prepareCell(builder: Table.Element.Builder) {
+        guard self.builder == nil else {
             return
         }
 
-        group.rowsIdentifier.forEach {
-            tableView.register(TableViewCell.self, forCellReuseIdentifier: $0)
-        }
+        let builder = builder()
+        self.builder = builder
+        _ = self.contentView.add(builder.uiView)
+    }
 
-        group.headersIdentifier.forEach {
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-        }
-
-        group.footersIdentifier.forEach {
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-        }
-
-        tableView.group = group
-        tableView.dataSource = tableView
-        tableView.delegate = tableView
+    public override var watchingViews: [UIView] {
+        return self.contentView.subviews
     }
 }

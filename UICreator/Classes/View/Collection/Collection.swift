@@ -66,7 +66,6 @@ public class Collection: UIViewCreator, HasViewDelegate, HasViewDataSource {
     }
 }
 
-
 public extension UIViewCreator where View: UICollectionView {
     func addCell(for identifier: String, _ cellClass: AnyClass?) -> Self {
         self.onNotRendered {

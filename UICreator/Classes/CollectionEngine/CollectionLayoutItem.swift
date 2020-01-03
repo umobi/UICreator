@@ -22,36 +22,34 @@
 
 import Foundation
 
-public extension Table {
-    convenience init(style: UITableView.Style,_ elements: Element...) {
-        self.init(style: style)
-        #if os(iOS)
-        (self.uiView as? View)?.separatorStyle = .none
-        #endif
-        let group = Group(elements)
+public class CollectionLayoutItem: CollectionLayoutConstraintable {
+    let vertical: CollectionLayoutSizeConstraint?
+    let horizontal: CollectionLayoutSizeConstraint?
 
-        if !group.isValid {
-            fatalError("Verify your content")
-        }
+    public init() {
+        self.vertical = nil
+        self.horizontal = nil
+    }
 
-        guard let tableView = self.uiView as? View else {
-            return
-        }
+    public init(vertical: CollectionLayoutSizeConstraint) {
+        self.vertical = vertical
+        self.horizontal = nil
+    }
 
-        group.rowsIdentifier.forEach {
-            tableView.register(TableViewCell.self, forCellReuseIdentifier: $0)
-        }
+    public init(horizontal: CollectionLayoutSizeConstraint) {
+        self.horizontal = horizontal
+        self.vertical = nil
+    }
 
-        group.headersIdentifier.forEach {
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-        }
+    public init(vertical: CollectionLayoutSizeConstraint, horizontal: CollectionLayoutSizeConstraint) {
+        self.vertical = vertical
+        self.horizontal = horizontal
+    }
 
-        group.footersIdentifier.forEach {
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-        }
-
-        tableView.group = group
-        tableView.dataSource = tableView
-        tableView.delegate = tableView
+    func size(_ size: CGSize) -> CGSize {
+        return .init(
+            width: self.size(relatedTo: size.width, applying: self.horizontal),
+            height: self.size(relatedTo: size.height, applying: self.vertical)
+        )
     }
 }

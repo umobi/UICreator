@@ -23,12 +23,17 @@
 import Foundation
 
 public protocol TableDataSource {
+    func numberOfSections(_ estimatedSections: Int) -> Int
     func numberOfRows(in section: Int, estimatedRows: Int) -> Int
 
     func cell(at indexPath: IndexPath, content: ViewCreator)
 }
 
 public extension TableDataSource {
+    func numberOfSections(_ estimatedSections: Int) -> Int {
+        return estimatedSections
+    }
+    
     func numberOfRows(in section: Int, estimatedRows: Int) -> Int {
         return estimatedRows
     }

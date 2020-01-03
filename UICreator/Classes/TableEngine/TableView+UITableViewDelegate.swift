@@ -31,7 +31,7 @@ extension TableView: UITableViewDelegate {
         guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: header.0) as? TableViewHeaderFooterCell else {
             fatalError()
         }
-
+        
         cell.prepareCell(builder: header.1)
         self.creatorDelegate?.header(at: section, content: cell.builder)
         return cell

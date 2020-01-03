@@ -21,37 +21,23 @@
 //
 
 import Foundation
+import UIKit
 
-public extension Table {
-    convenience init(style: UITableView.Style,_ elements: Element...) {
-        self.init(style: style)
-        #if os(iOS)
-        (self.uiView as? View)?.separatorStyle = .none
-        #endif
-        let group = Group(elements)
+public protocol CollectionDataSource {
+    func numberOfSections(_ estimatedSections: Int) -> Int
+    func numberOfRows(in section: Int, estimatedRows: Int) -> Int
 
-        if !group.isValid {
-            fatalError("Verify your content")
-        }
+    func cell(at indexPath: IndexPath, content: ViewCreator)
+}
 
-        guard let tableView = self.uiView as? View else {
-            return
-        }
-
-        group.rowsIdentifier.forEach {
-            tableView.register(TableViewCell.self, forCellReuseIdentifier: $0)
-        }
-
-        group.headersIdentifier.forEach {
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-        }
-
-        group.footersIdentifier.forEach {
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-        }
-
-        tableView.group = group
-        tableView.dataSource = tableView
-        tableView.delegate = tableView
+public extension CollectionDataSource {
+    func numberOfSections(_ estimatedSections: Int) -> Int {
+        return estimatedSections
     }
+
+    func numberOfRows(in section: Int, estimatedRows: Int) -> Int {
+        return estimatedRows
+    }
+
+    func cell(at indexPath: IndexPath, content: ViewCreator) {}
 }

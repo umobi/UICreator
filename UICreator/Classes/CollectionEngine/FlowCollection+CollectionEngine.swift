@@ -22,36 +22,33 @@
 
 import Foundation
 
-public extension Table {
-    convenience init(style: UITableView.Style,_ elements: Element...) {
-        self.init(style: style)
-        #if os(iOS)
-        (self.uiView as? View)?.separatorStyle = .none
-        #endif
-        let group = Group(elements)
+public extension FlowCollection {
+    convenience init(_ elements: Table.Element...) {
+        self.init()
+        let group = Table.Group(elements)
 
         if !group.isValid {
             fatalError("Verify your content")
         }
 
-        guard let tableView = self.uiView as? View else {
+        guard let collectionView = self.uiView as? View else {
             return
         }
 
         group.rowsIdentifier.forEach {
-            tableView.register(TableViewCell.self, forCellReuseIdentifier: $0)
+            collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
         }
 
         group.headersIdentifier.forEach {
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
+            collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
         }
 
         group.footersIdentifier.forEach {
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
+            collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
         }
 
-        tableView.group = group
-        tableView.dataSource = tableView
-        tableView.delegate = tableView
+        collectionView.group = group
+        collectionView.dataSource = collectionView
+        collectionView.delegate = collectionView
     }
 }
