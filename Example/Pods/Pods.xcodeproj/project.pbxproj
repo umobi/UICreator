@@ -19,6 +19,7 @@
 		0C08F82523BF7CB800C52B8E /* CollectionDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C08F82423BF7CB800C52B8E /* CollectionDataSource.swift */; };
 		0C08F82723BF7D2400C52B8E /* FlowCollection+CollectionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C08F82623BF7D2400C52B8E /* FlowCollection+CollectionEngine.swift */; };
 		0C08F82923BF7D8700C52B8E /* FlowCollection+LayoutEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C08F82823BF7D8700C52B8E /* FlowCollection+LayoutEngine.swift */; };
+		0C08F82B23BFB5DA00C52B8E /* PageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C08F82A23BFB5DA00C52B8E /* PageView.swift */; };
 		0C0B0B9123B4E54100FAF1E6 /* Slider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0B0B9023B4E54100FAF1E6 /* Slider.swift */; };
 		0C0B0B9323B4E56200FAF1E6 /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0B0B9223B4E56200FAF1E6 /* ActivityIndicator.swift */; };
 		0C0FACF223B258FD00E6B2FC /* LongPressGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACEA23B258FD00E6B2FC /* LongPressGesture.swift */; };
@@ -135,6 +136,7 @@
 		0C08F82423BF7CB800C52B8E /* CollectionDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionDataSource.swift; sourceTree = "<group>"; };
 		0C08F82623BF7D2400C52B8E /* FlowCollection+CollectionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FlowCollection+CollectionEngine.swift"; sourceTree = "<group>"; };
 		0C08F82823BF7D8700C52B8E /* FlowCollection+LayoutEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FlowCollection+LayoutEngine.swift"; sourceTree = "<group>"; };
+		0C08F82A23BFB5DA00C52B8E /* PageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageView.swift; sourceTree = "<group>"; };
 		0C0B0B9023B4E54100FAF1E6 /* Slider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Slider.swift; sourceTree = "<group>"; };
 		0C0B0B9223B4E56200FAF1E6 /* ActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
 		0C0FACEA23B258FD00E6B2FC /* LongPressGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LongPressGesture.swift; sourceTree = "<group>"; };
@@ -367,6 +369,7 @@
 		0C9346E423AE7D8600A9E112 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				0C08F82A23BFB5DA00C52B8E /* PageView.swift */,
 				0C7E8A9723B403B3007E480B /* DatePicker.swift */,
 				0C46815823BE1A3600BDC263 /* Segmented.swift */,
 				0C7E8A9923B40AFF007E480B /* Input.swift */,
@@ -763,6 +766,7 @@
 				0C93470923AE7D8600A9E112 /* ViewControllerType+ViewCreator.swift in Sources */,
 				0C93470523AE7D8600A9E112 /* Host.swift in Sources */,
 				0CAA4BF423B267A200DD5DDF /* Collection.swift in Sources */,
+				0C08F82B23BFB5DA00C52B8E /* PageView.swift in Sources */,
 				0C93470F23AE7D8600A9E112 /* Stack.swift in Sources */,
 				0C93470423AE7D8600A9E112 /* UIViewCreator+Navigation.swift in Sources */,
 				0C3883CB23BBB5FC009E6FF6 /* TouchGesture.swift in Sources */,

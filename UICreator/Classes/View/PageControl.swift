@@ -91,3 +91,9 @@ public extension UIViewCreator where View: UIPageControl {
         }
     }
 }
+
+public extension UIViewCreator where Self: Control, View: UIPageControl {
+    func onPageChanged(_ handler: @escaping (UIView) -> Void) -> Self {
+        self.onEvent(.valueChanged, handler)
+    }
+}

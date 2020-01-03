@@ -49,8 +49,8 @@ public extension ViewCreator {
 public extension UIView {
     var navigation: NavigationRepresentable? {
         return sequence(first: self, next: { $0?.superview }).first(where: {
-            $0?.ViewCreator is NavigationRepresentable
-        })??.ViewCreator as? NavigationRepresentable
+            $0?.viewCreator is NavigationRepresentable
+        })??.viewCreator as? NavigationRepresentable
     }
 }
 
