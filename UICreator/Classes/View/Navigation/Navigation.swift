@@ -100,6 +100,21 @@ public extension ViewCreator {
     }
 }
 
+public extension ViewCreator {
+    func animate(_ duration: TimeInterval, animations: @escaping () -> Void) {
+        UIView.animate(withDuration: duration, animations: {
+            animations()
+            self.uiView.setNeedsLayout()
+        }, completion: nil)
+    }
+    func animate(_ duration: TimeInterval, animations: @escaping () -> Void, completion: @escaping (Bool) -> Void) {
+        UIView.animate(withDuration: duration, animations: {
+            animations()
+            self.uiView.setNeedsLayout()
+        }, completion: completion)
+    }
+}
+
 public extension UIView {
     var navigationItem: UINavigationItem! {
         return self.viewController?.navigationItem

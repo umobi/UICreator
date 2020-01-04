@@ -32,195 +32,280 @@ private var kOnPossible: UInt = 0
 private var kOnEnded: UInt = 0
 private var kOnAnyOther: UInt = 0
 
-public protocol Gesture: UIGestureRecognizer {
-    init(target: UIView!)
+public protocol Gesture {
+    init(target view: UIView!)
 }
 
-internal class Handler<G: Gesture> {
-    let handler: (G) -> Void
+public protocol UIGesture: Gesture {
+    associatedtype Gesture: UIGestureRecognizer
+}
 
-    init(_ handler: @escaping (G) -> Void) {
+private var kGesture: UInt = 0
+internal extension UIGestureRecognizer {
+    var parent: Gesture? {
+        get { objc_getAssociatedObject(self, &kGesture) as? Gesture }
+        set { objc_setAssociatedObject(self, &kGesture, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    }
+
+    convenience init(target view: UIView!) {
+        self.init(target: view, action: #selector(view.someGestureRecognized(_:)))
+    }
+}
+
+private var kGestureRecognized: UInt = 0
+internal extension Gesture {
+    var gesture: UIGestureRecognizer! {
+        get { objc_getAssociatedObject(self, &kGestureRecognized) as? UIGestureRecognizer }
+        nonmutating
+        set { setGesture(newValue, policity: newValue?.view?.superview != nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
+    }
+
+    func setGesture(_ uiGesture: UIGestureRecognizer, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN) {
+        objc_setAssociatedObject(self, &kGestureRecognized, uiGesture, policity)
+    }
+}
+
+internal extension UIView {
+    func addGesture(_ gesture: Gesture) {
+        guard let gestureRecognize = gesture.gesture else {
+            return
+        }
+
+        self.addGestureRecognizer(gestureRecognize)
+        gesture.setGesture(gestureRecognize, policity: .OBJC_ASSOCIATION_ASSIGN)
+    }
+}
+
+internal struct Handler {
+    let handler: (UIGestureRecognizer) -> Void
+
+    init(_ handler: @escaping (UIGestureRecognizer) -> Void) {
         self.handler = handler
     }
 }
 
 internal extension Gesture {
-    var began: Handler<Self>? {
-        get { objc_getAssociatedObject(self, &kOnBegan) as? Handler<Self> }
+    var began: Handler? {
+        get { objc_getAssociatedObject(self, &kOnBegan) as? Handler }
+        nonmutating
         set { objc_setAssociatedObject(self, &kOnBegan, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
-    var cancelled: Handler<Self>? {
-        get { objc_getAssociatedObject(self, &kOnCancelled) as? Handler<Self> }
+    var cancelled: Handler? {
+        get { objc_getAssociatedObject(self, &kOnCancelled) as? Handler }
+        nonmutating
         set { objc_setAssociatedObject(self, &kOnCancelled, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
-    var changed: Handler<Self>? {
-        get { objc_getAssociatedObject(self, &kOnChanged) as? Handler<Self> }
+    var changed: Handler? {
+        get { objc_getAssociatedObject(self, &kOnChanged) as? Handler }
+        nonmutating
         set { objc_setAssociatedObject(self, &kOnChanged, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
-    var failed: Handler<Self>? {
-        get { objc_getAssociatedObject(self, &kOnFailed) as? Handler<Self> }
+    var failed: Handler? {
+        get { objc_getAssociatedObject(self, &kOnFailed) as? Handler }
+        nonmutating
         set { objc_setAssociatedObject(self, &kOnFailed, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
-    var recognized: Handler<Self>? {
-        get { objc_getAssociatedObject(self, &kOnRecognized) as? Handler<Self> }
+    var recognized: Handler? {
+        get { objc_getAssociatedObject(self, &kOnRecognized) as? Handler }
+        nonmutating
         set { objc_setAssociatedObject(self, &kOnRecognized, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
-    var possible: Handler<Self>? {
-        get { objc_getAssociatedObject(self, &kOnPossible) as? Handler<Self> }
+    var possible: Handler? {
+        get { objc_getAssociatedObject(self, &kOnPossible) as? Handler }
+        nonmutating
         set { objc_setAssociatedObject(self, &kOnPossible, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
-    var ended: Handler<Self>? {
-        get { objc_getAssociatedObject(self, &kOnEnded) as? Handler<Self> }
+    var ended: Handler? {
+        get { objc_getAssociatedObject(self, &kOnEnded) as? Handler }
+        nonmutating
         set { objc_setAssociatedObject(self, &kOnEnded, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
-    var anyOther: Handler<Self>? {
-        get { objc_getAssociatedObject(self, &kOnAnyOther) as? Handler<Self> }
+    var anyOther: Handler? {
+        get { objc_getAssociatedObject(self, &kOnAnyOther) as? Handler }
+        nonmutating
         set { objc_setAssociatedObject(self, &kOnAnyOther, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 }
 
-public extension Gesture {
+public extension UIGesture {
+    func `as`<UIGesture: UIGestureRecognizer>(_ reference: inout UIGesture!) -> Self {
+        reference = self.gesture as? UIGesture
+        return self
+    }
+
     func allowedPress(types pressTypes: Set<UIPress.PressType>) -> Self {
-        self.allowedPressTypes = pressTypes.map { NSNumber(value: $0.rawValue) }
+        self.gesture.allowedPressTypes = pressTypes.map { NSNumber(value: $0.rawValue) }
         return self
     }
 
     func allowedTouch(types touchTypes: Set<UITouch.TouchType>) -> Self {
-        self.allowedTouchTypes = touchTypes.map { NSNumber(value: $0.rawValue) }
+        self.gesture.allowedTouchTypes = touchTypes.map { NSNumber(value: $0.rawValue) }
         return self
     }
 
     func cancelsTouches(inView flag: Bool) -> Self {
-        self.cancelsTouchesInView = flag
+        self.gesture.cancelsTouchesInView = flag
         return self
     }
 
     func delaysTouches(atBegan flag: Bool) -> Self {
-        self.delaysTouchesEnded = flag
+        self.gesture.delaysTouchesEnded = flag
         return self
     }
 
     func delaysTouches(atEnded flag: Bool) -> Self {
-        self.delaysTouchesEnded = flag
+        self.gesture.delaysTouchesEnded = flag
         return self
     }
 
     func isEnabled(_ flag: Bool) -> Self {
-        self.isEnabled = flag
+        self.gesture.isEnabled = flag
         return self
     }
 
     @available(tvOS 11.0, *)
     @available(iOS 11, *)
     func name(_ string: String?) -> Self {
-        self.name = string
+        self.gesture.name = string
         return self
     }
 
     func requiredExclusive(touchType flag: Bool) -> Self {
-        self.requiresExclusiveTouchType = flag
+        self.gesture.requiresExclusiveTouchType = flag
         return self
     }
 }
 
-public extension Gesture {
-    func onBegan(_ handler: @escaping (Self) -> Void) -> Self {
+public extension UIGesture {
+    func onBegan(_ handler: @escaping (Gesture) -> Void) -> Self {
         let allBegan = self.began
         self.began = .init {
-            handler($0)
-            allBegan?.handler($0)
+            guard let gesture = $0 as? Gesture else {
+                return
+            }
+
+            handler(gesture)
+            allBegan?.handler(gesture)
         }
         return self
     }
 
-    func onCancelled(_ handler: @escaping (Self) -> Void) -> Self {
+    func onCancelled(_ handler: @escaping (Gesture) -> Void) -> Self {
         let allCancelled = self.cancelled
         self.cancelled = .init {
-            handler($0)
-            allCancelled?.handler($0)
+            guard let gesture = $0 as? Gesture else {
+                return
+            }
+
+            handler(gesture)
+            allCancelled?.handler(gesture)
         }
         return self
     }
 
-    func onChanged(_ handler: @escaping (Self) -> Void) -> Self {
+    func onChanged(_ handler: @escaping (Gesture) -> Void) -> Self {
         let allChanged = self.changed
         self.changed = .init {
-            handler($0)
-            allChanged?.handler($0)
+            guard let gesture = $0 as? Gesture else {
+                return
+            }
+
+            handler(gesture)
+            allChanged?.handler(gesture)
         }
         return self
     }
 
-    func onFailed(_ handler: @escaping (Self) -> Void) -> Self {
+    func onFailed(_ handler: @escaping (Gesture) -> Void) -> Self {
         let allFailed = self.failed
         self.failed = .init {
-            handler($0)
-            allFailed?.handler($0)
+            guard let gesture = $0 as? Gesture else {
+                return
+            }
+
+            handler(gesture)
+            allFailed?.handler(gesture)
         }
         return self
     }
 
-    func onRecognized(_ handler: @escaping (Self) -> Void) -> Self {
+    func onRecognized(_ handler: @escaping (Gesture) -> Void) -> Self {
         let allRecognized = self.recognized
         self.recognized = .init {
-            handler($0)
-            allRecognized?.handler($0)
+            guard let gesture = $0 as? Gesture else {
+                return
+            }
+
+            handler(gesture)
+            allRecognized?.handler(gesture)
         }
         return self
     }
 
-    func onPossible(_ handler: @escaping (Self) -> Void) -> Self {
+    func onPossible(_ handler: @escaping (Gesture) -> Void) -> Self {
         let allPossible = self.possible
         self.possible = .init {
-            handler($0)
-            allPossible?.handler($0)
+            guard let gesture = $0 as? Gesture else {
+                return
+            }
+
+            handler(gesture)
+            allPossible?.handler(gesture)
         }
         return self
     }
 
-    func onEnded(_ handler: @escaping (Self) -> Void) -> Self {
+    func onEnded(_ handler: @escaping (Gesture) -> Void) -> Self {
         let allEnded = self.ended
         self.ended = .init {
-            handler($0)
-            allEnded?.handler($0)
+            guard let gesture = $0 as? Gesture else {
+                return
+            }
+
+            handler(gesture)
+            allEnded?.handler(gesture)
         }
         return self
     }
 
-    func onAnyOther(_ handler: @escaping (Self) -> Void) -> Self {
+    func onAnyOther(_ handler: @escaping (Gesture) -> Void) -> Self {
         let allAnyOther = self.anyOther
         self.anyOther = .init {
-            handler($0)
-            allAnyOther?.handler($0)
+            guard let gesture = $0 as? Gesture else {
+                return
+            }
+
+            handler(gesture)
+            allAnyOther?.handler(gesture)
         }
         return self
     }
 }
 
 internal extension Gesture {
-    func commit(_ sender: Self) {
-        switch self.state {
+    func commit(_ sender: UIGestureRecognizer) {
+        switch sender.state {
         case .possible:
-            (sender.possible ?? sender.recognized)?.handler(sender)
+            (self.possible ?? self.recognized)?.handler(sender)
         case .began:
-            (sender.began ?? sender.recognized)?.handler(sender)
+            (self.began ?? self.recognized)?.handler(sender)
         case .changed:
-            (sender.changed ?? sender.recognized)?.handler(sender)
+            (self.changed ?? self.recognized)?.handler(sender)
         case .ended:
-            (sender.ended ?? sender.recognized)?.handler(sender)
+            (self.ended ?? self.recognized)?.handler(sender)
         case .cancelled:
-            (sender.cancelled ?? sender.recognized)?.handler(sender)
+            (self.cancelled ?? self.recognized)?.handler(sender)
         case .failed:
-            (sender.failed ?? sender.recognized)?.handler(sender)
+            (self.failed ?? self.recognized)?.handler(sender)
         @unknown default:
-            sender.anyOther?.handler(sender)
+            self.anyOther?.handler(sender)
         }
     }
 }

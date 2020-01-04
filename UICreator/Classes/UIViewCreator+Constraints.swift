@@ -35,7 +35,7 @@ extension UIView {
     }
 }
 
-public extension UIViewCreator {
+public extension ViewCreator {
     func safeArea(topEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
             guard let view = view ?? $0.realSuperview else {
@@ -567,7 +567,7 @@ public extension UIViewCreator {
     }
 }
 
-public extension UIViewCreator {
+public extension ViewCreator {
     func insets(equalTo value: CGFloat = 0, priority: ConstraintPriority = .required) -> Self {
         return self.top(equalTo: value, priority: priority)
             .bottom(equalTo: value, priority: priority)
@@ -576,7 +576,7 @@ public extension UIViewCreator {
     }
 }
 
-public extension UIViewCreator {
+public extension ViewCreator {
     func aspectRatio(equalTo multiplier: CGFloat = 1, priority: ConstraintPriority = .required) -> Self {
         return self.aspectRatio(heightEqualTo: multiplier, priority: priority)
     }
@@ -642,7 +642,7 @@ public extension UIViewCreator {
     }
 }
 
-public extension UIViewCreator {
+public extension ViewCreator {
     func height(equalTo constant: CGFloat, priority: ConstraintPriority = .required) -> Self {
         return self.onNotRendered {
             $0.snp.makeConstraints {
@@ -698,7 +698,7 @@ public extension UIViewCreator {
     }
 }
 
-public extension UIViewCreator {
+public extension ViewCreator {
     func hugging(vertical verticalPriority: UILayoutPriority = .defaultLow, horizontal horizontalPriority: UILayoutPriority = .defaultLow) -> Self {
         return self.onNotRendered {
             $0.setContentHuggingPriority(verticalPriority, for: .vertical)

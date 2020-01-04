@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import SnapKit
 
 private var kNotRenderedHandler: UInt = 0
 private var kRenderedHandler: UInt = 0
@@ -117,27 +118,13 @@ internal extension UIView {
     func add(_ view: UIView) -> Self {
         self.addSubview(view)
 
-        view.translatesAutoresizingMaskIntoConstraints = false
-        {
-            $0.isActive = true
-            $0.priority = .init(rawValue: 751)
-        }(view.topAnchor.constraint(equalTo: self.topAnchor, constant: 0));
+        let priority: ConstraintPriority = (self as UIView) is RootView && view is RootView ? .required :
+        .init(751)
 
-        {
-            $0.isActive = true
-            $0.priority = .init(rawValue: 751)
-        }(view.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0));
-
-        {
-            $0.isActive = true
-            $0.priority = .init(rawValue: 751)
-        }(view.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 0));
-
-        {
-            $0.isActive = true
-            $0.priority = .init(rawValue: 751)
-        }(view.rightAnchor.constraint(equalTo: self.rightAnchor, constant: 0));
-
+        view.snp.makeConstraints {
+            $0.edges.equalTo(0).priority(priority)
+        }
+        
         return self
     }
 

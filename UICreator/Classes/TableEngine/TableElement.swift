@@ -42,7 +42,7 @@ extension Table {
         }
 
         public static func footer(content: @escaping () -> ViewCreator) -> Element {
-            return .init(.header, content: .content(content))
+            return .init(.footer, content: .content(content))
         }
 
         public static func row(content: @escaping () -> ViewCreator) -> Element {
@@ -156,7 +156,7 @@ public extension Table.Element {
 
 public extension Table.Element {
     class Header {
-        let content: () -> ViewCreator
+        let content: Builder
 
         fileprivate init?(_ element: Table.Element) {
             guard case .header = element.type, case .content(let content) = element.content else {
@@ -170,7 +170,7 @@ public extension Table.Element {
 
 public extension Table.Element {
     class Footer {
-        let content: () -> ViewCreator
+        let content: Builder
 
         fileprivate init?(_ element: Table.Element) {
             guard case .footer = element.type, case .content(let content) = element.content else {
@@ -184,7 +184,7 @@ public extension Table.Element {
 
 public extension Table.Element {
     class Row {
-        let content: () -> ViewCreator
+        let content: Builder
         let quantity: Int
 
         fileprivate init?(_ element: Table.Element) {

@@ -26,11 +26,8 @@ import UIContainer
 public extension ViewControllerType where Self: ViewCreator {
     var content: ViewControllerMaker {
         return .dynamic {
-            $0.view.addSubview(self.uiView)
+            _ = $0.view.add(self.uiView)
             $0.view.backgroundColor = .clear
-            self.uiView.snp.makeConstraints {
-                $0.edges.equalTo(0)
-            }
         }
     }
 }

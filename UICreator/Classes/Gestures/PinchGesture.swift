@@ -24,38 +24,27 @@ import Foundation
 import UIKit
 
 #if os(iOS)
-public class PinchGesture: UIPinchGestureRecognizer, Gesture, HasViewDelegate {
 
-    required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.pinch(_:)))
+public class Pinch: UIGesture {
+    public typealias Gesture = UIPinchGestureRecognizer
+
+    public required init(target view: UIView!) {
+        self.setGesture(Gesture.init(target: view))
+        self.gesture.parent = self
     }
-
-    @discardableResult
-    public func delegate(_ delegate: UIGestureRecognizerDelegate?) -> Self {
-        self.delegate = delegate
-        return self
-    }
-}
-
-fileprivate extension UIView {
-
-    @objc func pinch(_ sender: PinchGesture!) {
-        sender.commit(sender)
-    }
-
 }
 
 public extension UIViewCreator {
 
-    func onPinchMaker(_ pinchConfigurator: (PinchGesture) -> PinchGesture) -> Self {
-        self.uiView.addGestureRecognizer(pinchConfigurator(PinchGesture(target: self.uiView)))
+    func onPinchMaker(_ pinchConfigurator: (Pinch) -> Pinch) -> Self {
+        self.uiView.addGesture(pinchConfigurator(Pinch(target: self.uiView)))
         return self
     }
 
     func onPinch(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onPinchMaker {
-            $0.onRecognized { _ in
-                handler(self.uiView)
+            $0.onRecognized {
+                handler($0.view!)
             }
         }
     }

@@ -21,37 +21,8 @@
 //
 
 import Foundation
+import UIKit
 
-public extension Table {
-    convenience init(style: UITableView.Style,_ elements: Element...) {
-        self.init(style: style)
-        #if os(iOS)
-        (self.uiView as? View)?.separatorStyle = .none
-        #endif
-        let group = Group(elements)
+extension CollectionView: UICollectionViewDelegate {
 
-        if !group.isValid {
-            fatalError("Verify your content")
-        }
-
-        guard let tableView = self.uiView as? View else {
-            return
-        }
-
-        group.rowsIdentifier.forEach {
-            tableView.register(TableViewCell.self, forCellReuseIdentifier: $0)
-        }
-
-        group.headersIdentifier.forEach {
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-        }
-
-        group.footersIdentifier.forEach {
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-        }
-
-        tableView.group = group
-        tableView.dataSource = tableView
-        tableView.delegate = tableView
-    }
 }

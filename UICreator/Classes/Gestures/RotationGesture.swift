@@ -24,38 +24,26 @@ import Foundation
 import UIKit
 
 #if os(iOS)
-public class RotationGesture: UIRotationGestureRecognizer, Gesture, HasViewDelegate {
+public class Rotation: UIGesture {
+    public typealias Gesture = UIRotationGestureRecognizer
 
-    required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.rotation(_:)))
+    public required init(target view: UIView!) {
+        self.setGesture(Gesture.init(target: view))
+        self.gesture.parent = self
     }
-
-    @discardableResult
-    public func delegate(_ delegate: UIGestureRecognizerDelegate?) -> Self {
-        self.delegate = delegate
-        return self
-    }
-}
-
-fileprivate extension UIView {
-
-    @objc func rotation(_ sender: RotationGesture!) {
-        sender.commit(sender)
-    }
-
 }
 
 public extension UIViewCreator {
 
-    func onRotationMaker(_ rotationConfigurator: (RotationGesture) -> RotationGesture) -> Self {
-        self.uiView.addGestureRecognizer(rotationConfigurator(RotationGesture(target: self.uiView)))
+    func onRotationMaker(_ rotationConfigurator: (Rotation) -> Rotation) -> Self {
+        self.uiView.addGesture(rotationConfigurator(Rotation(target: self.uiView)))
         return self
     }
 
     func onRotation(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onRotationMaker {
-            $0.onRecognized { _ in
-                handler(self.uiView)
+            $0.onRecognized {
+                handler($0.view!)
             }
         }
     }

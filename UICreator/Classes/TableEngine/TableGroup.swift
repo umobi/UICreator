@@ -96,6 +96,10 @@ extension Table {
                 return Element.section(self.elements).asSection!
             }
 
+            if sections.count <= index, let last = sections.last {
+                return last
+            }
+
             return sections[index]
         }
 
@@ -123,7 +127,7 @@ extension Table {
             }.reduce([]) { $0 + $1 }
         }
 
-        func row(at indexPath: IndexPath) -> (String, () -> ViewCreator)? {
+        func row(at indexPath: IndexPath) -> (String, Element.Builder)? {
             let section = self.section(at: indexPath.section)
             guard let row: (Int, Element.Row) = ({
                 if self.numberOfRows(in: section) <= indexPath.row {
@@ -147,17 +151,17 @@ extension Table {
             return ("\(indexPath.section)-\(row.0)", row.1.content)
         }
 
-        func header(at section: Int) -> (String, () -> ViewCreator)? {
+        func header(at section: Int) -> (String, Element.Builder)? {
             let section = self.section(at: section)
 
             guard let header = section.group.headers.first else {
                 return nil
             }
-            // 124
+            
             return ("\(header.0).header", header.1.content)
         }
 
-        func footer(at section: Int) -> (String, () -> ViewCreator)? {
+        func footer(at section: Int) -> (String, Element.Builder)? {
             let section = self.section(at: section)
 
             guard let footer = section.group.footers.first else {
@@ -166,5 +170,48 @@ extension Table {
 
             return ("\(footer.0).footer", footer.1.content)
         }
+    }
+}
+
+extension Table.Element {
+    typealias Builder = () -> ViewCreator
+}
+
+extension Table.Group {
+    public var isValid: Bool {
+        return self.isValid()
+    }
+
+    private func isValid(isInsideSection: Bool = false) -> Bool {
+        let isRoot = self.containsSection
+
+        if isRoot {
+            guard !isInsideSection else {
+                return false
+            }
+
+            if !self.containsOnlySection {
+                return false
+            }
+
+            return self.sections.allSatisfy {
+                $0.group.isValid(isInsideSection: true)
+            }
+        }
+
+        let headers = self.headers
+        if !headers.isEmpty && (headers.count > 1 || headers.first?.0 != 0) {
+            return false
+        }
+
+        let footers = self.elements.enumerated().filter {
+            $0.element.isFooter
+        }
+
+        if !footers.isEmpty && (footers.count > 1 || footers.first?.0 != self.elements.count - 1) {
+            return false
+        }
+
+        return !self.rows.isEmpty
     }
 }

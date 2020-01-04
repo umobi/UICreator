@@ -22,13 +22,8 @@
 
 import Foundation
 import UIKit
-import UIContainer
 
-public class _Container<View: UIViewController>: UIContainer.Container<View> {
-    override var watchingViews: [UIView] {
-        return []
-    }
-
+public class PageControl: UIPageControl {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -50,17 +45,55 @@ public class _Container<View: UIViewController>: UIContainer.Container<View> {
     }
 }
 
-public class Container<ViewController: UIViewController>: UIViewCreator {
-    public typealias View = _Container<ViewController>
+public class Page: UIViewCreator, Control {
+    public typealias View = PageControl
 
-    public required init(_ content: @escaping () -> ViewController) {
+    public init(numberOfPages: Int) {
         self.uiView = View.init(builder: self)
-        _ = self.onInTheScene {
-            ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: content)
+        (self.uiView as? View)?.numberOfPages = numberOfPages
+    }
+}
+
+public extension UIViewCreator where View: UIPageControl {
+    func currentPage(_ page: Int) -> Self {
+        self.onInTheScene {
+            ($0 as? View)?.currentPage = page
         }
     }
 
-    deinit {
-        print("Killed")
+    func currentPage(indicatorTintColor: UIColor?) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.currentPageIndicatorTintColor = indicatorTintColor
+        }
+    }
+
+    func defersCurrentPageDisplay(_ flag: Bool) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.defersCurrentPageDisplay = flag
+        }
+    }
+
+    func hidesForSinglePage(_ flag: Bool) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.hidesForSinglePage = flag
+        }
+    }
+
+    func numberOfPages(_ pages: Int) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.numberOfPages = pages
+        }
+    }
+
+    func page(indicatorTintColor: UIColor?) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.pageIndicatorTintColor = indicatorTintColor
+        }
+    }
+}
+
+public extension UIViewCreator where Self: Control, View: UIPageControl {
+    func onPageChanged(_ handler: @escaping (UIView) -> Void) -> Self {
+        self.onEvent(.valueChanged, handler)
     }
 }

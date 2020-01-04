@@ -31,9 +31,75 @@ extension TableView: UITableViewDelegate {
         guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: header.0) as? TableViewHeaderFooterCell else {
             fatalError()
         }
-
-        cell.prepareCell(content: header.1)
+        
+        cell.prepareCell(builder: header.1)
         self.creatorDelegate?.header(at: section, content: cell.builder)
         return cell
+    }
+
+    public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        guard let footer = self.group?.footer(at: section) else {
+            return nil
+        }
+
+        guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: footer.0) as? TableViewHeaderFooterCell else {
+            fatalError()
+        }
+
+        cell.prepareCell(builder: footer.1)
+        self.creatorDelegate?.footer(at: section, content: cell.builder)
+        return cell
+    }
+}
+
+extension TableView {
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        guard self.group?.header(at: section) != nil else {
+            return .zero
+        }
+
+        return self.creatorDelegate?.tableView(tableView, heightForHeaderAt: section) ?? tableView.sectionHeaderHeight
+    }
+
+    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        guard self.group?.footer(at: section) != nil else {
+            return .zero
+        }
+
+        return self.creatorDelegate?.tableView(tableView, heightForHeaderAt: section) ?? tableView.sectionFooterHeight
+    }
+
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        guard self.group?.row(at: indexPath) != nil else {
+            return .zero
+        }
+
+        return self.creatorDelegate?.tableView(tableView, heightForRowAt: indexPath) ?? tableView.rowHeight
+    }
+}
+
+extension TableView {
+    public func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
+        guard self.group?.header(at: section) != nil else {
+            return .zero
+        }
+
+        return self.creatorDelegate?.tableView(tableView, estimatedHeightForHeaderAt: section) ?? 1
+    }
+
+    public func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection section: Int) -> CGFloat {
+        guard self.group?.footer(at: section) != nil else {
+            return .zero
+        }
+
+        return self.creatorDelegate?.tableView(tableView, estimatedHeightForHeaderAt: section) ?? 1
+    }
+
+    public func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        guard self.group?.row(at: indexPath) != nil else {
+            return .zero
+        }
+
+        return self.creatorDelegate?.tableView(tableView, estimatedHeightForRowAt: indexPath) ?? tableView.estimatedRowHeight
     }
 }

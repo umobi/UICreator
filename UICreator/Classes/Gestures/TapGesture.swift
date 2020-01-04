@@ -23,50 +23,41 @@
 import Foundation
 import UIKit
 
-public class TapGesture: UITapGestureRecognizer, Gesture, HasViewDelegate {
+public class Tap: UIGesture {
+    public typealias Gesture = UITapGestureRecognizer
 
-    required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.tap(_:)))
-    }
-
-    @discardableResult
-    public func delegate(_ delegate: UIGestureRecognizerDelegate?) -> Self {
-        self.delegate = delegate
-        return self
+    public required init(target view: UIView!) {
+        self.setGesture(Gesture.init(target: view))
+        self.gesture.parent = self
     }
 }
 
-extension Gesture where Self: UITapGestureRecognizer {
+extension UIGesture where Gesture: UITapGestureRecognizer {
     func number(ofTapsRequired number: Int) -> Self {
-        self.numberOfTapsRequired = number
+        (self.gesture as? Gesture)?.numberOfTapsRequired = number
         return self
     }
 
     #if os(iOS)
     func number(ofTouchesRequired number: Int) -> Self {
-        self.numberOfTouchesRequired = number
+        (self.gesture as? Gesture)?.numberOfTouchesRequired = number
         return self
     }
     #endif
 }
 
-fileprivate extension UIView {
-    @objc func tap(_ sender: TapGesture!) {
-        sender.commit(sender)
-    }
-}
-
 public extension UIViewCreator {
-    func onTapMaker(_ tapConfigurator: (TapGesture) -> TapGesture) -> Self {
-        self.uiView.addGestureRecognizer(tapConfigurator(tapConfigurator(TapGesture(target: self.uiView))))
+    func onTapMaker(_ tapConfigurator: (Tap) -> Tap) -> Self {
+        self.uiView.addGesture(tapConfigurator(Tap(target: self.uiView)))
         return self
     }
 
     func onTap(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onTapMaker {
-            $0.onRecognized { _ in
-                handler(self.uiView)
+            $0.onRecognized {
+                handler($0.view!)
             }
         }
     }
 }
+ 

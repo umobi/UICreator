@@ -22,45 +22,30 @@
 
 import Foundation
 import UIKit
-import UIContainer
 
-public class _Container<View: UIViewController>: UIContainer.Container<View> {
-    override var watchingViews: [UIView] {
-        return []
+private var kCollectionGroup: UInt = 0
+private var kCollectionDataSource: UInt = 0
+private var kCollectionDelegate: UInt = 0
+private var kCollectionLayoutGroup: UInt = 0
+
+extension UICollectionView {
+    var group: Table.Group? {
+        get { objc_getAssociatedObject(self, &kCollectionGroup) as? Table.Group }
+        set { objc_setAssociatedObject(self, &kCollectionGroup, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
+    var layoutGroup: [CollectionLayoutSection]? {
+        get { objc_getAssociatedObject(self, &kCollectionLayoutGroup) as? [CollectionLayoutSection] }
+        set { objc_setAssociatedObject(self, &kCollectionLayoutGroup, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        self.commitRendered()
+    var creatorDataSource: CollectionDataSource? {
+        get { objc_getAssociatedObject(self, &kCollectionDataSource) as? CollectionDataSource }
+        set { objc_setAssociatedObject(self, &kCollectionDataSource, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        self.commitInTheScene()
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        self.commitLayout()
-    }
-}
-
-public class Container<ViewController: UIViewController>: UIViewCreator {
-    public typealias View = _Container<ViewController>
-
-    public required init(_ content: @escaping () -> ViewController) {
-        self.uiView = View.init(builder: self)
-        _ = self.onInTheScene {
-            ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: content)
-        }
-    }
-
-    deinit {
-        print("Killed")
+    var creatorDelegate: TableDelegate? {
+        get { objc_getAssociatedObject(self, &kCollectionDelegate) as? TableDelegate }
+        set { objc_setAssociatedObject(self, &kCollectionDelegate, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 }

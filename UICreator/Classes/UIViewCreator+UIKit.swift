@@ -120,4 +120,52 @@ public extension UIViewCreator {
             $0.isHidden = flag
         }
     }
+
+    func isUserInteractionEnabled(_ flag: Bool) -> Self {
+        return self.onInTheScene {
+            $0.isUserInteractionEnabled = flag
+        }
+    }
+
+    #if os(iOS)
+    func isExclusiveTouch(_ flag: Bool) -> Self {
+        return self.onInTheScene {
+            $0.isExclusiveTouch = flag
+        }
+    }
+    #endif
+}
+
+public extension ViewCreator {
+    func transform3d(_ transform3d: CATransform3D) -> Self {
+        self.onRendered {
+            if #available(iOS 12.0, tvOS 12.0, *) {
+                $0.transform3D = transform3d
+            } else {
+                $0.layer.transform = transform3d
+            }
+        }
+    }
+
+    func transform(_ transform: CGAffineTransform) -> Self {
+        self.onRendered {
+            $0.transform = transform
+        }
+    }
+}
+
+public extension ViewCreator {
+    @available(iOS 13, tvOS 13, *)
+    func userInterfaceStyle(_ style: UIUserInterfaceStyle) -> Self {
+        self.onNotRendered {
+            $0.overrideUserInterfaceStyle = style
+        }
+    }
+}
+
+public extension UIViewCreator {
+    func accessibily(_ handler: @escaping (UIAccessibilityCreator<Self>) -> UIAccessibilityCreator<Self>) -> Self {
+        _ = handler(.init(self))
+        return self
+    }
 }

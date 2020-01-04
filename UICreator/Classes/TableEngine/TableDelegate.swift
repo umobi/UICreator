@@ -24,8 +24,46 @@ import Foundation
 
 public protocol TableDelegate {
     func header(at section: Int, content: ViewCreator)
+    func footer(at section: Int, content: ViewCreator)
+
+    func tableView(_ tableView: UITableView!, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat
+    func tableView(_ tableView: UITableView!, estimatedHeightForHeaderAt section: Int) -> CGFloat
+    func tableView(_ tableView: UITableView!, estimatedHeightForFooterAt section: Int) -> CGFloat
+
+    func tableView(_ tableView: UITableView!, heightForRowAt indexPath: IndexPath) -> CGFloat
+    func tableView(_ tableView: UITableView!, heightForHeaderAt section: Int) -> CGFloat
+    func tableView(_ tableView: UITableView!, heightForFooterAt section: Int) -> CGFloat
 }
 
 public extension TableDelegate {
     func header(at section: Int, content: ViewCreator) {}
+    func footer(at section: Int, content: ViewCreator) {}
+}
+
+public extension TableDelegate {
+    func tableView(_ tableView: UITableView!, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return tableView.estimatedRowHeight
+    }
+
+    func tableView(_ tableView: UITableView!, estimatedHeightForHeaderAt section: Int) -> CGFloat {
+        return 1
+    }
+
+    func tableView(_ tableView: UITableView!, estimatedHeightForFooterAt section: Int) -> CGFloat {
+        return 1
+    }
+}
+
+public extension TableDelegate {
+    func tableView(_ tableView: UITableView!, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return tableView.rowHeight
+    }
+
+    func tableView(_ tableView: UITableView!, heightForHeaderAt section: Int) -> CGFloat {
+        return tableView.sectionHeaderHeight
+    }
+
+    func tableView(_ tableView: UITableView!, heightForFooterAt section: Int) -> CGFloat {
+        return tableView.sectionFooterHeight
+    }
 }

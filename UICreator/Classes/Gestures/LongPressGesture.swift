@@ -23,49 +23,38 @@
 import Foundation
 import UIKit
 
-public class LongPressGesture: UILongPressGestureRecognizer, Gesture, HasViewDelegate {
+public class LongPress: UIGesture {
+    public typealias Gesture = UILongPressGestureRecognizer
 
-    required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.longPress(_:)))
-    }
-
-    @discardableResult
-    public func delegate(_ delegate: UIGestureRecognizerDelegate?) -> Self {
-        self.delegate = delegate
-        return self
+    public required init(target view: UIView!) {
+        self.setGesture(Gesture.init(target: view))
+        self.gesture.parent = self
     }
 }
 
-extension Gesture where Self: UILongPressGestureRecognizer {
+public extension UIGesture where Gesture: UILongPressGestureRecognizer {
     func maximumMovement(_ value: CGFloat) -> Self {
-        self.allowableMovement = value
+        (self.gesture as? Gesture)?.allowableMovement = value
         return self
     }
 
     func minimumPressDuration(_ duration: TimeInterval) -> Self {
-        self.minimumPressDuration = duration
+        (self.gesture as? Gesture)?.minimumPressDuration = duration
         return self
-    }
-}
-
-fileprivate extension UIView {
-
-    @objc func longPress(_ sender: LongPressGesture!) {
-        sender.commit(sender)
     }
 }
 
 public extension UIViewCreator {
 
-    func onLongPressMaker(_ longPressConfigurator: (LongPressGesture) -> LongPressGesture) -> Self {
-        self.uiView.addGestureRecognizer(longPressConfigurator(LongPressGesture(target: self.uiView)))
+    func onLongPressMaker(_ longPressConfigurator: (LongPress) -> LongPress) -> Self {
+        self.uiView.addGesture(longPressConfigurator(LongPress(target: self.uiView)))
         return self
     }
 
     func onLongPress(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onLongPressMaker {
-            $0.onRecognized { _ in
-                handler(self.uiView)
+            $0.onRecognized {
+                handler($0.view!)
             }
         }
     }

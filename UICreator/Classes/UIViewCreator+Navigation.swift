@@ -22,11 +22,15 @@
 
 import Foundation
 
-internal extension UIView {
+public extension UIView {
     weak var viewController: UIViewController! {
         return sequence(first: self as UIResponder, next: { $0.next }).first(where: {
             $0 is UIViewController
         }) as? UIViewController
+    }
+
+    weak var navigationController: UINavigationController? {
+        return self.viewController.navigationController
     }
 }
 
@@ -45,8 +49,8 @@ public extension ViewCreator {
 public extension UIView {
     var navigation: NavigationRepresentable? {
         return sequence(first: self, next: { $0?.superview }).first(where: {
-            $0?.ViewCreator is NavigationRepresentable
-        })??.ViewCreator as? NavigationRepresentable
+            $0?.viewCreator is NavigationRepresentable
+        })??.viewCreator as? NavigationRepresentable
     }
 }
 

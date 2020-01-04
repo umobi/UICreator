@@ -57,12 +57,12 @@ internal class TableViewCell: UITableViewCell {
         self.commitLayout()
     }
 
-    func prepareCell(content: @escaping () -> ViewCreator) {
+    func prepareCell(builder: Table.Element.Builder) {
         guard self.builder == nil else {
             return
         }
 
-        let builder = content()
+        let builder = builder()
         self.builder = builder
         _ = self.contentView.add(builder.uiView)
     }

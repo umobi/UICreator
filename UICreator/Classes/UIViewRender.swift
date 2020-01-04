@@ -35,18 +35,18 @@ protocol UIViewRender: UIView {
 
 private var kViewBuilder: UInt = 0
 internal extension UIViewRender {
-    private(set) var ViewCreator: ViewCreator? {
+    private(set) var viewCreator: ViewCreator? {
         get { objc_getAssociatedObject(self, &kViewBuilder) as? ViewCreator }
         set { objc_setAssociatedObject(self, &kViewBuilder, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
     init(builder: ViewCreator) {
         self.init()
-        self.ViewCreator = builder
+        self.viewCreator = builder
     }
 
     func updateBuilder(_ builder: ViewCreator) {
-        self.ViewCreator = builder
+        self.viewCreator = builder
     }
 }
 
@@ -68,7 +68,7 @@ extension UIView: UIViewRender {
             $0.renderedHandler = nil
         }
 
-        self.ViewCreator?.setView(self, policity: .OBJC_ASSOCIATION_ASSIGN)
+        self.viewCreator?.setView(self, policity: .OBJC_ASSOCIATION_ASSIGN)
     }
 
     func commitInTheScene() {

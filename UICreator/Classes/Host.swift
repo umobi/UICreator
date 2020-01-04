@@ -42,7 +42,7 @@ public class Host: Root, ViewControllerType, UIViewCreator {
 
 extension Host: ViewControllerAppearStates {
     var hosted: ViewCreator? {
-        return (self.uiView.subviews.first(where: { $0.ViewCreator != nil }))?.ViewCreator
+        return (self.uiView.subviews.first(where: { $0.viewCreator != nil }))?.viewCreator
     }
 
     public func viewWillAppear(_ animated: Bool) {

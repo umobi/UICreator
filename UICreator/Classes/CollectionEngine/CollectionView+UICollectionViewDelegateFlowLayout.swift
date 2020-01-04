@@ -21,37 +21,14 @@
 //
 
 import Foundation
+import UIKit
 
-public extension Table {
-    convenience init(style: UITableView.Style,_ elements: Element...) {
-        self.init(style: style)
-        #if os(iOS)
-        (self.uiView as? View)?.separatorStyle = .none
-        #endif
-        let group = Group(elements)
-
-        if !group.isValid {
-            fatalError("Verify your content")
+extension CollectionView: UICollectionViewDelegateFlowLayout {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        guard let wrapper = self.layoutGroup?.section(at: indexPath.section) else {
+            return .zero
         }
 
-        guard let tableView = self.uiView as? View else {
-            return
-        }
-
-        group.rowsIdentifier.forEach {
-            tableView.register(TableViewCell.self, forCellReuseIdentifier: $0)
-        }
-
-        group.headersIdentifier.forEach {
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-        }
-
-        group.footersIdentifier.forEach {
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-        }
-
-        tableView.group = group
-        tableView.dataSource = tableView
-        tableView.delegate = tableView
+        return wrapper.size(inside: collectionView.frame.size, forItem: indexPath.row)
     }
 }

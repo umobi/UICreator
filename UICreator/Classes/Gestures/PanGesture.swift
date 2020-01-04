@@ -23,52 +23,46 @@
 import Foundation
 import UIKit
 
-public class PanGesture: UIPanGestureRecognizer, Gesture, HasViewDelegate {
+public class Pan: UIGesture {
+    public typealias Gesture = UIPanGestureRecognizer
 
-    required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.pan(_:)))
-    }
-
-    @discardableResult
-    public func delegate(_ delegate: UIGestureRecognizerDelegate?) -> Self {
-        self.delegate = delegate
-        return self
+    public required init(target view: UIView!) {
+        self.setGesture(Gesture.init(target: view))
+        self.gesture.parent = self
     }
 }
 
 #if os(iOS)
-extension Gesture where Self: UIPanGestureRecognizer {
+extension UIGesture where Gesture: UIPanGestureRecognizer {
     func maximumNumber(ofTouches number: Int) -> Self {
-        self.maximumNumberOfTouches = number
+        (self.gesture as? Gesture)?.maximumNumberOfTouches = number
         return self
     }
 
     func minimumNumber(ofTouches number: Int) -> Self {
-        self.minimumNumberOfTouches = number
+        (self.gesture as? Gesture)?.minimumNumberOfTouches = number
         return self
     }
 }
 #endif
 
-fileprivate extension UIView {
-
-    @objc func pan(_ sender: PanGesture!) {
-        sender.commit(sender)
+internal extension UIView {
+    @objc func someGestureRecognized(_ sender: UIGestureRecognizer) {
+        sender.parent?.commit(sender)
     }
-
 }
 
 public extension UIViewCreator {
 
-    func onPanMaker(_ panConfigurator: (PanGesture) -> PanGesture) -> Self {
-        self.uiView.addGestureRecognizer(panConfigurator(PanGesture(target: self.uiView)))
+    func onPanMaker(_ panConfigurator: (Pan) -> Pan) -> Self {
+        self.uiView.addGesture(panConfigurator(Pan(target: self.uiView)))
         return self
     }
 
     func onPan(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onPanMaker {
-            $0.onRecognized { _ in
-                handler(self.uiView)
+            $0.onRecognized {
+                handler($0.view!)
             }
         }
     }

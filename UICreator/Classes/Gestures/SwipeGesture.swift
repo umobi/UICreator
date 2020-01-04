@@ -23,37 +23,26 @@
 import Foundation
 import UIKit
 
-public class SwipeGesture: UISwipeGestureRecognizer, Gesture, HasViewDelegate {
+public class Swipe: UIGesture {
+    public typealias Gesture = UISwipeGestureRecognizer
 
-    required public init(target: UIView!) {
-        super.init(target: target, action: #selector(target.swipe(_:)))
-    }
-
-    @discardableResult
-    public func delegate(_ delegate: UIGestureRecognizerDelegate?) -> Self {
-        self.delegate = delegate
-        return self
-    }
-}
-
-fileprivate extension UIView {
-
-    @objc func swipe(_ sender: SwipeGesture!) {
-        sender.commit(sender)
+    public required init(target view: UIView!) {
+        self.setGesture(Gesture.init(target: view))
+        self.gesture.parent = self
     }
 }
 
 public extension UIViewCreator {
 
-    func onSwipeMaker(_ swipeConfigurator: (SwipeGesture) -> SwipeGesture) -> Self {
-        self.uiView.addGestureRecognizer(swipeConfigurator(SwipeGesture(target: self.uiView)))
+    func onSwipeMaker(_ swipeConfigurator: (Swipe) -> Swipe) -> Self {
+        self.uiView.addGesture(swipeConfigurator(Swipe(target: self.uiView)))
         return self
     }
 
     func onSwipe(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onSwipeMaker {
-            $0.onRecognized { _ in
-                handler(self.uiView)
+            $0.onRecognized {
+                handler($0.view!)
             }
         }
     }

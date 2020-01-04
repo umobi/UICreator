@@ -89,12 +89,6 @@ public extension UIViewCreator where View: UIImageView {
         }
     }
 
-    func tint(color: UIColor?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.tintColor = color
-        }
-    }
-
     func rendering(mode: UIImage.RenderingMode) -> Self {
         return self.onRendered {
             ($0 as? View)?.image = ($0 as? View)?.image?.withRenderingMode(mode)
