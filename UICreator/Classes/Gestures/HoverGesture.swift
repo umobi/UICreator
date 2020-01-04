@@ -46,8 +46,8 @@ public extension UIViewCreator {
     @available(iOS 13.0, *)
     func onHover(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onHoverMaker {
-            $0.onRecognized { _ in
-                handler(self.uiView)
+            $0.onRecognized {
+                handler($0.view!)
             }
         }
     }

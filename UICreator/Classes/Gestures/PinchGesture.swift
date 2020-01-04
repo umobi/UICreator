@@ -43,8 +43,8 @@ public extension UIViewCreator {
 
     func onPinch(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onPinchMaker {
-            $0.onRecognized { _ in
-                handler(self.uiView)
+            $0.onRecognized {
+                handler($0.view!)
             }
         }
     }

@@ -111,8 +111,8 @@ public extension UIViewCreator {
 
     func onTouch(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onTouchMaker {
-            $0.onRecognized { _ in
-                handler(self.uiView)
+            $0.onRecognized {
+                handler($0.view!)
             }
         }
     }

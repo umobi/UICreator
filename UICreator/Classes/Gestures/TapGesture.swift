@@ -54,8 +54,8 @@ public extension UIViewCreator {
 
     func onTap(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onTapMaker {
-            $0.onRecognized { _ in
-                handler(self.uiView)
+            $0.onRecognized {
+                handler($0.view!)
             }
         }
     }

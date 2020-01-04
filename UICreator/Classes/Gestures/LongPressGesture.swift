@@ -53,8 +53,8 @@ public extension UIViewCreator {
 
     func onLongPress(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onLongPressMaker {
-            $0.onRecognized { _ in
-                handler(self.uiView)
+            $0.onRecognized {
+                handler($0.view!)
             }
         }
     }

@@ -61,8 +61,8 @@ public extension UIViewCreator {
 
     func onPan(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onPanMaker {
-            $0.onRecognized { _ in
-                handler(self.uiView)
+            $0.onRecognized {
+                handler($0.view!)
             }
         }
     }

@@ -41,8 +41,8 @@ public extension UIViewCreator {
 
     func onSwipe(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onSwipeMaker {
-            $0.onRecognized { _ in
-                handler(self.uiView)
+            $0.onRecognized {
+                handler($0.view!)
             }
         }
     }

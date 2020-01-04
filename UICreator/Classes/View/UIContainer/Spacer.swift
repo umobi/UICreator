@@ -95,7 +95,7 @@ public extension Spacer {
 }
 
 public extension Spacer {
-    convenience init(top: CGFloat, bottom: CGFloat, leading: CGFloat, trailing: CGFloat, content: @escaping () -> Content) {
+    convenience init(top: CGFloat, bottom: CGFloat, leading: CGFloat, trailing: CGFloat, content: @escaping () -> ViewCreator) {
         self.init(margin: .init(top: top, bottom: bottom, leading: leading, trailing: trailing), content: content)
     }
 

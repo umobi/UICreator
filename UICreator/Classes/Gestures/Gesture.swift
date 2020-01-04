@@ -57,7 +57,7 @@ internal extension Gesture {
     var gesture: UIGestureRecognizer! {
         get { objc_getAssociatedObject(self, &kGestureRecognized) as? UIGestureRecognizer }
         nonmutating
-        set { setGesture(newValue, policity: newValue?.view != nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
+        set { setGesture(newValue, policity: newValue?.view?.superview != nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
     }
 
     func setGesture(_ uiGesture: UIGestureRecognizer, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN) {
