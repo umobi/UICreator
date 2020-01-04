@@ -165,17 +165,19 @@ public extension UIAccessibilityCreator where View: UIView {
         return self
     }
 
-    @available(iOS 11.0, tvOS 11, *)
+    #if os(iOS)
+    @available(iOS 11.0, *)
     func dropPointDescriptors(_ points: [UIAccessibilityLocationDescriptor]) -> Self {
         self.uiView.accessibilityDropPointDescriptors = points
         return self
     }
 
-    @available(iOS 11.0, tvOS 11, *)
+    @available(iOS 11.0, *)
     func dragSourceDescriptors(_ points: [UIAccessibilityLocationDescriptor]) -> Self {
         self.uiView.accessibilityDragSourceDescriptors = points
         return self
     }
+    #endif
 
     @available(iOS 13.0, tvOS 13.0, *)
     func attributedUserInputLabels(_ labels: [NSAttributedString]) -> Self {
@@ -323,9 +325,11 @@ public extension UIAccessibilityCreator where View: UIView {
         }
     }
 
+    #if os(iOS)
     func onHearingDevicePairedEarChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.hearingDevicePairedEarDidChangeNotification) { _ in
             handler(self.uiView)
         }
     }
+    #endif
 }

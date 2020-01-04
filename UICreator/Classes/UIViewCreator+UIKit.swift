@@ -139,7 +139,7 @@ public extension UIViewCreator {
 public extension ViewCreator {
     func transform3d(_ transform3d: CATransform3D) -> Self {
         self.onRendered {
-            if #available(iOS 12.0, *) {
+            if #available(iOS 12.0, tvOS 12.0, *) {
                 $0.transform3D = transform3d
             } else {
                 $0.layer.transform = transform3d
@@ -155,7 +155,7 @@ public extension ViewCreator {
 }
 
 public extension ViewCreator {
-    @available(iOS 13, *)
+    @available(iOS 13, tvOS 13, *)
     func userInterfaceStyle(_ style: UIUserInterfaceStyle) -> Self {
         self.onNotRendered {
             $0.overrideUserInterfaceStyle = style

@@ -26,7 +26,9 @@ import UIContainer
 
 public class PageViewController: UIPageViewController {
     private var queuedViewControllers: [UIViewController]!
+    #if os(iOS)
     fileprivate var spineLocationHandler: ((UIInterfaceOrientation) -> SpineLocation)? = nil
+    #endif
     fileprivate var onPageChangeHandler: ((Int) -> Void)? = nil
     fileprivate var isInfinityScroll: Bool = false
 
@@ -81,6 +83,7 @@ extension PageViewController: UIPageViewControllerDelegate {
         self.onPageChangeHandler?(currentPage)
     }
 
+    #if os(iOS)
     public func pageViewController(_ pageViewController: UIPageViewController, spineLocationFor orientation: UIInterfaceOrientation) -> UIPageViewController.SpineLocation {
         return self.spineLocationHandler?(orientation) ?? .none
     }
@@ -88,6 +91,7 @@ extension PageViewController: UIPageViewControllerDelegate {
     public func pageViewControllerSupportedInterfaceOrientations(_ pageViewController: UIPageViewController) -> UIInterfaceOrientationMask {
         return UIApplication.shared.supportedInterfaceOrientations(for: self.view.window)
     }
+    #endif
 }
 
 extension PageViewController: UIPageViewControllerDataSource {
@@ -177,7 +181,7 @@ public class PageViewControllerView: UIView {
         super.layoutSubviews()
         self.commitLayout()
 
-        if #available(iOS 11, *), let view = self.container.view {
+        if #available(iOS 11, tvOS 11, *), let view = self.container.view {
             if let stackView = self.stackView, let location = indicatorLocation {
                 switch location {
                 case .topRespectedToSafeArea:
@@ -222,7 +226,7 @@ public class PageViewControllerView: UIView {
             stackView.axis = .vertical
             stackView.snp.makeConstraints {
                 $0.leading.trailing.equalTo(0)
-                if #available(iOS 11.0, *) {
+                if #available(iOS 11.0, tvOS 11, *) {
                     $0.top.equalTo(self.safeAreaLayoutGuide.snp.topMargin)
                 } else {
                     $0.top.equalTo(self.snp.topMargin)
@@ -233,7 +237,7 @@ public class PageViewControllerView: UIView {
             stackView.axis = .vertical
             stackView.snp.makeConstraints {
                 $0.leading.trailing.equalTo(0)
-                if #available(iOS 11.0, *) {
+                if #available(iOS 11.0, tvOS 11, *) {
                     $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottomMargin)
                 } else {
                     $0.bottom.equalTo(self.snp.bottomMargin)
@@ -342,11 +346,13 @@ public extension Pages {
         }
     }
 
+    #if os(iOS)
     func spineLocation(_ handler: @escaping (UIInterfaceOrientation) -> UIPageViewController.SpineLocation) -> Self {
         self.onInTheScene { [unowned self] _ in
             self.pageController.spineLocationHandler = handler
         }
     }
+    #endif
 
     func onPageChanged(_ handler: @escaping (Int) -> Void) -> Self {
         self.onInTheScene { [unowned self] _ in

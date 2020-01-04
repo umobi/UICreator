@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'UICreator'
-  s.version          = '1.0.0-alpha.4'
+  s.version          = '1.0.0-alpha.5'
   s.summary          = 'Creating view using declarative statements'
 
 # This description is used to generate tags and improve search results.
