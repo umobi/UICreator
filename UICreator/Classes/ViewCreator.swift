@@ -71,18 +71,31 @@ public extension ViewCreator {
 
     @discardableResult
     func onNotRendered(_ handler: @escaping (UIView) -> Void) -> Self {
+        guard self.uiView.renderState == .notRendered else {
+            handler(self.uiView)
+            return self
+        }
+
         _ = self.uiView.appendBeforeRendering(handler)
         return self
     }
 
     @discardableResult
     func onRendered(_ handler: @escaping (UIView) -> Void) -> Self {
+        guard self.uiView.renderState < .rendered else {
+            handler(self.uiView)
+            return self
+        }
         _ = self.uiView.appendRendered(handler)
         return self
     }
 
     @discardableResult
     func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
+        guard self.uiView.renderState < .inTheScene else {
+            handler(self.uiView)
+            return self
+        }
         _ = self.uiView.appendInTheScene(handler)
         return self
     }

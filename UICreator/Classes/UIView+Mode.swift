@@ -38,6 +38,46 @@ internal extension UIView {
         case notRendered
         case rendered
         case inTheScene
+
+        private static var allCases: [RenderState] {
+            return [.notRendered, .rendered, .inTheScene]
+        }
+
+        static func >(left: RenderState, right: RenderState) -> Bool {
+            let allCases = self.allCases
+            guard let leftOffset = allCases.enumerated().first(where: { $0.element == left })?.offset else {
+                return false
+            }
+
+            return allCases[0..<leftOffset].contains(right)
+        }
+
+        static func <(left: RenderState, right: RenderState) -> Bool {
+            let allCases = self.allCases
+            guard let leftOffset = allCases.enumerated().first(where: { $0.element == left })?.offset else {
+                return false
+            }
+
+            return allCases[(leftOffset+1)..<allCases.count].contains(right)
+        }
+
+        static func >=(left: RenderState, right: RenderState) -> Bool {
+            let allCases = self.allCases
+            guard let leftOffset = allCases.enumerated().first(where: { $0.element == left })?.offset else {
+                return false
+            }
+
+            return allCases[0...leftOffset].contains(right)
+        }
+
+        static func <=(left: RenderState, right: RenderState) -> Bool {
+            let allCases = self.allCases
+            guard let leftOffset = allCases.enumerated().first(where: { $0.element == left })?.offset else {
+                return false
+            }
+
+            return allCases[leftOffset..<allCases.count].contains(right)
+        }
     }
 
     /// The current state of the view
