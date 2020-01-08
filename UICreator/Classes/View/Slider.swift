@@ -49,7 +49,7 @@ public class _Slider: UISlider {
 public class Slider: UIViewCreator, Control {
     public typealias View = _Slider
 
-    init() {
+    public init() {
         self.uiView = .init()
     }
 }
@@ -112,6 +112,12 @@ public extension UIViewCreator where View: UISlider {
     func thumbImage(_ image: UIImage?, for state: UIControl.State = .normal) -> Self {
         self.onRendered {
             ($0 as? View)?.setThumbImage(image, for: state)
+        }
+    }
+
+    func thumbTintColor(_ color: UIColor?) -> Self {
+        self.onRendered {
+            ($0 as? View)?.thumbTintColor = color
         }
     }
 

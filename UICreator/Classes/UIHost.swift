@@ -23,6 +23,17 @@
 import Foundation
 import UIKit
 
+public class UIViewWrapper {
+    private let wrap: ViewCreator
+    public init(_ wrap: ViewCreator) {
+        self.wrap = wrap
+    }
+
+    public weak var uiView: UIView! {
+        return self.wrap.uiView
+    }
+}
+
 public protocol UIViewMaker: ViewCreator {
     var loadView: UIView { get }
 }
