@@ -26,7 +26,8 @@ import UIContainer
 
 public class Host: Root, ViewControllerType, UIViewCreator {
     public init(size: CGSize = .zero, content: @escaping () -> ViewCreator) {
-        super.init(loader: nil)
+        super.init()
+//        super.init(loader: nil)
         self.uiView.frame = .init(origin: self.uiView.frame.origin, size: size)
         _ = self.uiView.add(content().uiView)
     }

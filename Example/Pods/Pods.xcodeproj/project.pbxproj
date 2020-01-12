@@ -95,6 +95,7 @@
 		0CAA4C0123B2696B00DD5DDF /* Dashed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAA4BFE23B2696B00DD5DDF /* Dashed.swift */; };
 		0CAA4C0223B2696B00DD5DDF /* Gradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAA4BFF23B2696B00DD5DDF /* Gradient.swift */; };
 		0CAA4C0323B2696B00DD5DDF /* Spacer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAA4C0023B2696B00DD5DDF /* Spacer.swift */; };
+		0CD136B823CBACAD0001504B /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD136B723CBACAD0001504B /* Value.swift */; };
 		10A720BC38C4767848A52520B0E80DEA /* UICreator-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E7C1E1B5D136F5CB635DDE8786A868 /* UICreator-dummy.m */; };
 		1B2E5E9DD86C13AD483990487E4E4D76 /* Pods-UICreator_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = DADD9F6084F3910855908ABF70C37894 /* Pods-UICreator_Tests-dummy.m */; };
 		2D45A3531A9DAC1937364ADF21B7C96A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
@@ -213,6 +214,7 @@
 		0CAA4BFE23B2696B00DD5DDF /* Dashed.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dashed.swift; sourceTree = "<group>"; };
 		0CAA4BFF23B2696B00DD5DDF /* Gradient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gradient.swift; sourceTree = "<group>"; };
 		0CAA4C0023B2696B00DD5DDF /* Spacer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Spacer.swift; sourceTree = "<group>"; };
+		0CD136B723CBACAD0001504B /* Value.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Value.swift; path = UICreator/Classes/Value.swift; sourceTree = "<group>"; };
 		14CB1E5FF33F6496D92F2D453F554956 /* UICreator.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = UICreator.modulemap; sourceTree = "<group>"; };
 		16EDA50CD75EDCD98EFADB0BD963864C /* UICreator-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UICreator-prefix.pch"; sourceTree = "<group>"; };
 		17713BC37052DDF97BB9C03D326E26B5 /* UICreator.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; path = UICreator.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -459,6 +461,7 @@
 		23482E1745BD744A1B8DC0CDFA317DBA /* UICreator */ = {
 			isa = PBXGroup;
 			children = (
+				0CD136B723CBACAD0001504B /* Value.swift */,
 				0C61B4CD23BE7823001A28B1 /* CollectionEngine */,
 				0C3E8C1A23BA7CA00045C86E /* TableEngine */,
 				0C3E8C1723BA68B70045C86E /* Font */,
@@ -805,6 +808,7 @@
 				0C93471223AE7D8600A9E112 /* Image.swift in Sources */,
 				0C3E8C2D23BA83570045C86E /* UITableView+TableEngine.swift in Sources */,
 				0C93471423AE7D8600A9E112 /* Child.swift in Sources */,
+				0CD136B823CBACAD0001504B /* Value.swift in Sources */,
 				0C08F81F23BF7C0900C52B8E /* CollectionView+UICollectionViewDelegateFlowLayout.swift in Sources */,
 				0CAA4BF523B267A200DD5DDF /* FlowCollection.swift in Sources */,
 				0CAA4BF823B267A200DD5DDF /* NavigationRepresentable.swift in Sources */,

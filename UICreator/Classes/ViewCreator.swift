@@ -64,6 +64,10 @@ internal extension ViewCreator {
 
     func setView(_ uiView: UIView, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN) {
         objc_setAssociatedObject(self, &kUIView, uiView, policity)
+
+        if let root = self as? (Root & TemplateView) {
+            root.viewDidChanged()
+        }
     }
 }
 

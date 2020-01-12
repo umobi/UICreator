@@ -32,14 +32,8 @@ public class Navigation: Root, NavigationRepresentable {
         }
     }
 
-    public required init(loader: (() -> View)? = nil) {
-        super.init(loader: loader)
-    }
-}
-
-public extension TemplateView where Self: Root & NavigationRepresentable {
-    init(_ content: @escaping () -> ViewCreator) {
-        self.init()
+    public init(_ content: @escaping () -> ViewCreator) {
+        super.init()
         self.content = .init(content)
     }
 }

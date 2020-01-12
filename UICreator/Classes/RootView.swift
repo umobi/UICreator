@@ -84,20 +84,32 @@ private var kViewDidLoad: UInt = 0
 open class Root: ViewCreator {
     public typealias View = RootView
 
-    public required init(loader: (() -> View)?) {
-        self.uiView = loader?() ?? View.init(builder: self)
-        self.uiView.updateBuilder(self)
+    public init() {
+        self.uiView = View.init(builder: self)
     }
 }
 
+private var kTemplateViewDidConfiguredView: UInt = 0
 extension TemplateView where Self: Root {
-    public init() {
-        self.init(loader: nil)
-        (self.uiView as? View)?.willCommitNotRenderedHandler = { [unowned self] in
-            if self.uiView.subviews.isEmpty {
+    private var didConfiguredView: Bool {
+        get { (objc_getAssociatedObject(self, &kTemplateViewDidConfiguredView) as? Bool) ?? false }
+        nonmutating
+        set { objc_setAssociatedObject(self, &kTemplateViewDidConfiguredView, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    }
+
+    internal func viewDidChanged() {
+        guard !self.didConfiguredView else {
+            return
+        }
+
+        self.didConfiguredView = true
+
+        if self.uiView.subviews.isEmpty {
+            (self.uiView as? View)?.willCommitNotRenderedHandler = { [unowned self] in
                 _ = self.uiView.add(self.body.uiView)
             }
         }
+
         (self.uiView as? View)?.didCommitNotRenderedHandler = { [unowned self] in
             if !self.didViewLoad {
                 self.viewDidLoad()
