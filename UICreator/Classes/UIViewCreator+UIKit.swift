@@ -76,6 +76,13 @@ public extension UIViewCreator {
         reference = self.uiView as? UIElement
         return self
     }
+
+    func `as`<UIElement: UIView>(_ reference: inout [UIElement]) -> Self {
+        if let view = self.uiView as? UIElement {
+            reference.append(view)
+        }
+        return self
+    }
 }
 
 public extension UIViewCreator {
@@ -347,6 +354,14 @@ public extension UIView {
 
         public init(_ sequence: CreatorKeyframe...) {
             self.sequence = sequence
+        }
+    }
+}
+
+public extension ViewCreator {
+    func addLayer(_ handler: @escaping (UIView) -> CALayer) -> Self {
+        self.onNotRendered {
+            $0.layer.addSublayer(handler($0))
         }
     }
 }

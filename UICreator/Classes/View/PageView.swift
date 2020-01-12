@@ -291,7 +291,7 @@ public class PageViewControllerView: UIView {
     }
 }
 
-public class Pages: ViewCreator {
+public class Pages: UIViewCreator {
     public typealias View = PageViewControllerView
 
     private(set) var transitionStyle: UIPageViewController.TransitionStyle = .scroll
