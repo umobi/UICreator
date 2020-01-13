@@ -56,6 +56,7 @@ public class Stack: UIViewCreator {
         self.uiView = View.init(arrangedSubviews: subviews.views.map {
             $0.uiView
         })
+        (self.uiView as? View)?.updateBuilder(self)
         (self.uiView as? View)?.axis = axis
         (self.uiView as? View)?.spacing = spacing
     }
@@ -64,6 +65,7 @@ public class Stack: UIViewCreator {
         self.uiView = View.init(arrangedSubviews: views.map {
             $0.uiView
         })
+        (self.uiView as? View)?.updateBuilder(self)
         (self.uiView as? View)?.axis = axis
         (self.uiView as? View)?.spacing = spacing
     }
@@ -72,6 +74,7 @@ public class Stack: UIViewCreator {
         self.uiView = View.init(arrangedSubviews: views.map {
             $0.uiView
         })
+        (self.uiView as? View)?.updateBuilder(self)
         (self.uiView as? View)?.axis = axis
         (self.uiView as? View)?.spacing = spacing
     }
@@ -124,6 +127,35 @@ public extension UIViewCreator where View: UIStackView {
     func alignment(_ alignment: View.Alignment) -> Self {
         self.onNotRendered {
             ($0 as? View)?.alignment = alignment
+        }
+    }
+}
+
+extension Stack: SupportForEach {
+    func viewsDidChange(placeholderView: UIView!, _ sequence: Getter<[ViewCreator]>) {
+        weak var firstView: UIView? = placeholderView
+        weak var lastView: UIView? = placeholderView
+
+        sequence.onChange { values in
+            if firstView != nil {
+                let startIndex = (self.uiView as? View)?.arrangedSubviews.enumerated().first(where: {
+                    $0.element == firstView
+                })?.offset ?? 0
+                let endIndex = (self.uiView as? View)?.arrangedSubviews.enumerated().first(where: {
+                    $0.element == lastView
+                })?.offset ?? 0
+
+                (self.uiView as? View)?.arrangedSubviews[startIndex...endIndex].forEach {
+                    $0.removeFromSuperview()
+                }
+            }
+
+            values.forEach {
+                (self.uiView as? View)?.addArrangedSubview($0.uiView)
+            }
+
+            firstView = values.first?.uiView
+            lastView = values.last?.uiView
         }
     }
 }

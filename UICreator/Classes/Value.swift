@@ -41,9 +41,14 @@ public protocol _Setter: _Getter {
 }
 
 private var kGetterValue: UInt = 0
-public extension Getter {
+
+public extension _Getter {
     var value: Value {
-        objc_getAssociatedObject(self, &kGetterValue) as! Value
+        var a: Value! {
+            return objc_getAssociatedObject(self, &kGetterValue) as? Value
+        }
+
+        return a
     }
 
     func onChange(_ onChange: @escaping (Value) -> Void) {

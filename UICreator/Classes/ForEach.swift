@@ -22,41 +22,22 @@
 
 import Foundation
 
-#if DEBUG && canImport(SwiftUI)
-import SwiftUI
-
-@available(iOS 13, tvOS 13, *)
-public struct LivePreview<View: ViewCreator>: SwiftUI.View {
-
-    let view: View
-    public init(_ initClass: View) {
-        self.view = initClass
-    }
-
-    public init(content: () -> View) {
-        self.view = content()
-    }
-
-    public var body: some SwiftUI.View {
-        Previewer<View>(view)
-    }
+protocol SupportForEach {
+    func viewsDidChange(placeholderView: UIView!, _ sequence: Getter<[ViewCreator]>)
 }
 
-@available(iOS 13, tvOS 13, *)
-public struct Previewer<View: ViewCreator>: UIViewRepresentable {
-    public func makeUIView(context: UIViewRepresentableContext<Previewer<View>>) -> UIView {
-        return self.view.uiView
+public class ForEach<Value>: ViewCreator {
+    public init(_ getter: Getter<[Value]>, content: @escaping (Value) -> ViewCreator) {
+        self.uiView = .init()
+        self.onInTheScene { view in
+            weak var superview: UIView? = view.superview
+            let observedValue: UICreator.Value<[ViewCreator]> = .init(value: [])
+            (superview?.viewCreator as? SupportForEach)?.viewsDidChange(placeholderView: self.uiView, observedValue)
+            getter.onChange { value in
+                observedValue.value = value.map {
+                    content($0)
+                }
+            }
+        }
     }
-
-    public typealias UIViewType = UIView
-
-    let view: View
-
-    public init(_ initClass: View) {
-        self.view = initClass
-    }
-
-    public func updateUIView(_ uiView: UIView, context: Context) {}
 }
-
-#endif

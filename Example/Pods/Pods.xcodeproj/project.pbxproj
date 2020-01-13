@@ -50,6 +50,7 @@
 		0C3E8C3D23BA86590045C86E /* ViewCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C3C23BA86590045C86E /* ViewCreator.swift */; };
 		0C3E8C3F23BA86E10045C86E /* UIHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C3E23BA86E10045C86E /* UIHost.swift */; };
 		0C46815923BE1A3600BDC263 /* Segmented.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C46815823BE1A3600BDC263 /* Segmented.swift */; };
+		0C4B86B623CCAA9B006FBAA1 /* ForEach.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4B86B523CCAA9B006FBAA1 /* ForEach.swift */; };
 		0C61B4C823BE5EF4001A28B1 /* UIAccessibilityCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C61B4C723BE5EF4001A28B1 /* UIAccessibilityCreator.swift */; };
 		0C61B4CA23BE6E04001A28B1 /* PageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C61B4C923BE6E04001A28B1 /* PageControl.swift */; };
 		0C61B4CC23BE6E86001A28B1 /* NSProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C61B4CB23BE6E86001A28B1 /* NSProtocol.swift */; };
@@ -169,6 +170,7 @@
 		0C3E8C3C23BA86590045C86E /* ViewCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ViewCreator.swift; path = UICreator/Classes/ViewCreator.swift; sourceTree = "<group>"; };
 		0C3E8C3E23BA86E10045C86E /* UIHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIHost.swift; path = UICreator/Classes/UIHost.swift; sourceTree = "<group>"; };
 		0C46815823BE1A3600BDC263 /* Segmented.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segmented.swift; sourceTree = "<group>"; };
+		0C4B86B523CCAA9B006FBAA1 /* ForEach.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ForEach.swift; path = UICreator/Classes/ForEach.swift; sourceTree = "<group>"; };
 		0C61B4C723BE5EF4001A28B1 /* UIAccessibilityCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIAccessibilityCreator.swift; path = UICreator/Classes/UIAccessibilityCreator.swift; sourceTree = "<group>"; };
 		0C61B4C923BE6E04001A28B1 /* PageControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageControl.swift; sourceTree = "<group>"; };
 		0C61B4CB23BE6E86001A28B1 /* NSProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NSProtocol.swift; path = UICreator/Classes/NSProtocol.swift; sourceTree = "<group>"; };
@@ -461,6 +463,7 @@
 		23482E1745BD744A1B8DC0CDFA317DBA /* UICreator */ = {
 			isa = PBXGroup;
 			children = (
+				0C4B86B523CCAA9B006FBAA1 /* ForEach.swift */,
 				0CD136B723CBACAD0001504B /* Value.swift */,
 				0C61B4CD23BE7823001A28B1 /* CollectionEngine */,
 				0C3E8C1A23BA7CA00045C86E /* TableEngine */,
@@ -757,6 +760,7 @@
 				0C08F82923BF7D8700C52B8E /* FlowCollection+LayoutEngine.swift in Sources */,
 				0C93471623AE7D8600A9E112 /* Rounder.swift in Sources */,
 				0C0FACF523B258FD00E6B2FC /* RotationGesture.swift in Sources */,
+				0C4B86B623CCAA9B006FBAA1 /* ForEach.swift in Sources */,
 				0C93471323AE7D8600A9E112 /* Table.swift in Sources */,
 				0C3E8C3523BA84190045C86E /* TableView+UITableViewDelegate.swift in Sources */,
 				0C93470223AE7D8600A9E112 /* HasViewDelegate.swift in Sources */,
