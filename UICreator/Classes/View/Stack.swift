@@ -52,31 +52,29 @@ public class StackView: UIStackView {
 public class Stack: UIViewCreator {
     public typealias View = StackView
 
-    public init(axis: NSLayoutConstraint.Axis, spacing: CGFloat = 0,_ subviews: Subview) {
-        self.uiView = View.init(arrangedSubviews: subviews.views.map {
-            $0.uiView
+    private func prepare(axis: NSLayoutConstraint.Axis, spacing: CGFloat, _ views: [ViewCreator]) {
+        self.uiView = View.init(arrangedSubviews: views.map {
+            if let forEachCreator = $0 as? ForEachCreator {
+                forEachCreator.manager = self
+            }
+
+            return $0.uiView
         })
         (self.uiView as? View)?.updateBuilder(self)
         (self.uiView as? View)?.axis = axis
         (self.uiView as? View)?.spacing = spacing
+    }
+
+    public init(axis: NSLayoutConstraint.Axis, spacing: CGFloat = 0,_ subviews: Subview) {
+        self.prepare(axis: axis, spacing: spacing, subviews.views)
     }
 
     public init(axis: NSLayoutConstraint.Axis = .vertical, spacing: CGFloat = 0, _ views: ViewCreator...) {
-        self.uiView = View.init(arrangedSubviews: views.map {
-            $0.uiView
-        })
-        (self.uiView as? View)?.updateBuilder(self)
-        (self.uiView as? View)?.axis = axis
-        (self.uiView as? View)?.spacing = spacing
+        self.prepare(axis: axis, spacing: spacing, views)
     }
 
     public init(axis: NSLayoutConstraint.Axis = .vertical, spacing: CGFloat = 0, _ views: [ViewCreator]) {
-        self.uiView = View.init(arrangedSubviews: views.map {
-            $0.uiView
-        })
-        (self.uiView as? View)?.updateBuilder(self)
-        (self.uiView as? View)?.axis = axis
-        (self.uiView as? View)?.spacing = spacing
+        self.prepare(axis: axis, spacing: spacing, views)
     }
 }
 

@@ -155,11 +155,11 @@ internal extension UIView {
     }
 
     /// The `add(_:)` function is used internally to add views inside view and constraint with 751 of priority in all edges.
-    func add(_ view: UIView) -> Self {
+    func add(priority: ConstraintPriority? = nil,_ view: UIView) -> Self {
         self.addSubview(view)
 
-        let priority: ConstraintPriority = (self as UIView) is RootView && view is RootView ? .required :
-        .init(751)
+        let priority: ConstraintPriority = priority ?? ((self as UIView) is RootView && view is RootView ? .required :
+        .init(751))
 
         view.snp.makeConstraints {
             $0.edges.equalTo(0).priority(priority)

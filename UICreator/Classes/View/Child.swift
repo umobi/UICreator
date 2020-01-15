@@ -50,19 +50,7 @@ public class ChildView: UIView {
 public class Child: UIViewCreator {
     public typealias View = ChildView
 
-    public init(_ subview: Subview) {
-        self.uiView = View.init(builder: self)
-
-        subview.views.compactMap { $0 }
-            .forEach {
-                self.uiView.addSubview($0.uiView)
-                $0.uiView.snp.makeConstraints {
-                    $0.edges.equalTo(0).priority(.low)
-                }
-            }
-    }
-
-    public init(_ views: ViewCreator...) {
+    private init(_ views: [ViewCreator]) {
         self.uiView = View.init(builder: self)
 
         views.compactMap { $0 }
@@ -72,5 +60,13 @@ public class Child: UIViewCreator {
                     $0.edges.equalTo(0).priority(.low)
                 }
             }
+    }
+
+    public convenience init(_ subview: Subview) {
+        self.init(subview.views)
+    }
+
+    public convenience init(_ views: ViewCreator...) {
+        self.init(views)
     }
 }

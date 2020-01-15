@@ -62,6 +62,7 @@ public class Table: UIViewCreator, HasViewDelegate, HasViewDataSource {
 
     public init(style: UITableView.Style) {
         self.uiView = View.init(frame: .zero, style: style)
+        self.uiView.updateBuilder(self)
     }
 }
 
