@@ -134,22 +134,23 @@ extension Stack: SupportForEach {
         weak var firstView: UIView? = placeholderView
         weak var lastView: UIView? = placeholderView
 
+        weak var view = self.uiView as? View
         sequence.onChange { values in
             if firstView != nil {
-                let startIndex = (self.uiView as? View)?.arrangedSubviews.enumerated().first(where: {
+                let startIndex = view?.arrangedSubviews.enumerated().first(where: {
                     $0.element == firstView
                 })?.offset ?? 0
-                let endIndex = (self.uiView as? View)?.arrangedSubviews.enumerated().first(where: {
+                let endIndex = view?.arrangedSubviews.enumerated().first(where: {
                     $0.element == lastView
                 })?.offset ?? 0
 
-                (self.uiView as? View)?.arrangedSubviews[startIndex...endIndex].forEach {
+                view?.arrangedSubviews[startIndex...endIndex].forEach {
                     $0.removeFromSuperview()
                 }
             }
 
             values.forEach {
-                (self.uiView as? View)?.addArrangedSubview($0.uiView)
+                view?.addArrangedSubview($0.uiView)
             }
 
             firstView = values.first?.uiView

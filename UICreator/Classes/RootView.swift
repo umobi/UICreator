@@ -117,3 +117,5 @@ extension TemplateView where Self: Root {
         }
     }
 }
+
+public typealias UICView = Root & TemplateView

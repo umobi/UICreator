@@ -52,15 +52,32 @@ public extension _Getter {
     }
 
     func onChange(_ onChange: @escaping (Value) -> Void) {
-        NotificationCenter.reactive.addObserver(forName: Notification.Name(rawValue: "\(ObjectIdentifier(self)).valueChanged"), object: nil, queue: nil, using: { _ in
+        NotificationCenter.reactive.addObserver(forName: Notification.Name(rawValue: "\(ObjectIdentifier(self)).valueChanged"), object: nil, queue: nil, using: { [weak self] _ in
+            guard let self = self else {
+                return
+            }
             onChange(self.value)
         })
+    }
+
+    func sync(_ syncHandler: @escaping (Value) -> Void) {
+        self.onChange {
+            syncHandler($0)
+        }
+
+        syncHandler(self.value)
     }
 }
 
 public extension _Setter {
     var value: Value {
-        get { objc_getAssociatedObject(self, &kGetterValue) as! Value }
+        get {
+            var a: Value! {
+                return objc_getAssociatedObject(self, &kGetterValue) as? Value
+            }
+
+            return a
+        }
         set { setValue(newValue) }
     }
 
@@ -76,5 +93,11 @@ final public class Value<Value>: Getter<Value>, _Setter {
     public init(value: Value) {
         super.init()
         self.value = value
+        print("\(ObjectIdentifier(self))")
+    }
+
+    deinit {
+        print("Killed")
+        print("\(ObjectIdentifier(self))")
     }
 }

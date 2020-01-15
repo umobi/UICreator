@@ -58,7 +58,10 @@ internal class TableViewCell: UITableViewCell {
     }
 
     func prepareCell(builder: Table.Element.Builder) {
-        guard self.builder == nil else {
+        if let creator = self.builder {
+            if let currentViewContext = creator as? ViewContext, let newViewContext = builder() as? ViewContext {
+                currentViewContext.update(context: newViewContext.context)
+            }
             return
         }
 

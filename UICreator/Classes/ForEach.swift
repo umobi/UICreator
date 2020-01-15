@@ -33,16 +33,17 @@ protocol SupportForEach {
 }
 
 public class ForEach<Value>: ViewCreator, ForEachCreator {
-    let getter: Getter<[Value]>
+    weak var getter: Getter<[Value]>!
     let content: (Value) -> ViewCreator
-    var manager: AnyObject?
+    weak var manager: AnyObject?
 
     func startObservation() {
         let observedValue: UICreator.Value<[ViewCreator]> = .init(value: [])
+        let content = self.content
         (self.manager as? SupportForEach)?.viewsDidChange(placeholderView: self.uiView, observedValue)
-        getter.onChange { value in
-            observedValue.value = value.map {
-                self.content($0)
+        getter?.onChange { [weak observedValue] value in
+            observedValue?.value = value.map {
+                content($0)
             }
         }
     }
@@ -51,9 +52,10 @@ public class ForEach<Value>: ViewCreator, ForEachCreator {
         self.getter = getter
         self.content = content
         self.uiView = .init()
+        self.uiView.updateBuilder(self)
 
         self.onInTheScene { view in
-            self.startObservation()
+            (view.viewCreator as? Self)?.startObservation()
         }
     }
 }
