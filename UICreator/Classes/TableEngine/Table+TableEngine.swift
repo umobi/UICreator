@@ -60,24 +60,24 @@ protocol ListContentDelegate: class {
 }
 
 extension ListManager {
-    struct Content: SupportForEach {
-        class Support: SupportForEach {
-            let content: Content
-
-            init(content: inout Content) {
-                self.content = content
-            }
-
-            func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>) {
-                content.viewsDidChange(placeholderView: placeholderView, sequence)
-            }
-        }
+    class Content: SupportForEach {
+//        class Support: SupportForEach {
+//            let content: Content
+//
+//            init(content: Content) {
+//                self.content = content
+//            }
+//
+//            func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>) {
+//                content.viewsDidChange(placeholderView: placeholderView, sequence)
+//            }
+//        }
 
         let element: Table.Element
         let identifier: Int
         let isDynamic: Bool
         weak var delegate: ListContentDelegate!
-        var support: Support?
+//        var support: Support?
 
         init(identifier: Int,_ element: Table.Element) {
             self.element = element
@@ -94,8 +94,12 @@ extension ListManager {
         func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>) {
             let cellIdentifier = "\(ObjectIdentifier(self.delegate).hashValue).row.\(identifier)"
             weak var delegate = self.delegate
-            
-            sequence.next {
+//            weak var support = self.support
+            sequence.next { [weak self] in
+                guard let self = self else {
+                    return
+                }
+
                 delegate?.content(self, updatedWith: $0.map { view in
                     .row(identifier: cellIdentifier, content: {
                         view
@@ -104,18 +108,22 @@ extension ListManager {
             }
         }
 
+        private var contentManager: Content? = nil
         static func eachRow(identifier: Int, _ forEach: ForEachCreator, delegate: ListContentDelegate) -> Content {
-            var content = Content(identifier: identifier, .row(identifier: "\(ObjectIdentifier(delegate).hashValue).row.\(identifier)", content: {
+            let content = Content(identifier: identifier, .row(identifier: "\(ObjectIdentifier(delegate).hashValue).row.\(identifier)", content: {
                 forEach
             }))
             content.delegate = delegate
-            content.support = .init(content: &content)
-            forEach.manager = content.support
+//            content.support = .init(content: content)
+            forEach.manager = content
+//            content.support = .init(content: content)
             return content
         }
 
         static func makeRow(_ original: Content, element: Table.Element) -> Content {
-            return .init(identifier: original.identifier, element)
+            let content = Content(identifier: original.identifier, element)
+            content.contentManager = original
+            return content
         }
     }
 }
