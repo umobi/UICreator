@@ -22,10 +22,75 @@
 
 import Foundation
 
-private var _reactive = NotificationCenter()
-public extension NotificationCenter {
-    static var reactive: NotificationCenter {
+private let _reactive = ReactiveCenter()
+class ReactiveCenter: NotificationCenter {
+    static var shared: ReactiveCenter {
         return _reactive
+    }
+
+    private static let kNotificationNewValue = "kNotificationNewValue"
+    func valueDidChange<Value>(_ identifier: String, newValue: Value) {
+        self.post(name: .init(rawValue: "\(identifier).valueChanged"), object: nil, userInfo: [Self.kNotificationNewValue: newValue])
+    }
+
+    func valueDidChange<Value>(_ identifier: String, handler: @escaping (Value) -> Void) {
+        self.addObserver(forName: .init(rawValue: "\(identifier).valueChanged"), object: nil, queue: nil) { notification in
+            handler(transform(notification.userInfo?[Self.kNotificationNewValue]))
+        }
+    }
+}
+
+public struct Relay<Value> {
+    let identifier: String
+    init(identifier: String) {
+        self.identifier = identifier
+        self.handler = nil
+    }
+
+    public func next(_ handler: @escaping (Value) -> Void) {
+        Self.collapse(self)() { value in
+            handler(value)
+        }
+    }
+
+    private static func collapse<Value>(_ relay: Relay<Value>) -> ((@escaping (Value) -> Void) -> Void) {
+        let identifier = relay.identifier
+        let handler = relay.handler
+
+        return { externalHandler in
+            if let selfHandler = handler {
+                selfHandler() {
+                    externalHandler($0)
+                }
+
+                return
+            }
+
+            ReactiveCenter.shared.valueDidChange(identifier) {
+                externalHandler($0)
+            }
+        }
+    }
+
+    let handler: ((@escaping  (Value) -> Void) -> Void)?
+    init(_ identifier: String, handler: @escaping ((@escaping (Value) -> Void) -> Void)) {
+        self.identifier = identifier
+        self.handler = handler
+    }
+
+    public func map<Other>(_ handler: @escaping  (Value) -> Other) -> Relay<Other> {
+        let callbase = Self.collapse(self)
+        return Relay<Other>.init(self.identifier, handler: { function in
+            return callbase() {
+                function(handler($0))
+            }
+        })
+    }
+}
+
+public extension Value {
+    var asRelay: Relay<Value> {
+        return .init(identifier: "\(self.identifier)")
     }
 }
 
@@ -43,25 +108,20 @@ public protocol _Setter: _Getter {
 private var kGetterValue: UInt = 0
 
 public extension _Getter {
-    var value: Value {
-        var a: Value! {
-            return objc_getAssociatedObject(self, &kGetterValue) as? Value
-        }
-
-        return a
+    fileprivate var identifier: String {
+        return "\(ObjectIdentifier(self).hashValue)"
     }
 
-    func onChange(_ onChange: @escaping (Value) -> Void) {
-        NotificationCenter.reactive.addObserver(forName: Notification.Name(rawValue: "\(ObjectIdentifier(self)).valueChanged"), object: nil, queue: nil, using: { [weak self] _ in
-            guard let self = self else {
-                return
-            }
-            onChange(self.value)
-        })
+    var value: Value {
+        transform(objc_getAssociatedObject(self, &kGetterValue))
+    }
+    
+    func next(_ handler: @escaping (Value) -> Void) {
+        ReactiveCenter.shared.valueDidChange(self.identifier, handler: handler)
     }
 
     func sync(_ syncHandler: @escaping (Value) -> Void) {
-        self.onChange {
+        self.next {
             syncHandler($0)
         }
 
@@ -69,35 +129,26 @@ public extension _Getter {
     }
 }
 
-public extension _Setter {
-    var value: Value {
-        get {
-            var a: Value! {
-                return objc_getAssociatedObject(self, &kGetterValue) as? Value
-            }
-
-            return a
-        }
-        set { setValue(newValue) }
+private func transform<Value>(_ any: Any?) -> Value {
+    var a: Value! {
+        return any as? Value
     }
 
-    private func setValue(_ newValue: Value) {
-        objc_setAssociatedObject(self, &kGetterValue, newValue, .OBJC_ASSOCIATION_RETAIN)
-        NotificationCenter.reactive.post(.init(name: Notification.Name(rawValue: "\(ObjectIdentifier(self)).valueChanged")))
+    return a
+}
+
+public extension _Setter {
+    var value: Value {
+        get { transform(objc_getAssociatedObject(self, &kGetterValue)) }
+        set {
+            objc_setAssociatedObject(self, &kGetterValue, newValue, .OBJC_ASSOCIATION_RETAIN)
+            ReactiveCenter.shared.valueDidChange(self.identifier, newValue: newValue)
+        }
     }
 }
 
-public class Getter<Value>: _Getter {}
-
-final public class Value<Value>: Getter<Value>, _Setter {
-    public init(value: Value) {
-        super.init()
+public class Value<Value>: _Getter, _Setter {
+    required public init(value: Value) {
         self.value = value
-        print("\(ObjectIdentifier(self))")
-    }
-
-    deinit {
-        print("Killed")
-        print("\(ObjectIdentifier(self))")
     }
 }

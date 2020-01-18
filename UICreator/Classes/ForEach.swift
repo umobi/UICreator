@@ -29,27 +29,25 @@ protocol ForEachCreator: ViewCreator {
 }
 
 protocol SupportForEach {
-    func viewsDidChange(placeholderView: UIView!, _ sequence: Getter<[ViewCreator]>)
+    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>)
 }
 
 public class ForEach<Value>: ViewCreator, ForEachCreator {
-    weak var getter: Getter<[Value]>!
+    let relay: Relay<[Value]>
     let content: (Value) -> ViewCreator
     weak var manager: AnyObject?
 
     func startObservation() {
-        let observedValue: UICreator.Value<[ViewCreator]> = .init(value: [])
         let content = self.content
-        (self.manager as? SupportForEach)?.viewsDidChange(placeholderView: self.uiView, observedValue)
-        getter?.onChange { [weak observedValue] value in
-            observedValue?.value = value.map {
+        (self.manager as? SupportForEach)?.viewsDidChange(placeholderView: self.uiView, relay.map {
+            $0.map {
                 content($0)
             }
-        }
+        })
     }
 
-    public init(_ getter: Getter<[Value]>, content: @escaping (Value) -> ViewCreator) {
-        self.getter = getter
+    public init(_ value: UICreator.Value<[Value]>, content: @escaping (Value) -> ViewCreator) {
+        self.relay = value.asRelay
         self.content = content
         self.uiView = .init()
         self.uiView.updateBuilder(self)

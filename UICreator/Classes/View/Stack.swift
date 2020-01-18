@@ -130,12 +130,12 @@ public extension UIViewCreator where View: UIStackView {
 }
 
 extension Stack: SupportForEach {
-    func viewsDidChange(placeholderView: UIView!, _ sequence: Getter<[ViewCreator]>) {
+    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>) {
         weak var firstView: UIView? = placeholderView
         weak var lastView: UIView? = placeholderView
 
         weak var view = self.uiView as? View
-        sequence.onChange { values in
+        sequence.next { values in
             if firstView != nil {
                 let startIndex = view?.arrangedSubviews.enumerated().first(where: {
                     $0.element == firstView
