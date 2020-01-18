@@ -37,7 +37,11 @@ private var kViewBuilder: UInt = 0
 internal extension UIViewRender {
     private(set) var viewCreator: ViewCreator? {
         get { objc_getAssociatedObject(self, &kViewBuilder) as? ViewCreator }
-        set { objc_setAssociatedObject(self, &kViewBuilder, newValue, .OBJC_ASSOCIATION_RETAIN) }
+        set { self.setCreator(newValue, policity: self.superview == nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
+    }
+
+    func setCreator(_ newValue: ViewCreator?, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_ASSIGN) {
+        objc_setAssociatedObject(self, &kViewBuilder, newValue, policity)
     }
 
     init(builder: ViewCreator) {

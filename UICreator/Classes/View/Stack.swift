@@ -58,7 +58,7 @@ public class Stack: UIViewCreator {
                 forEachCreator.manager = self
             }
 
-            return $0.uiView
+            return $0.releaseUIView()
         })
         (self.uiView as? View)?.updateBuilder(self)
         (self.uiView as? View)?.axis = axis
@@ -150,7 +150,7 @@ extension Stack: SupportForEach {
             }
 
             values.forEach {
-                view?.addArrangedSubview($0.uiView)
+                view?.addArrangedSubview($0.releaseUIView())
             }
 
             firstView = values.first?.uiView

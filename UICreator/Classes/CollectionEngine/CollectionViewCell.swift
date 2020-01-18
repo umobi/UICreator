@@ -62,7 +62,7 @@ public class CollectionViewCell: UICollectionViewCell {
 
         let builder = builder()
         self.builder = builder
-        _ = self.contentView.add(builder.uiView)
+        _ = self.contentView.add(builder.releaseUIView())
     }
 
     public override var watchingViews: [UIView] {

@@ -55,7 +55,7 @@ public class Child: UIViewCreator {
 
         views.compactMap { $0 }
             .forEach {
-                self.uiView.addSubview($0.uiView)
+                self.uiView.addSubview($0.releaseUIView())
                 $0.uiView.snp.makeConstraints {
                     $0.edges.equalTo(0).priority(.low)
                 }

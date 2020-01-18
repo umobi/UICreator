@@ -22,13 +22,223 @@
 
 import Foundation
 
+public class Section: ViewCreator {
+    public let content: [ViewCreator]
+
+    public convenience init(_ content: ViewCreator...) {
+        self.init(content: content)
+    }
+
+    internal init(content: [ViewCreator]) {
+        self.content = content
+    }
+}
+
+public class Header: ViewCreator {
+    let content: () -> ViewCreator
+
+    public init(content: @escaping () -> ViewCreator) {
+        self.content = content
+    }
+}
+
+public class Footer: ViewCreator {
+    let content: () -> ViewCreator
+
+    public init(content: @escaping () -> ViewCreator) {
+        self.content = content
+    }
+}
+
+protocol ListSupport: class {
+    func reloadData()
+    var group: Table.Group? { get }
+}
+
+protocol ListContentDelegate: class {
+    func content(_ content: ListManager.Content, updatedWith sequence: [Table.Element])
+}
+
+extension ListManager {
+    struct Content: SupportForEach {
+        class Support: SupportForEach {
+            let content: Content
+
+            init(content: inout Content) {
+                self.content = content
+            }
+
+            func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>) {
+                content.viewsDidChange(placeholderView: placeholderView, sequence)
+            }
+        }
+
+        let element: Table.Element
+        let identifier: Int
+        let isDynamic: Bool
+        weak var delegate: ListContentDelegate!
+        var support: Support?
+
+        init(identifier: Int,_ element: Table.Element) {
+            self.element = element
+            self.identifier = identifier
+            self.isDynamic = true
+        }
+
+        init(_ element: Table.Element) {
+            self.identifier = 0
+            self.isDynamic = false
+            self.element = element
+        }
+
+        func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>) {
+            let cellIdentifier = "\(ObjectIdentifier(self.delegate).hashValue).row.\(identifier)"
+            weak var delegate = self.delegate
+            
+            sequence.next {
+                delegate?.content(self, updatedWith: $0.map { view in
+                    .row(identifier: cellIdentifier, content: {
+                        view
+                    })
+                })
+            }
+        }
+
+        static func eachRow(identifier: Int, _ forEach: ForEachCreator, delegate: ListContentDelegate) -> Content {
+            var content = Content(identifier: identifier, .row(identifier: "\(ObjectIdentifier(delegate).hashValue).row.\(identifier)", content: {
+                forEach
+            }))
+            content.delegate = delegate
+            content.support = .init(content: &content)
+            forEach.manager = content.support
+            return content
+        }
+
+        static func makeRow(_ original: Content, element: Table.Element) -> Content {
+            return .init(identifier: original.identifier, element)
+        }
+    }
+}
+
+class ListManager {
+    fileprivate(set) var contents: [ContentSection] = []
+    weak var list: ListSupport!
+
+    private var identifierCount: Int = 0
+    private func nextIdentifier() -> Int {
+        let next = identifierCount
+        identifierCount += 1
+        return next
+    }
+
+    var elements: [Table.Element] {
+        return self.contents.map {
+            $0.section
+        }
+    }
+
+    private func mountSection(for elements: [ViewCreator]) -> [Content] {
+        elements.map { view in
+            if let header = view as? Header {
+                return .init(.header(content: header.content))
+            }
+
+            if let footer = view as? Footer {
+                return .init(.footer(content: footer.content))
+            }
+
+            if let forEach = view as? ForEachCreator {
+                return Content.eachRow(identifier: self.nextIdentifier(), forEach, delegate: self)
+            }
+
+            return .init(.row(content: {
+                view
+            }))
+        }
+    }
+
+    struct ContentSection {
+        let section: Table.Element
+        let contents: [Content]
+
+        init(contents: [Content]) {
+            self.contents = contents
+            self.section = .section(contents.map {
+                $0.element
+            })
+        }
+    }
+
+    init(content: [ViewCreator]) {
+        if content.allSatisfy({ $0 is Section }) {
+            self.contents = content.compactMap {
+                guard let section = $0 as? Section else {
+                    return nil
+                }
+
+                return .init(contents: self.mountSection(for: section.content))
+            }
+
+            return
+        }
+
+        if content.first(where: { $0 is Section }) != nil {
+            fatalError("Verify your content")
+        }
+
+        self.contents = [.init(contents: self.mountSection(for: content))]
+    }
+}
+
+extension TableView: ListSupport {
+
+}
+
+extension ListManager: ListContentDelegate {
+    private static func update(section: ContentSection, first: (Int, Content), last: (Int, Content)?, with contents: [Content]) -> ContentSection {
+        return .init(contents: Array(section.contents[0...first.0]) +
+            contents + {
+                if section.contents.count == ((last ?? first).0 + 1) {
+                    return []
+                }
+
+                return Array(section.contents[((last ?? first).0+1)..<section.contents.count])
+            }()
+        )
+    }
+
+    func content(_ content: ListManager.Content, updatedWith sequence: [Table.Element]) {
+        self.contents = self.contents.map { section in
+            guard let first = section.contents.enumerated().first(where: { $0.element.identifier == content.identifier }) else {
+                return section
+            }
+
+            guard let end = section.contents.enumerated().reversed().first(where: { $0.element.identifier == content.identifier }) else {
+                return ListManager.update(section: section, first: first, last: nil, with: sequence.map {
+                    .makeRow(content, element: $0)
+                })
+            }
+
+            return ListManager.update(section: section, first: first, last: end, with: sequence.map {
+                .makeRow(content, element: $0)
+            })
+        }
+
+        self.list.reloadData()
+    }
+}
+
 public extension Table {
-    convenience init(style: UITableView.Style,_ elements: Element...) {
+    convenience init(style: UITableView.Style,_ subviews: Subview) {
+        self.init(style: style, ListManager(content: subviews.views))
+    }
+    
+    private convenience init(style: UITableView.Style,_ manager: ListManager) {
         self.init(style: style)
         #if os(iOS)
         (self.uiView as? View)?.separatorStyle = .none
         #endif
-        let group = Group(elements)
+        let group = Group(manager)
 
         if !group.isValid {
             fatalError("Verify your content")
@@ -53,5 +263,6 @@ public extension Table {
         tableView.group = group
         tableView.dataSource = tableView
         tableView.delegate = tableView
+        manager.list = tableView
     }
 }

@@ -50,7 +50,7 @@ public class Spacer: UIViewCreator {
     public typealias View = _SpacerView
 
     public required init(margin: View.Margin, content: @escaping () -> ViewCreator) {
-        self.uiView = View.init(content().uiView, margin: margin)
+        self.uiView = View.init(content().releaseUIView(), margin: margin)
     }
 }
 

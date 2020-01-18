@@ -208,13 +208,13 @@ public extension TextKeyboard where View: UITextView {
 
     func inputView(content: @escaping () -> ViewCreator) -> Self {
         self.onRendered {
-            ($0 as? View)?.inputView = content().uiView
+            ($0 as? View)?.inputView = content().releaseUIView()
         }
     }
 
     func inputAccessoryView(content: @escaping () -> ViewCreator) -> Self {
         self.onRendered {
-            ($0 as? View)?.inputAccessoryView = content().uiView
+            ($0 as? View)?.inputAccessoryView = content().releaseUIView()
         }
     }
 

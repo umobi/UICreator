@@ -29,7 +29,7 @@ public class Host: Root, ViewControllerType, UIViewCreator {
         super.init()
 //        super.init(loader: nil)
         self.uiView.frame = .init(origin: self.uiView.frame.origin, size: size)
-        _ = self.uiView.add(content().uiView)
+        _ = self.uiView.add(content().releaseUIView())
     }
 
     public required init(_ view: View!) {

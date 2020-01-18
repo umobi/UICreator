@@ -51,7 +51,7 @@ public class Content: UIViewCreator {
     public typealias View = _ContentView
 
     public init(mode: View.ContentMode = .center, priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) {
-        self.uiView = View(content().uiView, contentMode: mode, priority: priority)
+        self.uiView = View(content().releaseUIView(), contentMode: mode, priority: priority)
     }
 }
 

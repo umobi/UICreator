@@ -161,7 +161,7 @@ public extension UIViewCreator where View: UITableView {
 
     func background(_ content: @escaping () -> ViewCreator) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.backgroundView = Host(content: content).uiView
+            ($0 as? View)?.backgroundView = Host(content: content).releaseUIView()
         }
     }
 
@@ -200,13 +200,13 @@ public extension UIViewCreator where View: UITableView {
 
     func header(size: CGSize = .zero, _ content: @escaping () -> ViewCreator) -> Self {
         return self.onRendered {
-            ($0 as? View)?.tableHeaderView = Host(size: size, content: content).uiView
+            ($0 as? View)?.tableHeaderView = Host(size: size, content: content).releaseUIView()
         }
     }
 
     func footer(size: CGSize = .zero, _ content: @escaping () -> ViewCreator) -> Self {
         return self.onRendered {
-            ($0 as? View)?.tableFooterView = Host(size: size, content: content).uiView
+            ($0 as? View)?.tableFooterView = Host(size: size, content: content).releaseUIView()
         }
     }
 }

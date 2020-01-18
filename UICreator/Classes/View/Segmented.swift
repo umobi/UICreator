@@ -111,7 +111,7 @@ public class Segment {
         if let onSelected = self.onSelected {
             _ = segmented.onSelectedIndex {
                 if $0 == index {
-                    onSelected(segmented.uiView)
+                    onSelected(segmented.releaseUIView())
                 }
             }
         }

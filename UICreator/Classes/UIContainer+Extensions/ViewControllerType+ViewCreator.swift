@@ -26,7 +26,7 @@ import UIContainer
 public extension ViewControllerType where Self: ViewCreator {
     var content: ViewControllerMaker {
         return .dynamic {
-            _ = $0.view.add(self.uiView)
+            _ = $0.view.add(self.releaseUIView())
             $0.view.backgroundColor = .clear
         }
     }

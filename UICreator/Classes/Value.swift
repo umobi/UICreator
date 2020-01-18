@@ -38,6 +38,16 @@ class ReactiveCenter: NotificationCenter {
             handler(transform(notification.userInfo?[Self.kNotificationNewValue]))
         }
     }
+
+    func privateValueDidChange<Value>(_ identifier: String, newValue: Value) {
+        self.post(name: .init(rawValue: "\(identifier).private.valueChanged"), object: nil, userInfo: [Self.kNotificationNewValue: newValue])
+    }
+
+    func privateValueDidChange<Value>(_ identifier: String, handler: @escaping (Value) -> Void) {
+        self.addObserver(forName: .init(rawValue: "\(identifier).private.valueChanged"), object: nil, queue: nil) { notification in
+            handler(transform(notification.userInfo?[Self.kNotificationNewValue]))
+        }
+    }
 }
 
 public struct Relay<Value> {
@@ -69,6 +79,10 @@ public struct Relay<Value> {
             ReactiveCenter.shared.valueDidChange(identifier) {
                 externalHandler($0)
             }
+
+            ReactiveCenter.shared.privateValueDidChange(identifier) {
+                externalHandler($0)
+            }
         }
     }
 
@@ -85,6 +99,10 @@ public struct Relay<Value> {
                 function(handler($0))
             }
         })
+    }
+
+    func `post`(_ value: Value) {
+        ReactiveCenter.shared.privateValueDidChange(self.identifier, newValue: value)
     }
 }
 

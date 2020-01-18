@@ -69,6 +69,13 @@ internal extension ViewCreator {
             root.viewDidChanged()
         }
     }
+
+    func releaseUIView() -> UIView! {
+        let uiView = self.uiView!
+        uiView.setCreator(self, policity: .OBJC_ASSOCIATION_RETAIN)
+        self.setView(uiView, policity: .OBJC_ASSOCIATION_ASSIGN)
+        return uiView
+    }
 }
 
 public extension ViewCreator {

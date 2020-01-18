@@ -50,7 +50,7 @@ public class Rounder: UIViewCreator {
     public typealias View = _RounderView
 
     public init(radius: CGFloat, content: @escaping () -> ViewCreator) {
-        self.uiView = View.init(content().uiView, radius: radius)
+        self.uiView = View.init(content().releaseUIView(), radius: radius)
     }
 }
 

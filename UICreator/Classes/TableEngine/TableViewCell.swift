@@ -58,6 +58,14 @@ internal class TableViewCell: UITableViewCell {
     }
 
     func prepareCell(builder: Table.Element.Builder) {
+        if self.contentView.subviews.first is PlaceholderView {
+            self.contentView.subviews.forEach {
+                $0.removeFromSuperview()
+            }
+            
+            self.builder = nil
+        }
+
         if let creator = self.builder {
             if let currentViewContext = creator as? ViewContext, let newViewContext = builder() as? ViewContext {
                 currentViewContext.update(context: newViewContext.context)
@@ -67,7 +75,7 @@ internal class TableViewCell: UITableViewCell {
 
         let builder = builder()
         self.builder = builder
-        _ = self.contentView.add(builder.uiView)
+        _ = self.contentView.add(builder.releaseUIView())
     }
 
     public override var watchingViews: [UIView] {

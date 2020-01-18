@@ -32,6 +32,23 @@ protocol SupportForEach {
     func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>)
 }
 
+public class PlaceholderView: UIView {
+    override open func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        self.commitRendered()
+    }
+
+    override open func didMoveToWindow() {
+        super.didMoveToWindow()
+        self.commitInTheScene()
+    }
+
+    override open func layoutSubviews() {
+        super.layoutSubviews()
+        self.commitLayout()
+    }
+}
+
 public class ForEach<Value>: ViewCreator, ForEachCreator {
     let relay: Relay<[Value]>
     let content: (Value) -> ViewCreator
@@ -49,11 +66,11 @@ public class ForEach<Value>: ViewCreator, ForEachCreator {
     public init(_ value: UICreator.Value<[Value]>, content: @escaping (Value) -> ViewCreator) {
         self.relay = value.asRelay
         self.content = content
-        self.uiView = .init()
-        self.uiView.updateBuilder(self)
+        self.uiView = PlaceholderView(builder: self)
 
-        self.onInTheScene { view in
+        self.onInTheScene { [weak value] view in
             (view.viewCreator as? Self)?.startObservation()
+            (view.viewCreator as? Self)?.relay.post(value?.value ?? [])
         }
     }
 }

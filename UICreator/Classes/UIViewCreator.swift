@@ -40,8 +40,9 @@ open class Context {
 
     func sync(context: Context) {
         let all = self.onContextChangeHandler
+        let old = context.onContextChangeHandler
         self.onContextChangeHandler = {
-            context.onContextChangeHandler?()
+            old?()
             all?()
         }
     }
@@ -62,7 +63,7 @@ internal extension ViewContext {
     private(set) var context: Context? {
         get { objc_getAssociatedObject(self, &kContext) as? Context }
         nonmutating
-        set { objc_setAssociatedObject(self, &kContext, newValue, .OBJC_ASSOCIATION_ASSIGN) }
+        set { objc_setAssociatedObject(self, &kContext, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
     func update(context: Context?) {
@@ -81,9 +82,8 @@ internal extension ViewContext {
 
 extension UIViewContext {
     public var context: Context {
-        get { (objc_getAssociatedObject(self, &kContext) as? Context) ?? {
+        get { (self as ViewContext).context as? Context ?? {
             let context = Context.init()
-
             weak var uiView = self.uiView
 
             context.onContextChange {

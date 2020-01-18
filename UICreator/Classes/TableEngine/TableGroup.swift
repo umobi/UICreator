@@ -24,13 +24,21 @@ import Foundation
 
 extension Table {
     public struct Group {
-        let elements: [Element]
-        public init(_ elements: [Element]) {
-            self.elements = elements
+        private let _elements: [Table.Element]?
+        let manager: ListManager?
+
+        internal init(_ manager: ListManager) {
+            self._elements = nil
+            self.manager = manager
         }
 
-        public init(_ elements: Element...) {
-            self.elements = elements
+        internal init(_ elements: [Table.Element]) {
+            self._elements = elements
+            self.manager = nil
+        }
+
+        var elements: [Table.Element] {
+            return self._elements ?? manager?.elements ?? []
         }
 
         var containsSection: Bool {
@@ -106,7 +114,7 @@ extension Table {
         var rowsIdentifier: [String] {
             return self.sections.enumerated().map { section in
                 section.element.group.rows.map { row -> String in
-                    return "\(section.offset)-\(row.0)"
+                    return "\(section.offset)-\(row.1.identifier ?? "\(row.0)")"
                 }
             }.reduce([]) { $0 + $1 }
         }
@@ -148,7 +156,7 @@ extension Table {
                 return nil
             }
 
-            return ("\(indexPath.section)-\(row.0)", row.1.content)
+            return ("\(indexPath.section)-\(row.1.identifier ?? "\(row.0)")", row.1.content)
         }
 
         func header(at section: Int) -> (String, Element.Builder)? {
@@ -212,6 +220,6 @@ extension Table.Group {
             return false
         }
 
-        return !self.rows.isEmpty
+        return true
     }
 }

@@ -230,14 +230,14 @@ public extension UIViewCreator where Self: Control, View: UITextField {
 public extension UIViewCreator where View: UITextField {
     func leftView(_ mode: UITextField.ViewMode = .always, content: @escaping () -> ViewCreator) -> Self {
         return self.onRendered {
-            ($0 as? View)?.leftView = Host(content: content).uiView
+            ($0 as? View)?.leftView = Host(content: content).releaseUIView()
             ($0 as? View)?.leftViewMode = mode
         }
     }
 
     func rightView(_ mode: UITextField.ViewMode = .always, content: @escaping () -> ViewCreator) -> Self {
         return self.onRendered {
-            ($0 as? View)?.rightView = Host(content: content).uiView
+            ($0 as? View)?.rightView = Host(content: content).releaseUIView()
             ($0 as? View)?.rightViewMode = mode
         }
     }
@@ -323,13 +323,13 @@ public extension TextKeyboard where View: UITextField {
 
     func inputView(content: @escaping () -> ViewCreator) -> Self {
         self.onRendered {
-           ($0 as? View)?.inputView = content().uiView
+           ($0 as? View)?.inputView = content().releaseUIView()
         }
     }
 
     func inputAccessoryView(content: @escaping () -> ViewCreator) -> Self {
         self.onRendered {
-            ($0 as? View)?.inputAccessoryView = content().uiView
+            ($0 as? View)?.inputAccessoryView = content().releaseUIView()
         }
     }
 

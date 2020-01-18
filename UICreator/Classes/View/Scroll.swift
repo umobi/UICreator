@@ -50,7 +50,7 @@ public class Scroll: UIViewCreator, HasViewDelegate {
     public typealias View = _ScrollView
 
     public init(axis: View.Axis = .vertical, content: @escaping () -> ViewCreator) {
-        self.uiView = View.init(content().uiView, axis: axis)
+        self.uiView = View.init(content().releaseUIView(), axis: axis)
     }
 
     public func delegate(_ delegate: UIScrollViewDelegate?) -> Self {

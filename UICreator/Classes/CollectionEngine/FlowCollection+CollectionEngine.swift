@@ -25,7 +25,7 @@ import Foundation
 public extension FlowCollection {
     convenience init(_ elements: Table.Element...) {
         self.init()
-        let group = Table.Group(elements)
+        let group = Table.Group(.init(content: []))
 
         if !group.isValid {
             fatalError("Verify your content")

@@ -56,7 +56,7 @@ public struct Previewer<View: ViewCreator>: UIViewRepresentable {
     public func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<Previewer<View>>) {}
 
     public func makeUIView(context: UIViewRepresentableContext<Previewer<View>>) -> UIView {
-        return self.view.uiView
+        return self.view.releaseUIView()
     }
 }
 

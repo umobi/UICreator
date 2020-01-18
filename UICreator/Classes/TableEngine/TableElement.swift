@@ -27,11 +27,14 @@ extension Table {
         let type: ContentType
         let content: Content
         let max: Int
+        let identifier: String?
+        internal var __isValid: Bool = true
 
-        private init(_ type: ContentType, content: Content, max: Int = 0) {
+        private init(_ type: ContentType, content: Content, identifier: String? = nil, max: Int = 0) {
             self.type = type
             self.content = content
             self.max = max
+            self.identifier = identifier
             if !self.isValid {
                 fatalError("Table.Element is not valid")
             }
@@ -47,6 +50,10 @@ extension Table {
 
         public static func row(content: @escaping () -> ViewCreator) -> Element {
             return .init(.row, content: .content(content))
+        }
+
+        internal static func row(identifier: String, content: @escaping () -> ViewCreator) -> Element {
+            return .init(.row, content: .content(content), identifier: identifier)
         }
 
         public static func rows(max: Int, content: @escaping () -> ViewCreator) -> Element {
@@ -82,6 +89,10 @@ extension Table.Element {
 
     var isHeader: Bool {
         return self.type == .header
+    }
+
+    internal func isIdentifierEquals(_ identifier: String) -> Bool {
+        self.identifier == identifier
     }
 }
 
@@ -186,6 +197,7 @@ public extension Table.Element {
     class Row {
         let content: Builder
         let quantity: Int
+        let identifier: String?
 
         fileprivate init?(_ element: Table.Element) {
             guard case .row = element.type, case .content(let content) = element.content else {
@@ -194,6 +206,7 @@ public extension Table.Element {
 
             self.content = content
             self.quantity = element.max
+            self.identifier = element.identifier
         }
     }
 }

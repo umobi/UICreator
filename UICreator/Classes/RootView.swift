@@ -106,7 +106,7 @@ extension TemplateView where Self: Root {
 
         if self.uiView.subviews.isEmpty {
             (self.uiView as? View)?.willCommitNotRenderedHandler = { [unowned self] in
-                _ = self.uiView.add(self.body.uiView)
+                _ = self.uiView.add(self.body.releaseUIView())
             }
         }
 

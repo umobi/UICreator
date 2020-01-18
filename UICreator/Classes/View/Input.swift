@@ -50,7 +50,7 @@ public class Input: UIViewCreator {
 
     public init(size: CGSize = .zero, style: UIInputView.Style = .keyboard, content: () -> ViewCreator) {
         self.uiView = View.init(frame: .init(origin: .zero, size: size), inputViewStyle: style)
-        _ = self.uiView.add(content().uiView)
+        _ = self.uiView.add(content().releaseUIView())
     }
 }
 
