@@ -22,6 +22,20 @@
 
 import Foundation
 
-public protocol UIViewCreator: ViewCreator {
-    associatedtype View: UIView
+public final class Value<Value>: Getter, Setter {
+    required public init(value: Value) {
+        ReactiveCenter.shared.start(self.identifier)
+        self.value = value
+    }
+
+    deinit {
+        ReactiveCenter.shared.privateDeinit(self.identifier)
+        ReactiveCenter.shared.unregister(self.identifier)
+    }
+}
+
+public extension Value {
+    var asRelay: Relay<Value> {
+        return .init(identifier: self.identifier)
+    }
 }

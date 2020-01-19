@@ -22,25 +22,6 @@
 
 import Foundation
 
-struct Fatal {
-    static func die(_ string: String) {
-        fatalError(string)
-    }
-
-    enum ReactiveCenter {
-        case unregistered
-
-        func error() {
-            Fatal.die({
-                switch self {
-                case .unregistered:
-                    return "Identifier for Relay or Value isn't registered in ReactiveCenter"
-                }
-                }())
-        }
-    }
-}
-
 private let _reactive = ReactiveCenter()
 class ReactiveCenter: NotificationCenter {
     static var shared: ReactiveCenter {
@@ -71,7 +52,7 @@ class ReactiveCenter: NotificationCenter {
 
     private func isRegisteredOrDie(_ identifier: String) {
         guard self.activeIdentifiers.contains(identifier) else {
-            Fatal.ReactiveCenter.unregistered.error()
+            Fatal.ReactiveCenter.unregistered.die()
             return
         }
     }
@@ -123,135 +104,15 @@ class ReactiveCenter: NotificationCenter {
     }
 }
 
-public class Relay<Value> {
-    let identifier: String
-    init(identifier: String) {
-        self.identifier = identifier
-        self.handler = nil
-        print("[Relay] init")
-    }
+extension Fatal {
+    enum ReactiveCenter: FatalType {
+        case unregistered
 
-    deinit {
-        print("[Relay] deinit")
-    }
-
-    public func next(_ handler: @escaping (Value) -> Void) {
-        Self.collapse(self)() { value in
-            handler(value)
-        }
-    }
-
-    private static func collapse<Value>(_ relay: Relay<Value>) -> ((@escaping (Value) -> Void) -> Void) {
-        let identifier = relay.identifier
-        let handler = relay.handler
-
-        return  { externalHandler in
-            if let selfHandler = handler {
-                selfHandler() {
-                    externalHandler($0)
-                }
-
-                return
-            }
-
-            ReactiveCenter.shared.valueDidChange(identifier) {
-                externalHandler($0)
-            }
-
-            ReactiveCenter.shared.privateValueDidChange(identifier) {
-                externalHandler($0)
+        var error: String {
+            switch self {
+                case .unregistered:
+                    return "Identifier for Relay or Value isn't registered in ReactiveCenter"
             }
         }
-    }
-
-    let handler: ((@escaping  (Value) -> Void) -> Void)?
-    init(_ identifier: String, handler: @escaping ((@escaping (Value) -> Void) -> Void)) {
-        self.identifier = identifier
-        self.handler = handler
-        print("[Relay] init")
-    }
-
-    public func map<Other>(_ handler: @escaping  (Value) -> Other) -> Relay<Other> {
-        let callbase = Self.collapse(self)
-        return Relay<Other>.init(self.identifier, handler: { function in
-            return callbase() {
-                function(handler($0))
-            }
-        })
-    }
-
-    func `post`(_ value: Value) {
-        ReactiveCenter.shared.privateValueDidChange(self.identifier, newValue: value)
-    }
-}
-
-public extension Value {
-    var asRelay: Relay<Value> {
-        return .init(identifier: self.identifier)
-    }
-}
-
-public protocol _Getter: class {
-    associatedtype Value
-
-    var value: Value { get }
-}
-
-public protocol _Setter: _Getter {
-    var value: Value { get set }
-    init(value: Value)
-}
-
-private var kGetterValue: UInt = 0
-
-public extension _Getter {
-    fileprivate var identifier: String {
-        return "\(ObjectIdentifier(self))"
-    }
-
-    var value: Value {
-        transform(objc_getAssociatedObject(self, &kGetterValue))
-    }
-    
-    func next(_ handler: @escaping (Value) -> Void) {
-        ReactiveCenter.shared.valueDidChange(self.identifier, handler: handler)
-    }
-
-    func sync(_ syncHandler: @escaping (Value) -> Void) {
-        self.next {
-            syncHandler($0)
-        }
-
-        syncHandler(self.value)
-    }
-}
-
-private func transform<Value>(_ any: Any?) -> Value {
-    var a: Value! {
-        return any as? Value
-    }
-
-    return a
-}
-
-public extension _Setter {
-    var value: Value {
-        get { transform(objc_getAssociatedObject(self, &kGetterValue)) }
-        set {
-            objc_setAssociatedObject(self, &kGetterValue, newValue, .OBJC_ASSOCIATION_RETAIN)
-            ReactiveCenter.shared.valueDidChange(self.identifier, newValue: newValue)
-        }
-    }
-}
-
-public class Value<Value>: _Getter, _Setter {
-    required public init(value: Value) {
-        ReactiveCenter.shared.start(self.identifier)
-        self.value = value
-    }
-
-    deinit {
-        ReactiveCenter.shared.privateDeinit(self.identifier)
-        ReactiveCenter.shared.unregister(self.identifier)
     }
 }

@@ -22,6 +22,19 @@
 
 import Foundation
 
-public protocol UIViewCreator: ViewCreator {
-    associatedtype View: UIView
+struct Fatal {
+    static func die(_ type: FatalType) {
+        fatalError(type.error)
+    }
+}
+
+protocol FatalType {
+    var error: String { get }
+    func die()
+}
+
+extension FatalType {
+    func die() {
+        Fatal.die(self)
+    }
 }

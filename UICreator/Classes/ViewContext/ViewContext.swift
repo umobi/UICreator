@@ -22,6 +22,23 @@
 
 import Foundation
 
-public protocol UIViewCreator: ViewCreator {
-    associatedtype View: UIView
+public protocol ViewContext: ViewCreator {
+
+}
+
+private var kContext: UInt = 0
+internal extension ViewContext {
+    private(set) var context: Context? {
+        get { objc_getAssociatedObject(self, &kContext) as? Context }
+        set { objc_setAssociatedObject(self, &kContext, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    }
+
+    func update(context: Context?) {
+        guard let context = context else {
+            return
+        }
+
+        self.context = context
+        self.context?.notifyContextChange(self.uiView)
+    }
 }

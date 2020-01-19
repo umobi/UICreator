@@ -21,7 +21,17 @@
 //
 
 import Foundation
+import UIKit
 
-public protocol UIViewCreator: ViewCreator {
-    associatedtype View: UIView
+open class Context {
+    required public init() {}
+
+    private var onContextChangeHandler: ((UIView) -> Void)? = nil
+    internal func onContextChange(_ handler: @escaping (UIView) -> Void) {
+        self.onContextChangeHandler = handler
+    }
+
+    internal func notifyContextChange(_ uiView: UIView) {
+        self.onContextChangeHandler?(uiView)
+    }
 }
