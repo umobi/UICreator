@@ -29,30 +29,21 @@ public protocol UIViewCreator: ViewCreator {
 open class Context {
     required public init() {}
 
-    private var onContextChangeHandler: (() -> Void)? = nil
-    internal func onContextChange(_ handler: @escaping () -> Void) {
+    private var onContextChangeHandler: ((UIView) -> Void)? = nil
+    internal func onContextChange(_ handler: @escaping (UIView) -> Void) {
         self.onContextChangeHandler = handler
     }
 
-    internal func notifyContextChange() {
-        self.onContextChangeHandler?()
-    }
-
-    func sync(context: Context) {
-        let all = self.onContextChangeHandler
-        let old = context.onContextChangeHandler
-        self.onContextChangeHandler = {
-            old?()
-            all?()
-        }
+    internal func notifyContextChange(_ uiView: UIView) {
+        self.onContextChangeHandler?(uiView)
     }
 }
 
-public protocol ViewContext {
+public protocol ViewContext: ViewCreator {
 
 }
 
-public protocol UIViewContext: ViewContext, ViewCreator {
+public protocol UIViewContext: ViewContext {
     associatedtype Context: UICreator.Context
     func bindContext(_ context: Context)
 }
@@ -62,7 +53,6 @@ private var kContext: UInt = 0
 internal extension ViewContext {
     private(set) var context: Context? {
         get { objc_getAssociatedObject(self, &kContext) as? Context }
-        nonmutating
         set { objc_setAssociatedObject(self, &kContext, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
@@ -71,42 +61,38 @@ internal extension ViewContext {
             return
         }
 
-        let storedContext = self.context
         self.context = context
-        if let oldContext = storedContext {
-            context.sync(context: oldContext)
-        }
-        self.context?.notifyContextChange()
+        self.context?.notifyContextChange(self.uiView)
     }
 }
 
 extension UIViewContext {
     private static func createContext<Context: UICreator.Context>(for uiView: UIView!) -> Context {
         let context = Context.init()
-//        guard let _self = uiView.viewCreator as? Self else {
-//            return context
-//        }
-//
-//        context.onContextChange { [weak uiView] in
-//            if uiView?.superview == nil {
-//                _ = uiView?.viewCreator?.onRendered {
-//                    guard let _self = $0.viewCreator as? Self else {
-//                        return
-//                    }
-//
-//                    _self.bindContext(_self.context)
-//                }
-//
-//                return
-//            }
-//
-//            guard let _self = uiView?.viewCreator as? Self else {
-//                return
-//            }
-//            _self.bindContext(_self.context)
-//        }
-//
-//        _self.update(context: context)
+        guard let _self = uiView.viewCreator as? Self else {
+            return context
+        }
+
+        context.onContextChange { uiView in
+            if uiView.superview == nil {
+                _ = uiView.viewCreator?.onRendered {
+                    guard let _self = $0.viewCreator as? Self else {
+                        return
+                    }
+
+                    _self.bindContext(_self.context)
+                }
+
+                return
+            }
+
+            guard let _self = uiView.viewCreator as? Self else {
+                return
+            }
+            _self.bindContext(_self.context)
+        }
+
+        _self.update(context: context)
         return context
     }
 
