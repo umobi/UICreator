@@ -41,7 +41,7 @@ Definitions of UIView as ViewBuild:
     - **leaf** are views that is the last view in the hierarchy of builders views, so it may manage it self content. This core has `Stack` as `UIStackView`, `Child` as `UIView`, `Table` as `UITableView`. If the view is to much complex and there is no way to keep the right hierarchy of ViewBuilder's methods, you can use the `Host` view in the middle of subviews that will keep the integrity of the hierarchy by calling the commits methods for its subviews.
 */
 
-public protocol ViewCreator {
+public protocol ViewCreator: class {
     /// It is executed in `willMove(toSubview:)` and depends of superview to call the `commitNotRendered()`.
     func onNotRendered(_ handler: @escaping (UIView) -> Void) -> Self
 
@@ -58,7 +58,6 @@ internal var kUIView: UInt = 0
 internal extension ViewCreator {
     var uiView: UIView! {
         get { (self as? UIViewMaker)?.makeView() ?? objc_getAssociatedObject(self, &kUIView) as? UIView }
-        nonmutating
         set { setView(newValue, policity: newValue?.superview != nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
     }
 

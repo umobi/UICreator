@@ -23,12 +23,18 @@
 import Foundation
 
 protocol ForEachCreator: ViewCreator {
-    var manager: AnyObject? { get nonmutating set }
-
     func startObservation()
 }
 
-protocol SupportForEach {
+private var kManager: UInt = 0
+extension ForEachCreator {
+    weak var manager: SupportForEach? {
+        get { objc_getAssociatedObject(self, &kManager) as? SupportForEach }
+        set { objc_setAssociatedObject(self, &kManager, newValue, .OBJC_ASSOCIATION_ASSIGN) }
+    }
+}
+
+protocol SupportForEach: class {
     func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>)
 }
 
@@ -52,11 +58,10 @@ public class PlaceholderView: UIView {
 public class ForEach<Value>: ViewCreator, ForEachCreator {
     let relay: Relay<[Value]>
     let content: (Value) -> ViewCreator
-    weak var manager: AnyObject?
 
     func startObservation() {
         let content = self.content
-        (self.manager as? SupportForEach)?.viewsDidChange(placeholderView: self.uiView, relay.map {
+        self.manager?.viewsDidChange(placeholderView: self.uiView, relay.map {
             $0.map {
                 content($0)
             }

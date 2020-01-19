@@ -23,12 +23,11 @@
 import Foundation
 
 extension Table {
-    public class Element {
+    public struct Element {
         let type: ContentType
         let content: Content
         let max: Int
         let identifier: String?
-        internal var __isValid: Bool = true
 
         private init(_ type: ContentType, content: Content, identifier: String? = nil, max: Int = 0) {
             self.type = type
@@ -166,7 +165,7 @@ public extension Table.Element {
 }
 
 public extension Table.Element {
-    class Header {
+    struct Header {
         let content: Builder
 
         fileprivate init?(_ element: Table.Element) {
@@ -180,7 +179,7 @@ public extension Table.Element {
 }
 
 public extension Table.Element {
-    class Footer {
+    struct Footer {
         let content: Builder
 
         fileprivate init?(_ element: Table.Element) {
@@ -194,7 +193,7 @@ public extension Table.Element {
 }
 
 public extension Table.Element {
-    class Row {
+    struct Row {
         let content: Builder
         let quantity: Int
         let identifier: String?

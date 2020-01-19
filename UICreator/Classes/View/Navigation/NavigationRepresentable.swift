@@ -68,12 +68,11 @@ public extension NavigationRepresentable {
 
     internal var content: ContentHandler? {
         get { objc_getAssociatedObject(self, &kContentHandler) as? ContentHandler }
-        nonmutating
         set { objc_setAssociatedObject(self, &kContentHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
     var body: ViewCreator {
-        Container {
+        Container { [unowned self] in
             guard let content = self.content?.content else {
                 fatalError()
             }

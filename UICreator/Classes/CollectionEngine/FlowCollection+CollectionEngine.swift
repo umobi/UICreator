@@ -22,10 +22,19 @@
 
 import Foundation
 
+
+extension CollectionView: ListSupport {
+
+}
+
 public extension FlowCollection {
-    convenience init(_ elements: Table.Element...) {
+    convenience init(_ content: ViewCreator...) {
+        self.init(ListManager(content: content))
+    }
+    
+    private convenience init(_ manager: ListManager) {
         self.init()
-        let group = Table.Group(.init(content: []))
+        let group = Table.Group(manager)
 
         if !group.isValid {
             fatalError("Verify your content")
@@ -50,5 +59,6 @@ public extension FlowCollection {
         collectionView.group = group
         collectionView.dataSource = collectionView
         collectionView.delegate = collectionView
+        manager.list = collectionView
     }
 }

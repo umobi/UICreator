@@ -22,39 +22,117 @@
 
 import Foundation
 
+struct Fatal {
+    static func die(_ string: String) {
+        fatalError(string)
+    }
+
+    enum ReactiveCenter {
+        case unregistered
+
+        func error() {
+            Fatal.die({
+                switch self {
+                case .unregistered:
+                    return "Identifier for Relay or Value isn't registered in ReactiveCenter"
+                }
+                }())
+        }
+    }
+}
+
 private let _reactive = ReactiveCenter()
 class ReactiveCenter: NotificationCenter {
     static var shared: ReactiveCenter {
         return _reactive
     }
 
+    private var activeIdentifiers: Set<String> = []
+    private var activeObservables: [(String, NSObjectProtocol)] = []
+
+    func start(_ identifier: String) {
+        self.unregister(identifier)
+
+        self.activeIdentifiers.insert(identifier)
+    }
+
+    func unregister(_ identifier: String) {
+        self.activeObservables = self.activeObservables.filter {
+            $0.0 == identifier ? {
+                ReactiveCenter.shared.removeObserver($0)
+                return false
+            }($0.1) : true
+        }
+
+        self.activeIdentifiers = self.activeIdentifiers.filter {
+            $0 != identifier
+        }
+    }
+
+    private func isRegisteredOrDie(_ identifier: String) {
+        guard self.activeIdentifiers.contains(identifier) else {
+            Fatal.ReactiveCenter.unregistered.error()
+            return
+        }
+    }
+
+    private func track(_ identifier: String,_ observable: NSObjectProtocol) {
+        self.activeObservables.append((identifier, observable))
+    }
+
     private static let kNotificationNewValue = "kNotificationNewValue"
     func valueDidChange<Value>(_ identifier: String, newValue: Value) {
+        self.isRegisteredOrDie(identifier)
         self.post(name: .init(rawValue: "\(identifier).valueChanged"), object: nil, userInfo: [Self.kNotificationNewValue: newValue])
     }
 
     func valueDidChange<Value>(_ identifier: String, handler: @escaping (Value) -> Void) {
-        self.addObserver(forName: .init(rawValue: "\(identifier).valueChanged"), object: nil, queue: nil) { notification in
+        self.isRegisteredOrDie(identifier)
+
+        self.track(identifier, self.addObserver(forName: .init(rawValue: "\(identifier).valueChanged"), object: nil, queue: nil) { notification in
             handler(transform(notification.userInfo?[Self.kNotificationNewValue]))
-        }
+        })
     }
 
     func privateValueDidChange<Value>(_ identifier: String, newValue: Value) {
+        self.isRegisteredOrDie(identifier)
+
         self.post(name: .init(rawValue: "\(identifier).private.valueChanged"), object: nil, userInfo: [Self.kNotificationNewValue: newValue])
     }
 
     func privateValueDidChange<Value>(_ identifier: String, handler: @escaping (Value) -> Void) {
-        self.addObserver(forName: .init(rawValue: "\(identifier).private.valueChanged"), object: nil, queue: nil) { notification in
+        self.isRegisteredOrDie(identifier)
+
+        self.track(identifier, self.addObserver(forName: .init(rawValue: "\(identifier).private.valueChanged"), object: nil, queue: nil) { notification in
             handler(transform(notification.userInfo?[Self.kNotificationNewValue]))
-        }
+        })
+    }
+
+    func privateDeinit(_ identifier: String) {
+        self.isRegisteredOrDie(identifier)
+
+        self.post(name: .init(rawValue: "\(identifier).private.deinit"), object: nil)
+    }
+
+    func privateDeinit(_ identifier: String, handler: @escaping () -> Void) {
+        self.isRegisteredOrDie(identifier)
+
+        self.track(identifier, self.addObserver(forName: .init(rawValue: "\(identifier).private.deinit"), object: nil, queue: nil) { _ in
+            handler()
+        })
     }
 }
 
-public struct Relay<Value> {
+public class Relay<Value> {
     let identifier: String
     init(identifier: String) {
         self.identifier = identifier
         self.handler = nil
+        print("[Relay] init")
+    }
+
+    deinit {
+        print("[Relay] deinit")
     }
 
     public func next(_ handler: @escaping (Value) -> Void) {
@@ -67,7 +145,7 @@ public struct Relay<Value> {
         let identifier = relay.identifier
         let handler = relay.handler
 
-        return { externalHandler in
+        return  { externalHandler in
             if let selfHandler = handler {
                 selfHandler() {
                     externalHandler($0)
@@ -90,6 +168,7 @@ public struct Relay<Value> {
     init(_ identifier: String, handler: @escaping ((@escaping (Value) -> Void) -> Void)) {
         self.identifier = identifier
         self.handler = handler
+        print("[Relay] init")
     }
 
     public func map<Other>(_ handler: @escaping  (Value) -> Other) -> Relay<Other> {
@@ -108,7 +187,7 @@ public struct Relay<Value> {
 
 public extension Value {
     var asRelay: Relay<Value> {
-        return .init(identifier: "\(self.identifier)")
+        return .init(identifier: self.identifier)
     }
 }
 
@@ -127,7 +206,7 @@ private var kGetterValue: UInt = 0
 
 public extension _Getter {
     fileprivate var identifier: String {
-        return "\(ObjectIdentifier(self).hashValue)"
+        return "\(ObjectIdentifier(self))"
     }
 
     var value: Value {
@@ -167,6 +246,12 @@ public extension _Setter {
 
 public class Value<Value>: _Getter, _Setter {
     required public init(value: Value) {
+        ReactiveCenter.shared.start(self.identifier)
         self.value = value
+    }
+
+    deinit {
+        ReactiveCenter.shared.privateDeinit(self.identifier)
+        ReactiveCenter.shared.unregister(self.identifier)
     }
 }

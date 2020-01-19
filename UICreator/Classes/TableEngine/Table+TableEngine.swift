@@ -61,23 +61,10 @@ protocol ListContentDelegate: class {
 
 extension ListManager {
     class Content: SupportForEach {
-//        class Support: SupportForEach {
-//            let content: Content
-//
-//            init(content: Content) {
-//                self.content = content
-//            }
-//
-//            func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>) {
-//                content.viewsDidChange(placeholderView: placeholderView, sequence)
-//            }
-//        }
-
         let element: Table.Element
         let identifier: Int
         let isDynamic: Bool
         weak var delegate: ListContentDelegate!
-//        var support: Support?
 
         init(identifier: Int,_ element: Table.Element) {
             self.element = element
@@ -94,7 +81,7 @@ extension ListManager {
         func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>) {
             let cellIdentifier = "\(ObjectIdentifier(self.delegate).hashValue).row.\(identifier)"
             weak var delegate = self.delegate
-//            weak var support = self.support
+
             sequence.next { [weak self] in
                 guard let self = self else {
                     return
@@ -146,7 +133,7 @@ class ListManager {
     }
 
     private func mountSection(for elements: [ViewCreator]) -> [Content] {
-        elements.map { view in
+        elements.map { [unowned self] view in
             if let header = view as? Header {
                 return .init(.header(content: header.content))
             }
@@ -165,7 +152,7 @@ class ListManager {
         }
     }
 
-    struct ContentSection {
+    class ContentSection {
         let section: Table.Element
         let contents: [Content]
 
@@ -179,7 +166,7 @@ class ListManager {
 
     init(content: [ViewCreator]) {
         if content.allSatisfy({ $0 is Section }) {
-            self.contents = content.compactMap {
+            self.contents = content.compactMap { [unowned self] in
                 guard let section = $0 as? Section else {
                     return nil
                 }
@@ -216,7 +203,7 @@ extension ListManager: ListContentDelegate {
     }
 
     func content(_ content: ListManager.Content, updatedWith sequence: [Table.Element]) {
-        self.contents = self.contents.map { section in
+        self.contents = self.contents.map { [unowned content] section in
             guard let first = section.contents.enumerated().first(where: { $0.element.identifier == content.identifier }) else {
                 return section
             }
@@ -256,15 +243,15 @@ public extension Table {
             return
         }
 
-        group.rowsIdentifier.forEach {
+        group.rowsIdentifier.forEach { [unowned tableView] in
             tableView.register(TableViewCell.self, forCellReuseIdentifier: $0)
         }
 
-        group.headersIdentifier.forEach {
+        group.headersIdentifier.forEach { [unowned tableView] in
             tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
         }
 
-        group.footersIdentifier.forEach {
+        group.footersIdentifier.forEach { [unowned tableView] in
             tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
         }
 

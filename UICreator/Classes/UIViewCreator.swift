@@ -81,31 +81,38 @@ internal extension ViewContext {
 }
 
 extension UIViewContext {
+    private static func createContext<Context: UICreator.Context>(for uiView: UIView!) -> Context {
+        let context = Context.init()
+//        guard let _self = uiView.viewCreator as? Self else {
+//            return context
+//        }
+//
+//        context.onContextChange { [weak uiView] in
+//            if uiView?.superview == nil {
+//                _ = uiView?.viewCreator?.onRendered {
+//                    guard let _self = $0.viewCreator as? Self else {
+//                        return
+//                    }
+//
+//                    _self.bindContext(_self.context)
+//                }
+//
+//                return
+//            }
+//
+//            guard let _self = uiView?.viewCreator as? Self else {
+//                return
+//            }
+//            _self.bindContext(_self.context)
+//        }
+//
+//        _self.update(context: context)
+        return context
+    }
+
     public var context: Context {
         get { (self as ViewContext).context as? Context ?? {
-            let context = Context.init()
-            weak var uiView = self.uiView
-
-            context.onContextChange {
-                if uiView?.superview == nil {
-                    _ = uiView?.viewCreator?.onRendered {
-                        guard let _self = $0.viewCreator as? Self else {
-                            return
-                        }
-
-                        _self.bindContext(_self.context)
-                    }
-
-                    return
-                }
-
-                guard let _self = uiView?.viewCreator as? Self else {
-                    return
-                }
-                _self.bindContext(_self.context)
-            }
-            self.update(context: context)
-            return context
+            return Self.createContext(for: self.uiView)
         }() }
     }
 }

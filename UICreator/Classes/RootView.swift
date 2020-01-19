@@ -93,7 +93,6 @@ private var kTemplateViewDidConfiguredView: UInt = 0
 extension TemplateView where Self: Root {
     private var didConfiguredView: Bool {
         get { (objc_getAssociatedObject(self, &kTemplateViewDidConfiguredView) as? Bool) ?? false }
-        nonmutating
         set { objc_setAssociatedObject(self, &kTemplateViewDidConfiguredView, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
