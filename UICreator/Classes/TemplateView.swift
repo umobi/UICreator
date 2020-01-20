@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
+/// The `TemplateView` makes the magic of any view creator, it has the body getter that will be used to configure the view creators created using declarative syntax. This protocol will only work as intended with Root class and UICView that is the type alias that merge TemplateView with Root.
 public protocol TemplateView: ViewCreator {
     var body: ViewCreator { get }
-//    init()
 }

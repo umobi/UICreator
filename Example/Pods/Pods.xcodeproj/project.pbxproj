@@ -83,7 +83,7 @@
 		0C93470723AE7D8600A9E112 /* Subview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346DD23AE7D8600A9E112 /* Subview.swift */; };
 		0C93470923AE7D8600A9E112 /* ViewControllerType+ViewCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346E023AE7D8600A9E112 /* ViewControllerType+ViewCreator.swift */; };
 		0C93470A23AE7D8600A9E112 /* UICContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346E123AE7D8600A9E112 /* UICContent.swift */; };
-		0C93470C23AE7D8600A9E112 /* Text.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346E323AE7D8600A9E112 /* Text.swift */; };
+		0C93470C23AE7D8600A9E112 /* TextElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346E323AE7D8600A9E112 /* TextElement.swift */; };
 		0C93470D23AE7D8600A9E112 /* UICLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346E523AE7D8600A9E112 /* UICLabel.swift */; };
 		0C93470E23AE7D8600A9E112 /* UICScroll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346E623AE7D8600A9E112 /* UICScroll.swift */; };
 		0C93470F23AE7D8600A9E112 /* UICStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346E723AE7D8600A9E112 /* UICStack.swift */; };
@@ -213,7 +213,7 @@
 		0C9346DD23AE7D8600A9E112 /* Subview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Subview.swift; path = UICreator/Classes/Subview.swift; sourceTree = "<group>"; };
 		0C9346E023AE7D8600A9E112 /* ViewControllerType+ViewCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ViewControllerType+ViewCreator.swift"; sourceTree = "<group>"; };
 		0C9346E123AE7D8600A9E112 /* UICContent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UICContent.swift; sourceTree = "<group>"; };
-		0C9346E323AE7D8600A9E112 /* Text.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Text.swift; path = UICreator/Classes/Text.swift; sourceTree = "<group>"; };
+		0C9346E323AE7D8600A9E112 /* TextElement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TextElement.swift; path = UICreator/Classes/TextElement.swift; sourceTree = "<group>"; };
 		0C9346E523AE7D8600A9E112 /* UICLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UICLabel.swift; sourceTree = "<group>"; };
 		0C9346E623AE7D8600A9E112 /* UICScroll.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UICScroll.swift; sourceTree = "<group>"; };
 		0C9346E723AE7D8600A9E112 /* UICStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UICStack.swift; sourceTree = "<group>"; };
@@ -519,7 +519,7 @@
 				0C9346DD23AE7D8600A9E112 /* Subview.swift */,
 				0C9346D723AE7D8500A9E112 /* TemplateView.swift */,
 				0C61B4CB23BE6E86001A28B1 /* NSProtocol.swift */,
-				0C9346E323AE7D8600A9E112 /* Text.swift */,
+				0C9346E323AE7D8600A9E112 /* TextElement.swift */,
 				0C61B4C723BE5EF4001A28B1 /* UIAccessibilityCreator.swift */,
 				0C9346F223AE7D8600A9E112 /* UIView+Mode.swift */,
 				0C9346CA23AE7D8500A9E112 /* Root.swift */,
@@ -848,7 +848,7 @@
 				0C93470E23AE7D8600A9E112 /* UICScroll.swift in Sources */,
 				0C7E8A9623B3FA5D007E480B /* TextKeyboard.swift in Sources */,
 				0C08F81523BF7B5500C52B8E /* CollectionLayoutItem.swift in Sources */,
-				0C93470C23AE7D8600A9E112 /* Text.swift in Sources */,
+				0C93470C23AE7D8600A9E112 /* TextElement.swift in Sources */,
 				0C08F81923BF7B9E00C52B8E /* CollectionLayoutGroup.swift in Sources */,
 				0CAA4BF623B267A200DD5DDF /* UICCompositional.swift in Sources */,
 				0C93471923AE7D8600A9E112 /* UIViewCreator+Constraints.swift in Sources */,

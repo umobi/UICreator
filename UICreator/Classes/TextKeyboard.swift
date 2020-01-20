@@ -23,6 +23,7 @@
 import Foundation
 import UIKit
 
+/// `TextKeyboard` has the same problem as *TextElement* and may be removed in the next released versions.
 public protocol TextKeyboard: UIViewCreator {
     func autocapitalization(type: UITextAutocapitalizationType) -> Self
     func autocorrection(type: UITextAutocorrectionType) -> Self
