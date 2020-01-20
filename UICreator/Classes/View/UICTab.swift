@@ -130,11 +130,13 @@ public extension UICTabCreator {
         }
     }
 
+    #if os(iOS)
     func tabBar(barStyle style: UIBarStyle) -> Self {
         self.onRendered { [unowned self] _ in
             self.tabController.tabBar.barStyle = style
         }
     }
+    #endif
 
     func tabBar(barTintColor tintColor: UIColor?) -> Self {
         self.onRendered { [unowned self] _ in
@@ -148,11 +150,13 @@ public extension UICTabCreator {
         }
     }
 
+    #if os(iOS)
     func tabBar(itemPositioning position: UITabBar.ItemPositioning) -> Self {
         self.onRendered { [unowned self] _ in
             self.tabController.tabBar.itemPositioning = position
         }
     }
+    #endif
 
     func tabBar(itemSpacing spacing: CGFloat) -> Self {
         self.onRendered { [unowned self] _ in
