@@ -57,7 +57,7 @@ internal class TableViewCell: UITableViewCell {
         self.commitLayout()
     }
 
-    func prepareCell(builder: Table.Element.Builder) {
+    func prepareCell(builder: UICList.Element.Builder) {
         if self.contentView.subviews.first is PlaceholderView {
             self.contentView.subviews.forEach {
                 $0.removeFromSuperview()

@@ -46,7 +46,7 @@ public class _Slider: UISlider {
     }
 }
 
-public class Slider: UIViewCreator, Control {
+public class UICSlider: UIViewCreator, Control {
     public typealias View = _Slider
 
     public init() {

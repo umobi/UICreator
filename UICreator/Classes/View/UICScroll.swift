@@ -46,7 +46,7 @@ public class _ScrollView: ScrollView {
     }
 }
 
-public class Scroll: UIViewCreator, HasViewDelegate {
+public class UICScroll: UIViewCreator, HasViewDelegate {
     public typealias View = _ScrollView
 
     public init(axis: View.Axis = .vertical, content: @escaping () -> ViewCreator) {
@@ -59,11 +59,11 @@ public class Scroll: UIViewCreator, HasViewDelegate {
     }
 }
 
-public func VScroll(_ content: @escaping () -> ViewCreator) -> Scroll {
+public func UICVScroll(_ content: @escaping () -> ViewCreator) -> UICScroll {
     return .init(axis: .vertical, content: content)
 }
 
-public func HScroll(_ content: @escaping () -> ViewCreator) -> Scroll {
+public func UICHScroll(_ content: @escaping () -> ViewCreator) -> UICScroll {
     return .init(axis: .horizontal, content: content)
 }
 

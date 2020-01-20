@@ -27,8 +27,8 @@ private var kTableDataSource: UInt = 0
 private var kTableDelegate: UInt = 0
 
 extension UITableView {
-    var group: Table.Group? {
-        get { objc_getAssociatedObject(self, &kTableGroup) as? Table.Group }
+    var group: UICList.Group? {
+        get { objc_getAssociatedObject(self, &kTableGroup) as? UICList.Group }
         set { objc_setAssociatedObject(self, &kTableGroup, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 

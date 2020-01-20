@@ -22,7 +22,7 @@
 
 import Foundation
 
-extension Table {
+extension UICList {
     public struct Element {
         let type: ContentType
         let content: Content
@@ -35,7 +35,7 @@ extension Table {
             self.max = max
             self.identifier = identifier
             if !self.isValid {
-                fatalError("Table.Element is not valid")
+                fatalError("UICList.Element is not valid")
             }
         }
 
@@ -73,7 +73,7 @@ extension Table {
     }
 }
 
-extension Table.Element {
+extension UICList.Element {
     var isSection: Bool {
         return self.type == .section
     }
@@ -95,7 +95,7 @@ extension Table.Element {
     }
 }
 
-extension Table.Element {
+extension UICList.Element {
     var asSection: Section? {
         return Section(self)
     }
@@ -113,7 +113,7 @@ extension Table.Element {
     }
 }
 
-extension Table.Element {
+extension UICList.Element {
     var isValid: Bool {
         switch self.type {
         case .footer:
@@ -150,11 +150,11 @@ extension Table.Element {
     }
 }
 
-public extension Table.Element {
+public extension UICList.Element {
     class Section {
-        let group: Table.Group
+        let group: UICList.Group
 
-        fileprivate init?(_ element: Table.Element) {
+        fileprivate init?(_ element: UICList.Element) {
             guard case .section = element.type, case .group(let group) = element.content else {
                 return nil
             }
@@ -164,11 +164,11 @@ public extension Table.Element {
     }
 }
 
-public extension Table.Element {
+public extension UICList.Element {
     struct Header {
         let content: Builder
 
-        fileprivate init?(_ element: Table.Element) {
+        fileprivate init?(_ element: UICList.Element) {
             guard case .header = element.type, case .content(let content) = element.content else {
                 return nil
             }
@@ -178,11 +178,11 @@ public extension Table.Element {
     }
 }
 
-public extension Table.Element {
+public extension UICList.Element {
     struct Footer {
         let content: Builder
 
-        fileprivate init?(_ element: Table.Element) {
+        fileprivate init?(_ element: UICList.Element) {
             guard case .footer = element.type, case .content(let content) = element.content else {
                 return nil
             }
@@ -192,13 +192,13 @@ public extension Table.Element {
     }
 }
 
-public extension Table.Element {
+public extension UICList.Element {
     struct Row {
         let content: Builder
         let quantity: Int
         let identifier: String?
 
-        fileprivate init?(_ element: Table.Element) {
+        fileprivate init?(_ element: UICList.Element) {
             guard case .row = element.type, case .content(let content) = element.content else {
                 return nil
             }

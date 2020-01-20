@@ -22,7 +22,16 @@
 
 import Foundation
 
-public class Section: ViewCreator {
+protocol ListSupport: class {
+    func reloadData()
+    var group: UICList.Group? { get }
+}
+
+protocol ListContentDelegate: class {
+    func content(_ content: ListManager.Content, updatedWith sequence: [UICList.Element])
+}
+
+public class UICSection: ViewCreator {
     public let content: [ViewCreator]
 
     public convenience init(_ content: ViewCreator...) {
@@ -34,7 +43,7 @@ public class Section: ViewCreator {
     }
 }
 
-public class Header: ViewCreator {
+public class UICHeader: ViewCreator {
     let content: () -> ViewCreator
 
     public init(content: @escaping () -> ViewCreator) {
@@ -42,7 +51,7 @@ public class Header: ViewCreator {
     }
 }
 
-public class Footer: ViewCreator {
+public class UICFooter: ViewCreator {
     let content: () -> ViewCreator
 
     public init(content: @escaping () -> ViewCreator) {
@@ -50,29 +59,92 @@ public class Footer: ViewCreator {
     }
 }
 
-protocol ListSupport: class {
-    func reloadData()
-    var group: Table.Group? { get }
+class ListManager {
+    fileprivate(set) var contents: [ContentSection] = []
+    weak var list: ListSupport!
+
+    private var identifierCount: Int = 0
+    private func nextIdentifier() -> Int {
+        let next = identifierCount
+        identifierCount += 1
+        return next
+    }
+
+    var elements: [UICList.Element] {
+        return self.contents.map {
+            $0.section
+        }
+    }
+
+    private func mountSection(for elements: [ViewCreator]) -> [Content] {
+        elements.map { [unowned self] view in
+            if let header = view as? UICHeader {
+                return .init(.header(content: header.content))
+            }
+
+            if let footer = view as? UICFooter {
+                return .init(.footer(content: footer.content))
+            }
+
+            if let forEach = view as? ForEachCreator {
+                return Content.eachRow(identifier: self.nextIdentifier(), forEach, delegate: self)
+            }
+
+            return .init(.row(content: {
+                view
+            }))
+        }
+    }
+
+    init(content: [ViewCreator]) {
+        if content.allSatisfy({ $0 is UICSection }) {
+            self.contents = content.compactMap { [unowned self] in
+                guard let section = $0 as? UICSection else {
+                    return nil
+                }
+
+                return .init(contents: self.mountSection(for: section.content))
+            }
+
+            return
+        }
+
+        if content.first(where: { $0 is UICSection }) != nil {
+            fatalError("Verify your content")
+        }
+
+        self.contents = [.init(contents: self.mountSection(for: content))]
+    }
 }
 
-protocol ListContentDelegate: class {
-    func content(_ content: ListManager.Content, updatedWith sequence: [Table.Element])
+extension ListManager {
+    class ContentSection {
+        let section: UICList.Element
+        let contents: [Content]
+
+        init(contents: [Content]) {
+            self.contents = contents
+            self.section = .section(contents.map {
+                $0.element
+            })
+        }
+    }
 }
 
 extension ListManager {
     class Content: SupportForEach {
-        let element: Table.Element
+        let element: UICList.Element
         let identifier: Int
         let isDynamic: Bool
         weak var delegate: ListContentDelegate!
 
-        init(identifier: Int,_ element: Table.Element) {
+        init(identifier: Int,_ element: UICList.Element) {
             self.element = element
             self.identifier = identifier
             self.isDynamic = true
         }
 
-        init(_ element: Table.Element) {
+        init(_ element: UICList.Element) {
             self.identifier = 0
             self.isDynamic = false
             self.element = element
@@ -101,92 +173,16 @@ extension ListManager {
                 forEach
             }))
             content.delegate = delegate
-//            content.support = .init(content: content)
             forEach.manager = content
-//            content.support = .init(content: content)
             return content
         }
 
-        static func makeRow(_ original: Content, element: Table.Element) -> Content {
+        static func makeRow(_ original: Content, element: UICList.Element) -> Content {
             let content = Content(identifier: original.identifier, element)
             content.contentManager = original
             return content
         }
     }
-}
-
-class ListManager {
-    fileprivate(set) var contents: [ContentSection] = []
-    weak var list: ListSupport!
-
-    private var identifierCount: Int = 0
-    private func nextIdentifier() -> Int {
-        let next = identifierCount
-        identifierCount += 1
-        return next
-    }
-
-    var elements: [Table.Element] {
-        return self.contents.map {
-            $0.section
-        }
-    }
-
-    private func mountSection(for elements: [ViewCreator]) -> [Content] {
-        elements.map { [unowned self] view in
-            if let header = view as? Header {
-                return .init(.header(content: header.content))
-            }
-
-            if let footer = view as? Footer {
-                return .init(.footer(content: footer.content))
-            }
-
-            if let forEach = view as? ForEachCreator {
-                return Content.eachRow(identifier: self.nextIdentifier(), forEach, delegate: self)
-            }
-
-            return .init(.row(content: {
-                view
-            }))
-        }
-    }
-
-    class ContentSection {
-        let section: Table.Element
-        let contents: [Content]
-
-        init(contents: [Content]) {
-            self.contents = contents
-            self.section = .section(contents.map {
-                $0.element
-            })
-        }
-    }
-
-    init(content: [ViewCreator]) {
-        if content.allSatisfy({ $0 is Section }) {
-            self.contents = content.compactMap { [unowned self] in
-                guard let section = $0 as? Section else {
-                    return nil
-                }
-
-                return .init(contents: self.mountSection(for: section.content))
-            }
-
-            return
-        }
-
-        if content.first(where: { $0 is Section }) != nil {
-            fatalError("Verify your content")
-        }
-
-        self.contents = [.init(contents: self.mountSection(for: content))]
-    }
-}
-
-extension TableView: ListSupport {
-
 }
 
 extension ListManager: ListContentDelegate {
@@ -202,7 +198,7 @@ extension ListManager: ListContentDelegate {
         )
     }
 
-    func content(_ content: ListManager.Content, updatedWith sequence: [Table.Element]) {
+    func content(_ content: ListManager.Content, updatedWith sequence: [UICList.Element]) {
         self.contents = self.contents.map { [unowned content] section in
             guard let first = section.contents.enumerated().first(where: { $0.element.identifier == content.identifier }) else {
                 return section
@@ -220,44 +216,5 @@ extension ListManager: ListContentDelegate {
         }
 
         self.list.reloadData()
-    }
-}
-
-public extension Table {
-    convenience init(style: UITableView.Style,_ subviews: Subview) {
-        self.init(style: style, ListManager(content: subviews.views))
-    }
-    
-    private convenience init(style: UITableView.Style,_ manager: ListManager) {
-        self.init(style: style)
-        #if os(iOS)
-        (self.uiView as? View)?.separatorStyle = .none
-        #endif
-        let group = Group(manager)
-
-        if !group.isValid {
-            fatalError("Verify your content")
-        }
-
-        guard let tableView = self.uiView as? View else {
-            return
-        }
-
-        group.rowsIdentifier.forEach { [unowned tableView] in
-            tableView.register(TableViewCell.self, forCellReuseIdentifier: $0)
-        }
-
-        group.headersIdentifier.forEach { [unowned tableView] in
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-        }
-
-        group.footersIdentifier.forEach { [unowned tableView] in
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-        }
-
-        tableView.group = group
-        tableView.dataSource = tableView
-        tableView.delegate = tableView
-        manager.list = tableView
     }
 }

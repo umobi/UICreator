@@ -46,7 +46,7 @@ public class _SpacerView: SpacerView {
     }
 }
 
-public class Spacer: UIViewCreator {
+public class UICSpacer: UIViewCreator {
     public typealias View = _SpacerView
 
     public required init(margin: View.Margin, content: @escaping () -> ViewCreator) {
@@ -54,47 +54,47 @@ public class Spacer: UIViewCreator {
     }
 }
 
-public class Empty: ViewCreator {
+public class UICEmpty: ViewCreator {
     public typealias View = UIView
 
     public init() {
-        self.uiView = .init()
+        self.uiView = .init(builder: self)
     }
 }
 
-public extension Spacer {
+public extension UICSpacer {
     convenience init(vertical: CGFloat, horizontal: CGFloat) {
         self.init(margin: .init(vertical: vertical, horizontal: horizontal)) {
-            Empty()
+            UICEmpty()
         }
     }
 
     convenience init(vertical: CGFloat) {
         self.init(margin: .init(vertical: vertical, horizontal: 0)) {
-            Empty()
+            UICEmpty()
         }
     }
 
     convenience init(horizontal: CGFloat) {
         self.init(margin: .init(vertical: 0, horizontal: horizontal)) {
-           Empty()
+           UICEmpty()
        }
     }
 
     convenience init() {
         self.init(margin: .init(spacing: 0)) {
-            Empty()
+            UICEmpty()
         }
     }
 
     convenience init(spacing: CGFloat) {
         self.init(margin: .init(spacing: spacing)) {
-            Empty()
+            UICEmpty()
         }
     }
 }
 
-public extension Spacer {
+public extension UICSpacer {
     convenience init(top: CGFloat, bottom: CGFloat, leading: CGFloat, trailing: CGFloat, content: @escaping () -> ViewCreator) {
         self.init(margin: .init(top: top, bottom: bottom, leading: leading, trailing: trailing), content: content)
     }

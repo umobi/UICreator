@@ -22,8 +22,9 @@
 
 import Foundation
 import UIKit
+import UIContainer
 
-public class _Button: UIButton {
+public class _GradientView: GradientView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -45,53 +46,45 @@ public class _Button: UIButton {
     }
 }
 
-public class Button: UIViewCreator, Control {
-    public typealias View = _Button
+public class UICGradient: UIViewCreator {
+    public typealias View = _GradientView
 
-    public init(_ title: String?, type: UIButton.ButtonType? = nil) {
-        if let type = type {
-            self.uiView = View.init(type: type)
-            (self.uiView as? View)?.setTitle(title, for: .normal)
-            return
-        }
-
+    public init(_ colors: [UIColor], direction: View.Direction = .right) {
         self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.setTitle(title, for: .normal)
+        (self.uiView as? View)?.colors = colors
+        (self.uiView as? View)?.direction = direction
+    }
+
+    public convenience init(_ colors: UIColor..., direction: View.Direction = .right) {
+        self.init(colors, direction: direction)
     }
 }
 
-public extension UIViewCreator where View: UIButton {
+public extension UIViewCreator where View: GradientView {
 
-    func title(_ string: String?, for state: UIControl.State = .normal) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.setTitle(string, for: state)
+    func colors(_ colors: UIColor...) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.colors = colors
         }
     }
 
-    func title(_ attributedText: NSAttributedString?, for state: UIControl.State = .normal) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.setTitle(attributedText?.string, for: state)
-            ($0 as? View)?.titleLabel?.attributedText = attributedText
+    func colors(_ colors: [UIColor]) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.colors = colors
         }
     }
 
-    func title(color: UIColor?, for state: UIControl.State = .normal) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.setTitleColor(color, for: state)
+    func direction(_ direction: View.Direction) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.direction = direction
         }
     }
 
-    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.titleLabel?.font = font
-            ($0 as? View)?.titleLabel?.isDynamicTextSize = isDynamicTextSize
+    func animation(_ layerHandler: @escaping (CAGradientLayer) -> Void) -> Self {
+        self.onRendered {
+            ($0 as? View)?.animates {
+                layerHandler($0)
+            }
         }
     }
 }
-
-public extension UIViewCreator where View: UIButton, Self: Control {
-    func onTouchInside(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.onEvent(.touchUpInside, handler)
-    }
-}
-

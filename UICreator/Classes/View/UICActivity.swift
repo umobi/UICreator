@@ -22,9 +22,8 @@
 
 import Foundation
 import UIKit
-import UIContainer
 
-public class _BlurView: BlurView {
+public class UICActivityIndicatorView: UIActivityIndicatorView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -46,41 +45,26 @@ public class _BlurView: BlurView {
     }
 }
 
-public class Blur: ViewCreator {
-    public typealias View = _BlurView
+public class UICActivity: UIViewCreator {
+    public typealias View = UICActivityIndicatorView
 
-    public init(blur: UIBlurEffect.Style = .regular) {
-        self.uiView = View.init(blur: blur)
+    public init(style: View.Style) {
+        self.uiView = View.init(builder: self)
+        (self.uiView as? View)?.style = style
     }
 }
 
-public extension UIViewCreator where View: BlurView {
-    func blur(style: UIBlurEffect.Style) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.apply(blurEffect: style)
+public extension UIViewCreator where View: UIActivityIndicatorView {
+
+    func color(_ color: UIColor) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.color = color
         }
     }
 
-    func blur(dynamic dynamicStyle: TraitObject<UIBlurEffect.Style>) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.apply(dynamicBlur: dynamicStyle)
+    func hidesWhenStopped(_ flag: Bool) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.hidesWhenStopped = flag
         }
     }
 }
-
-#if os(iOS)
-@available(iOS 13, *)
-public extension UIViewCreator where View: BlurView {
-    func vibrancy(effect: UIVibrancyEffectStyle) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.apply(vibrancyEffect: effect)
-        }
-    }
-
-    func vibrancy(dynamic dynamicEffect: TraitObject<UIVibrancyEffectStyle>) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.apply(dynamicVibrancy: dynamicEffect)
-        }
-    }
-}
-#endif

@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 import UIContainer
 
-public class Navigation: Root, NavigationRepresentable {
+public class UICNavigation: Root, NavigationRepresentable {
 
     public var navigationLoader: (UIViewController) -> UINavigationController {
         {
@@ -38,8 +38,8 @@ public class Navigation: Root, NavigationRepresentable {
     }
 }
 
-public extension Navigation {
-    class Other<NavigationController: UINavigationController>: Navigation {
+public extension UICNavigation {
+    class Other<NavigationController: UINavigationController>: UICNavigation {
         override public var navigationLoader: (UIViewController) -> UINavigationController {
             {
                 return NavigationController(rootViewController: $0)
@@ -47,19 +47,6 @@ public extension Navigation {
         }
     }
 }
-
-
-//public extension UIView {
-//    weak var navigation: UINavigationController? {
-////        guard self is UIViewRender else {
-////            fatalError("You shouldn't call present on view that is not of ViewCreator type")
-////        }
-//
-//        return sequence(first: self, next: { $0.superview }).first(where: {
-//            $0 is Navigation
-//        }) as? Navigation
-//    }
-//}
 
 public extension ViewCreator {
 

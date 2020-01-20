@@ -72,7 +72,7 @@ public extension NavigationRepresentable {
     }
 
     var body: ViewCreator {
-        Container { [unowned self] in
+        UICContainer { [unowned self] in
             guard let content = self.content?.content else {
                 fatalError()
             }

@@ -24,11 +24,7 @@ import Foundation
 import UIKit
 import UIContainer
 
-public class _Container<View: UIViewController>: UIContainer.Container<View> {
-    override var watchingViews: [UIView] {
-        return []
-    }
-
+public class _RounderView: RounderView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -50,17 +46,14 @@ public class _Container<View: UIViewController>: UIContainer.Container<View> {
     }
 }
 
-public class Container<ViewController: UIViewController>: UIViewCreator {
-    public typealias View = _Container<ViewController>
+public class UICRounder: UIViewCreator {
+    public typealias View = _RounderView
 
-    public required init(_ content: @escaping () -> ViewController) {
-        self.uiView = View.init(builder: self)
-        _ = self.onInTheScene {
-            ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: content)
-        }
+    public init(radius: CGFloat, content: @escaping () -> ViewCreator) {
+        self.uiView = View.init(content().releaseUIView(), radius: radius)
     }
+}
 
-    deinit {
-        print("Killed")
-    }
+public func UICCircle(content: @escaping () -> ViewCreator) -> UICRounder {
+    return .init(radius: 0.5, content: content)
 }

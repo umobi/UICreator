@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 import UIContainer
 
-public class TabViewControllerView: UIView {
+public class UICTabContainer: UIView {
     private(set) weak var container: _Container<UITabBarController>!
     private var content: (() -> UITabBarController)? = nil
 
@@ -70,8 +70,8 @@ public class TabViewControllerView: UIView {
     }
 }
 
-public class TabLoader<TabController: UITabBarController>: UIViewCreator {
-    public typealias View = TabViewControllerView
+public class UICTabCreator<TabController: UITabBarController>: UIViewCreator {
+    public typealias View = UICTabContainer
 
     private lazy var _tabBarController: TabController? = {
         return .init()
@@ -110,20 +110,20 @@ public class TabLoader<TabController: UITabBarController>: UIViewCreator {
     }
 }
 
-public typealias Tab = TabLoader<UITabBarController>
+public typealias UICTab = UICTabCreator<UITabBarController>
 
-extension Tab {
-    typealias Other<TabController: UITabBarController> = TabLoader<UITabBarController>
+extension UICTab {
+    typealias Other<TabController: UITabBarController> = UICTabCreator<UITabBarController>
 }
 
-public extension TabLoader {
+public extension UICTabCreator {
     func `as`(_ ref: inout TabController!) -> Self {
         ref = self.tabController
         return self
     }
 }
 
-public extension TabLoader {
+public extension UICTabCreator {
     func tabBar(backgroundImage image: UIImage?) -> Self {
         self.onRendered { [unowned self] _ in
             self.tabController.tabBar.backgroundImage = image

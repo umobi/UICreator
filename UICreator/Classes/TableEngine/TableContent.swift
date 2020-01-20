@@ -22,11 +22,11 @@
 
 import Foundation
 
-extension Table {
+extension UICList {
     public enum Content {
         case group(Group)
         case content(_ content: () -> ViewCreator)
         case empty
-        case sections([Table.Element.Section])
+        case sections([UICList.Element.Section])
     }
 }

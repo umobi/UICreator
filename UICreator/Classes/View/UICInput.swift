@@ -22,9 +22,8 @@
 
 import Foundation
 import UIKit
-import UIContainer
 
-public class _DashedView: DashedView {
+public class _InputView: UIInputView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -46,36 +45,18 @@ public class _DashedView: DashedView {
     }
 }
 
-public class Dashed: UIViewCreator {
-    public typealias View = _DashedView
+public class UICInput: UIViewCreator {
+    public typealias View = _InputView
 
-    public init(color: UIColor, pattern: [NSNumber] = [2, 3], content: () -> ViewCreator) {
-        self.uiView = View.init(content().releaseUIView(), dash: pattern)
-            .apply(strokeColor: color)
-            .apply(lineWidth: 1)
+    public init(size: CGSize = .zero, style: UIInputView.Style = .keyboard, content: () -> ViewCreator) {
+        self.uiView = View.init(frame: .init(origin: .zero, size: size), inputViewStyle: style)
+        _ = self.uiView.add(content().releaseUIView())
     }
 }
 
-extension UIViewCreator where View: DashedView {
-
-    public func dash(color: UIColor) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.apply(strokeColor: color)
-                .refresh()
-        }
-    }
-
-    public func dash(lineWidth width: CGFloat) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.apply(lineWidth: width)
-                .refresh()
-        }
-    }
-
-    public func dash(pattern: [NSNumber]) -> Self {
-        self.onNotRendered {
-            _ = ($0 as? View)?.apply(dashPattern: pattern)
-                .refresh()
-        }
+public extension UIViewCreator where View: UIInputView {
+    func allowsSelfsSizing(_ flag: Bool) -> Self {
+        (self.uiView as? View)?.allowsSelfSizing = flag
+        return self
     }
 }

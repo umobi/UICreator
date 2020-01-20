@@ -22,8 +22,9 @@
 
 import Foundation
 import UIKit
+import UIContainer
 
-public class ActivityIndicatorView: UIActivityIndicatorView {
+public class _BlurView: BlurView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -45,26 +46,41 @@ public class ActivityIndicatorView: UIActivityIndicatorView {
     }
 }
 
-public class Activity: UIViewCreator {
-    public typealias View = ActivityIndicatorView
+public class UICBlur: ViewCreator {
+    public typealias View = _BlurView
 
-    public init(style: View.Style) {
-        self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.style = style
+    public init(blur: UIBlurEffect.Style = .regular) {
+        self.uiView = View.init(blur: blur)
     }
 }
 
-public extension UIViewCreator where View: UIActivityIndicatorView {
-
-    func color(_ color: UIColor) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.color = color
+public extension UIViewCreator where View: BlurView {
+    func blur(style: UIBlurEffect.Style) -> Self {
+        return self.onRendered {
+            ($0 as? View)?.apply(blurEffect: style)
         }
     }
 
-    func hidesWhenStopped(_ flag: Bool) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.hidesWhenStopped = flag
+    func blur(dynamic dynamicStyle: TraitObject<UIBlurEffect.Style>) -> Self {
+        return self.onRendered {
+            ($0 as? View)?.apply(dynamicBlur: dynamicStyle)
         }
     }
 }
+
+#if os(iOS)
+@available(iOS 13, *)
+public extension UIViewCreator where View: BlurView {
+    func vibrancy(effect: UIVibrancyEffectStyle) -> Self {
+        return self.onRendered {
+            ($0 as? View)?.apply(vibrancyEffect: effect)
+        }
+    }
+
+    func vibrancy(dynamic dynamicEffect: TraitObject<UIVibrancyEffectStyle>) -> Self {
+        return self.onRendered {
+            ($0 as? View)?.apply(dynamicVibrancy: dynamicEffect)
+        }
+    }
+}
+#endif

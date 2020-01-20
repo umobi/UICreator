@@ -22,43 +22,43 @@
 
 import Foundation
 
+extension TableView: ListSupport {}
 
-extension _CollectionView: ListSupport {
-
-}
-
-public extension UICFlow {
-    convenience init(_ content: ViewCreator...) {
-        self.init(ListManager(content: content))
+public extension UICList {
+    convenience init(style: UITableView.Style,_ subviews: Subview) {
+        self.init(style: style, ListManager(content: subviews.views))
     }
     
-    private convenience init(_ manager: ListManager) {
-        self.init()
-        let group = UICList.Group(manager)
+    private convenience init(style: UITableView.Style,_ manager: ListManager) {
+        self.init(style: style)
+        #if os(iOS)
+        (self.uiView as? View)?.separatorStyle = .none
+        #endif
+        let group = Group(manager)
 
         if !group.isValid {
             fatalError("Verify your content")
         }
 
-        guard let collectionView = self.uiView as? View else {
+        guard let tableView = self.uiView as? View else {
             return
         }
 
-        group.rowsIdentifier.forEach {
-            collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
+        group.rowsIdentifier.forEach { [unowned tableView] in
+            tableView.register(TableViewCell.self, forCellReuseIdentifier: $0)
         }
 
-        group.headersIdentifier.forEach {
-            collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
+        group.headersIdentifier.forEach { [unowned tableView] in
+            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
         }
 
-        group.footersIdentifier.forEach {
-            collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
+        group.footersIdentifier.forEach { [unowned tableView] in
+            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
         }
 
-        collectionView.group = group
-        collectionView.dataSource = collectionView
-        collectionView.delegate = collectionView
-        manager.list = collectionView
+        tableView.group = group
+        tableView.dataSource = tableView
+        tableView.delegate = tableView
+        manager.list = tableView
     }
 }

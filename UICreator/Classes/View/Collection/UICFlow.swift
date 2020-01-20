@@ -22,7 +22,7 @@
 
 import Foundation
 
-public class FlowCollection: Collection, CollectionLayout {
+public class UICFlow: UICCollection, CollectionLayout {
     public convenience init() {
         self.init {
             UICollectionViewFlowLayout()
@@ -34,7 +34,7 @@ public class FlowCollection: Collection, CollectionLayout {
     }
 }
 
-public extension FlowCollection {
+public extension UICFlow {
     func line(minimumSpacing: CGFloat) -> Self {
         return self.onRendered { _ in
             self.dynamicCollectionViewLayout.minimumLineSpacing = minimumSpacing

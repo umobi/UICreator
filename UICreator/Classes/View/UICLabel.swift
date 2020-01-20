@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public class PageControl: UIPageControl {
+public class _Label: UILabel {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -45,55 +45,76 @@ public class PageControl: UIPageControl {
     }
 }
 
-public class Page: UIViewCreator, Control {
-    public typealias View = PageControl
+public class UICLabel: UIViewCreator, TextElement {
+    public typealias View = _Label
 
-    public init(numberOfPages: Int) {
+    required public init(_ text: String?) {
         self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.numberOfPages = numberOfPages
+        (self.uiView as? View)?.text = text
+    }
+
+    required public init(_ attributedText: NSAttributedString?) {
+        self.uiView = View.init(builder: self)
+        (self.uiView as? View)?.attributedText = attributedText
     }
 }
 
-public extension UIViewCreator where View: UIPageControl {
-    func currentPage(_ page: Int) -> Self {
-        self.onInTheScene {
-            ($0 as? View)?.currentPage = page
+public extension TextElement where View: UILabel {
+    func text(_ string: String?) -> Self {
+        return self.onNotRendered {
+            ($0 as? View)?.text = string
         }
     }
 
-    func currentPage(indicatorTintColor: UIColor?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.currentPageIndicatorTintColor = indicatorTintColor
+    func text(_ attributedText: NSAttributedString?) -> Self {
+        return self.onNotRendered {
+            ($0 as? View)?.attributedText = attributedText
         }
     }
 
-    func defersCurrentPageDisplay(_ flag: Bool) -> Self {
+    func text(color: UIColor?) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.defersCurrentPageDisplay = flag
+            ($0 as? View)?.textColor = color
         }
     }
 
-    func hidesForSinglePage(_ flag: Bool) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.hidesForSinglePage = flag
+    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> Self {
+        return self.onNotRendered {
+            ($0 as? View)?.font = font
+            ($0 as? View)?.isDynamicTextSize = isDynamicTextSize
         }
     }
 
-    func numberOfPages(_ pages: Int) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.numberOfPages = pages
+    func text(scale: CGFloat) -> Self {
+        return self.onNotRendered {
+            ($0 as? View)?.minimumScaleFactor = scale
+            ($0 as? View)?.adjustsFontSizeToFitWidth = scale != 1
         }
     }
 
-    func page(indicatorTintColor: UIColor?) -> Self {
+    func text(alignment: NSTextAlignment) -> Self {
+        return self.onNotRendered {
+            ($0 as? View)?.textAlignment = alignment
+        }
+    }
+
+    func number(ofLines number: Int) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.pageIndicatorTintColor = indicatorTintColor
+            ($0 as? View)?.numberOfLines = number
         }
     }
 }
 
-public extension UIViewCreator where Self: Control, View: UIPageControl {
-    func onPageChanged(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.onEvent(.valueChanged, handler)
+public extension TextElement where View: UILabel {
+    func adjustsFont(forContentSizeCategory flag: Bool) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.adjustsFontForContentSizeCategory = flag
+        }
+    }
+
+    func adjustsFontSize(toFitWidth flag: Bool) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.adjustsFontSizeToFitWidth = flag
+        }
     }
 }

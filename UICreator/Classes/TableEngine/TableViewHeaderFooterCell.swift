@@ -56,7 +56,7 @@ internal class TableViewHeaderFooterCell: UITableViewHeaderFooterView {
         self.commitLayout()
     }
 
-    func prepareCell(builder: Table.Element.Builder) {
+    func prepareCell(builder: UICList.Element.Builder) {
         guard self.builder == nil else {
             return
         }

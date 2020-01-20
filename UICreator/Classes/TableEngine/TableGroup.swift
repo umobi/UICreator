@@ -22,9 +22,9 @@
 
 import Foundation
 
-extension Table {
+extension UICList {
     public struct Group {
-        private let _elements: [Table.Element]?
+        private let _elements: [UICList.Element]?
         let manager: ListManager?
 
         internal init(_ manager: ListManager) {
@@ -32,12 +32,12 @@ extension Table {
             self.manager = manager
         }
 
-        internal init(_ elements: [Table.Element]) {
+        internal init(_ elements: [UICList.Element]) {
             self._elements = elements
             self.manager = nil
         }
 
-        var elements: [Table.Element] {
+        var elements: [UICList.Element] {
             return self._elements ?? manager?.elements ?? []
         }
 
@@ -181,11 +181,11 @@ extension Table {
     }
 }
 
-extension Table.Element {
+extension UICList.Element {
     typealias Builder = () -> ViewCreator
 }
 
-extension Table.Group {
+extension UICList.Group {
     public var isValid: Bool {
         return self.isValid()
     }

@@ -45,7 +45,7 @@ public class TableView: UITableView {
     }
 }
 
-public class Table: UIViewCreator, HasViewDelegate, HasViewDataSource {
+public class UICList: UIViewCreator, HasViewDelegate, HasViewDataSource {
     public typealias View = TableView
 
     public func delegate(_ delegate: UITableViewDelegate?) -> Self {

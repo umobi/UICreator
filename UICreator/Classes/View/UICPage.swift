@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 import UIContainer
 
-public class PageViewController: UIPageViewController {
+public class UICPageViewController: UIPageViewController {
     private var queuedViewControllers: [UIViewController]!
     #if os(iOS)
     fileprivate var spineLocationHandler: ((UIInterfaceOrientation) -> SpineLocation)? = nil
@@ -73,7 +73,7 @@ public class PageViewController: UIPageViewController {
     }
 }
 
-extension PageViewController: UIPageViewControllerDelegate {
+extension UICPageViewController: UIPageViewControllerDelegate {
     public func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         if (!completed) {
             return
@@ -94,7 +94,7 @@ extension PageViewController: UIPageViewControllerDelegate {
     #endif
 }
 
-extension PageViewController: UIPageViewControllerDataSource {
+extension UICPageViewController: UIPageViewControllerDataSource {
     public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         let queueViews = self.queuedViewControllers ?? []
         guard let viewControllerSlice = queueViews.enumerated().first(where: {
@@ -134,9 +134,9 @@ extension PageViewController: UIPageViewControllerDataSource {
     }
 }
 
-public class PageViewControllerView: UIView {
-    private(set) weak var container: _Container<PageViewController>!
-    private var content: (() -> PageViewController)? = nil
+public class UICPageContainer: UIView {
+    private(set) weak var container: _Container<UICPageViewController>!
+    private var content: (() -> UICPageViewController)? = nil
 
     private weak var stackView: UIStackView!
     private var indicatorLocation: IndicatorViewPosition? = nil
@@ -145,7 +145,7 @@ public class PageViewControllerView: UIView {
         return self.stackView?.arrangedSubviews ?? []
     }
 
-    func setContent(content: @escaping () -> PageViewController) {
+    func setContent(content: @escaping () -> UICPageViewController) {
         self.content = content
     }
 
@@ -162,7 +162,7 @@ public class PageViewControllerView: UIView {
     override open func didMoveToWindow() {
         super.didMoveToWindow()
         self.container = self.container ?? {
-            let container = _Container<PageViewController>(in: self.viewController, loadHandler: { [unowned self] in
+            let container = _Container<UICPageViewController>(in: self.viewController, loadHandler: { [unowned self] in
                 let viewController = self.content?()
                 self.content = nil
                 return viewController
@@ -291,15 +291,15 @@ public class PageViewControllerView: UIView {
     }
 }
 
-public class Pages: UIViewCreator {
-    public typealias View = PageViewControllerView
+public class UICPage: UIViewCreator {
+    public typealias View = UICPageContainer
 
     private(set) var transitionStyle: UIPageViewController.TransitionStyle = .scroll
     private(set) var navigationOrientation: UIPageViewController.NavigationOrientation = .horizontal
     private(set) var options: [UIPageViewController.OptionsKey: Any]?
 
-    private lazy var _pageViewController: PageViewController? = {
-        let pageController: PageViewController = .init(transitionStyle: self.transitionStyle, navigationOrientation: self.navigationOrientation, options: self.options)
+    private lazy var _pageViewController: UICPageViewController? = {
+        let pageController: UICPageViewController = .init(transitionStyle: self.transitionStyle, navigationOrientation: self.navigationOrientation, options: self.options)
 
         pageController.dataSource = pageController
         pageController.delegate = pageController
@@ -307,13 +307,13 @@ public class Pages: UIViewCreator {
         return pageController
     }()
 
-    private weak var pageViewController: PageViewController! {
+    private weak var pageViewController: UICPageViewController! {
         willSet {
             self._pageViewController = nil
         }
     }
 
-    var pageController: PageViewController! {
+    var pageController: UICPageViewController! {
         return self._pageViewController ?? self.pageViewController
     }
 
@@ -330,7 +330,7 @@ public class Pages: UIViewCreator {
     }
 }
 
-public extension Pages {
+public extension UICPage {
     func `as`<Controller: UIPageViewController>(_ ref: inout Controller!) -> Self {
         ref = self.pageController as? Controller
         return self

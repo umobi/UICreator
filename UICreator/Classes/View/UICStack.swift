@@ -49,7 +49,7 @@ public class StackView: UIStackView {
     }
 }
 
-public class Stack: UIViewCreator {
+public class UICStack: UIViewCreator {
     public typealias View = StackView
 
     private func prepare(axis: NSLayoutConstraint.Axis, spacing: CGFloat, _ views: [ViewCreator]) {
@@ -78,27 +78,27 @@ public class Stack: UIViewCreator {
     }
 }
 
-public func HStack(spacing: CGFloat = 0, _ subviews: Subview) -> Stack {
+public func UICHStack(spacing: CGFloat = 0, _ subviews: Subview) -> UICStack {
     return .init(axis: .horizontal, spacing: spacing, subviews)
 }
 
-public func VStack(spacing: CGFloat = 0, _ subviews: Subview) -> Stack {
+public func UICVStack(spacing: CGFloat = 0, _ subviews: Subview) -> UICStack {
     return .init(axis: .vertical, spacing: spacing, subviews)
 }
 
-public func HStack(spacing: CGFloat = 0, _ subviews: ViewCreator...) -> Stack {
+public func UICHStack(spacing: CGFloat = 0, _ subviews: ViewCreator...) -> UICStack {
     return .init(axis: .horizontal, spacing: spacing, subviews)
 }
 
-public func VStack(spacing: CGFloat = 0, _ subviews: ViewCreator...) -> Stack {
+public func UICVStack(spacing: CGFloat = 0, _ subviews: ViewCreator...) -> UICStack {
     return .init(axis: .vertical, spacing: spacing, subviews)
 }
 
-public func HStack(spacing: CGFloat = 0, _ subviews: [ViewCreator]) -> Stack {
+public func UICHStack(spacing: CGFloat = 0, _ subviews: [ViewCreator]) -> UICStack {
     return .init(axis: .horizontal, spacing: spacing, subviews)
 }
 
-public func VStack(spacing: CGFloat = 0, _ subviews: [ViewCreator]) -> Stack {
+public func UICVStack(spacing: CGFloat = 0, _ subviews: [ViewCreator]) -> UICStack {
     return .init(axis: .vertical, spacing: spacing, subviews)
 }
 
@@ -129,7 +129,7 @@ public extension UIViewCreator where View: UIStackView {
     }
 }
 
-extension Stack: SupportForEach {
+extension UICStack: SupportForEach {
     func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>) {
         weak var firstView: UIView? = placeholderView
         weak var lastView: UIView? = placeholderView

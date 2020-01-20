@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public class SegmentedControl: UISegmentedControl {
+public class _SegmentedControl: UISegmentedControl {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -88,7 +88,7 @@ public class Segment {
         return self
     }
 
-    internal func apply(in segmented: Segmented, at index: Int) {
+    internal func apply(in segmented: UICSegmented, at index: Int) {
         switch self.content {
         case .image(let image):
             _ = segmented.addSegment(image: image, at: index)
@@ -122,8 +122,8 @@ public class Segment {
     }
 }
 
-public class Segmented: UIViewCreator, Control {
-    public typealias View = SegmentedControl
+public class UICSegmented: UIViewCreator, Control {
+    public typealias View = _SegmentedControl
 
     public init(_ segments: Segment...) {
         self.uiView = View.init(builder: self)

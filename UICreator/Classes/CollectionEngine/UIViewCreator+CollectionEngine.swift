@@ -22,7 +22,7 @@
 
 import Foundation
 
-public extension UIViewCreator where View: CollectionView {
+public extension UIViewCreator where View: _CollectionView {
     func dynamicDataSource(_ dataSource: CollectionDataSource) -> Self {
         (self.uiView as? View)?.creatorDataSource = dataSource
         return self

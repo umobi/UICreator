@@ -23,8 +23,7 @@
 import Foundation
 import UIKit
 
-#if os(iOS)
-public class _Switch: UISwitch {
+public class _Button: UIButton {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -46,52 +45,53 @@ public class _Switch: UISwitch {
     }
 }
 
-public class Switch: UIViewCreator, Control {
-    public typealias View = _Switch
+public class UICButton: UIViewCreator, Control {
+    public typealias View = _Button
 
-    public init(on: Bool) {
+    public init(_ title: String?, type: UIButton.ButtonType? = nil) {
+        if let type = type {
+            self.uiView = View.init(type: type)
+            (self.uiView as? View)?.setTitle(title, for: .normal)
+            return
+        }
+
         self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.isOn = on
+        (self.uiView as? View)?.setTitle(title, for: .normal)
     }
 }
 
-public extension UIViewCreator where View: UISwitch {
+public extension UIViewCreator where View: UIButton {
 
-    func isOn(_ flag: Bool) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.isOn = flag
+    func title(_ string: String?, for state: UIControl.State = .normal) -> Self {
+        return self.onNotRendered {
+            ($0 as? View)?.setTitle(string, for: state)
         }
     }
 
-    func offImage(_ image: UIImage?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.offImage = image
+    func title(_ attributedText: NSAttributedString?, for state: UIControl.State = .normal) -> Self {
+        return self.onNotRendered {
+            ($0 as? View)?.setTitle(attributedText?.string, for: state)
+            ($0 as? View)?.titleLabel?.attributedText = attributedText
         }
     }
 
-    func onImage(_ image: UIImage?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.onImage = image
+    func title(color: UIColor?, for state: UIControl.State = .normal) -> Self {
+        return self.onNotRendered {
+            ($0 as? View)?.setTitleColor(color, for: state)
         }
     }
 
-    func onTintColor(_ color: UIColor?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.onTintColor = color
-        }
-    }
-
-    func thumbTintColor(_ color: UIColor?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.thumbTintColor = color
+    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> Self {
+        return self.onRendered {
+            ($0 as? View)?.titleLabel?.font = font
+            ($0 as? View)?.titleLabel?.isDynamicTextSize = isDynamicTextSize
         }
     }
 }
 
-public extension UIViewCreator where Self: Control, View: UISwitch {
-    func onValueChanged(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onEvent(.valueChanged, handler)
+public extension UIViewCreator where View: UIButton, Self: Control {
+    func onTouchInside(_ handler: @escaping (UIView) -> Void) -> Self {
+        self.onEvent(.touchUpInside, handler)
     }
 }
-#endif
 

@@ -47,7 +47,7 @@ public class _ContentView: ContentView {
     }
 }
 
-public class Content: UIViewCreator {
+public class UICContent: UIViewCreator {
     public typealias View = _ContentView
 
     public init(mode: View.ContentMode = .center, priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) {
@@ -55,39 +55,39 @@ public class Content: UIViewCreator {
     }
 }
 
-public func Center(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
+public func UICCenter(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .center, priority: priority, content: content)
 }
 
-public func TopLeft(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
+public func UICTopLeft(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .topLeft, priority: priority, content: content)
 }
 
-public func Top(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
+public func UICTop(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .top, priority: priority, content: content)
 }
 
-public func TopRight(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
+public func UICTopRight(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .topRight, priority: priority, content: content)
 }
 
-public func Left(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
+public func UICLeft(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .left, priority: priority, content: content)
 }
 
-public func Right(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
+public func UICRight(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .right, priority: priority, content: content)
 }
 
-public func BottomLeft(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
+public func UICBottomLeft(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .bottomLeft, priority: priority, content: content)
 }
 
-public func Bottom(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
+public func UICBottom(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .bottom, priority: priority, content: content)
 }
 
-public func BottomRight(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> Content {
+public func UICBottomRight(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .bottomRight, priority: priority, content: content)
 }
 

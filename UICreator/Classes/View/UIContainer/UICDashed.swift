@@ -21,8 +21,10 @@
 //
 
 import Foundation
+import UIKit
+import UIContainer
 
-public class ImageView: UIImageView {
+public class _DashedView: DashedView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -44,65 +46,36 @@ public class ImageView: UIImageView {
     }
 }
 
-public class Image: UIViewCreator {
-    public typealias View = ImageView
+public class UICDashed: UIViewCreator {
+    public typealias View = _DashedView
 
-    public init(mode: View.ContentMode = .scaleToFill) {
-        self.uiView = View.init(image: nil, highlightedImage: nil)
-        self.uiView.contentMode = mode
-    }
-
-    public init(image: UIImage?, highlightedImage: UIImage? = nil) {
-        self.uiView = View.init(image: image, highlightedImage: nil)
-    }
-
-    public init() {
-        self.uiView = View.init(image: nil, highlightedImage: nil)
+    public init(color: UIColor, pattern: [NSNumber] = [2, 3], content: () -> ViewCreator) {
+        self.uiView = View.init(content().releaseUIView(), dash: pattern)
+            .apply(strokeColor: color)
+            .apply(lineWidth: 1)
     }
 }
 
-public extension UIViewCreator where View: UIImageView {
+extension UIViewCreator where View: DashedView {
 
-    @available(iOS 13, tvOS 13.0, *)
-    func applySymbolConfiguration(_ configuration: UIImage.SymbolConfiguration) -> Self {
+    public func dash(color: UIColor) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.image = ($0 as? View)?.image?.applyingSymbolConfiguration(configuration)
+            ($0 as? View)?.apply(strokeColor: color)
+                .refresh()
         }
     }
 
-    @available(iOS 13, tvOS 13.0, *)
-    func preferredSymbolConfiguration(_ configuration: UIImage.SymbolConfiguration) -> Self {
+    public func dash(lineWidth width: CGFloat) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.preferredSymbolConfiguration = configuration
+            ($0 as? View)?.apply(lineWidth: width)
+                .refresh()
         }
     }
 
-    func content(mode: View.ContentMode) -> Self {
+    public func dash(pattern: [NSNumber]) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.contentMode = mode
-        }
-    }
-
-    func image(_ image: UIImage?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.image = image
-        }
-    }
-
-    func rendering(mode: UIImage.RenderingMode) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.image = ($0 as? View)?.image?.withRenderingMode(mode)
+            _ = ($0 as? View)?.apply(dashPattern: pattern)
+                .refresh()
         }
     }
 }
-
-#if os(tvOS)
-public extension UIViewCreator where View: UIImageView {
-    @available(tvOS 13, *)
-    func adjustsImageWhenAncestorFocused(_ flag: Bool) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.adjustsImageWhenAncestorFocused = flag
-        }
-    }
-}
-#endif

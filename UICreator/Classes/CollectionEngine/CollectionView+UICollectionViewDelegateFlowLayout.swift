@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-extension CollectionView: UICollectionViewDelegateFlowLayout {
+extension _CollectionView: UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         guard let wrapper = self.layoutGroup?.section(at: indexPath.section) else {
             return .zero

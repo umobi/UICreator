@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-extension CollectionView: UICollectionViewDataSource {
+extension _CollectionView: UICollectionViewDataSource {
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
         let estimatedSections = self.group?.numberOfSections ?? 0
         return creatorDataSource?.numberOfSections(estimatedSections) ?? estimatedSections

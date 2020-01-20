@@ -22,9 +22,8 @@
 
 import Foundation
 import UIKit
-import UIContainer
 
-public class _GradientView: GradientView {
+public class _PageControl: UIPageControl {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -46,45 +45,55 @@ public class _GradientView: GradientView {
     }
 }
 
-public class Gradient: UIViewCreator {
-    public typealias View = _GradientView
+public class UICPageControl: UIViewCreator, Control {
+    public typealias View = _PageControl
 
-    public init(_ colors: [UIColor], direction: View.Direction = .right) {
+    public init(numberOfPages: Int) {
         self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.colors = colors
-        (self.uiView as? View)?.direction = direction
-    }
-
-    public convenience init(_ colors: UIColor..., direction: View.Direction = .right) {
-        self.init(colors, direction: direction)
+        (self.uiView as? View)?.numberOfPages = numberOfPages
     }
 }
 
-public extension UIViewCreator where View: GradientView {
-
-    func colors(_ colors: UIColor...) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.colors = colors
+public extension UIViewCreator where View: UIPageControl {
+    func currentPage(_ page: Int) -> Self {
+        self.onInTheScene {
+            ($0 as? View)?.currentPage = page
         }
     }
 
-    func colors(_ colors: [UIColor]) -> Self {
+    func currentPage(indicatorTintColor: UIColor?) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.colors = colors
+            ($0 as? View)?.currentPageIndicatorTintColor = indicatorTintColor
         }
     }
 
-    func direction(_ direction: View.Direction) -> Self {
+    func defersCurrentPageDisplay(_ flag: Bool) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.direction = direction
+            ($0 as? View)?.defersCurrentPageDisplay = flag
         }
     }
 
-    func animation(_ layerHandler: @escaping (CAGradientLayer) -> Void) -> Self {
-        self.onRendered {
-            ($0 as? View)?.animates {
-                layerHandler($0)
-            }
+    func hidesForSinglePage(_ flag: Bool) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.hidesForSinglePage = flag
         }
+    }
+
+    func numberOfPages(_ pages: Int) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.numberOfPages = pages
+        }
+    }
+
+    func page(indicatorTintColor: UIColor?) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.pageIndicatorTintColor = indicatorTintColor
+        }
+    }
+}
+
+public extension UIViewCreator where Self: Control, View: UIPageControl {
+    func onPageChanged(_ handler: @escaping (UIView) -> Void) -> Self {
+        self.onEvent(.valueChanged, handler)
     }
 }

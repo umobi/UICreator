@@ -21,10 +21,8 @@
 //
 
 import Foundation
-import UIKit
 
-#if os(iOS)
-public class _DatePicker: UIDatePicker {
+public class _ImageView: UIImageView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -46,70 +44,65 @@ public class _DatePicker: UIDatePicker {
     }
 }
 
-public class DatePicker: UIViewCreator, Control {
-    public typealias View = _DatePicker
+public class UICImage: UIViewCreator {
+    public typealias View = _ImageView
 
-    public init(calendar: Calendar? = nil) {
-        self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.calendar = calendar ?? .current
+    public init(mode: View.ContentMode = .scaleToFill) {
+        self.uiView = View.init(image: nil, highlightedImage: nil)
+        self.uiView.contentMode = mode
+    }
+
+    public init(image: UIImage?, highlightedImage: UIImage? = nil) {
+        self.uiView = View.init(image: image, highlightedImage: nil)
+    }
+
+    public init() {
+        self.uiView = View.init(image: nil, highlightedImage: nil)
     }
 }
 
-public extension UIViewCreator where View: UIDatePicker {
+public extension UIViewCreator where View: UIImageView {
 
-    func date(_ date: Date) -> Self {
-        self.onInTheScene {
-            ($0 as? View)?.date = date
+    @available(iOS 13, tvOS 13.0, *)
+    func applySymbolConfiguration(_ configuration: UIImage.SymbolConfiguration) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.image = ($0 as? View)?.image?.applyingSymbolConfiguration(configuration)
         }
     }
 
-    func mode(_ mode: UIDatePicker.Mode) -> Self {
+    @available(iOS 13, tvOS 13.0, *)
+    func preferredSymbolConfiguration(_ configuration: UIImage.SymbolConfiguration) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.datePickerMode = mode
+            ($0 as? View)?.preferredSymbolConfiguration = configuration
         }
     }
 
-    func locale(_ locale: Locale?) -> Self {
+    func content(mode: View.ContentMode) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.locale = locale
+            ($0 as? View)?.contentMode = mode
         }
     }
 
-    func maximumDate(_ maximumDate: Date?) -> Self {
+    func image(_ image: UIImage?) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.maximumDate = maximumDate
+            ($0 as? View)?.image = image
         }
     }
 
-    func minimumDate(_ minimumDate: Date?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.minimumDate = minimumDate
-        }
-    }
-
-    func countDownDuration(_ duration: TimeInterval) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.countDownDuration = duration
-        }
-    }
-
-    func minuteInterval(_ interval: Int) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.minuteInterval = interval
-        }
-    }
-
-    func timeZone(_ timeZone: TimeZone?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.timeZone = timeZone
+    func rendering(mode: UIImage.RenderingMode) -> Self {
+        return self.onRendered {
+            ($0 as? View)?.image = ($0 as? View)?.image?.withRenderingMode(mode)
         }
     }
 }
 
-public extension UIViewCreator where Self: Control, View: UIDatePicker {
-    func onValueChanged(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onEvent(.valueChanged, handler)
+#if os(tvOS)
+public extension UIViewCreator where View: UIImageView {
+    @available(tvOS 13, *)
+    func adjustsImageWhenAncestorFocused(_ flag: Bool) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.adjustsImageWhenAncestorFocused = flag
+        }
     }
 }
-
 #endif

@@ -23,7 +23,8 @@
 import Foundation
 import UIKit
 
-public class _Label: UILabel {
+#if os(iOS)
+public class _DatePicker: UIDatePicker {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -45,76 +46,70 @@ public class _Label: UILabel {
     }
 }
 
-public class Label: UIViewCreator, TextElement {
-    public typealias View = _Label
+public class UICDatePicker: UIViewCreator, Control {
+    public typealias View = _DatePicker
 
-    required public init(_ text: String?) {
+    public init(calendar: Calendar? = nil) {
         self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.text = text
-    }
-
-    required public init(_ attributedText: NSAttributedString?) {
-        self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.attributedText = attributedText
+        (self.uiView as? View)?.calendar = calendar ?? .current
     }
 }
 
-public extension TextElement where View: UILabel {
-    func text(_ string: String?) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.text = string
+public extension UIViewCreator where View: UIDatePicker {
+
+    func date(_ date: Date) -> Self {
+        self.onInTheScene {
+            ($0 as? View)?.date = date
         }
     }
 
-    func text(_ attributedText: NSAttributedString?) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.attributedText = attributedText
-        }
-    }
-
-    func text(color: UIColor?) -> Self {
+    func mode(_ mode: UIDatePicker.Mode) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.textColor = color
+            ($0 as? View)?.datePickerMode = mode
         }
     }
 
-    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.font = font
-            ($0 as? View)?.isDynamicTextSize = isDynamicTextSize
-        }
-    }
-
-    func text(scale: CGFloat) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.minimumScaleFactor = scale
-            ($0 as? View)?.adjustsFontSizeToFitWidth = scale != 1
-        }
-    }
-
-    func text(alignment: NSTextAlignment) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.textAlignment = alignment
-        }
-    }
-
-    func number(ofLines number: Int) -> Self {
+    func locale(_ locale: Locale?) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.numberOfLines = number
+            ($0 as? View)?.locale = locale
+        }
+    }
+
+    func maximumDate(_ maximumDate: Date?) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.maximumDate = maximumDate
+        }
+    }
+
+    func minimumDate(_ minimumDate: Date?) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.minimumDate = minimumDate
+        }
+    }
+
+    func countDownDuration(_ duration: TimeInterval) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.countDownDuration = duration
+        }
+    }
+
+    func minuteInterval(_ interval: Int) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.minuteInterval = interval
+        }
+    }
+
+    func timeZone(_ timeZone: TimeZone?) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.timeZone = timeZone
         }
     }
 }
 
-public extension TextElement where View: UILabel {
-    func adjustsFont(forContentSizeCategory flag: Bool) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.adjustsFontForContentSizeCategory = flag
-        }
-    }
-
-    func adjustsFontSize(toFitWidth flag: Bool) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.adjustsFontSizeToFitWidth = flag
-        }
+public extension UIViewCreator where Self: Control, View: UIDatePicker {
+    func onValueChanged(_ handler: @escaping (UIView) -> Void) -> Self {
+        return self.onEvent(.valueChanged, handler)
     }
 }
+
+#endif

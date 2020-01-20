@@ -173,7 +173,7 @@ public extension Array where Element == CollectionLayoutSection {
     }
 }
 
-public extension FlowCollection {
+public extension UICFlow {
     func layoutMaker(content: @escaping () -> [CollectionLayoutSection]) -> Self {
         return self.onInTheScene {
             ($0 as? View)?.layoutGroup = content()

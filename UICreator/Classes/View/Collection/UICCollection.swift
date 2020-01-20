@@ -27,7 +27,7 @@ public protocol CollectionLayout {
     var dynamicCollectionViewLayout: Layout { get }
 }
 
-public class CollectionView: UICollectionView {
+public class _CollectionView: UICollectionView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -49,8 +49,8 @@ public class CollectionView: UICollectionView {
     }
 }
 
-public class Collection: UIViewCreator, HasViewDelegate, HasViewDataSource {
-    public typealias View = CollectionView
+public class UICCollection: UIViewCreator, HasViewDelegate, HasViewDataSource {
+    public typealias View = _CollectionView
     init(layout: () -> UICollectionViewLayout) {
         self.uiView = View(frame: .zero, collectionViewLayout: layout())
     }
