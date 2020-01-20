@@ -29,8 +29,8 @@ private var kCollectionDelegate: UInt = 0
 private var kCollectionLayoutGroup: UInt = 0
 
 extension UICollectionView {
-    var group: Table.Group? {
-        get { objc_getAssociatedObject(self, &kCollectionGroup) as? Table.Group }
+    var group: UICList.Group? {
+        get { objc_getAssociatedObject(self, &kCollectionGroup) as? UICList.Group }
         set { objc_setAssociatedObject(self, &kCollectionGroup, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 

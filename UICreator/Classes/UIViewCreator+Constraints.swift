@@ -699,6 +699,134 @@ public extension ViewCreator {
 }
 
 public extension ViewCreator {
+    func center(equalTo constant: CGFloat = 0, priority: ConstraintPriority = .required, orRelatedView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.center.equalTo(view.snp.center)
+                    .offset(constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func center(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, orRelatedView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.center.lessThanOrEqualTo(view.snp.center)
+                    .offset(constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func center(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, orRelatedView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.center.greaterThanOrEqualTo(view.snp.center)
+                    .offset(constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func centerX(equalTo constant: CGFloat = 0, priority: ConstraintPriority = .required, orRelatedView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.centerX.equalTo(view.snp.centerX)
+                    .offset(constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func centerX(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, orRelatedView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.centerX.lessThanOrEqualTo(view.snp.centerX)
+                    .offset(constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func centerX(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, orRelatedView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.centerX.greaterThanOrEqualTo(view.snp.centerX)
+                    .offset(constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func centerY(equalTo constant: CGFloat = 0, priority: ConstraintPriority = .required, orRelatedView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.centerY.equalTo(view.snp.centerY)
+                    .offset(constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func centerY(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, orRelatedView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.centerY.lessThanOrEqualTo(view.snp.centerY)
+                    .offset(constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func centerY(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, orRelatedView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.centerY.greaterThanOrEqualTo(view.snp.centerY)
+                    .offset(constant)
+                    .priority(priority)
+            }
+        }
+    }
+}
+
+public extension ViewCreator {
     func hugging(vertical verticalPriority: UILayoutPriority = .defaultLow, horizontal horizontalPriority: UILayoutPriority = .defaultLow) -> Self {
         return self.onNotRendered {
             $0.setContentHuggingPriority(verticalPriority, for: .vertical)

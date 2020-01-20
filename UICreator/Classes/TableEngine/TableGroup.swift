@@ -22,15 +22,23 @@
 
 import Foundation
 
-extension Table {
+extension UICList {
     public struct Group {
-        let elements: [Element]
-        public init(_ elements: [Element]) {
-            self.elements = elements
+        private let _elements: [UICList.Element]?
+        let manager: ListManager?
+
+        internal init(_ manager: ListManager) {
+            self._elements = nil
+            self.manager = manager
         }
 
-        public init(_ elements: Element...) {
-            self.elements = elements
+        internal init(_ elements: [UICList.Element]) {
+            self._elements = elements
+            self.manager = nil
+        }
+
+        var elements: [UICList.Element] {
+            return self._elements ?? manager?.elements ?? []
         }
 
         var containsSection: Bool {
@@ -106,7 +114,7 @@ extension Table {
         var rowsIdentifier: [String] {
             return self.sections.enumerated().map { section in
                 section.element.group.rows.map { row -> String in
-                    return "\(section.offset)-\(row.0)"
+                    return "\(section.offset)-\(row.1.identifier ?? "\(row.0)")"
                 }
             }.reduce([]) { $0 + $1 }
         }
@@ -148,7 +156,7 @@ extension Table {
                 return nil
             }
 
-            return ("\(indexPath.section)-\(row.0)", row.1.content)
+            return ("\(indexPath.section)-\(row.1.identifier ?? "\(row.0)")", row.1.content)
         }
 
         func header(at section: Int) -> (String, Element.Builder)? {
@@ -173,11 +181,11 @@ extension Table {
     }
 }
 
-extension Table.Element {
+extension UICList.Element {
     typealias Builder = () -> ViewCreator
 }
 
-extension Table.Group {
+extension UICList.Group {
     public var isValid: Bool {
         return self.isValid()
     }
@@ -212,6 +220,6 @@ extension Table.Group {
             return false
         }
 
-        return !self.rows.isEmpty
+        return true
     }
 }

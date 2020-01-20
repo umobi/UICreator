@@ -38,6 +38,46 @@ internal extension UIView {
         case notRendered
         case rendered
         case inTheScene
+
+        private static var allCases: [RenderState] {
+            return [.notRendered, .rendered, .inTheScene]
+        }
+
+        static func >(left: RenderState, right: RenderState) -> Bool {
+            let allCases = self.allCases
+            guard let leftOffset = allCases.enumerated().first(where: { $0.element == left })?.offset else {
+                return false
+            }
+
+            return allCases[0..<leftOffset].contains(right)
+        }
+
+        static func <(left: RenderState, right: RenderState) -> Bool {
+            let allCases = self.allCases
+            guard let leftOffset = allCases.enumerated().first(where: { $0.element == left })?.offset else {
+                return false
+            }
+
+            return allCases[(leftOffset+1)..<allCases.count].contains(right)
+        }
+
+        static func >=(left: RenderState, right: RenderState) -> Bool {
+            let allCases = self.allCases
+            guard let leftOffset = allCases.enumerated().first(where: { $0.element == left })?.offset else {
+                return false
+            }
+
+            return allCases[0...leftOffset].contains(right)
+        }
+
+        static func <=(left: RenderState, right: RenderState) -> Bool {
+            let allCases = self.allCases
+            guard let leftOffset = allCases.enumerated().first(where: { $0.element == left })?.offset else {
+                return false
+            }
+
+            return allCases[leftOffset..<allCases.count].contains(right)
+        }
     }
 
     /// The current state of the view
@@ -56,7 +96,7 @@ internal extension UIView {
     /// `class Handler` is a wrap for callbacks used by Core to execute some of the style configurations and other callbacks.
     /// It always return the `self` view as a parameter, so you will not need to create memory dependency in callbacks.
     /// As a tip, you may just cast like `$0 as? View`, that may work.
-    class Handler {
+    struct Handler {
         private let handler: (UIView) -> Void
 
         init(_ handler: @escaping (UIView) -> Void) {
@@ -115,11 +155,11 @@ internal extension UIView {
     }
 
     /// The `add(_:)` function is used internally to add views inside view and constraint with 751 of priority in all edges.
-    func add(_ view: UIView) -> Self {
+    func add(priority: ConstraintPriority? = nil,_ view: UIView) -> Self {
         self.addSubview(view)
 
-        let priority: ConstraintPriority = (self as UIView) is RootView && view is RootView ? .required :
-        .init(751)
+        let priority: ConstraintPriority = priority ?? ((self as UIView) is RootView && view is RootView ? .required :
+        .init(751))
 
         view.snp.makeConstraints {
             $0.edges.equalTo(0).priority(priority)

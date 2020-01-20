@@ -22,7 +22,7 @@
 
 import Foundation
 
-#if DEBUG && canImport(SwiftUI) && targetEnvironment(simulator)
+#if DEBUG && canImport(SwiftUI)
 import SwiftUI
 
 @available(iOS 13, tvOS 13, *)
@@ -44,9 +44,6 @@ public struct LivePreview<View: ViewCreator>: SwiftUI.View {
 
 @available(iOS 13, tvOS 13, *)
 public struct Previewer<View: ViewCreator>: UIViewRepresentable {
-    public func makeUIView(context: UIViewRepresentableContext<Previewer<View>>) -> UIView {
-        return self.view.uiView
-    }
 
     public typealias UIViewType = UIView
 
@@ -56,7 +53,11 @@ public struct Previewer<View: ViewCreator>: UIViewRepresentable {
         self.view = initClass
     }
 
-    public func updateUIView(_ uiView: UIView, context: Context) {}
+    public func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<Previewer<View>>) {}
+
+    public func makeUIView(context: UIViewRepresentableContext<Previewer<View>>) -> UIView {
+        return self.view.releaseUIView()
+    }
 }
 
 #endif

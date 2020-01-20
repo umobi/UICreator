@@ -76,6 +76,13 @@ public extension UIViewCreator {
         reference = self.uiView as? UIElement
         return self
     }
+
+    func `as`<UIElement: UIView>(_ reference: inout [UIElement]) -> Self {
+        if let view = self.uiView as? UIElement {
+            reference.append(view)
+        }
+        return self
+    }
 }
 
 public extension UIViewCreator {
@@ -167,5 +174,194 @@ public extension UIViewCreator {
     func accessibily(_ handler: @escaping (UIAccessibilityCreator<Self>) -> UIAccessibilityCreator<Self>) -> Self {
         _ = handler(.init(self))
         return self
+    }
+}
+
+public extension ViewCreator {
+    /**
+        Use this function to move the view inside superview
+        If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
+     */
+    @discardableResult
+    func frame(x: CGFloat) -> Self {
+        self.onRendered {
+            let frame = $0.frame
+            $0.frame = .init(x: x, y: frame.origin.y, width: frame.width, height: frame.height)
+        }
+    }
+
+    /**
+        Use this function to move the view inside superview
+        If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
+     */
+    @discardableResult
+    func frame(y: CGFloat) -> Self {
+        self.onRendered {
+            let frame = $0.frame
+            $0.frame = .init(x: frame.origin.x, y: y, width: frame.width, height: frame.height)
+        }
+    }
+
+    /**
+        Use this function to move the view inside superview
+        If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
+     */
+    @discardableResult
+    func frame(height: CGFloat) -> Self {
+        self.onRendered {
+            let frame = $0.frame
+            $0.frame = .init(x: frame.origin.x, y: frame.origin.y, width: frame.width, height: height)
+        }
+    }
+
+    /**
+        Use this function to move the view inside superview
+        If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
+     */
+    @discardableResult
+    func frame(width: CGFloat) -> Self {
+        self.onRendered {
+            let frame = $0.frame
+            $0.frame = .init(x: frame.origin.x, y: frame.origin.y, width: width, height: frame.height)
+        }
+    }
+}
+
+public extension ViewCreator {
+
+    /**
+        Use this function to move the view inside superview
+        If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
+     */
+    @discardableResult
+    func frame(insetByX x: CGFloat) -> Self {
+        self.onRendered {
+            let frame = $0.frame
+            $0.frame = frame.insetBy(dx: x, dy: 0)
+        }
+    }
+
+    /**
+        Use this function to move the view inside superview
+        If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
+     */
+    @discardableResult
+    func frame(insetByY y: CGFloat) -> Self {
+        self.onRendered {
+            let frame = $0.frame
+            $0.frame = frame.insetBy(dx: 0, dy: y)
+        }
+    }
+}
+
+public extension ViewCreator {
+
+    /**
+        Use this function to move the view inside superview
+        If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
+     */
+    @discardableResult
+    func frame(offsetByX x: CGFloat) -> Self {
+        self.onRendered {
+            let frame = $0.frame
+            $0.frame = frame.offsetBy(dx: x, dy: 0)
+        }
+    }
+
+    /**
+        Use this function to move the view inside superview
+        If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
+     */
+    @discardableResult
+    func frame(offsetByY y: CGFloat) -> Self {
+        self.onRendered {
+            let frame = $0.frame
+            $0.frame = frame.offsetBy(dx: 0, dy: y)
+        }
+    }
+}
+
+public extension ViewCreator {
+    /// Set frame to UIView
+    func frame(_ frame: CGRect) -> Self {
+        self.onRendered {
+            $0.frame = frame
+        }
+    }
+}
+
+
+public extension ViewCreator {
+    @discardableResult
+    func animate(_ duration: TimeInterval, animations: @escaping (UIView) -> Void) -> Self {
+        UIView.animate(withDuration: duration, animations: {
+            animations(self.uiView)
+            self.uiView.setNeedsLayout()
+        }, completion: nil)
+        return self
+    }
+
+    @discardableResult
+    func animate(_ duration: TimeInterval, animations: @escaping (UIView) -> Void, completion: @escaping (Bool) -> Void) -> Self {
+        UIView.animate(withDuration: duration, animations: {
+            animations(self.uiView)
+            self.uiView.setNeedsLayout()
+        }, completion: completion)
+        return self
+    }
+
+    @discardableResult
+    func animate(_ duration: TimeInterval, delay: TimeInterval, options: UIView.AnimationOptions, animations: @escaping (UIView) -> Void, completion: ((Bool) -> Void)? = nil) -> Self {
+        UIView.animate(withDuration: duration, delay: delay, options: options, animations: {
+            animations(self.uiView)
+            self.uiView.setNeedsLayout()
+        }, completion: completion)
+        return self
+    }
+
+    @discardableResult
+    func animateWithKeyframes(_ duration: TimeInterval, delay: TimeInterval = 0, options: UIView.KeyframeAnimationOptions = [], animations animationsSequence: UIView.CreatorKeyframeSequence, completion: ((Bool) -> Void)? = nil) -> Self {
+        UIView.animateKeyframes(withDuration: duration, delay: delay, options: options, animations: {
+            animationsSequence.sequence.forEach { keyframe in
+                UIView.addKeyframe(withRelativeStartTime: keyframe.startTime, relativeDuration: keyframe.duration, animations: {
+                    keyframe.animations(self.uiView)
+                })
+            }
+        }, completion: completion)
+        return self
+    }
+}
+
+public extension UIView {
+    struct CreatorKeyframe {
+        let startTime: TimeInterval
+        let duration: TimeInterval
+        let animations: (UIView) -> Void
+
+        private init(startAt startTime: TimeInterval, duration: TimeInterval, animations: @escaping (UIView) -> Void) {
+            self.startTime = startTime
+            self.duration = duration
+            self.animations = animations
+        }
+
+        public static func keyframe(startAt startTime: TimeInterval, duration: TimeInterval, animations: @escaping (UIView) -> Void) -> CreatorKeyframe{
+            return .init(startAt: startTime, duration: duration, animations: animations)
+        }
+    }
+
+    struct CreatorKeyframeSequence {
+        let sequence: [CreatorKeyframe]
+
+        public init(_ sequence: CreatorKeyframe...) {
+            self.sequence = sequence
+        }
+    }
+}
+
+public extension ViewCreator {
+    func addLayer(_ handler: @escaping (UIView) -> CALayer) -> Self {
+        self.onNotRendered {
+            $0.layer.addSublayer(handler($0))
+        }
     }
 }

@@ -22,7 +22,7 @@
 
 import Foundation
 
-extension Table {
+extension UICList {
     public enum ContentType {
         case header
         case row

@@ -23,6 +23,6 @@
 import Foundation
 import UIKit
 
-extension CollectionView: UICollectionViewDelegate {
+extension _CollectionView: UICollectionViewDelegate {
 
 }

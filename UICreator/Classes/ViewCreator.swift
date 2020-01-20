@@ -38,10 +38,10 @@ After committed the callbacks are removed from the stack of Handlers and cannot 
 
 Definitions of UIView as ViewBuild:
     - **root** are views that implements the `var body: UIView` as TemplateView and should add the body as subviews. This core implements the `class View` that does this, so you may change the superclass that your view is extending.
-    - **leaf** are views that is the last view in the hierarchy of builders views, so it may manage it self content. This core has `Stack` as `UIStackView`, `Child` as `UIView`, `Table` as `UITableView`. If the view is to much complex and there is no way to keep the right hierarchy of ViewBuilder's methods, you can use the `Host` view in the middle of subviews that will keep the integrity of the hierarchy by calling the commits methods for its subviews.
+    - **leaf** are views that is the last view in the hierarchy of builders views, so it may manage it self content. This core has `Stack` as `UIStackView`, `Child` as `UIView`, `Table` as `UITableView`. If the view is to much complex and there is no way to keep the right hierarchy of ViewBuilder's methods, you can use the `UICHost` view in the middle of subviews that will keep the integrity of the hierarchy by calling the commits methods for its subviews.
 */
 
-public protocol ViewCreator {
+public protocol ViewCreator: class {
     /// It is executed in `willMove(toSubview:)` and depends of superview to call the `commitNotRendered()`.
     func onNotRendered(_ handler: @escaping (UIView) -> Void) -> Self
 
@@ -58,12 +58,22 @@ internal var kUIView: UInt = 0
 internal extension ViewCreator {
     var uiView: UIView! {
         get { (self as? UIViewMaker)?.makeView() ?? objc_getAssociatedObject(self, &kUIView) as? UIView }
-        nonmutating
         set { setView(newValue, policity: newValue?.superview != nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
     }
 
     func setView(_ uiView: UIView, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN) {
         objc_setAssociatedObject(self, &kUIView, uiView, policity)
+
+        if let root = self as? (Root & TemplateView) {
+            root.viewDidChanged()
+        }
+    }
+
+    func releaseUIView() -> UIView! {
+        let uiView = self.uiView!
+        uiView.setCreator(self, policity: .OBJC_ASSOCIATION_RETAIN)
+        self.setView(uiView, policity: .OBJC_ASSOCIATION_ASSIGN)
+        return uiView
     }
 }
 
@@ -71,18 +81,31 @@ public extension ViewCreator {
 
     @discardableResult
     func onNotRendered(_ handler: @escaping (UIView) -> Void) -> Self {
+        guard self.uiView.renderState == .notRendered else {
+            handler(self.uiView)
+            return self
+        }
+
         _ = self.uiView.appendBeforeRendering(handler)
         return self
     }
 
     @discardableResult
     func onRendered(_ handler: @escaping (UIView) -> Void) -> Self {
+        guard self.uiView.renderState < .rendered else {
+            handler(self.uiView)
+            return self
+        }
         _ = self.uiView.appendRendered(handler)
         return self
     }
 
     @discardableResult
     func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
+        guard self.uiView.renderState < .inTheScene else {
+            handler(self.uiView)
+            return self
+        }
         _ = self.uiView.appendInTheScene(handler)
         return self
     }

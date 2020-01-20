@@ -56,14 +56,14 @@ internal class TableViewHeaderFooterCell: UITableViewHeaderFooterView {
         self.commitLayout()
     }
 
-    func prepareCell(builder: Table.Element.Builder) {
+    func prepareCell(builder: UICList.Element.Builder) {
         guard self.builder == nil else {
             return
         }
 
         let builder = builder()
         self.builder = builder
-        _ = self.contentView.add(builder.uiView)
+        _ = self.contentView.add(builder.releaseUIView())
     }
 
     public override var watchingViews: [UIView] {

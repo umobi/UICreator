@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public protocol TemplateView: class, ViewCreator {
+public protocol TemplateView: ViewCreator {
     var body: ViewCreator { get }
-    init()
+//    init()
 }

@@ -59,9 +59,9 @@ public extension UIViewCreator {
     func toolbar(_ views: ViewCreator...) -> Self {
         self.onInTheScene {
             $0.viewController.toolbarItems = views.map { view in
-                UIBarButtonItem(customView: Host {
+                UIBarButtonItem(customView: UICHost {
                     view
-                }.uiView)
+                }.releaseUIView())
             }
         }
     }
@@ -69,9 +69,9 @@ public extension UIViewCreator {
     func toolbar(_ views: [ViewCreator]) -> Self {
         self.onInTheScene {
             $0.viewController.toolbarItems = views.map { view in
-                UIBarButtonItem(customView: Host {
+                UIBarButtonItem(customView: UICHost {
                     view
-                }.uiView)
+                }.releaseUIView())
             }
         }
     }
@@ -144,7 +144,7 @@ public extension UIViewCreator {
 
     func navigation(titleView content: @escaping () -> ViewCreator) -> Self {
         return self.onInTheScene {
-            $0.navigationItem.titleView = Host(content: content).uiView
+            $0.navigationItem.titleView = UICHost(content: content).releaseUIView()
         }
     }
 
@@ -164,20 +164,20 @@ public extension UIViewCreator {
                 return
             }
 
-            $0.navigationItem.setLeftBarButton(.init(customView: Host(content: item).uiView), animated: false)
+            $0.navigationItem.setLeftBarButton(.init(customView: UICHost(content: item).releaseUIView()), animated: false)
         }
     }
     #endif
 
     func navigation(leftButton item: @escaping () -> ViewCreator) -> Self {
         return self.onInTheScene {
-            $0.navigationItem.setLeftBarButton(.init(customView: Host(content: item).uiView), animated: false)
+            $0.navigationItem.setLeftBarButton(.init(customView: UICHost(content: item).releaseUIView()), animated: false)
         }
     }
 
     func navigation(rightButton item: @escaping () -> ViewCreator) -> Self {
         return self.onInTheScene {
-            $0.navigationItem.setLeftBarButton(.init(customView: Host(content: item).uiView), animated: false)
+            $0.navigationItem.setLeftBarButton(.init(customView: UICHost(content: item).releaseUIView()), animated: false)
         }
     }
 
@@ -185,7 +185,7 @@ public extension UIViewCreator {
         return self.onInTheScene {
             $0.navigationItem
                 .setLeftBarButtonItems(items.map { view in
-                    .init(customView: Host(content: { view }).uiView)
+                    .init(customView: UICHost(content: { view }).releaseUIView())
                 }, animated: false)
         }
     }
@@ -194,7 +194,7 @@ public extension UIViewCreator {
         return self.onInTheScene {
             $0.navigationItem
                 .setRightBarButtonItems(items.map { view in
-                    .init(customView: Host(content: { view }).uiView)
+                    .init(customView: UICHost(content: { view }).releaseUIView())
                 }, animated: false)
         }
     }
