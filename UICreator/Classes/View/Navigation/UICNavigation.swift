@@ -52,7 +52,7 @@ public extension ViewCreator {
 
     @discardableResult
     func present<View: ViewCreator>(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> View) -> Self {
-        let controller = ContainerController(Host(content: content))
+        let controller = ContainerController(UICHost(content: content))
         self.viewController?.present(controller, animated: animated, completion: onCompletion)
         return self
     }

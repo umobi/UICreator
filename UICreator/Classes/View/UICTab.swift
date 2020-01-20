@@ -95,7 +95,7 @@ public class UICTabCreator<TabController: UITabBarController>: UIViewCreator {
         self.uiView = View.init(builder: self)
 
         self.tabController.viewControllers = sequence.map { view in
-            let controller = ContainerController(Host {
+            let controller = ContainerController(UICHost {
                 view
             })
             controller.tabBarItem = view.uiView.tabBarItem
@@ -316,13 +316,13 @@ public extension ViewCreator {
 }
 
 public class Controller: UIViewCreator {
-    public typealias View = _Container<ContainerController<Host>>
+    public typealias View = _Container<ContainerController<UICHost>>
 
     public init(content: @escaping () -> ViewCreator) {
         self.uiView = View.init(builder: self)
         _ = self.onInTheScene {
             ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: {
-                ContainerController(Host {
+                ContainerController(UICHost {
                     content()
                 })
             })

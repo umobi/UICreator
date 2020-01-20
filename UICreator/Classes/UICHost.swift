@@ -24,24 +24,16 @@ import Foundation
 import UIKit
 import UIContainer
 
-public class Host: Root, ViewControllerType, UIViewCreator {
+public class UICHost: Root, ViewControllerType, UIViewCreator {
     public init(size: CGSize = .zero, content: @escaping () -> ViewCreator) {
         super.init()
 //        super.init(loader: nil)
         self.uiView.frame = .init(origin: self.uiView.frame.origin, size: size)
         _ = self.uiView.add(content().releaseUIView())
     }
-
-    public required init(_ view: View!) {
-        fatalError("init(_:) has not been implemented")
-    }
-
-    public required init(loader: (() -> View)? = nil) {
-        fatalError("init(loader:) has not been implemented")
-    }
 }
 
-extension Host: ViewControllerAppearStates {
+extension UICHost: ViewControllerAppearStates {
     var hosted: ViewCreator? {
         return (self.uiView.subviews.first(where: { $0.viewCreator != nil }))?.viewCreator
     }

@@ -38,7 +38,7 @@ After committed the callbacks are removed from the stack of Handlers and cannot 
 
 Definitions of UIView as ViewBuild:
     - **root** are views that implements the `var body: UIView` as TemplateView and should add the body as subviews. This core implements the `class View` that does this, so you may change the superclass that your view is extending.
-    - **leaf** are views that is the last view in the hierarchy of builders views, so it may manage it self content. This core has `Stack` as `UIStackView`, `Child` as `UIView`, `Table` as `UITableView`. If the view is to much complex and there is no way to keep the right hierarchy of ViewBuilder's methods, you can use the `Host` view in the middle of subviews that will keep the integrity of the hierarchy by calling the commits methods for its subviews.
+    - **leaf** are views that is the last view in the hierarchy of builders views, so it may manage it self content. This core has `Stack` as `UIStackView`, `Child` as `UIView`, `Table` as `UITableView`. If the view is to much complex and there is no way to keep the right hierarchy of ViewBuilder's methods, you can use the `UICHost` view in the middle of subviews that will keep the integrity of the hierarchy by calling the commits methods for its subviews.
 */
 
 public protocol ViewCreator: class {

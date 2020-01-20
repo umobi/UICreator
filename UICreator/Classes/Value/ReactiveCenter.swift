@@ -23,7 +23,7 @@
 import Foundation
 
 private let _reactive = ReactiveCenter()
-class ReactiveCenter: NotificationCenter {
+final class ReactiveCenter: NotificationCenter {
     static var shared: ReactiveCenter {
         return _reactive
     }

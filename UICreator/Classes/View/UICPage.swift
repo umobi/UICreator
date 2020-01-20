@@ -339,7 +339,7 @@ public extension UICPage {
     func pages(direction: UIPageViewController.NavigationDirection,_ subview: Subview) -> Self {
         self.onInTheScene { [unowned self] _ in
             self.pageController.updateViewControllers(subview.views.enumerated().map { slice in
-                ContainerController(Host {
+                ContainerController(UICHost {
                     slice.element
                 })
             }, direction: direction, animated: false, completion: nil)
@@ -368,7 +368,7 @@ public extension UICPage {
 
     func addIndicator(atLocation location: View.IndicatorViewPosition, content: @escaping () -> ViewCreator) -> Self {
         self.onInTheScene {
-            ($0 as? View)?.setIndicatorViews(location: location, views: [Host {
+            ($0 as? View)?.setIndicatorViews(location: location, views: [UICHost {
                 content()
             }.uiView])
         }

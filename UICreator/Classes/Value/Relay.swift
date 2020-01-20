@@ -22,7 +22,7 @@
 
 import Foundation
 
-public class Relay<Value> {
+public final class Relay<Value> {
     let identifier: String
     init(identifier: String) {
         self.identifier = identifier

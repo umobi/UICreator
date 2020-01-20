@@ -105,7 +105,7 @@ public extension UIViewCreator where View: UICollectionView {
 
     func background<Background: ViewCreator>(_ content: @escaping () -> Background) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.backgroundView = Host(content: content).releaseUIView()
+            ($0 as? View)?.backgroundView = UICHost(content: content).releaseUIView()
         }
     }
 

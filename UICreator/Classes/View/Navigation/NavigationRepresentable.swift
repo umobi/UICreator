@@ -78,13 +78,13 @@ public extension NavigationRepresentable {
             }
 
             self.content = nil
-            return self.navigationLoader(ContainerController(Host(content: content)))
+            return self.navigationLoader(ContainerController(UICHost(content: content)))
         }
     }
 
     @discardableResult
     func push(animated: Bool, content: @escaping () -> ViewCreator) -> Self {
-        self.navigationController.pushViewController(ContainerController(Host(content: content)), animated: animated)
+        self.navigationController.pushViewController(ContainerController(UICHost(content: content)), animated: animated)
         return self
     }
 
@@ -109,7 +109,7 @@ public extension NavigationRepresentable {
     @discardableResult
     func popTo(view: ViewCreator, animated: Bool) -> Self {
         guard let viewController = self.navigationController.viewControllers.first(where: {
-            guard let controller = $0 as? ContainerController<Host> else {
+            guard let controller = $0 as? ContainerController<UICHost> else {
                 return false
             }
 

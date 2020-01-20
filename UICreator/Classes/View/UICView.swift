@@ -21,46 +21,5 @@
 //
 
 import Foundation
-import UIKit
 
-public class UIViewWrapper {
-    private let wrap: ViewCreator
-    public init(_ wrap: ViewCreator) {
-        self.wrap = wrap
-    }
-
-    public weak var uiView: UIView! {
-        return self.wrap.uiView
-    }
-}
-
-public protocol UIViewMaker: ViewCreator {
-    var loadView: UIView { get }
-}
-
-public protocol UIHost: UIViewCreator, UIViewMaker {
-    var uiView: View! { get }
-    func makeUIView() -> View
-}
-
-internal extension UIViewMaker {
-    func makeView() -> UIView {
-        if let view = objc_getAssociatedObject(self, &kUIView) as? UIView {
-            return view
-        }
-
-        let view = self.loadView
-        objc_setAssociatedObject(self, &kUIView, view, .OBJC_ASSOCIATION_RETAIN)
-        return view
-    }
-}
-
-public extension UIHost {
-    var loadView: UIView {
-        return self.makeUIView()
-    }
-
-    var uiView: View! {
-        return (self as ViewCreator).uiView as? View
-    }
-}
+public typealias UICView = Root & TemplateView

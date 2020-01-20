@@ -17,8 +17,8 @@
 		0C08F82123BF7C4700C52B8E /* UICollectionView+CollectionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C08F82023BF7C4700C52B8E /* UICollectionView+CollectionEngine.swift */; };
 		0C08F82323BF7CAA00C52B8E /* UIViewCreator+CollectionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C08F82223BF7CAA00C52B8E /* UIViewCreator+CollectionEngine.swift */; };
 		0C08F82523BF7CB800C52B8E /* CollectionDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C08F82423BF7CB800C52B8E /* CollectionDataSource.swift */; };
-		0C08F82723BF7D2400C52B8E /* FlowCollection+CollectionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C08F82623BF7D2400C52B8E /* FlowCollection+CollectionEngine.swift */; };
-		0C08F82923BF7D8700C52B8E /* FlowCollection+LayoutEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C08F82823BF7D8700C52B8E /* FlowCollection+LayoutEngine.swift */; };
+		0C08F82723BF7D2400C52B8E /* UICFlow+CollectionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C08F82623BF7D2400C52B8E /* UICFlow+CollectionEngine.swift */; };
+		0C08F82923BF7D8700C52B8E /* UICFlow+LayoutEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C08F82823BF7D8700C52B8E /* UICFlow+LayoutEngine.swift */; };
 		0C08F82B23BFB5DA00C52B8E /* UICPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C08F82A23BFB5DA00C52B8E /* UICPage.swift */; };
 		0C0B0B9123B4E54100FAF1E6 /* UICSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0B0B9023B4E54100FAF1E6 /* UICSlider.swift */; };
 		0C0B0B9323B4E56200FAF1E6 /* UICActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0B0B9223B4E56200FAF1E6 /* UICActivity.swift */; };
@@ -39,6 +39,7 @@
 		0C0FACF823B258FD00E6B2FC /* HoverGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACF023B258FD00E6B2FC /* HoverGesture.swift */; };
 		0C0FACF923B258FD00E6B2FC /* PinchGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACF123B258FD00E6B2FC /* PinchGesture.swift */; };
 		0C2855BE23D525DD007E45DE /* ListManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2855BD23D525DD007E45DE /* ListManager.swift */; };
+		0C2855C023D527EC007E45DE /* UICView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2855BF23D527EC007E45DE /* UICView.swift */; };
 		0C31DAF123CB5D8A0044B70B /* UICTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31DAF023CB5D8A0044B70B /* UICTab.swift */; };
 		0C3883CB23BBB5FC009E6FF6 /* TouchGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3883CA23BBB5FC009E6FF6 /* TouchGesture.swift */; };
 		0C3E8C1923BA68CA0045C86E /* SystemFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C1823BA68CA0045C86E /* SystemFont.swift */; };
@@ -57,9 +58,9 @@
 		0C3E8C3923BA84490045C86E /* TableDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C3823BA84490045C86E /* TableDataSource.swift */; };
 		0C3E8C3B23BA86220045C86E /* UIViewRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C3A23BA86220045C86E /* UIViewRender.swift */; };
 		0C3E8C3D23BA86590045C86E /* ViewCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C3C23BA86590045C86E /* ViewCreator.swift */; };
-		0C3E8C3F23BA86E10045C86E /* UIHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C3E23BA86E10045C86E /* UIHost.swift */; };
+		0C3E8C3F23BA86E10045C86E /* UICViewRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C3E23BA86E10045C86E /* UICViewRepresentable.swift */; };
 		0C46815923BE1A3600BDC263 /* UICSegmented.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C46815823BE1A3600BDC263 /* UICSegmented.swift */; };
-		0C4B86B623CCAA9B006FBAA1 /* ForEach.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4B86B523CCAA9B006FBAA1 /* ForEach.swift */; };
+		0C4B86B623CCAA9B006FBAA1 /* UICForEach.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4B86B523CCAA9B006FBAA1 /* UICForEach.swift */; };
 		0C61B4C823BE5EF4001A28B1 /* UIAccessibilityCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C61B4C723BE5EF4001A28B1 /* UIAccessibilityCreator.swift */; };
 		0C61B4CA23BE6E04001A28B1 /* UICPageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C61B4C923BE6E04001A28B1 /* UICPageControl.swift */; };
 		0C61B4CC23BE6E86001A28B1 /* NSProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C61B4CB23BE6E86001A28B1 /* NSProtocol.swift */; };
@@ -70,7 +71,7 @@
 		0C7E8A9A23B40AFF007E480B /* UICInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7E8A9923B40AFF007E480B /* UICInput.swift */; };
 		0C9346F323AE7D8600A9E112 /* UIViewCreator+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346C823AE7D8500A9E112 /* UIViewCreator+UIKit.swift */; };
 		0C9346F423AE7D8600A9E112 /* UIViewCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346C923AE7D8500A9E112 /* UIViewCreator.swift */; };
-		0C9346F523AE7D8600A9E112 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346CA23AE7D8500A9E112 /* RootView.swift */; };
+		0C9346F523AE7D8600A9E112 /* Root.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346CA23AE7D8500A9E112 /* Root.swift */; };
 		0C9346F623AE7D8600A9E112 /* HasViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346CB23AE7D8500A9E112 /* HasViewDataSource.swift */; };
 		0C9346FD23AE7D8600A9E112 /* Gesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346D323AE7D8500A9E112 /* Gesture.swift */; };
 		0C9346FF23AE7D8600A9E112 /* UIControl+Control.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346D523AE7D8500A9E112 /* UIControl+Control.swift */; };
@@ -78,7 +79,7 @@
 		0C93470223AE7D8600A9E112 /* HasViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346D823AE7D8500A9E112 /* HasViewDelegate.swift */; };
 		0C93470323AE7D8600A9E112 /* Control.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346D923AE7D8500A9E112 /* Control.swift */; };
 		0C93470423AE7D8600A9E112 /* UIViewCreator+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346DA23AE7D8500A9E112 /* UIViewCreator+Navigation.swift */; };
-		0C93470523AE7D8600A9E112 /* Host.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346DB23AE7D8500A9E112 /* Host.swift */; };
+		0C93470523AE7D8600A9E112 /* UICHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346DB23AE7D8500A9E112 /* UICHost.swift */; };
 		0C93470723AE7D8600A9E112 /* Subview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346DD23AE7D8600A9E112 /* Subview.swift */; };
 		0C93470923AE7D8600A9E112 /* ViewControllerType+ViewCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346E023AE7D8600A9E112 /* ViewControllerType+ViewCreator.swift */; };
 		0C93470A23AE7D8600A9E112 /* UICContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9346E123AE7D8600A9E112 /* UICContent.swift */; };
@@ -146,8 +147,8 @@
 		0C08F82023BF7C4700C52B8E /* UICollectionView+CollectionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView+CollectionEngine.swift"; sourceTree = "<group>"; };
 		0C08F82223BF7CAA00C52B8E /* UIViewCreator+CollectionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewCreator+CollectionEngine.swift"; sourceTree = "<group>"; };
 		0C08F82423BF7CB800C52B8E /* CollectionDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionDataSource.swift; sourceTree = "<group>"; };
-		0C08F82623BF7D2400C52B8E /* FlowCollection+CollectionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FlowCollection+CollectionEngine.swift"; sourceTree = "<group>"; };
-		0C08F82823BF7D8700C52B8E /* FlowCollection+LayoutEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FlowCollection+LayoutEngine.swift"; sourceTree = "<group>"; };
+		0C08F82623BF7D2400C52B8E /* UICFlow+CollectionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICFlow+CollectionEngine.swift"; sourceTree = "<group>"; };
+		0C08F82823BF7D8700C52B8E /* UICFlow+LayoutEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICFlow+LayoutEngine.swift"; sourceTree = "<group>"; };
 		0C08F82A23BFB5DA00C52B8E /* UICPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICPage.swift; sourceTree = "<group>"; };
 		0C0B0B9023B4E54100FAF1E6 /* UICSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICSlider.swift; sourceTree = "<group>"; };
 		0C0B0B9223B4E56200FAF1E6 /* UICActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICActivity.swift; sourceTree = "<group>"; };
@@ -168,6 +169,7 @@
 		0C0FACF023B258FD00E6B2FC /* HoverGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HoverGesture.swift; sourceTree = "<group>"; };
 		0C0FACF123B258FD00E6B2FC /* PinchGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinchGesture.swift; sourceTree = "<group>"; };
 		0C2855BD23D525DD007E45DE /* ListManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListManager.swift; sourceTree = "<group>"; };
+		0C2855BF23D527EC007E45DE /* UICView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICView.swift; sourceTree = "<group>"; };
 		0C31DAF023CB5D8A0044B70B /* UICTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICTab.swift; sourceTree = "<group>"; };
 		0C3883CA23BBB5FC009E6FF6 /* TouchGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchGesture.swift; sourceTree = "<group>"; };
 		0C3E8C1823BA68CA0045C86E /* SystemFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemFont.swift; sourceTree = "<group>"; };
@@ -186,9 +188,9 @@
 		0C3E8C3823BA84490045C86E /* TableDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableDataSource.swift; sourceTree = "<group>"; };
 		0C3E8C3A23BA86220045C86E /* UIViewRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIViewRender.swift; path = UICreator/Classes/UIViewRender.swift; sourceTree = "<group>"; };
 		0C3E8C3C23BA86590045C86E /* ViewCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ViewCreator.swift; path = UICreator/Classes/ViewCreator.swift; sourceTree = "<group>"; };
-		0C3E8C3E23BA86E10045C86E /* UIHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIHost.swift; path = UICreator/Classes/UIHost.swift; sourceTree = "<group>"; };
+		0C3E8C3E23BA86E10045C86E /* UICViewRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UICViewRepresentable.swift; path = UICreator/Classes/UICViewRepresentable.swift; sourceTree = "<group>"; };
 		0C46815823BE1A3600BDC263 /* UICSegmented.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICSegmented.swift; sourceTree = "<group>"; };
-		0C4B86B523CCAA9B006FBAA1 /* ForEach.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ForEach.swift; path = UICreator/Classes/ForEach.swift; sourceTree = "<group>"; };
+		0C4B86B523CCAA9B006FBAA1 /* UICForEach.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UICForEach.swift; path = UICreator/Classes/UICForEach.swift; sourceTree = "<group>"; };
 		0C61B4C723BE5EF4001A28B1 /* UIAccessibilityCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIAccessibilityCreator.swift; path = UICreator/Classes/UIAccessibilityCreator.swift; sourceTree = "<group>"; };
 		0C61B4C923BE6E04001A28B1 /* UICPageControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICPageControl.swift; sourceTree = "<group>"; };
 		0C61B4CB23BE6E86001A28B1 /* NSProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NSProtocol.swift; path = UICreator/Classes/NSProtocol.swift; sourceTree = "<group>"; };
@@ -199,7 +201,7 @@
 		0C7E8A9923B40AFF007E480B /* UICInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICInput.swift; sourceTree = "<group>"; };
 		0C9346C823AE7D8500A9E112 /* UIViewCreator+UIKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UIViewCreator+UIKit.swift"; path = "UICreator/Classes/UIViewCreator+UIKit.swift"; sourceTree = "<group>"; };
 		0C9346C923AE7D8500A9E112 /* UIViewCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIViewCreator.swift; path = UICreator/Classes/UIViewCreator.swift; sourceTree = "<group>"; };
-		0C9346CA23AE7D8500A9E112 /* RootView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RootView.swift; path = UICreator/Classes/RootView.swift; sourceTree = "<group>"; };
+		0C9346CA23AE7D8500A9E112 /* Root.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Root.swift; path = UICreator/Classes/Root.swift; sourceTree = "<group>"; };
 		0C9346CB23AE7D8500A9E112 /* HasViewDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HasViewDataSource.swift; path = UICreator/Classes/HasViewDataSource.swift; sourceTree = "<group>"; };
 		0C9346D323AE7D8500A9E112 /* Gesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gesture.swift; sourceTree = "<group>"; };
 		0C9346D523AE7D8500A9E112 /* UIControl+Control.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIControl+Control.swift"; sourceTree = "<group>"; };
@@ -207,7 +209,7 @@
 		0C9346D823AE7D8500A9E112 /* HasViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HasViewDelegate.swift; path = UICreator/Classes/HasViewDelegate.swift; sourceTree = "<group>"; };
 		0C9346D923AE7D8500A9E112 /* Control.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Control.swift; sourceTree = "<group>"; };
 		0C9346DA23AE7D8500A9E112 /* UIViewCreator+Navigation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UIViewCreator+Navigation.swift"; path = "UICreator/Classes/UIViewCreator+Navigation.swift"; sourceTree = "<group>"; };
-		0C9346DB23AE7D8500A9E112 /* Host.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Host.swift; path = UICreator/Classes/Host.swift; sourceTree = "<group>"; };
+		0C9346DB23AE7D8500A9E112 /* UICHost.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UICHost.swift; path = UICreator/Classes/UICHost.swift; sourceTree = "<group>"; };
 		0C9346DD23AE7D8600A9E112 /* Subview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Subview.swift; path = UICreator/Classes/Subview.swift; sourceTree = "<group>"; };
 		0C9346E023AE7D8600A9E112 /* ViewControllerType+ViewCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ViewControllerType+ViewCreator.swift"; sourceTree = "<group>"; };
 		0C9346E123AE7D8600A9E112 /* UICContent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UICContent.swift; sourceTree = "<group>"; };
@@ -399,8 +401,8 @@
 				0C08F82023BF7C4700C52B8E /* UICollectionView+CollectionEngine.swift */,
 				0C08F82223BF7CAA00C52B8E /* UIViewCreator+CollectionEngine.swift */,
 				0C08F82423BF7CB800C52B8E /* CollectionDataSource.swift */,
-				0C08F82623BF7D2400C52B8E /* FlowCollection+CollectionEngine.swift */,
-				0C08F82823BF7D8700C52B8E /* FlowCollection+LayoutEngine.swift */,
+				0C08F82623BF7D2400C52B8E /* UICFlow+CollectionEngine.swift */,
+				0C08F82823BF7D8700C52B8E /* UICFlow+LayoutEngine.swift */,
 			);
 			name = CollectionEngine;
 			path = UICreator/Classes/CollectionEngine;
@@ -418,6 +420,7 @@
 		0C9346E423AE7D8600A9E112 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				0C2855BF23D527EC007E45DE /* UICView.swift */,
 				0C08F82A23BFB5DA00C52B8E /* UICPage.swift */,
 				0C31DAF023CB5D8A0044B70B /* UICTab.swift */,
 				0C7E8A9723B403B3007E480B /* UICDatePicker.swift */,
@@ -506,26 +509,26 @@
 		23482E1745BD744A1B8DC0CDFA317DBA /* UICreator */ = {
 			isa = PBXGroup;
 			children = (
-				0C4B86B523CCAA9B006FBAA1 /* ForEach.swift */,
+				0C4B86B523CCAA9B006FBAA1 /* UICForEach.swift */,
 				0C0D306A23D517BF00D2AE79 /* Fatal.swift */,
 				0C7E8A9523B3FA5D007E480B /* TextKeyboard.swift */,
 				0C07F76B23B17C5600A7A65B /* Previewer.swift */,
 				0C9346CB23AE7D8500A9E112 /* HasViewDataSource.swift */,
 				0C9346D823AE7D8500A9E112 /* HasViewDelegate.swift */,
-				0C9346DB23AE7D8500A9E112 /* Host.swift */,
+				0C9346DB23AE7D8500A9E112 /* UICHost.swift */,
 				0C9346DD23AE7D8600A9E112 /* Subview.swift */,
 				0C9346D723AE7D8500A9E112 /* TemplateView.swift */,
 				0C61B4CB23BE6E86001A28B1 /* NSProtocol.swift */,
 				0C9346E323AE7D8600A9E112 /* Text.swift */,
 				0C61B4C723BE5EF4001A28B1 /* UIAccessibilityCreator.swift */,
 				0C9346F223AE7D8600A9E112 /* UIView+Mode.swift */,
-				0C9346CA23AE7D8500A9E112 /* RootView.swift */,
+				0C9346CA23AE7D8500A9E112 /* Root.swift */,
 				0C9346C823AE7D8500A9E112 /* UIViewCreator+UIKit.swift */,
 				0C9346C923AE7D8500A9E112 /* UIViewCreator.swift */,
 				0C3E8C3A23BA86220045C86E /* UIViewRender.swift */,
 				0C3E8C3C23BA86590045C86E /* ViewCreator.swift */,
 				0C9346F123AE7D8600A9E112 /* UIViewCreator+Constraints.swift */,
-				0C3E8C3E23BA86E10045C86E /* UIHost.swift */,
+				0C3E8C3E23BA86E10045C86E /* UICViewRepresentable.swift */,
 				0C9346DA23AE7D8500A9E112 /* UIViewCreator+Navigation.swift */,
 				0C0D306C23D5185A00D2AE79 /* Value */,
 				0C0FACE923B2584100E6B2FC /* Gestures */,
@@ -785,7 +788,7 @@
 				0C0D306023D516C400D2AE79 /* Context.swift in Sources */,
 				0CAA4C0323B2696B00DD5DDF /* UICSpacer.swift in Sources */,
 				0C0FACF923B258FD00E6B2FC /* PinchGesture.swift in Sources */,
-				0C9346F523AE7D8600A9E112 /* RootView.swift in Sources */,
+				0C9346F523AE7D8600A9E112 /* Root.swift in Sources */,
 				0C0FACF723B258FD00E6B2FC /* TapGesture.swift in Sources */,
 				0C0D306923D517AA00D2AE79 /* Setter.swift in Sources */,
 				0C61B4C823BE5EF4001A28B1 /* UIAccessibilityCreator.swift in Sources */,
@@ -805,10 +808,10 @@
 				0C9346FD23AE7D8600A9E112 /* Gesture.swift in Sources */,
 				0C3E8C2723BA80000045C86E /* TableElement.swift in Sources */,
 				0C2855BE23D525DD007E45DE /* ListManager.swift in Sources */,
-				0C08F82923BF7D8700C52B8E /* FlowCollection+LayoutEngine.swift in Sources */,
+				0C08F82923BF7D8700C52B8E /* UICFlow+LayoutEngine.swift in Sources */,
 				0C93471623AE7D8600A9E112 /* UICRounder.swift in Sources */,
 				0C0FACF523B258FD00E6B2FC /* RotationGesture.swift in Sources */,
-				0C4B86B623CCAA9B006FBAA1 /* ForEach.swift in Sources */,
+				0C4B86B623CCAA9B006FBAA1 /* UICForEach.swift in Sources */,
 				0C93471323AE7D8600A9E112 /* UICList.swift in Sources */,
 				0C3E8C3523BA84190045C86E /* TableView+UITableViewDelegate.swift in Sources */,
 				0C93470223AE7D8600A9E112 /* HasViewDelegate.swift in Sources */,
@@ -818,11 +821,11 @@
 				0CAA4BF723B267A200DD5DDF /* UICNavigation.swift in Sources */,
 				0C93471723AE7D8600A9E112 /* UICTextView.swift in Sources */,
 				0C08F81723BF7B7100C52B8E /* CollectionLayoutSizeConstraint.swift in Sources */,
-				0C3E8C3F23BA86E10045C86E /* UIHost.swift in Sources */,
+				0C3E8C3F23BA86E10045C86E /* UICViewRepresentable.swift in Sources */,
 				0C0FACF623B258FD00E6B2FC /* ScreenEdgePanGesture.swift in Sources */,
 				0CAA4BFC23B267C300DD5DDF /* UICContainer.swift in Sources */,
 				0C93470923AE7D8600A9E112 /* ViewControllerType+ViewCreator.swift in Sources */,
-				0C93470523AE7D8600A9E112 /* Host.swift in Sources */,
+				0C93470523AE7D8600A9E112 /* UICHost.swift in Sources */,
 				0CAA4BF423B267A200DD5DDF /* UICCollection.swift in Sources */,
 				0C08F82B23BFB5DA00C52B8E /* UICPage.swift in Sources */,
 				0C93470F23AE7D8600A9E112 /* UICStack.swift in Sources */,
@@ -839,6 +842,7 @@
 				0C0B0B9323B4E56200FAF1E6 /* UICActivity.swift in Sources */,
 				0C3E8C3923BA84490045C86E /* TableDataSource.swift in Sources */,
 				0C3E8C2B23BA802F0045C86E /* TableContent.swift in Sources */,
+				0C2855C023D527EC007E45DE /* UICView.swift in Sources */,
 				0C61B4CC23BE6E86001A28B1 /* NSProtocol.swift in Sources */,
 				0C0FACF223B258FD00E6B2FC /* LongPressGesture.swift in Sources */,
 				0C93470E23AE7D8600A9E112 /* UICScroll.swift in Sources */,
@@ -852,7 +856,7 @@
 				0C0D306523D5176300D2AE79 /* Relay.swift in Sources */,
 				0C3E8C1F23BA7CEA0045C86E /* TableViewCell.swift in Sources */,
 				0C0B0B9123B4E54100FAF1E6 /* UICSlider.swift in Sources */,
-				0C08F82723BF7D2400C52B8E /* FlowCollection+CollectionEngine.swift in Sources */,
+				0C08F82723BF7D2400C52B8E /* UICFlow+CollectionEngine.swift in Sources */,
 				0C3E8C2523BA7FE00045C86E /* TableGroup.swift in Sources */,
 				0C31DAF123CB5D8A0044B70B /* UICTab.swift in Sources */,
 				0C0D306323D5173D00D2AE79 /* ReactiveCenter.swift in Sources */,

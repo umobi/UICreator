@@ -55,7 +55,7 @@ public class PlaceholderView: UIView {
     }
 }
 
-public class ForEach<Value>: ViewCreator, ForEachCreator {
+public class UICForEach<Value>: ViewCreator, ForEachCreator {
     let relay: Relay<[Value]>
     let content: (Value) -> ViewCreator
 
