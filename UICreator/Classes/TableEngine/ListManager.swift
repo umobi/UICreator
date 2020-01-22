@@ -219,22 +219,7 @@ extension ListManager: ListContentDelegate {
 
 public class Link: UICHost {
     public init(content: @escaping () -> ViewCreator) {
-        super.init(content: {
-            UICSpacer(horizontal: 15) {
-                UICHStack(
-                    content(),
-
-                    UICCenter {
-                        UICSpacer()
-                            .aspectRatio()
-                            .leading()
-                            .trailing()
-                            .height(equalTo: 25)
-                    }
-
-                ).spacing(15)
-            }.insets()
-        })
+        super.init(content: content)
     }
 }
 

@@ -568,7 +568,7 @@ public extension ViewCreator {
 }
 
 public extension ViewCreator {
-    func insets(equalTo value: CGFloat = 0, priority: ConstraintPriority = .required) -> Self {
+    func insets(equalTo value: CGFloat, priority: ConstraintPriority = .required) -> Self {
         return self.top(equalTo: value, priority: priority)
             .bottom(equalTo: value, priority: priority)
             .leading(equalTo: value, priority: priority)
@@ -852,6 +852,230 @@ public extension ViewCreator {
         return self.onNotRendered {
             $0.setContentHuggingPriority(huggingPriority, for: .horizontal)
             $0.setContentCompressionResistancePriority(compressionPriority, for: .horizontal)
+        }
+    }
+}
+
+public extension ViewCreator {
+    func topMargin(equalTo constant: CGFloat = 0, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.top.equalTo(view.snp.topMargin)
+                    .offset(constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func topMargin(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.top.greaterThanOrEqualTo(view.snp.topMargin)
+                    .offset(constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func topMargin(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.top.lessThanOrEqualTo(view.snp.topMargin)
+                    .offset(constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func bottomMargin(equalTo constant: CGFloat = 0, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.bottom.equalTo(view.snp.bottomMargin)
+                    .offset(-constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func bottomMargin(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.bottom.greaterThanOrEqualTo(view.snp.bottomMargin)
+                    .offset(-constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func bottomMargin(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.bottom.lessThanOrEqualTo(view.snp.bottomMargin)
+                    .offset(-constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func leadingMargin(equalTo constant: CGFloat = 0, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.leading.equalTo(view.snp.leadingMargin)
+                    .offset(constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func leadingMargin(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.leading.greaterThanOrEqualTo(view.snp.leadingMargin)
+                    .offset(constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func leadingMargin(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.leading.lessThanOrEqualTo(view.snp.leadingMargin)
+                    .offset(constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func trailingMargin(equalTo constant: CGFloat = 0, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.trailing.equalTo(view.snp.trailingMargin)
+                    .offset(-constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func trailingMargin(greaterThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.trailing.greaterThanOrEqualTo(view.snp.trailingMargin)
+                    .offset(-constant)
+                    .priority(priority)
+            }
+        }
+    }
+
+    func trailingMargin(lessThanOrEqualTo constant: CGFloat, priority: ConstraintPriority = .required, toView view: UIView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view ?? $0.realSuperview else {
+                return
+            }
+
+            $0.snp.makeConstraints {
+                $0.trailing.lessThanOrEqualTo(view.snp.trailingMargin)
+                .offset(-constant)
+                .priority(priority)
+            }
+        }
+    }
+}
+
+public enum Margin: CaseIterable {
+    case top
+    case bottom
+    case leading
+    case trailing
+}
+
+public extension ViewCreator {
+    func safeArea(priority: ConstraintPriority = .required,_ margins: Margin...) -> Self {
+        Set(margins.isEmpty ? Margin.allCases : margins).reduce(self) {
+            switch $1 {
+            case .top:
+                return self.safeArea(topEqualTo: 0, priority: priority)
+            case .bottom:
+                return self.safeArea(bottomEqualTo: 0, priority: priority)
+            case .leading:
+                return self.safeArea(leadingEqualTo: 0, priority: priority)
+            case .trailing:
+                return self.safeArea(trailingEqualTo: 0, priority: priority)
+            }
+        }
+    }
+
+    func insets(priority: ConstraintPriority = .required,_ margins: Margin...) -> Self {
+        Set(margins.isEmpty ? Margin.allCases : margins).reduce(self) {
+            switch $1 {
+            case .top:
+                return self.top(priority: priority)
+            case .bottom:
+                return self.bottom(priority: priority)
+            case .leading:
+                return self.leading(priority: priority)
+            case .trailing:
+                return self.trailing(priority: priority)
+            }
+        }
+    }
+
+    func margin(priority: ConstraintPriority = .required,_ margins: Margin...) -> Self {
+        Set(margins.isEmpty ? Margin.allCases : margins).reduce(self) {
+            switch $1 {
+            case .top:
+                return self.topMargin(priority: priority)
+            case .bottom:
+                return self.bottomMargin(priority: priority)
+            case .leading:
+                return self.leadingMargin(priority: priority)
+            case .trailing:
+                return self.trailingMargin(priority: priority)
+            }
         }
     }
 }

@@ -210,3 +210,36 @@ public extension UIViewCreator where View: UITableView {
         }
     }
 }
+
+public extension UIViewCreator where View: UITableView {
+    func accessoryType(_ type: UITableViewCell.AccessoryType) -> Self {
+        (self.uiView as? View)?.appendCellHandler {
+            $0.accessoryType = type
+        }
+
+        return self
+    }
+}
+
+private var kTableViewCellHandler: UInt = 0
+extension UITableView {
+    private var tableViewCellHandler: ((UITableViewCell) -> Void)? {
+        get { objc_getAssociatedObject(self, &kTableViewCellHandler) as? (UITableViewCell) -> Void }
+        set { objc_setAssociatedObject(self, &kTableViewCellHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    }
+
+    @discardableResult
+    func appendCellHandler(handler: @escaping (UITableViewCell) -> Void) -> Self {
+        let all = self.tableViewCellHandler
+        self.tableViewCellHandler = {
+            all?($0)
+            handler($0)
+        }
+
+        return self
+    }
+
+    func commitCell(_ cell: UITableViewCell) {
+        self.tableViewCellHandler?(cell)
+    }
+}

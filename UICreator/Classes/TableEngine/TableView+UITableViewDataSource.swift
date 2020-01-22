@@ -52,6 +52,8 @@ extension TableView: UITableViewDataSource {
 
         cell.prepareCell(builder: row.1)
         self.creatorDataSource?.cell(at: indexPath, content: cell.builder)
+
+        self.commitCell(cell)
         return cell
     }
 }
