@@ -31,7 +31,7 @@ extension UIViewContext {
     private static func createContext<Context: UICreator.Context>(for uiView: UIView!) -> Context {
         let context = Context.init()
         guard let _self = uiView.viewCreator as? Self else {
-            return context
+            fatalError()
         }
 
         context.onContextChange { uiView in

@@ -35,7 +35,7 @@ extension ForEachCreator {
 }
 
 protocol SupportForEach: class {
-    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>)
+    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>)
 }
 
 public class PlaceholderView: UIView {
@@ -62,8 +62,10 @@ public class UICForEach<Value>: ViewCreator, ForEachCreator {
     func startObservation() {
         let content = self.content
         self.manager?.viewsDidChange(placeholderView: self.uiView, relay.map {
-            $0.map {
-                content($0)
+            $0.map { item in
+                {
+                    content(item)
+                }
             }
         })
     }
@@ -76,6 +78,18 @@ public class UICForEach<Value>: ViewCreator, ForEachCreator {
         self.onInTheScene { [weak value] view in
             (view.viewCreator as? Self)?.startObservation()
             (view.viewCreator as? Self)?.relay.post(value?.value ?? [])
+        }
+    }
+
+    public init(_ value: [Value], content: @escaping (Value) -> ViewCreator) {
+        let value = UICreator.Value(value: value)
+        self.relay = value.asRelay
+        self.content = content
+        self.uiView = PlaceholderView(builder: self)
+
+        self.onInTheScene { view in
+            (view.viewCreator as? Self)?.startObservation()
+            (view.viewCreator as? Self)?.relay.post(value.value)
         }
     }
 }

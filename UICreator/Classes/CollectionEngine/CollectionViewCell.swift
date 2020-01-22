@@ -56,13 +56,38 @@ public class CollectionViewCell: UICollectionViewCell {
     }
 
     func prepareCell(builder: UICList.Element.Builder) {
-        guard self.builder == nil else {
+        if self.contentView.subviews.first is PlaceholderView {
+            self.contentView.subviews.forEach {
+                $0.removeFromSuperview()
+            }
+            
+            self.builder = nil
+        }
+        
+        if let creator = self.builder {
+            //            if let currentViewContext = creator as? ViewContext, let newViewContext = builder() as? ViewContext {
+            //                currentViewContext.update(context: newViewContext.context)
+            //            }
+            
+            self.contentView.subviews.forEach {
+                $0.removeFromSuperview()
+            }
+            
+            self.builder = creator
+            _ = self.contentView.add(creator.releaseUIView())
+            
             return
         }
-
+        
         let builder = builder()
         self.builder = builder
         _ = self.contentView.add(builder.releaseUIView())
+        
+        if self.contentView.subviews.first is PlaceholderView {
+            self.contentView.subviews.first?.snp.makeConstraints {
+                $0.height.equalTo(0)
+            }
+        }
     }
 
     public override var watchingViews: [UIView] {

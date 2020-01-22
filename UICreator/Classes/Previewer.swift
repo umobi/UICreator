@@ -27,40 +27,42 @@ import SwiftUI
 
 @available(iOS 13, tvOS 13, *)
 /// `LivePreview` is the main class that will manipulate the view creator for SwiftUI. It is necessary to use it as SwiftUI.View
-public struct LivePreview<View: ViewCreator>: SwiftUI.View {
+public struct LivePreview: SwiftUI.View {
 
-    let view: View
+    let view: ViewCreator
 
     /// The init supports directly constructor of view creator or it can be used the callback constructor. Since view creator doesn’t have a default constructor, it is needed to be created outside of LivePreview.
-    public init(_ initClass: View) {
-        self.view = initClass
+    public init(_ initClass: ViewCreator) {
+        self.view = UICCenter {
+            initClass
+        }
     }
 
     /// Create LivePreview with content callback
-    public init(content: () -> View) {
-        self.view = content()
+    public init(content: @escaping () -> ViewCreator) {
+        self.view = UICCenter(content: content)
     }
 
     public var body: some SwiftUI.View {
-        Previewer<View>(view)
+        Previewer(view)
     }
 }
 
 @available(iOS 13, tvOS 13, *)
 /// This is an internal class used to display the view creator in SwiftUI views.
-public struct Previewer<View: ViewCreator>: UIViewRepresentable {
+public struct Previewer: UIViewRepresentable {
 
     public typealias UIViewType = UIView
 
-    let view: View
+    let view: ViewCreator
 
-    public init(_ initClass: View) {
+    public init(_ initClass: ViewCreator) {
         self.view = initClass
     }
 
-    public func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<Previewer<View>>) {}
+    public func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<Previewer>) {}
 
-    public func makeUIView(context: UIViewRepresentableContext<Previewer<View>>) -> UIView {
+    public func makeUIView(context: UIViewRepresentableContext<Previewer>) -> UIView {
         return self.view.releaseUIView()
     }
 }

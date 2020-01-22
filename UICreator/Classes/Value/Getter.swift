@@ -28,14 +28,9 @@ public protocol Getter: class {
     var value: Value { get }
 }
 
-internal var kGetterValue: UInt = 0
 public extension Getter {
     internal var identifier: String {
         return "\(ObjectIdentifier(self))"
-    }
-
-    var value: Value {
-        transform(objc_getAssociatedObject(self, &kGetterValue))
     }
 
     func next(_ handler: @escaping (Value) -> Void) {
@@ -49,12 +44,4 @@ public extension Getter {
 
         syncHandler(self.value)
     }
-}
-
-internal func transform<Value>(_ any: Any?) -> Value {
-    var a: Value! {
-        return any as? Value
-    }
-
-    return a
 }

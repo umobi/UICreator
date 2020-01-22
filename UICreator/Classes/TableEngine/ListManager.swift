@@ -150,7 +150,7 @@ extension ListManager {
             self.element = element
         }
 
-        func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>) {
+        func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
             let cellIdentifier = "\(ObjectIdentifier(self.delegate).hashValue).row.\(identifier)"
             weak var delegate = self.delegate
 
@@ -159,10 +159,8 @@ extension ListManager {
                     return
                 }
 
-                delegate?.content(self, updatedWith: $0.map { view in
-                    .row(identifier: cellIdentifier, content: {
-                        view
-                    })
+                delegate?.content(self, updatedWith: $0.map { constructor in
+                    .row(identifier: cellIdentifier, content: constructor)
                 })
             }
         }
@@ -187,7 +185,7 @@ extension ListManager {
 
 extension ListManager: ListContentDelegate {
     private static func update(section: ContentSection, first: (Int, Content), last: (Int, Content)?, with contents: [Content]) -> ContentSection {
-        return .init(contents: Array(section.contents[0...first.0]) +
+        return .init(contents: Array(section.contents[0..<first.0]) +
             contents + {
                 if section.contents.count == ((last ?? first).0 + 1) {
                     return []
@@ -216,5 +214,39 @@ extension ListManager: ListContentDelegate {
         }
 
         self.list.reloadData()
+    }
+}
+
+public class Link: UICHost {
+    public init(content: @escaping () -> ViewCreator) {
+        super.init(content: {
+            UICSpacer(horizontal: 15) {
+                UICHStack(
+                    content(),
+
+                    UICCenter {
+                        UICSpacer()
+                            .aspectRatio()
+                            .leading()
+                            .trailing()
+                            .height(equalTo: 25)
+                    }
+
+                ).spacing(15)
+            }.insets()
+        })
+    }
+}
+
+public extension Link {
+    func destination(content: @escaping () -> ViewCreator) -> Self {
+        self.onInTheScene {
+            _ = $0.viewCreator?.onTap {
+                if $0.navigationController != nil {
+                    $0.navigation?.push(animated: true, content: content)
+                    return
+                }
+            }
+        }
     }
 }

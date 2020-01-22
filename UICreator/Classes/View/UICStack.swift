@@ -130,12 +130,14 @@ public extension UIViewCreator where View: UIStackView {
 }
 
 extension UICStack: SupportForEach {
-    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>) {
+    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
         weak var firstView: UIView? = placeholderView
         weak var lastView: UIView? = placeholderView
 
         weak var view = self.uiView as? View
-        sequence.next { values in
+        sequence.map {
+            $0.map { $0() }
+        }.next { views in
             if firstView != nil {
                 let startIndex = view?.arrangedSubviews.enumerated().first(where: {
                     $0.element == firstView
@@ -149,12 +151,12 @@ extension UICStack: SupportForEach {
                 }
             }
 
-            values.forEach {
+            views.forEach {
                 view?.addArrangedSubview($0.releaseUIView())
             }
 
-            firstView = values.first?.uiView
-            lastView = values.last?.uiView
+            firstView = views.first?.uiView
+            lastView = views.last?.uiView
         }
     }
 }

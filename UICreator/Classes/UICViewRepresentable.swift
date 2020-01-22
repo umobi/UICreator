@@ -41,6 +41,7 @@ public protocol UIViewMaker: ViewCreator {
 public protocol UICViewRepresentable: UIViewCreator, UIViewMaker {
     var uiView: View! { get }
     func makeUIView() -> View
+    func updateView(_ view: View)
 }
 
 internal extension UIViewMaker {
@@ -57,7 +58,13 @@ internal extension UIViewMaker {
 
 public extension UICViewRepresentable {
     var loadView: UIView {
-        return self.makeUIView()
+        return self.makeUIView().appendInTheScene {
+            guard let view = ($0 as? View) else {
+                return
+            }
+
+            self.updateView(view)
+        }
     }
 
     var uiView: View! {
