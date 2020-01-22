@@ -40,6 +40,7 @@
 		0C0FACF923B258FD00E6B2FC /* PinchGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FACF123B258FD00E6B2FC /* PinchGesture.swift */; };
 		0C2855BE23D525DD007E45DE /* ListManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2855BD23D525DD007E45DE /* ListManager.swift */; };
 		0C2855C023D527EC007E45DE /* UICView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2855BF23D527EC007E45DE /* UICView.swift */; };
+		0C2C774B23D8AE070012E60D /* ReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2C774923D8ADF50012E60D /* ReusableView.swift */; };
 		0C31DAF123CB5D8A0044B70B /* UICTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31DAF023CB5D8A0044B70B /* UICTab.swift */; };
 		0C3883CB23BBB5FC009E6FF6 /* TouchGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3883CA23BBB5FC009E6FF6 /* TouchGesture.swift */; };
 		0C3E8C1923BA68CA0045C86E /* SystemFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C1823BA68CA0045C86E /* SystemFont.swift */; };
@@ -170,6 +171,7 @@
 		0C0FACF123B258FD00E6B2FC /* PinchGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinchGesture.swift; sourceTree = "<group>"; };
 		0C2855BD23D525DD007E45DE /* ListManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListManager.swift; sourceTree = "<group>"; };
 		0C2855BF23D527EC007E45DE /* UICView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICView.swift; sourceTree = "<group>"; };
+		0C2C774923D8ADF50012E60D /* ReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableView.swift; sourceTree = "<group>"; };
 		0C31DAF023CB5D8A0044B70B /* UICTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICTab.swift; sourceTree = "<group>"; };
 		0C3883CA23BBB5FC009E6FF6 /* TouchGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchGesture.swift; sourceTree = "<group>"; };
 		0C3E8C1823BA68CA0045C86E /* SystemFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemFont.swift; sourceTree = "<group>"; };
@@ -369,6 +371,7 @@
 		0C3E8C1A23BA7CA00045C86E /* TableEngine */ = {
 			isa = PBXGroup;
 			children = (
+				0C2C774923D8ADF50012E60D /* ReusableView.swift */,
 				0C2855BD23D525DD007E45DE /* ListManager.swift */,
 				0C3E8C1B23BA7CC80045C86E /* TableViewHeaderFooterCell.swift */,
 				0C3E8C1E23BA7CEA0045C86E /* TableViewCell.swift */,
@@ -851,6 +854,7 @@
 				0C93470C23AE7D8600A9E112 /* TextElement.swift in Sources */,
 				0C08F81923BF7B9E00C52B8E /* CollectionLayoutGroup.swift in Sources */,
 				0CAA4BF623B267A200DD5DDF /* UICCompositional.swift in Sources */,
+				0C2C774B23D8AE070012E60D /* ReusableView.swift in Sources */,
 				0C93471923AE7D8600A9E112 /* UIViewCreator+Constraints.swift in Sources */,
 				0C9346F423AE7D8600A9E112 /* UIViewCreator.swift in Sources */,
 				0C0D306523D5176300D2AE79 /* Relay.swift in Sources */,

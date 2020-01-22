@@ -21,42 +21,37 @@
 //
 
 import Foundation
-import UIKit
 
-internal class TableViewHeaderFooterCell: UITableViewHeaderFooterView, ReusableView {
-    var builder: ViewCreator! = nil
+protocol ReusableView {
+    var contentView: UIView { get }
+    var builder: ViewCreator! { get nonmutating set }
+    func prepareCell(builder: UICList.Element.Builder)
+}
 
-    override init(reuseIdentifier: String?) {
-        super.init(reuseIdentifier: reuseIdentifier)
-        self.backgroundView = self.backgroundView ?? UIView()
-        self.backgroundView?.backgroundColor = .clear
-    }
+extension ReusableView {
+    func prepareCell(builder: UICList.Element.Builder) {
+        if self.contentView.subviews.first is PlaceholderView {
+            self.contentView.subviews.forEach {
+                $0.removeFromSuperview()
+            }
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+            self.builder = nil
+        }
 
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
-    }
+        if self.builder != nil {
+            self.contentView.subviews.forEach {
+                $0.removeFromSuperview()
+            }
+        }
 
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        self.commitRendered()
-    }
+        let builder = builder()
+        self.builder = builder
+        _ = self.contentView.add(builder.releaseUIView())
 
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        self.commitInTheScene()
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        self.commitLayout()
-    }
-
-    public override var watchingViews: [UIView] {
-        return self.contentView.subviews
+        if self.contentView.subviews.first is PlaceholderView {
+            self.contentView.subviews.first?.snp.makeConstraints {
+                $0.height.equalTo(0)
+            }
+        }
     }
 }

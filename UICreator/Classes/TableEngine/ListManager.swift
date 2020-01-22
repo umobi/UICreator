@@ -151,7 +151,7 @@ extension ListManager {
         }
 
         func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
-            let cellIdentifier = "\(ObjectIdentifier(self.delegate).hashValue).row.\(identifier)"
+            let cellIdentifier = "\(ObjectIdentifier(self.delegate)).row.\(identifier)"
             weak var delegate = self.delegate
 
             sequence.next { [weak self] in
@@ -167,7 +167,7 @@ extension ListManager {
 
         private var contentManager: Content? = nil
         static func eachRow(identifier: Int, _ forEach: ForEachCreator, delegate: ListContentDelegate) -> Content {
-            let content = Content(identifier: identifier, .row(identifier: "\(ObjectIdentifier(delegate).hashValue).row.\(identifier)", content: {
+            let content = Content(identifier: identifier, .row(identifier: "\(ObjectIdentifier(delegate)).row.\(identifier)", content: {
                 forEach
             }))
             content.delegate = delegate
