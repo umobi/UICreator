@@ -25,23 +25,16 @@ import Foundation
 protocol ReusableView {
     var contentView: UIView { get }
     var builder: ViewCreator! { get nonmutating set }
-    func prepareCell(builder: UICList.Element.Builder)
+    func prepareCell(builder: @escaping UICList.Element.Builder)
 }
 
 extension ReusableView {
-    func prepareCell(builder: UICList.Element.Builder) {
+    func prepareCell(builder: @escaping UICList.Element.Builder) {
         self.contentView.subviews.forEach {
             $0.removeFromSuperview()
         }
 
-        let builder = builder()
-        self.builder = builder
-        _ = self.contentView.add(builder.releaseUIView())
-
-        if self.contentView.subviews.first is PlaceholderView {
-            self.contentView.subviews.first?.snp.makeConstraints {
-                $0.height.equalTo(0)
-            }
-        }
+        let host = UICHost(content: builder)
+        _ = self.contentView.add(host.releaseUIView())
     }
 }

@@ -73,28 +73,26 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
         })
     }
 
-    public init(_ value: UICreator.Value<[Value]>, content: @escaping (Value) -> View) {
-        self.relay = value.asRelay
-        self.content = content
-        self.viewType = View.self
-        self.uiView = PlaceholderView(builder: self)
-
-        self.onInTheScene { [weak value] view in
-            (view.viewCreator as? Self)?.startObservation()
-            (view.viewCreator as? Self)?.relay.post(value?.value ?? [])
-        }
+    public convenience init(_ value: UICreator.Value<[Value]>, content: @escaping (Value) -> View) {
+        self.init(value.asRelay, value: { [weak value] in value?.value }, content: content)
     }
 
-    public init(_ value: [Value], content: @escaping (Value) -> View) {
+    public convenience init(_ value: [Value], content: @escaping (Value) -> View) {
         let value = UICreator.Value(value: value)
-        self.relay = value.asRelay
+        self.init(value.asRelay, value: { value.value }, content: content)
+    }
+
+    private init(_ relay: Relay<[Value]>, value: @escaping () -> [Value]?, content: @escaping (Value) -> View) {
+        self.relay = relay
         self.content = content
         self.viewType = View.self
         self.uiView = PlaceholderView(builder: self)
 
-        self.onInTheScene { view in
-            (view.viewCreator as? Self)?.startObservation()
-            (view.viewCreator as? Self)?.relay.post(value.value)
-        }
+        self.height(equalTo: 0, priority: .high)
+            .width(equalTo: 0, priority: .high)
+            .onInTheScene { view in
+                (view.viewCreator as? Self)?.startObservation()
+                (view.viewCreator as? Self)?.relay.post(value() ?? [])
+            }
     }
 }

@@ -85,7 +85,7 @@ class ListManager {
             }
 
             if let section = $0 as? UICSection {
-                return .init(contents: self.mountSection(for: section.content))
+                return .init(identifier: self.nextIdentifier(), self.mountSection(for: section.content))
             }
 
             return nil

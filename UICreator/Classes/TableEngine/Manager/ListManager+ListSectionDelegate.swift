@@ -33,7 +33,7 @@ extension ListManager: ListSectionDelegate {
                 return $0 + toAppend
             }
 
-            return $0
+            return $0 + [$1]
         }
 
         let newRows: [String] = (self.list.group?.rowsIdentifier ?? []).compactMap {

@@ -97,7 +97,7 @@ extension ListManager.ContentSection: SupportForEach {
                 ($0() as? UICSection)?.content
             }
 
-            self.delegate.content(self, updateSections: sections.map { section in
+            delegate?.content(self, updateSections: sections.map { section in
                 lastRowIdentifierIndex = 0
                 return .init(identifier: identifier, section.map { view in
                     if let header = view as? UICHeader {
