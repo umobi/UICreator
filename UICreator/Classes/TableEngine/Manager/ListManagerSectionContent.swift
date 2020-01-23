@@ -109,7 +109,7 @@ extension ListManager.ContentSection: SupportForEach {
                     }
 
                     if let forEach = view as? ForEachCreator {
-                        return Content.eachRow(identifier: identifier, forEach, delegate: delegate!)
+                        return ListManager.Content.eachRow(identifier: identifier, forEach, delegate: delegate!)
                     }
 
                     if let row = view as? UICRow {

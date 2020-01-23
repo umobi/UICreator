@@ -28,7 +28,7 @@ protocol ListSupport: class {
 }
 
 class ListManager {
-    fileprivate(set) var contents: [ContentSection] = []
+    var contents: [ContentSection] = []
     weak var list: ListSupport!
 
     private var identifierCount: Int = 0
