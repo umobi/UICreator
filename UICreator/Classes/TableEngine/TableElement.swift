@@ -43,8 +43,16 @@ extension UICList {
             return .init(.header, content: .content(content))
         }
 
+        internal static func header(identifier: String, content: @escaping () -> ViewCreator) -> Element {
+            return .init(.header, content: .content(content), identifier: identifier)
+        }
+
         public static func footer(content: @escaping () -> ViewCreator) -> Element {
             return .init(.footer, content: .content(content))
+        }
+
+        internal static func footer(identifier: String, content: @escaping () -> ViewCreator) -> Element {
+            return .init(.footer, content: .content(content), identifier: identifier)
         }
 
         public static func row(content: @escaping () -> ViewCreator) -> Element {
@@ -167,6 +175,7 @@ public extension UICList.Element {
 public extension UICList.Element {
     struct Header {
         let content: Builder
+        let identifier: String?
 
         fileprivate init?(_ element: UICList.Element) {
             guard case .header = element.type, case .content(let content) = element.content else {
@@ -174,6 +183,7 @@ public extension UICList.Element {
             }
 
             self.content = content
+            self.identifier = element.identifier
         }
     }
 }
@@ -181,6 +191,7 @@ public extension UICList.Element {
 public extension UICList.Element {
     struct Footer {
         let content: Builder
+        let identifier: String?
 
         fileprivate init?(_ element: UICList.Element) {
             guard case .footer = element.type, case .content(let content) = element.content else {
@@ -188,6 +199,7 @@ public extension UICList.Element {
             }
 
             self.content = content
+            self.identifier = element.identifier
         }
     }
 }

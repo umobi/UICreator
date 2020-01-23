@@ -21,43 +21,22 @@
 //
 
 import Foundation
-import UIKit
 
-public class _InputView: UIInputView {
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
-    }
-
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        self.commitRendered()
-    }
-
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        self.commitInTheScene()
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        self.commitLayout()
+public class Link: UICHost {
+    public init(content: @escaping () -> ViewCreator) {
+        super.init(content: content)
     }
 }
 
-public class UICInput: UIViewCreator {
-    public typealias View = _InputView
-
-    public init(size: CGSize = .zero, style: UIInputView.Style = .keyboard, content: () -> ViewCreator) {
-        self.uiView = View.init(frame: .init(origin: .zero, size: size), inputViewStyle: style)
-        self.uiView.updateBuilder(self)
-        _ = self.uiView.add(content().releaseUIView())
-    }
-}
-
-public extension UIViewCreator where View: UIInputView {
-    func allowsSelfsSizing(_ flag: Bool) -> Self {
-        (self.uiView as? View)?.allowsSelfSizing = flag
-        return self
+public extension Link {
+    func destination(content: @escaping () -> ViewCreator) -> Self {
+        self.onInTheScene {
+            _ = $0.viewCreator?.onTap {
+                if $0.navigationController != nil {
+                    $0.navigation?.push(animated: true, content: content)
+                    return
+                }
+            }
+        }
     }
 }

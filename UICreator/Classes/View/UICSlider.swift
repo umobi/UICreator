@@ -50,7 +50,7 @@ public class UICSlider: UIViewCreator, Control {
     public typealias View = _Slider
 
     public init() {
-        self.uiView = .init()
+        self.uiView = View.init(builder: self)
     }
 }
 

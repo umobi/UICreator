@@ -1,0 +1,134 @@
+//
+// Copyright (c) 2019-Present Umobi - https://github.com/umobi
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+import Foundation
+
+protocol ListSectionDelegate: ListContentDelegate {
+    func content(_ section: ListManager.ContentSection, updateSections: [ListManager.ContentSection])
+}
+
+extension ListManager {
+    class ContentSection {
+        let section: UICList.Element
+        let contents: [Content]
+        weak var delegate: ListSectionDelegate!
+        let identifier: Int
+        let isDynamic: Bool
+
+        var rows: [(Int, Content)] {
+            return self.contents.enumerated().filter {
+                $0.element.element.isRow
+            }
+        }
+
+        init(contents: [Content]) {
+            self.contents = contents
+            self.section = .section(contents.map {
+                $0.element
+            })
+            self.isDynamic = false
+            self.identifier = 0
+        }
+
+        init(identifier: Int,_ contents: [Content]) {
+            self.contents = contents
+            self.identifier = identifier
+            self.isDynamic = true
+            self.section = .section(contents.map {
+                $0.element
+            })
+        }
+
+        static func eachSection(identifier: Int, _ forEach: ForEachCreator, delegate: ListSectionDelegate) -> ContentSection {
+            let section = ContentSection(identifier: identifier, [
+                .init(.header(identifier: "\(ObjectIdentifier(delegate)).header.\(identifier)") {
+                    UICSpacer()
+                        .height(equalTo: 0)
+                }),
+                .init(.row(identifier: "\(ObjectIdentifier(delegate)).row.\(identifier)") {
+                    forEach
+                }),
+                .init(.footer(identifier: "\(ObjectIdentifier(delegate)).footer.\(identifier)") {
+                    UICSpacer()
+                        .height(equalTo: 0)
+                })
+            ])
+            section.delegate = delegate
+            forEach.manager = section
+            return section
+        }
+    }
+}
+
+extension ListManager.ContentSection: SupportForEach {
+    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
+        let delegateIdentifier = "\(ObjectIdentifier(self.delegate))"
+        let identifier = self.identifier
+        weak var delegate = self.delegate
+
+        var activeRowIdentifiers: [Int] = []
+        var lastRowIdentifierIndex = 0
+
+        sequence.next { [weak self] in
+            guard let self = self else {
+                return
+            }
+
+            let sections = $0.compactMap {
+                ($0() as? UICSection)?.content
+            }
+
+            self.delegate.content(self, updateSections: sections.map { section in
+                lastRowIdentifierIndex = 0
+                return .init(identifier: identifier, section.map { view in
+                    if let header = view as? UICHeader {
+                        return .init(.header(identifier: "\(delegateIdentifier).header.\(identifier)", content: header.content))
+                    }
+
+                    if let footer = view as? UICFooter {
+                        return .init(.footer(identifier: "\(delegateIdentifier).footer.\(identifier)", content: footer.content))
+                    }
+
+                    if let forEach = view as? ForEachCreator {
+                        return Content.eachRow(identifier: identifier, forEach, delegate: delegate!)
+                    }
+
+                    if let row = view as? UICRow {
+                        return .init(.row(identifier: {
+                            if let identifier = activeRowIdentifiers.enumerated().first(where: { $0.element == lastRowIdentifierIndex })?.1 {
+                                lastRowIdentifierIndex += 1
+                                return "\(delegateIdentifier).row.\(identifier)"
+                            }
+
+                            let identifier = lastRowIdentifierIndex
+                            activeRowIdentifiers.append(lastRowIdentifierIndex)
+                            lastRowIdentifierIndex += 1
+                            return "\(delegateIdentifier).row.\(identifier)"
+                        }(), content: row.content))
+                    }
+
+                    fatalError("Try using UICRow as wrapper for ViewCreators in list. It can be use UICForEach either")
+                })
+            })
+        }
+    }
+}

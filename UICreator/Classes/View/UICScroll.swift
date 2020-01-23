@@ -51,6 +51,7 @@ public class UICScroll: UIViewCreator, HasViewDelegate {
 
     public init(axis: View.Axis = .vertical, content: @escaping () -> ViewCreator) {
         self.uiView = View.init(content().releaseUIView(), axis: axis)
+        self.uiView.updateBuilder(self)
     }
 
     public func delegate(_ delegate: UIScrollViewDelegate?) -> Self {

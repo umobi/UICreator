@@ -23,6 +23,7 @@
 import Foundation
 
 protocol ForEachCreator: ViewCreator {
+    var viewType: ViewCreator.Type { get }
     func startObservation()
 }
 
@@ -55,7 +56,9 @@ public class PlaceholderView: UIView {
     }
 }
 
-public class UICForEach<Value>: ViewCreator, ForEachCreator {
+public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
+    let viewType: ViewCreator.Type
+
     let relay: Relay<[Value]>
     let content: (Value) -> ViewCreator
 
@@ -70,9 +73,10 @@ public class UICForEach<Value>: ViewCreator, ForEachCreator {
         })
     }
 
-    public init(_ value: UICreator.Value<[Value]>, content: @escaping (Value) -> ViewCreator) {
+    public init(_ value: UICreator.Value<[Value]>, content: @escaping (Value) -> View) {
         self.relay = value.asRelay
         self.content = content
+        self.viewType = View.self
         self.uiView = PlaceholderView(builder: self)
 
         self.onInTheScene { [weak value] view in
@@ -81,10 +85,11 @@ public class UICForEach<Value>: ViewCreator, ForEachCreator {
         }
     }
 
-    public init(_ value: [Value], content: @escaping (Value) -> ViewCreator) {
+    public init(_ value: [Value], content: @escaping (Value) -> View) {
         let value = UICreator.Value(value: value)
         self.relay = value.asRelay
         self.content = content
+        self.viewType = View.self
         self.uiView = PlaceholderView(builder: self)
 
         self.onInTheScene { view in

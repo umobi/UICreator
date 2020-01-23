@@ -22,36 +22,10 @@
 
 import Foundation
 
-protocol ReusableView {
-    var contentView: UIView { get }
-    var builder: ViewCreator! { get nonmutating set }
-    func prepareCell(builder: UICList.Element.Builder)
-}
+public class UICHeader: ViewCreator {
+    let content: () -> ViewCreator
 
-extension ReusableView {
-    func prepareCell(builder: UICList.Element.Builder) {
-        if self.contentView.subviews.first is PlaceholderView {
-            self.contentView.subviews.forEach {
-                $0.removeFromSuperview()
-            }
-
-            self.builder = nil
-        }
-
-        if self.builder != nil {
-            self.contentView.subviews.forEach {
-                $0.removeFromSuperview()
-            }
-        }
-
-        let builder = builder()
-        self.builder = builder
-        _ = self.contentView.add(builder.releaseUIView())
-
-        if self.contentView.subviews.first is PlaceholderView {
-            self.contentView.subviews.first?.snp.makeConstraints {
-                $0.height.equalTo(0)
-            }
-        }
+    public init(content: @escaping () -> ViewCreator) {
+        self.content = content
     }
 }

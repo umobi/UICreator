@@ -28,7 +28,7 @@ public extension UICList {
     convenience init(style: UITableView.Style,_ subviews: Subview) {
         self.init(style: style, ListManager(content: subviews.views))
     }
-    
+
     private convenience init(style: UITableView.Style,_ manager: ListManager) {
         self.init(style: style)
         #if os(iOS)

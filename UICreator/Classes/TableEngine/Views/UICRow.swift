@@ -21,43 +21,11 @@
 //
 
 import Foundation
-import UIKit
 
-public class _InputView: UIInputView {
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
-    }
+public class UICRow: ViewCreator {
+    let content: () -> ViewCreator
 
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        self.commitRendered()
-    }
-
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        self.commitInTheScene()
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        self.commitLayout()
-    }
-}
-
-public class UICInput: UIViewCreator {
-    public typealias View = _InputView
-
-    public init(size: CGSize = .zero, style: UIInputView.Style = .keyboard, content: () -> ViewCreator) {
-        self.uiView = View.init(frame: .init(origin: .zero, size: size), inputViewStyle: style)
-        self.uiView.updateBuilder(self)
-        _ = self.uiView.add(content().releaseUIView())
-    }
-}
-
-public extension UIViewCreator where View: UIInputView {
-    func allowsSelfsSizing(_ flag: Bool) -> Self {
-        (self.uiView as? View)?.allowsSelfSizing = flag
-        return self
+    public init(content: @escaping () -> ViewCreator) {
+        self.content = content
     }
 }

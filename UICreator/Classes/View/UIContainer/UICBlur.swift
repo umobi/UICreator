@@ -51,6 +51,7 @@ public class UICBlur: ViewCreator {
 
     public init(blur: UIBlurEffect.Style = .regular) {
         self.uiView = View.init(blur: blur)
+        self.uiView.updateBuilder(self)
     }
 }
 

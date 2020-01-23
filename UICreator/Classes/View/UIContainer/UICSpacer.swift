@@ -51,6 +51,7 @@ public class UICSpacer: UIViewCreator {
 
     public required init(margin: View.Margin, content: @escaping () -> ViewCreator) {
         self.uiView = View.init(content().releaseUIView(), margin: margin)
+        self.uiView.updateBuilder(self)
     }
 }
 

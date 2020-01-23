@@ -114,7 +114,7 @@ extension UICList {
         var rowsIdentifier: [String] {
             return self.sections.enumerated().map { section in
                 section.element.group.rows.map { row -> String in
-                    return "\(section.offset)-\(row.1.identifier ?? "\(row.0)")"
+                    return row.1.identifier ?? "\(section.offset)-\(row.0)"
                 }
             }.reduce([]) { $0 + $1 }
         }
@@ -122,7 +122,7 @@ extension UICList {
         var headersIdentifier: [String] {
             return self.sections.enumerated().map { section in
                 section.element.group.headers.map { header -> String in
-                    return "\(header.0).header"
+                    return header.1.identifier ?? "\(header.0).header"
                 }
             }.reduce([]) { $0 + $1 }
         }
@@ -130,7 +130,7 @@ extension UICList {
         var footersIdentifier: [String] {
             return self.sections.enumerated().map { section in
                 section.element.group.footers.map { footer -> String in
-                    return "\(footer.0).footer"
+                    return footer.1.identifier ?? "\(footer.0).footer"
                 }
             }.reduce([]) { $0 + $1 }
         }
@@ -156,7 +156,7 @@ extension UICList {
                 return nil
             }
 
-            return ("\(indexPath.section)-\(row.1.identifier ?? "\(row.0)")", row.1.content)
+            return (row.1.identifier ?? "\(indexPath.section)-\(row.0)", row.1.content)
         }
 
         func header(at section: Int) -> (String, Element.Builder)? {
@@ -166,7 +166,7 @@ extension UICList {
                 return nil
             }
             
-            return ("\(header.0).header", header.1.content)
+            return (header.1.identifier ?? "\(header.0).header", header.1.content)
         }
 
         func footer(at section: Int) -> (String, Element.Builder)? {
@@ -176,7 +176,7 @@ extension UICList {
                 return nil
             }
 
-            return ("\(footer.0).footer", footer.1.content)
+            return (footer.1.identifier ?? "\(footer.0).footer", footer.1.content)
         }
     }
 }

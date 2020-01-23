@@ -21,43 +21,27 @@
 //
 
 import Foundation
-import UIKit
 
-public class _InputView: UIInputView {
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
-    }
-
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        self.commitRendered()
-    }
-
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        self.commitInTheScene()
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        self.commitLayout()
-    }
+protocol ReusableView {
+    var contentView: UIView { get }
+    var builder: ViewCreator! { get nonmutating set }
+    func prepareCell(builder: UICList.Element.Builder)
 }
 
-public class UICInput: UIViewCreator {
-    public typealias View = _InputView
+extension ReusableView {
+    func prepareCell(builder: UICList.Element.Builder) {
+        self.contentView.subviews.forEach {
+            $0.removeFromSuperview()
+        }
 
-    public init(size: CGSize = .zero, style: UIInputView.Style = .keyboard, content: () -> ViewCreator) {
-        self.uiView = View.init(frame: .init(origin: .zero, size: size), inputViewStyle: style)
-        self.uiView.updateBuilder(self)
-        _ = self.uiView.add(content().releaseUIView())
-    }
-}
+        let builder = builder()
+        self.builder = builder
+        _ = self.contentView.add(builder.releaseUIView())
 
-public extension UIViewCreator where View: UIInputView {
-    func allowsSelfsSizing(_ flag: Bool) -> Self {
-        (self.uiView as? View)?.allowsSelfSizing = flag
-        return self
+        if self.contentView.subviews.first is PlaceholderView {
+            self.contentView.subviews.first?.snp.makeConstraints {
+                $0.height.equalTo(0)
+            }
+        }
     }
 }
