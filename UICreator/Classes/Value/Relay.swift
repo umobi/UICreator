@@ -28,6 +28,7 @@ public final class Relay<Value> {
     init(identifier: String) {
         self.identifier = identifier
         self.handler = nil
+        print("[Relay] init")
     }
 
     public func next(_ handler: @escaping (Value) -> Void) {
@@ -89,5 +90,8 @@ public final class Relay<Value> {
 
     func `post`(_ value: Value) {
         ReactiveCenter.shared.privateValueDidChange(self.identifier, newValue: value)
+    }
+    deinit {
+        print("[Relay] deinit")
     }
 }

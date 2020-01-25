@@ -24,7 +24,7 @@ import Foundation
 
 protocol ListSupport: class {
     func reloadData()
-    var group: UICList.Group? { get }
+    var group: UICListCollectionElements? { get }
 }
 
 class ListManager {
@@ -59,7 +59,7 @@ class ListManager {
             }
 
             if let row = view as? UICRow {
-                return .init(.row(content: row.content))
+                return .init(.row(row))
             }
 
             fatalError("Try using UICRow as wrapper for ViewCreators in list. It can be use UICForEach either")

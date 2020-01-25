@@ -34,7 +34,7 @@ public extension UICList {
         #if os(iOS)
         (self.uiView as? View)?.separatorStyle = .none
         #endif
-        let group = Group(manager)
+        let group = UICList.Group(manager)
 
         if !group.isValid {
             fatalError("Verify your content")

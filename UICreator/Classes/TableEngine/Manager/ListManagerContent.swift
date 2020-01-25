@@ -47,7 +47,7 @@ extension ListManager {
 
         private var contentManager: Content? = nil
         static func eachRow(identifier: Int, _ forEach: ForEachCreator, delegate: ListContentDelegate) -> Content {
-            let content = Content(identifier: identifier, .row(identifier: "\(ObjectIdentifier(delegate)).row.\(identifier)", content: {
+            let content = Content(identifier: identifier, .row(identifier: "\(ObjectIdentifier(delegate)).row.\(identifier)", UICRow {
                 forEach
             }))
             content.delegate = delegate
@@ -73,8 +73,12 @@ extension ListManager.Content: SupportForEach {
                 return
             }
 
-            delegate?.content(self, updatedWith: $0.map { constructor in
-                .row(identifier: cellIdentifier, content: constructor)
+            delegate?.content(self, updatedWith: $0.compactMap { constructor in
+                guard let row = constructor() as? UICRow else {
+                    return nil
+                }
+
+                return .row(identifier: cellIdentifier, row)
             })
         }
     }

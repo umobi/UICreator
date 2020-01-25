@@ -32,7 +32,7 @@ extension TableView: UITableViewDelegate {
             fatalError()
         }
         
-        cell.prepareCell(builder: header.1)
+        cell.prepareCell(payload: header.1)
         self.creatorDelegate?.header(at: section, content: cell.builder)
         return cell
     }
@@ -46,9 +46,68 @@ extension TableView: UITableViewDelegate {
             fatalError()
         }
 
-        cell.prepareCell(builder: footer.1)
+        cell.prepareCell(payload: footer.1)
         self.creatorDelegate?.footer(at: section, content: cell.builder)
         return cell
+    }
+
+    public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        let row = self.group?.row(at: indexPath)?.1
+        return !((row?.leadingActions ?? []) + (row?.trailingActions ?? [])).isEmpty
+    }
+
+    @available(iOS 11.0, tvOS 11.0, *)
+    public func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard let row = self.group?.row(at: indexPath)?.1 else {
+            return nil
+        }
+
+        let configurator = UISwipeActionsConfiguration(actions: row.trailingActions.compactMap {
+            let contextualAction = $0 as? UICContextualAction
+            return contextualAction?
+                .indexPath(indexPath)
+                .tableView(tableView)
+                .rowAction
+        })
+
+        row.trailingActions.forEach {
+            ($0 as? UICContextualAction)?.commitConfigurator(configurator)
+        }
+
+        return configurator
+    }
+
+    @available(iOS 11.0, tvOS 11.0, *)
+    public func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard let row = self.group?.row(at: indexPath)?.1 else {
+            return nil
+        }
+
+        let configurator = UISwipeActionsConfiguration(actions: row.leadingActions.compactMap {
+            let contextualAction = $0 as? UICContextualAction
+            return contextualAction?
+                .indexPath(indexPath)
+                .tableView(tableView)
+                .rowAction
+        })
+
+        row.leadingActions.forEach {
+            ($0 as? UICContextualAction)?.commitConfigurator(configurator)
+        }
+
+        return configurator
+    }
+
+    public func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        guard let row = self.group?.row(at: indexPath)?.1 else {
+            return nil
+        }
+
+        return (row.trailingActions + row.leadingActions).compactMap {
+            let action = ($0 as? UICRowAction)
+            return action?.indexPath(indexPath)
+                .rowAction
+        }
     }
 }
 

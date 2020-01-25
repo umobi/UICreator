@@ -243,3 +243,69 @@ extension UITableView {
         self.tableViewCellHandler?(cell)
     }
 }
+
+public extension UIViewCreator where View: UITableView {
+    func deleteRows(with animation: UITableView.RowAnimation,_ value: Value<[IndexPath]>, onCompletion: @escaping ([IndexPath]) -> Void) -> Self {
+        value.asRelay.next { [weak self] indexPaths in
+            guard let group = (self?.uiView as? View)?.group as? UICList.Group else {
+                print("[warning] can perform deleteRows(with:,_:)")
+                return
+            }
+
+            (self?.uiView as? View)?.group = UICList.EditingGroup(group)
+                .disableIndexPaths(indexPaths)
+
+            if #available(iOS 11, tvOS 11, *) {
+                (self?.uiView as? View)?.performBatchUpdates({
+                    (self?.uiView as? View)?.deleteRows(at: indexPaths, with: animation)
+                }, completion: { didEnd in
+                    if didEnd {
+                        onCompletion(indexPaths)
+                    }
+                })
+                return
+            }
+
+            (self?.uiView as? View)?.beginUpdates()
+            (self?.uiView as? View)?.deleteRows(at: indexPaths, with: animation)
+            (self?.uiView as? View)?.endUpdates()
+
+            onCompletion(indexPaths)
+        }
+
+        return self
+    }
+
+    func deleteSections(with animation: UITableView.RowAnimation,_ value: Value<[Int]>, onCompletion: @escaping ([Int]) -> Void) -> Self {
+        value.asRelay.next { [weak self] sections in
+            guard let group = (self?.uiView as? View)?.group as? UICList.Group else {
+                print("[warning] can perform deleteRows(with:,_:)")
+                return
+            }
+
+            (self?.uiView as? View)?.group = UICList.EditingGroup(group)
+                .disableSections(sections)
+
+            if #available(iOS 11, tvOS 11, *) {
+                (self?.uiView as? View)?.performBatchUpdates({
+                    (self?.uiView as? View)?.deleteSections(.init(sections), with: animation)
+                }, completion: { didEnd in
+                    if didEnd {
+                        (self?.uiView as? View)?.group = group
+                        onCompletion(sections)
+                    }
+                })
+                return
+            }
+
+            (self?.uiView as? View)?.beginUpdates()
+            (self?.uiView as? View)?.deleteSections(.init(sections), with: animation)
+            (self?.uiView as? View)?.endUpdates()
+
+            (self?.uiView as? View)?.group = group
+            onCompletion(sections)
+        }
+
+        return self
+    }
+}

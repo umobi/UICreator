@@ -31,6 +31,7 @@ extension ListManager {
         let section: UICList.Element
         let contents: [Content]
         weak var delegate: ListSectionDelegate!
+        weak var forEach: ForEachCreator!
         let identifier: Int
         let isDynamic: Bool
 
@@ -64,9 +65,9 @@ extension ListManager {
                     UICSpacer()
                         .height(equalTo: 0)
                 }),
-                .init(.row(identifier: "\(ObjectIdentifier(delegate)).row.\(identifier)") {
+                .init(.row(identifier: "\(ObjectIdentifier(delegate)).row.\(identifier)", UICRow {
                     forEach
-                }),
+                })),
                 .init(.footer(identifier: "\(ObjectIdentifier(delegate)).footer.\(identifier)") {
                     UICSpacer()
                         .height(equalTo: 0)
@@ -74,7 +75,17 @@ extension ListManager {
             ])
             section.delegate = delegate
             forEach.manager = section
+            section.forEach = forEach
             return section
+        }
+
+        @discardableResult
+        func copy(from other: ListManager.ContentSection, relay: Relay<[() -> ViewCreator]>) -> Self {
+            self.delegate = other.delegate
+            self.forEach = other.forEach
+            self.forEach.manager = self
+            self.viewsDidChange(placeholderView: nil, relay)
+            return self
         }
     }
 }
@@ -88,7 +99,9 @@ extension ListManager.ContentSection: SupportForEach {
         var activeRowIdentifiers: [Int] = []
         var lastRowIdentifierIndex = 0
 
-        sequence.next { [weak self] in
+        var onErase: (() -> Void)? = nil
+
+        var handler: (([() -> ViewCreator]) -> Void)? = { [weak self, onErase] in
             guard let self = self else {
                 return
             }
@@ -97,7 +110,14 @@ extension ListManager.ContentSection: SupportForEach {
                 ($0() as? UICSection)?.content
             }
 
-            delegate?.content(self, updateSections: sections.map { section in
+            if sections.isEmpty {
+                let emptySection = ListManager.ContentSection(identifier: identifier, [])
+                delegate?.content(self, updateSections: [emptySection.copy(from: self, relay: sequence)])
+                onErase?()
+                return
+            }
+
+            let updateSections: [ListManager.ContentSection] = sections.map { section in
                 lastRowIdentifierIndex = 0
                 return .init(identifier: identifier, section.map { view in
                     if let header = view as? UICHeader {
@@ -123,12 +143,24 @@ extension ListManager.ContentSection: SupportForEach {
                             activeRowIdentifiers.append(lastRowIdentifierIndex)
                             lastRowIdentifierIndex += 1
                             return "\(delegateIdentifier).row.\(identifier)"
-                        }(), content: row.content))
+                        }(), row))
                     }
 
                     fatalError("Try using UICRow as wrapper for ViewCreators in list. It can be use UICForEach either")
                 })
-            })
+            }
+
+            updateSections.first?.copy(from: self, relay: sequence)
+            delegate?.content(self, updateSections: updateSections)
+            onErase?()
+        }
+
+        sequence.next { [handler] in
+            handler?($0)
+        }
+
+        onErase = {
+            handler = nil
         }
     }
 }

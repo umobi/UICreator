@@ -50,7 +50,7 @@ extension TableView: UITableViewDataSource {
             fatalError()
         }
 
-        cell.prepareCell(builder: row.1)
+        cell.prepareCell(payload: row.1)
         self.creatorDataSource?.cell(at: indexPath, content: cell.builder)
 
         self.commitCell(cell)

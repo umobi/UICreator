@@ -25,7 +25,7 @@ import Foundation
 extension UICList {
     public enum Content {
         case group(Group)
-        case content(_ content: () -> ViewCreator)
+        case payload(Element.Payload)
         case empty
         case sections([UICList.Element.Section])
     }

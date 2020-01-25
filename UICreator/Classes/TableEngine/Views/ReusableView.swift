@@ -25,16 +25,16 @@ import Foundation
 protocol ReusableView {
     var contentView: UIView { get }
     var builder: ViewCreator! { get nonmutating set }
-    func prepareCell(builder: @escaping UICList.Element.Builder)
+    func prepareCell(payload: UICList.Element.Payload)
 }
 
 extension ReusableView {
-    func prepareCell(builder: @escaping UICList.Element.Builder) {
+    func prepareCell(payload: UICList.Element.Payload) {
         self.contentView.subviews.forEach {
             $0.removeFromSuperview()
         }
 
-        let host = UICHost(content: builder)
+        let host = UICHost(content: payload.content)
         _ = self.contentView.add(host.releaseUIView())
     }
 }

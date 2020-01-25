@@ -40,31 +40,31 @@ extension UICList {
         }
 
         public static func header(content: @escaping () -> ViewCreator) -> Element {
-            return .init(.header, content: .content(content))
+            return .init(.header, content: .payload(.init(content)))
         }
 
         internal static func header(identifier: String, content: @escaping () -> ViewCreator) -> Element {
-            return .init(.header, content: .content(content), identifier: identifier)
+            return .init(.header, content: .payload(.init(content)), identifier: identifier)
         }
 
         public static func footer(content: @escaping () -> ViewCreator) -> Element {
-            return .init(.footer, content: .content(content))
+            return .init(.footer, content: .payload(.init(content)))
         }
 
         internal static func footer(identifier: String, content: @escaping () -> ViewCreator) -> Element {
-            return .init(.footer, content: .content(content), identifier: identifier)
+            return .init(.footer, content: .payload(.init(content)), identifier: identifier)
         }
 
-        public static func row(content: @escaping () -> ViewCreator) -> Element {
-            return .init(.row, content: .content(content))
+        public static func row(_ row: UICRow) -> Element {
+            return .init(.row, content: .payload(.init(row: row)))
         }
 
-        internal static func row(identifier: String, content: @escaping () -> ViewCreator) -> Element {
-            return .init(.row, content: .content(content), identifier: identifier)
+        internal static func row(identifier: String,_ row: UICRow) -> Element {
+            return .init(.row, content: .payload(.init(row: row)), identifier: identifier)
         }
 
-        public static func rows(max: Int, content: @escaping () -> ViewCreator) -> Element {
-            return .init(.row, content: .content(content), max: max)
+        public static func rows(max: Int,_ row: UICRow) -> Element {
+            return .init(.row, content: .payload(.init(row: row)), max: max)
         }
 
         public static func section(_ elements: Element...) -> Element {
@@ -125,19 +125,19 @@ extension UICList.Element {
     var isValid: Bool {
         switch self.type {
         case .footer:
-            guard case .content = self.content else {
+            guard case .payload = self.content else {
                 return false
             }
 
             return self.max == 0
         case .header:
-            guard case .content = self.content else {
+            guard case .payload = self.content else {
                 return false
             }
 
             return self.max == 0
         case .row:
-            guard case .content = self.content else {
+            guard case .payload = self.content else {
                 return false
             }
 
@@ -161,6 +161,7 @@ extension UICList.Element {
 public extension UICList.Element {
     class Section {
         let group: UICList.Group
+        var index: Int = 0
 
         fileprivate init?(_ element: UICList.Element) {
             guard case .section = element.type, case .group(let group) = element.content else {
@@ -174,15 +175,15 @@ public extension UICList.Element {
 
 public extension UICList.Element {
     struct Header {
-        let content: Builder
+        let payload: Payload
         let identifier: String?
 
         fileprivate init?(_ element: UICList.Element) {
-            guard case .header = element.type, case .content(let content) = element.content else {
+            guard case .header = element.type, case .payload(let payload) = element.content else {
                 return nil
             }
 
-            self.content = content
+            self.payload = payload
             self.identifier = element.identifier
         }
     }
@@ -190,15 +191,15 @@ public extension UICList.Element {
 
 public extension UICList.Element {
     struct Footer {
-        let content: Builder
+        let payload: Payload
         let identifier: String?
 
         fileprivate init?(_ element: UICList.Element) {
-            guard case .footer = element.type, case .content(let content) = element.content else {
+            guard case .footer = element.type, case .payload(let payload) = element.content else {
                 return nil
             }
 
-            self.content = content
+            self.payload = payload
             self.identifier = element.identifier
         }
     }
@@ -206,16 +207,16 @@ public extension UICList.Element {
 
 public extension UICList.Element {
     struct Row {
-        let content: Builder
+        let payload: Payload
         let quantity: Int
         let identifier: String?
 
         fileprivate init?(_ element: UICList.Element) {
-            guard case .row = element.type, case .content(let content) = element.content else {
+            guard case .row = element.type, case .payload(let payload) = element.content else {
                 return nil
             }
 
-            self.content = content
+            self.payload = payload
             self.quantity = element.max
             self.identifier = element.identifier
         }
