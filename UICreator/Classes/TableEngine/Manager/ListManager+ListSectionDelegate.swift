@@ -60,6 +60,6 @@ extension ListManager: ListSectionDelegate {
             }
         }
 
-        self.list.reloadData()
+        self.list.setNeedsReloadData()
     }
 }

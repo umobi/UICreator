@@ -52,6 +52,6 @@ extension ListManager: ListContentDelegate {
             })
         }
 
-        self.list.reloadData()
+        self.list.setNeedsReloadData()
     }
 }

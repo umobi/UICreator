@@ -61,17 +61,17 @@ extension ListManager {
 
         static func eachSection(identifier: Int, _ forEach: ForEachCreator, delegate: ListSectionDelegate) -> ContentSection {
             let section = ContentSection(identifier: identifier, [
-                .init(.header(identifier: "\(ObjectIdentifier(delegate)).header.\(identifier)") {
+                .init(.header(identifier: "\(ObjectIdentifier(delegate)).header.\(identifier)", UICHeader {
                     UICSpacer()
                         .height(equalTo: 0)
-                }),
+                })),
                 .init(.row(identifier: "\(ObjectIdentifier(delegate)).row.\(identifier)", UICRow {
                     forEach
                 })),
-                .init(.footer(identifier: "\(ObjectIdentifier(delegate)).footer.\(identifier)") {
+                .init(.footer(identifier: "\(ObjectIdentifier(delegate)).footer.\(identifier)", UICFooter {
                     UICSpacer()
                         .height(equalTo: 0)
-                })
+                }))
             ])
             section.delegate = delegate
             forEach.manager = section
@@ -121,11 +121,11 @@ extension ListManager.ContentSection: SupportForEach {
                 lastRowIdentifierIndex = 0
                 return .init(identifier: identifier, section.map { view in
                     if let header = view as? UICHeader {
-                        return .init(.header(identifier: "\(delegateIdentifier).header.\(identifier)", content: header.content))
+                        return .init(.header(identifier: "\(delegateIdentifier).header.\(identifier)", header))
                     }
 
                     if let footer = view as? UICFooter {
-                        return .init(.footer(identifier: "\(delegateIdentifier).footer.\(identifier)", content: footer.content))
+                        return .init(.footer(identifier: "\(delegateIdentifier).footer.\(identifier)", footer))
                     }
 
                     if let forEach = view as? ForEachCreator {

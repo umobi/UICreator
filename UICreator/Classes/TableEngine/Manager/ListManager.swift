@@ -27,6 +27,16 @@ protocol ListSupport: class {
     var group: UICListCollectionElements? { get }
 }
 
+extension ListSupport {
+    func setNeedsReloadData() {
+        guard group == nil || !(group is UICList.GroupAddingAction) else {
+            return
+        }
+
+        self.reloadData()
+    }
+}
+
 class ListManager {
     var contents: [ContentSection] = []
     weak var list: ListSupport!
@@ -47,11 +57,11 @@ class ListManager {
     private func mountSection(for elements: [ViewCreator]) -> [Content] {
         elements.map { [unowned self] view in
             if let header = view as? UICHeader {
-                return .init(.header(content: header.content))
+                return .init(.header(header))
             }
 
             if let footer = view as? UICFooter {
-                return .init(.footer(content: footer.content))
+                return .init(.footer(footer))
             }
 
             if let forEach = view as? ForEachCreator {

@@ -175,18 +175,18 @@ public extension UIViewCreator {
         }
     }
 
-    func navigation(rightButton item: @escaping () -> ViewCreator) -> Self {
-        return self.onInTheScene {
-            $0.navigationItem.setLeftBarButton(.init(customView: UICHost(content: item).releaseUIView()), animated: false)
-        }
-    }
-
     func navigation(leftButtons contents: @escaping () -> [ViewCreator]) -> Self {
         return self.onInTheScene {
             $0.navigationItem
                 .setLeftBarButtonItems(contents().map { view in
                     .init(customView: UICHost(content: { view }).releaseUIView())
                 }, animated: false)
+        }
+    }
+
+    func navigation(rightButton item: @escaping () -> ViewCreator) -> Self {
+        return self.onInTheScene {
+            $0.navigationItem.setRightBarButton(.init(customView: UICHost(content: item).releaseUIView()), animated: false)
         }
     }
 

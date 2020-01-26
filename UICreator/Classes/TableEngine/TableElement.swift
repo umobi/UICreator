@@ -39,20 +39,20 @@ extension UICList {
             }
         }
 
-        public static func header(content: @escaping () -> ViewCreator) -> Element {
-            return .init(.header, content: .payload(.init(content)))
+        public static func header(_ header: UICHeader) -> Element {
+            return .init(.header, content: .payload(.init(header: header)))
         }
 
-        internal static func header(identifier: String, content: @escaping () -> ViewCreator) -> Element {
-            return .init(.header, content: .payload(.init(content)), identifier: identifier)
+        internal static func header(identifier: String,_ header: UICHeader) -> Element {
+            return .init(.header, content: .payload(.init(header: header)), identifier: identifier)
         }
 
-        public static func footer(content: @escaping () -> ViewCreator) -> Element {
-            return .init(.footer, content: .payload(.init(content)))
+        public static func footer(_ footer: UICFooter) -> Element {
+            return .init(.footer, content: .payload(.init(footer: footer)))
         }
 
-        internal static func footer(identifier: String, content: @escaping () -> ViewCreator) -> Element {
-            return .init(.footer, content: .payload(.init(content)), identifier: identifier)
+        internal static func footer(identifier: String,_ footer: UICFooter) -> Element {
+            return .init(.footer, content: .payload(.init(footer: footer)), identifier: identifier)
         }
 
         public static func row(_ row: UICRow) -> Element {

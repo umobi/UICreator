@@ -313,7 +313,8 @@ public extension UIViewCreator where View: UITableView {
 }
 
 public extension UIViewCreator where View: UITableView {
-    func insertRows(with animation: UITableView.RowAnimation,_ value: Value<[IndexPath]>, onCompletion: @escaping ([IndexPath]) -> Void) -> Self {
+
+    func insertRows(with animation: UITableView.RowAnimation,_ value: Value<[IndexPath]>, perform: @escaping ([IndexPath]) -> Void) -> Self {
         value.asRelay.next { [weak self] indexPaths in
             guard let group = (self?.uiView as? View)?.group as? UICList.Group else {
                 Fatal.UICList.insertRows(indexPaths).warning()
@@ -321,14 +322,14 @@ public extension UIViewCreator where View: UITableView {
             }
 
             (self?.uiView as? View)?.group = UICList.GroupAddingAction(group)
-                .includeIndexPaths(indexPaths)
+            perform(indexPaths)
 
             if #available(iOS 11, tvOS 11, *) {
                 (self?.uiView as? View)?.performBatchUpdates({
                     (self?.uiView as? View)?.insertRows(at: indexPaths, with: animation)
                 }, completion: { didEnd in
                     if didEnd {
-                        onCompletion(indexPaths)
+                        (self?.uiView as? View)?.group = group
                     }
                 })
                 return
@@ -338,13 +339,13 @@ public extension UIViewCreator where View: UITableView {
             (self?.uiView as? View)?.insertRows(at: indexPaths, with: animation)
             (self?.uiView as? View)?.endUpdates()
 
-            onCompletion(indexPaths)
+            (self?.uiView as? View)?.group = group
         }
 
         return self
     }
 
-    func insertSections(with animation: UITableView.RowAnimation,_ value: Value<[Int]>, onCompletion: @escaping ([Int]) -> Void) -> Self {
+    func insertSections(with animation: UITableView.RowAnimation,_ value: Value<[Int]>, perform: @escaping ([Int]) -> Void) -> Self {
         value.asRelay.next { [weak self] sections in
             guard let group = (self?.uiView as? View)?.group as? UICList.Group else {
                 Fatal.UICList.insertSections(sections).warning()
@@ -352,7 +353,7 @@ public extension UIViewCreator where View: UITableView {
             }
 
             (self?.uiView as? View)?.group = UICList.GroupAddingAction(group)
-                .includeSections(sections)
+            perform(sections)
 
             if #available(iOS 11, tvOS 11, *) {
                 (self?.uiView as? View)?.performBatchUpdates({
@@ -360,7 +361,11 @@ public extension UIViewCreator where View: UITableView {
                 }, completion: { didEnd in
                     if didEnd {
                         (self?.uiView as? View)?.group = group
-                        onCompletion(sections)
+                        if let listSupport = self?.uiView as? ListSupport {
+                            listSupport.setNeedsReloadData()
+                            return
+                        }
+                        (self?.uiView as? View)?.reloadData()
                     }
                 })
                 return
@@ -371,7 +376,11 @@ public extension UIViewCreator where View: UITableView {
             (self?.uiView as? View)?.endUpdates()
 
             (self?.uiView as? View)?.group = group
-            onCompletion(sections)
+            if let listSupport = self?.uiView as? ListSupport {
+                listSupport.setNeedsReloadData()
+                return
+            }
+            (self?.uiView as? View)?.reloadData()
         }
 
         return self
