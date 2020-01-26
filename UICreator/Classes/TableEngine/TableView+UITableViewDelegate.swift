@@ -53,7 +53,7 @@ extension TableView: UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         let row = self.group?.row(at: indexPath)?.1
-        return !((row?.leadingActions ?? []) + (row?.trailingActions ?? [])).isEmpty
+        return !((row?.leadingActions?() ?? []) + (row?.trailingActions?() ?? [])).isEmpty
     }
 
     @available(iOS 11.0, tvOS 11.0, *)
@@ -62,7 +62,8 @@ extension TableView: UITableViewDelegate {
             return nil
         }
 
-        let configurator = UISwipeActionsConfiguration(actions: row.trailingActions.compactMap {
+        let rowActions = row.trailingActions?() ?? []
+        let configurator = UISwipeActionsConfiguration(actions: rowActions.compactMap {
             let contextualAction = $0 as? UICContextualAction
             return contextualAction?
                 .indexPath(indexPath)
@@ -70,7 +71,7 @@ extension TableView: UITableViewDelegate {
                 .rowAction
         })
 
-        row.trailingActions.forEach {
+        rowActions.forEach {
             ($0 as? UICContextualAction)?.commitConfigurator(configurator)
         }
 
@@ -83,7 +84,8 @@ extension TableView: UITableViewDelegate {
             return nil
         }
 
-        let configurator = UISwipeActionsConfiguration(actions: row.leadingActions.compactMap {
+        let rowActions = row.leadingActions?() ?? []
+        let configurator = UISwipeActionsConfiguration(actions: rowActions.compactMap {
             let contextualAction = $0 as? UICContextualAction
             return contextualAction?
                 .indexPath(indexPath)
@@ -91,7 +93,7 @@ extension TableView: UITableViewDelegate {
                 .rowAction
         })
 
-        row.leadingActions.forEach {
+        rowActions.forEach {
             ($0 as? UICContextualAction)?.commitConfigurator(configurator)
         }
 
@@ -103,9 +105,11 @@ extension TableView: UITableViewDelegate {
             return nil
         }
 
-        return (row.trailingActions + row.leadingActions).compactMap {
+        return ((row.trailingActions?() ?? []) + (row.leadingActions?() ?? [])).compactMap {
             let action = ($0 as? UICRowAction)
-            return action?.indexPath(indexPath)
+            return action?
+                .indexPath(indexPath)
+                .tableView(tableView)
                 .rowAction
         }
     }

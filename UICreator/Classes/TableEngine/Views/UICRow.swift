@@ -25,8 +25,8 @@ import Foundation
 public class UICRow: ViewCreator {
     let content: () -> ViewCreator
 
-    fileprivate(set) var trailingActions: [RowAction] = []
-    fileprivate(set) var leadingActions: [RowAction] = []
+    fileprivate(set) var trailingActions: (() -> [RowAction])? = nil
+    fileprivate(set) var leadingActions: (() -> [RowAction])? = nil
 
     public init(content: @escaping () -> ViewCreator) {
         self.content = content
@@ -86,7 +86,7 @@ public class UICContextualAction: RowAction {
         self.rowAction.image = image
     }
 
-    public func tableView(_ tableView: UITableView) -> Self {
+    internal func tableView(_ tableView: UITableView) -> Self {
         self.tableView = tableView
         return self
     }
@@ -119,11 +119,11 @@ public class UICContextualAction: RowAction {
     public func deleteAction(with animation: UITableView.RowAnimation, onCompletion handler: @escaping (IndexPath) -> Void) -> Self {
         self.onAction { [weak self] indexPath in
             guard let group = self?.tableView?.group as? UICList.Group else {
-                print("[warning] can't perform action")
+                Fatal.UICList.deleteRows([indexPath]).warning()
                 return false
             }
 
-            self?.tableView.group = UICList.EditingGroup(group)
+            self?.tableView.group = UICList.GroupRemovingAction(group)
                 .disableIndexPath(indexPath)
 
             self?.tableView?.performBatchUpdates({
@@ -140,6 +140,7 @@ public class UICContextualAction: RowAction {
     }
 }
 
+@available(iOS, deprecated: 13.0)
 public class UICRowAction: RowAction {
     private(set) var rowAction: UITableViewRowAction
     private(set) var handler: ((IndexPath) -> Void)?
@@ -174,15 +175,52 @@ public class UICRowAction: RowAction {
         self.handler = handler
         return self
     }
+
+    internal func tableView(_ tableView: UITableView) -> Self {
+        self.tableView = tableView
+        return self
+    }
+
+    public func deleteAction(with animation: UITableView.RowAnimation, onCompletion handler: @escaping (IndexPath) -> Void) -> Self {
+        self.onAction { [weak self] indexPath in
+            guard let group = self?.tableView?.group as? UICList.Group else {
+                Fatal.UICList.deleteRows([indexPath]).warning()
+                return
+            }
+
+            self?.tableView.group = UICList.GroupRemovingAction(group)
+                .disableIndexPath(indexPath)
+
+            if #available(iOS 11.0, *) {
+                self?.tableView?.performBatchUpdates({
+                    self?.tableView.deleteRows(at: [indexPath], with: animation)
+                }, completion: { didEnd in
+                    if didEnd {
+                        self?.tableView.group = group
+                        handler(indexPath)
+                    }
+                })
+
+                return
+            }
+
+            self?.tableView?.beginUpdates()
+            self?.tableView?.deleteRows(at: [indexPath], with: animation)
+            self?.tableView?.endUpdates()
+
+            self?.tableView?.group = group
+            handler(indexPath)
+        }
+    }
 }
 
 public extension UICRow {
-    func trailingActions(_ actions: RowAction...) -> Self {
+    func trailingActions(_ actions: @escaping () -> [RowAction]) -> Self {
         self.trailingActions = actions
         return self
     }
 
-    func leadingActions(_ actions: RowAction...) -> Self {
+    func leadingActions(_ actions: @escaping () -> [RowAction]) -> Self {
         self.leadingActions = actions
         return self
     }

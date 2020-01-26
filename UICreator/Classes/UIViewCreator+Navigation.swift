@@ -56,9 +56,9 @@ public extension UIView {
 
 #if os(iOS)
 public extension UIViewCreator {
-    func toolbar(_ views: ViewCreator...) -> Self {
+    func toolbar(_ contents: @escaping () -> [ViewCreator]) -> Self {
         self.onInTheScene {
-            $0.viewController.toolbarItems = views.map { view in
+            $0.viewController.toolbarItems = contents().map { view in
                 UIBarButtonItem(customView: UICHost {
                     view
                 }.releaseUIView())
@@ -181,19 +181,19 @@ public extension UIViewCreator {
         }
     }
 
-    func navigation(leftButtons items: ViewCreator...) -> Self {
+    func navigation(leftButtons contents: @escaping () -> [ViewCreator]) -> Self {
         return self.onInTheScene {
             $0.navigationItem
-                .setLeftBarButtonItems(items.map { view in
+                .setLeftBarButtonItems(contents().map { view in
                     .init(customView: UICHost(content: { view }).releaseUIView())
                 }, animated: false)
         }
     }
 
-    func navigation<Right: ViewCreator>(rightButtons items: Right...) -> Self {
+    func navigation(rightButtons contents: @escaping () -> [ViewCreator]) -> Self {
         return self.onInTheScene {
             $0.navigationItem
-                .setRightBarButtonItems(items.map { view in
+                .setRightBarButtonItems(contents().map { view in
                     .init(customView: UICHost(content: { view }).releaseUIView())
                 }, animated: false)
         }

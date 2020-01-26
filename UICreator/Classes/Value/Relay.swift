@@ -28,7 +28,6 @@ public final class Relay<Value> {
     init(identifier: String) {
         self.identifier = identifier
         self.handler = nil
-        print("[Relay] init")
     }
 
     public func next(_ handler: @escaping (Value) -> Void) {
@@ -76,7 +75,6 @@ public final class Relay<Value> {
     init(_ identifier: String, handler: @escaping ((@escaping (Value) -> Void) -> Void)) {
         self.identifier = identifier
         self.handler = handler
-        print("[Relay] init")
     }
 
     public func map<Other>(_ handler: @escaping  (Value) -> Other) -> Relay<Other> {
@@ -91,7 +89,5 @@ public final class Relay<Value> {
     func `post`(_ value: Value) {
         ReactiveCenter.shared.privateValueDidChange(self.identifier, newValue: value)
     }
-    deinit {
-        print("[Relay] deinit")
-    }
+
 }

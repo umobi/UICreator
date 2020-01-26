@@ -28,8 +28,8 @@ extension _CollectionView: ListSupport {
 }
 
 public extension UICFlow {
-    convenience init(_ content: ViewCreator...) {
-        self.init(ListManager(content: content))
+    convenience init(_ contents: @escaping () -> [ViewCreator]) {
+        self.init(ListManager(content: contents()))
     }
     
     private convenience init(_ manager: ListManager) {

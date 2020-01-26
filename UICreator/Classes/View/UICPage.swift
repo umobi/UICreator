@@ -336,9 +336,9 @@ public extension UICPage {
         return self
     }
     
-    func pages(direction: UIPageViewController.NavigationDirection,_ subview: Subview) -> Self {
+    func pages(direction: UIPageViewController.NavigationDirection,_ contents: @escaping () -> [ViewCreator]) -> Self {
         self.onInTheScene { [unowned self] _ in
-            self.pageController.updateViewControllers(subview.views.enumerated().map { slice in
+            self.pageController.updateViewControllers(contents().enumerated().map { slice in
                 ContainerController(UICHost {
                     slice.element
                 })

@@ -59,8 +59,4 @@ public class UICContainer<ViewController: UIViewController>: UIViewCreator {
             ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: content)
         }
     }
-
-    deinit {
-        print("Killed")
-    }
 }

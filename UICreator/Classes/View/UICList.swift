@@ -248,11 +248,11 @@ public extension UIViewCreator where View: UITableView {
     func deleteRows(with animation: UITableView.RowAnimation,_ value: Value<[IndexPath]>, onCompletion: @escaping ([IndexPath]) -> Void) -> Self {
         value.asRelay.next { [weak self] indexPaths in
             guard let group = (self?.uiView as? View)?.group as? UICList.Group else {
-                print("[warning] can perform deleteRows(with:,_:)")
+                Fatal.UICList.deleteRows(indexPaths).warning()
                 return
             }
 
-            (self?.uiView as? View)?.group = UICList.EditingGroup(group)
+            (self?.uiView as? View)?.group = UICList.GroupRemovingAction(group)
                 .disableIndexPaths(indexPaths)
 
             if #available(iOS 11, tvOS 11, *) {
@@ -260,6 +260,7 @@ public extension UIViewCreator where View: UITableView {
                     (self?.uiView as? View)?.deleteRows(at: indexPaths, with: animation)
                 }, completion: { didEnd in
                     if didEnd {
+                        (self?.uiView as? View)?.group = group
                         onCompletion(indexPaths)
                     }
                 })
@@ -270,6 +271,7 @@ public extension UIViewCreator where View: UITableView {
             (self?.uiView as? View)?.deleteRows(at: indexPaths, with: animation)
             (self?.uiView as? View)?.endUpdates()
 
+            (self?.uiView as? View)?.group = group
             onCompletion(indexPaths)
         }
 
@@ -279,11 +281,11 @@ public extension UIViewCreator where View: UITableView {
     func deleteSections(with animation: UITableView.RowAnimation,_ value: Value<[Int]>, onCompletion: @escaping ([Int]) -> Void) -> Self {
         value.asRelay.next { [weak self] sections in
             guard let group = (self?.uiView as? View)?.group as? UICList.Group else {
-                print("[warning] can perform deleteRows(with:,_:)")
+                Fatal.UICList.deleteSections(sections).warning()
                 return
             }
 
-            (self?.uiView as? View)?.group = UICList.EditingGroup(group)
+            (self?.uiView as? View)?.group = UICList.GroupRemovingAction(group)
                 .disableSections(sections)
 
             if #available(iOS 11, tvOS 11, *) {
@@ -307,5 +309,93 @@ public extension UIViewCreator where View: UITableView {
         }
 
         return self
+    }
+}
+
+public extension UIViewCreator where View: UITableView {
+    func insertRows(with animation: UITableView.RowAnimation,_ value: Value<[IndexPath]>, onCompletion: @escaping ([IndexPath]) -> Void) -> Self {
+        value.asRelay.next { [weak self] indexPaths in
+            guard let group = (self?.uiView as? View)?.group as? UICList.Group else {
+                Fatal.UICList.insertRows(indexPaths).warning()
+                return
+            }
+
+            (self?.uiView as? View)?.group = UICList.GroupAddingAction(group)
+                .includeIndexPaths(indexPaths)
+
+            if #available(iOS 11, tvOS 11, *) {
+                (self?.uiView as? View)?.performBatchUpdates({
+                    (self?.uiView as? View)?.insertRows(at: indexPaths, with: animation)
+                }, completion: { didEnd in
+                    if didEnd {
+                        onCompletion(indexPaths)
+                    }
+                })
+                return
+            }
+
+            (self?.uiView as? View)?.beginUpdates()
+            (self?.uiView as? View)?.insertRows(at: indexPaths, with: animation)
+            (self?.uiView as? View)?.endUpdates()
+
+            onCompletion(indexPaths)
+        }
+
+        return self
+    }
+
+    func insertSections(with animation: UITableView.RowAnimation,_ value: Value<[Int]>, onCompletion: @escaping ([Int]) -> Void) -> Self {
+        value.asRelay.next { [weak self] sections in
+            guard let group = (self?.uiView as? View)?.group as? UICList.Group else {
+                Fatal.UICList.insertSections(sections).warning()
+                return
+            }
+
+            (self?.uiView as? View)?.group = UICList.GroupAddingAction(group)
+                .includeSections(sections)
+
+            if #available(iOS 11, tvOS 11, *) {
+                (self?.uiView as? View)?.performBatchUpdates({
+                    (self?.uiView as? View)?.insertSections(.init(sections), with: animation)
+                }, completion: { didEnd in
+                    if didEnd {
+                        (self?.uiView as? View)?.group = group
+                        onCompletion(sections)
+                    }
+                })
+                return
+            }
+
+            (self?.uiView as? View)?.beginUpdates()
+            (self?.uiView as? View)?.insertSections(.init(sections), with: animation)
+            (self?.uiView as? View)?.endUpdates()
+
+            (self?.uiView as? View)?.group = group
+            onCompletion(sections)
+        }
+
+        return self
+    }
+}
+
+extension Fatal {
+    enum UICList: FatalType {
+        case deleteRows([IndexPath])
+        case deleteSections([Int])
+        case insertRows([IndexPath])
+        case insertSections([Int])
+
+        var error: String {
+            switch self {
+            case .deleteRows(let indexPaths):
+                return "UICList can't perform action deleteRows for indexPaths \(indexPaths)."
+            case .deleteSections(let sectionPaths):
+                return "UICList can't perform action deleteSections for sectionPaths \(sectionPaths)"
+            case .insertRows(let indexPaths):
+                return "UICList can't perform action insertRows for indexPaths \(indexPaths)."
+            case .insertSections(let sectionPaths):
+                return "UICList can't perform action insertSections for sectionPaths \(sectionPaths)"
+            }
+        }
     }
 }

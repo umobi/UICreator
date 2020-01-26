@@ -26,15 +26,24 @@ struct Fatal {
     static func die(_ type: FatalType) {
         fatalError(type.error)
     }
+
+    static func warning(_ type: FatalType) {
+        print("[WARNING] \(type.error)")
+    }
 }
 
 protocol FatalType {
     var error: String { get }
     func die()
+    func warning()
 }
 
 extension FatalType {
     func die() {
         Fatal.die(self)
+    }
+
+    func warning() {
+        Fatal.warning(self)
     }
 }

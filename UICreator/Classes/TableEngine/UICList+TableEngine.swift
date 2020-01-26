@@ -25,8 +25,8 @@ import Foundation
 extension TableView: ListSupport {}
 
 public extension UICList {
-    convenience init(style: UITableView.Style,_ subviews: Subview) {
-        self.init(style: style, ListManager(content: subviews.views))
+    convenience init(style: UITableView.Style,_ contents: @escaping () -> [ViewCreator]) {
+        self.init(style: style, ListManager(content: contents()))
     }
 
     private convenience init(style: UITableView.Style,_ manager: ListManager) {

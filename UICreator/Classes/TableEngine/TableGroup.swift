@@ -173,7 +173,50 @@ extension UICListCollectionElements {
 }
 
 public extension UICList {
-    class EditingGroup: UICListCollectionElements {
+    class GroupAddingAction: UICListCollectionElements {
+        let group: Group
+        var elements: [UICList.Element] {
+            return self.group.elements
+        }
+
+        init(_ group: Group) {
+            self.group = group
+        }
+
+        private var includeIndexPath: [IndexPath] = []
+        private var includeSections: [Int] = []
+
+        func includeIndexPath(_ indexPath: IndexPath) -> Self {
+            self.includeIndexPath.append(indexPath)
+            return self
+        }
+
+        func includeIndexPaths(_ indexPaths: [IndexPath]) -> Self {
+            self.includeIndexPath = indexPaths
+            return self
+        }
+
+        func includeSections(_ sections: [Int]) -> Self {
+            self.includeSections = sections
+            return self
+        }
+
+        func numberOfRows(in section: UICList.Element.Section) -> Int {
+            let numberOfRows = self.group.numberOfRows(in: section)
+
+            guard self.includeIndexPath.contains(where: {
+                $0.section == section.index
+            }) else { return numberOfRows }
+
+            return numberOfRows + self.includeIndexPath.reduce(0) { $0 + ($1.section == section.index ? 1 : 0 )}
+        }
+
+        var numberOfSections: Int {
+            return self.group.numberOfSections + IndexSet(self.includeSections).count
+        }
+    }
+
+    class GroupRemovingAction: UICListCollectionElements {
         let group: Group
         var elements: [UICList.Element] {
             return self.group.elements
@@ -196,8 +239,8 @@ public extension UICList {
             return self
         }
 
-        func disableSections(_ section: [Int]) -> Self {
-            self.disableSections = section
+        func disableSections(_ sections: [Int]) -> Self {
+            self.disableSections = sections
             return self
         }
 
@@ -241,13 +284,13 @@ extension UICList {
 public extension UICList.Element {
     struct Payload {
         let content: () -> ViewCreator
-        let trailingActions: [RowAction]
-        let leadingActions: [RowAction]
+        let trailingActions: (() -> [RowAction])?
+        let leadingActions: (() -> [RowAction])?
 
         init(_ content: @escaping () -> ViewCreator) {
             self.content = content
-            self.trailingActions = []
-            self.leadingActions = []
+            self.trailingActions = nil
+            self.leadingActions = nil
         }
 
         init(row: UICRow) {

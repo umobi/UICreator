@@ -25,8 +25,8 @@ import Foundation
 public class UICSection: ViewCreator {
     public let content: [ViewCreator]
 
-    public convenience init(_ content: ViewCreator...) {
-        self.init(content)
+    public convenience init(_ contents: @escaping () -> [ViewCreator]) {
+        self.init(contents())
     }
 
     internal init(_ content: [ViewCreator]) {
