@@ -22,179 +22,160 @@
 
 import Foundation
 
+struct UICCell {
+    let rowManager: ListManager.RowManager
+    let identifier: String
+
+    init(_ identifier: String,_ manager: ListManager.RowManager) {
+        self.rowManager = manager
+        self.identifier = identifier
+    }
+
+    struct Loaded {
+        let cell: UICCell
+        let trailingActions: [RowAction]
+        let leadingActions: [RowAction]
+
+        init(_ cell: UICCell) {
+            self.cell = cell
+            self.trailingActions = cell.rowManager.payload.trailingActions?() ?? []
+            self.leadingActions = cell.rowManager.payload.leadingActions?() ?? []
+        }
+    }
+
+    var load: Loaded {
+        return .init(self)
+    }
+}
+
 protocol UICListCollectionElements: class {
-    var elements: [UICList.Element] { get }
+    var sections: [ListManager.SectionManager] { get }
 
     var numberOfSections: Int { get }
-    func numberOfRows(in section: UICList.Element.Section) -> Int
-    func row(at indexPath: IndexPath) -> (String, UICList.Element.Payload)?
+    func numberOfRows(in section: ListManager.SectionManager) -> Int
+    func row(at indexPath: IndexPath) -> UICCell
 }
 
 extension UICListCollectionElements {
-    var containsSection: Bool {
-        return self.elements.first(where: {
-            return $0.isSection
-        }) != nil
-    }
+    var headers: [(Int, ListManager.RowManager)] {
+        return self.sections.enumerated().compactMap {
+            guard let header = $0.element.header else {
+                return nil
+            }
 
-    var containsOnlySection: Bool {
-        return self.elements.allSatisfy {
-            return $0.isSection
+            return ($0.offset, header)
         }
     }
 
-    var sections: [UICList.Element.Section] {
-        let sections: [UICList.Element.Section] = self.elements.compactMap {
-            $0.asSection
-        }
+    var footers: [(Int, ListManager.RowManager)] {
+        return self.sections.enumerated().compactMap {
+            guard let footer = $0.element.footer else {
+                return nil
+            }
 
-        return (sections.isEmpty ?
-            [UICList.Element.section(self.elements).asSection!] :
-            sections
-        ).enumerated().map {
-            $0.element.index = $0.offset
-            return $0.element
+            return ($0.offset, footer)
         }
     }
 
-    var headers: [(Int, UICList.Element.Header)] {
-        return self.elements.compactMap {
-            $0.asHeader
-        }.enumerated().map { ($0.0, $0.1) }
-    }
+//    var rows: [(Int, ListManager.Content)] {
+//        return self.sections.compactMap {
+//            $0.contents
+//        }.enumerated().map { ($0.0, $0.1) }
+//    }
 
-    var footers: [(Int, UICList.Element.Footer)] {
-        return self.elements.compactMap {
-            $0.asFooter
-        }.enumerated().map { ($0.0, $0.1) }
-    }
-
-    var rows: [(Int, UICList.Element.Row)] {
-        return self.elements.compactMap {
-            $0.asRow
-        }.enumerated().map { ($0.0, $0.1) }
-    }
-
-    func numberOfRows(in section: UICList.Element.Section) -> Int {
-        return section.group.rows.reduce(0) {
-            $0 + (($1.1.quantity == 0) ? 1 : $1.1.quantity)
-        }
+    func numberOfRows(in section: ListManager.SectionManager) -> Int {
+        return section.rows.count
     }
 
     var numberOfSections: Int {
-        let sections = self.sections
-        if !sections.isEmpty {
-            return sections.count
-        }
-
-        return self.numberOfRows(in: UICList.Element.section(self.elements).asSection!)
+        return self.sections.count
     }
 
-    func section(at index: Int) -> UICList.Element.Section {
-        let sections = self.sections
-        if sections.isEmpty {
-            return UICList.Element.section(self.elements).asSection!
-        }
-
-        if sections.count <= index, let last = sections.last {
-            return last
-        }
-
-        return sections[index]
+    func section(at index: Int) -> ListManager.SectionManager {
+        return self.sections[index]
     }
 
     var rowsIdentifier: [String] {
-        return self.sections.enumerated().map { section in
-            section.element.group.rows.map { row -> String in
-                return row.1.identifier ?? "\(section.offset)-\(row.0)"
+        return self.sections.map { section in
+            section.rows.map {
+                "\(section.identifier).\($0.identifier).row"
             }
         }.reduce([]) { $0 + $1 }
     }
 
     var headersIdentifier: [String] {
-        return self.sections.enumerated().map { section in
-            section.element.group.headers.map { header -> String in
-                return header.1.identifier ?? "\(header.0).header"
-            }
-        }.reduce([]) { $0 + $1 }
-    }
-
-    var footersIdentifier: [String] {
-        return self.sections.enumerated().map { section in
-            section.element.group.footers.map { footer -> String in
-                return footer.1.identifier ?? "\(footer.0).footer"
-            }
-        }.reduce([]) { $0 + $1 }
-    }
-
-    func row(at indexPath: IndexPath) -> (String, UICList.Element.Payload)? {
-        let section = self.section(at: indexPath.section)
-        guard let row: (Int, UICList.Element.Row) = ({
-            if self.numberOfRows(in: section) <= indexPath.row {
-                if let last = section.group.rows.last, last.1.quantity == 0, last.0 <= indexPath.row {
-                    return last
-                }
-
+        return self.sections.compactMap { section in
+            guard section.header != nil else {
                 return nil
             }
 
-            return section.group.rows.first(where: { row in
-                if row.1.quantity >= 1 {
-                    return (row.0..<row.0+row.1.quantity).contains(indexPath.row)
-                }
-                return row.0 == indexPath.row
-            })
-        }()) else {
-            return nil
+            return "\(section.identifier).header"
         }
-
-        return (row.1.identifier ?? "\(indexPath.section)-\(row.0)", row.1.payload)
     }
 
-    func header(at section: Int) -> (String, UICList.Element.Payload)? {
-        let section = self.section(at: section)
+    var footersIdentifier: [String] {
+        return self.sections.compactMap { section in
+            guard section.footer != nil else {
+                return nil
+            }
 
-        guard let header = section.group.headers.first else {
-            return nil
+            return "\(section.identifier).footer"
         }
-
-        return (header.1.identifier ?? "\(header.0).header", header.1.payload)
     }
 
-    func footer(at section: Int) -> (String, UICList.Element.Payload)? {
+    func row(at indexPath: IndexPath) -> UICCell {
+        let section = self.section(at: indexPath.section)
+        let row = section.rows[indexPath.row]
+
+        return .init("\(section.identifier).\(row.identifier).row", row)
+    }
+
+    func header(at section: Int) -> UICCell? {
         let section = self.section(at: section)
 
-        guard let footer = section.group.footers.first else {
+        guard let header = section.header else {
             return nil
         }
 
-        return (footer.1.identifier ?? "\(footer.0).footer", footer.1.payload)
+        return .init("\(section.identifier).header", header)
+    }
+
+    func footer(at section: Int) -> UICCell? {
+        let section = self.section(at: section)
+
+        guard let footer = section.footer else {
+            return nil
+        }
+
+        return .init("\(section.identifier).footer", footer)
     }
 }
 
 public extension UICList {
     class GroupAddingAction: UICListCollectionElements {
-        let group: Group
-        var elements: [UICList.Element] {
-            return self.group.elements
+        let manager: ListManager
+
+        var sections: [ListManager.SectionManager] {
+            return self.manager.sections
         }
 
-        init(_ group: Group) {
-            self.group = group
+        init(_ manager: ListManager) {
+            self.manager = manager
         }
     }
 
     class GroupRemovingAction: UICListCollectionElements {
-        let group: Group
-        var elements: [UICList.Element] {
-            return self.group.elements
+        let manager: ListManager
+
+        var sections: [ListManager.SectionManager] {
+            return self.manager.sections
         }
 
         private var disableIndexPath: [IndexPath] = []
         private var disableSections: [Int] = []
 
-        init(_ group: Group) {
-            self.group = group
+        init(_ manager: ListManager) {
+            self.manager = manager
         }
 
         func disableIndexPath(_ indexPath: IndexPath) -> Self {
@@ -212,8 +193,8 @@ public extension UICList {
             return self
         }
 
-        func numberOfRows(in section: UICList.Element.Section) -> Int {
-            let numberOfRows = self.group.numberOfRows(in: section)
+        func numberOfRows(in section: ListManager.SectionManager) -> Int {
+            let numberOfRows = self.manager.numberOfRows(in: section)
 
             guard self.disableIndexPath.contains(where: {
                 $0.section == section.index
@@ -223,93 +204,33 @@ public extension UICList {
         }
 
         var numberOfSections: Int {
-            return self.group.numberOfSections - IndexSet(self.disableSections).count
+            return self.manager.numberOfSections - IndexSet(self.disableSections).count
         }
     }
 }
 
-extension UICList {
-    public class Group: UICListCollectionElements {
-        private let _elements: [UICList.Element]?
-        let manager: ListManager?
-
-        internal init(_ manager: ListManager) {
-            self._elements = nil
-            self.manager = manager
-        }
-
-        internal init(_ elements: [UICList.Element]) {
-            self._elements = elements
-            self.manager = nil
-        }
-
-        var elements: [UICList.Element] {
-            return self._elements ?? manager?.elements ?? []
-        }
-    }
-}
-
-public extension UICList.Element {
-    struct Payload {
-        let content: () -> ViewCreator
-        let trailingActions: (() -> [RowAction])?
-        let leadingActions: (() -> [RowAction])?
-
-        init(header: UICHeader) {
-            self.content = header.content
-            self.trailingActions = nil
-            self.leadingActions = nil
-        }
-
-        init(footer: UICFooter) {
-            self.content = footer.content
-            self.trailingActions = nil
-            self.leadingActions = nil
-        }
-
-        init(row: UICRow) {
-            self.content = row.content
-            self.trailingActions = row.trailingActions
-            self.leadingActions = row.leadingActions
-        }
-    }
-}
-
-extension UICListCollectionElements {
-    public var isValid: Bool {
-        return self.isValid()
-    }
-
-    private func isValid(isInsideSection: Bool = false) -> Bool {
-        let isRoot = self.containsSection
-
-        if isRoot {
-            guard !isInsideSection else {
-                return false
-            }
-
-            if !self.containsOnlySection {
-                return false
-            }
-
-            return self.sections.allSatisfy {
-                $0.group.isValid(isInsideSection: true)
-            }
-        }
-
-        let headers = self.headers
-        if !headers.isEmpty && (headers.count > 1 || headers.first?.0 != 0) {
-            return false
-        }
-
-        let footers = self.elements.enumerated().filter {
-            $0.element.isFooter
-        }
-
-        if !footers.isEmpty && (footers.count > 1 || footers.first?.0 != self.elements.count - 1) {
-            return false
-        }
-
-        return true
-    }
-}
+//public extension UICList.Element {
+//    struct Payload {
+//        let content: () -> ViewCreator
+//        let trailingActions: (() -> [RowAction])?
+//        let leadingActions: (() -> [RowAction])?
+//
+//        init(header: UICHeader) {
+//            self.content = header.content
+//            self.trailingActions = nil
+//            self.leadingActions = nil
+//        }
+//
+//        init(footer: UICFooter) {
+//            self.content = footer.content
+//            self.trailingActions = nil
+//            self.leadingActions = nil
+//        }
+//
+//        init(row: UICRow) {
+//            self.content = row.content
+//            self.trailingActions = row.trailingActions
+//            self.leadingActions = row.leadingActions
+//        }
+//    }
+//}

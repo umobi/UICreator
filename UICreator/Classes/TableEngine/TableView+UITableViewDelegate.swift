@@ -28,12 +28,11 @@ extension TableView: UITableViewDelegate {
             return nil
         }
 
-        guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: header.0) as? TableViewHeaderFooterCell else {
+        guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: header.identifier) as? TableViewHeaderFooterCell else {
             fatalError()
         }
         
-        cell.prepareCell(payload: header.1)
-        self.creatorDelegate?.header(at: section, content: cell.builder)
+        cell.prepareCell(header)
         return cell
     }
 
@@ -42,28 +41,29 @@ extension TableView: UITableViewDelegate {
             return nil
         }
 
-        guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: footer.0) as? TableViewHeaderFooterCell else {
+        guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: footer.identifier) as? TableViewHeaderFooterCell else {
             fatalError()
         }
 
-        cell.prepareCell(payload: footer.1)
-        self.creatorDelegate?.footer(at: section, content: cell.builder)
+        cell.prepareCell(footer)
         return cell
     }
 
     public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        let row = self.group?.row(at: indexPath)?.1
-        return !((row?.leadingActions?() ?? []) + (row?.trailingActions?() ?? [])).isEmpty
+        guard let reusableView = tableView.cellForRow(at: indexPath) as? ReusableView else {
+            return false
+        }
+
+        return !(reusableView.cellLoaded.trailingActions + reusableView.cellLoaded.leadingActions).isEmpty
     }
 
     @available(iOS 11.0, tvOS 11.0, *)
     public func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let row = self.group?.row(at: indexPath)?.1 else {
+        guard let reusableView = tableView.cellForRow(at: indexPath) as? ReusableView else {
             return nil
         }
 
-        let rowActions = row.trailingActions?() ?? []
-        let configurator = UISwipeActionsConfiguration(actions: rowActions.compactMap {
+        let configurator = UISwipeActionsConfiguration(actions: reusableView.cellLoaded.trailingActions.compactMap {
             let contextualAction = $0 as? UICContextualAction
             return contextualAction?
                 .indexPath(indexPath)
@@ -71,7 +71,7 @@ extension TableView: UITableViewDelegate {
                 .rowAction
         })
 
-        rowActions.forEach {
+        reusableView.cellLoaded.trailingActions.forEach {
             ($0 as? UICContextualAction)?.commitConfigurator(configurator)
         }
 
@@ -80,12 +80,11 @@ extension TableView: UITableViewDelegate {
 
     @available(iOS 11.0, tvOS 11.0, *)
     public func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let row = self.group?.row(at: indexPath)?.1 else {
+        guard let reusableView = tableView.cellForRow(at: indexPath) as? ReusableView else {
             return nil
         }
 
-        let rowActions = row.leadingActions?() ?? []
-        let configurator = UISwipeActionsConfiguration(actions: rowActions.compactMap {
+        let configurator = UISwipeActionsConfiguration(actions: reusableView.cellLoaded.leadingActions.compactMap {
             let contextualAction = $0 as? UICContextualAction
             return contextualAction?
                 .indexPath(indexPath)
@@ -93,7 +92,7 @@ extension TableView: UITableViewDelegate {
                 .rowAction
         })
 
-        rowActions.forEach {
+        reusableView.cellLoaded.leadingActions.forEach {
             ($0 as? UICContextualAction)?.commitConfigurator(configurator)
         }
 
@@ -101,11 +100,11 @@ extension TableView: UITableViewDelegate {
     }
 
     public func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        guard let row = self.group?.row(at: indexPath)?.1 else {
+        guard let reusableView = tableView.cellForRow(at: indexPath) as? ReusableView else {
             return nil
         }
 
-        return ((row.trailingActions?() ?? []) + (row.leadingActions?() ?? [])).compactMap {
+        return (reusableView.cellLoaded.leadingActions + reusableView.cellLoaded.trailingActions).compactMap {
             let action = ($0 as? UICRowAction)
             return action?
                 .indexPath(indexPath)

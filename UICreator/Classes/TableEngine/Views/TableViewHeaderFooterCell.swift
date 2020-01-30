@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 
 internal class TableViewHeaderFooterCell: UITableViewHeaderFooterView, ReusableView {
-    var builder: ViewCreator! = nil
+    var cellLoaded: UICCell.Loaded!
 
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)

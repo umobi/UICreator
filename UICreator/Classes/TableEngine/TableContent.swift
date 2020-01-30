@@ -22,11 +22,11 @@
 
 import Foundation
 
-extension UICList {
-    public enum Content {
-        case group(Group)
-        case payload(Element.Payload)
-        case empty
-        case sections([UICList.Element.Section])
-    }
-}
+//extension UICList {
+//    public enum Content {
+//        case group([ViewCreator])
+//        case payload(Element.Payload)
+//        case empty
+//        case sections([UICList.Element.Section])
+//    }
+//}

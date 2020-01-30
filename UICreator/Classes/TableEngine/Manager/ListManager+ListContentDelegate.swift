@@ -22,36 +22,43 @@
 
 import Foundation
 
-extension ListManager: ListContentDelegate {
-    private static func update(section: ContentSection, first: (Int, Content), last: (Int, Content)?, with contents: [Content]) -> ContentSection {
-        return .init(contents: Array(section.contents[0..<first.0]) +
-            contents + {
-                if section.contents.count == ((last ?? first).0 + 1) {
-                    return []
-                }
-
-                return Array(section.contents[((last ?? first).0+1)..<section.contents.count])
-            }()
-        )
-    }
-
-    func content(_ content: ListManager.Content, updatedWith sequence: [UICList.Element]) {
-        self.contents = self.contents.map { [unowned content] section in
-            guard let first = section.rows.first(where: { $0.1.identifier == content.identifier }) else {
-                return section
-            }
-
-            guard let end = section.rows.reversed().first(where: { $0.1.identifier == content.identifier }) else {
-                return ListManager.update(section: section, first: first, last: nil, with: sequence.map {
-                    .makeRow(content, element: $0)
-                })
-            }
-
-            return ListManager.update(section: section, first: first, last: end, with: sequence.map {
-                .makeRow(content, element: $0)
-            })
-        }
-
-        self.list.setNeedsReloadData()
-    }
-}
+//extension ListManager: ListContentDelegate {
+//    private static func update(section: ContentSection, first: (Int, Content), last: (Int, Content)?, with contents: [Content]) -> ContentSection {
+//        return .init(
+//            contents: Array(section.contents[0..<first.0]) +
+//                contents + {
+//                    if section.contents.count == ((last ?? first).0 + 1) {
+//                        return []
+//                    }
+//
+//                    return Array(section.contents[((last ?? first).0+1)..<section.contents.count])
+//                }(),
+//            section: section.sectionIndex
+//        )
+//    }
+//
+//    func content(_ content: ListManager.Content, updatedWith sequence: [UICList.Element]) {
+//        self.contents = self.contents.enumerated().map { [unowned content] in
+//            guard $0.offset == content.section else {
+//                return $0.element
+//            }
+//
+//            let section = $0.element
+//            guard let first = section.rows.first(where: { $0.1.identifier == content.identifier }) else {
+//                return section
+//            }
+//
+//            guard let end = section.rows.reversed().first(where: { $0.1.identifier == content.identifier }) else {
+//                return ListManager.update(section: section, first: first, last: nil, with: sequence.map {
+//                    .makeRow(content, element: $0)
+//                })
+//            }
+//
+//            return ListManager.update(section: section, first: first, last: end, with: sequence.map {
+//                .makeRow(content, element: $0)
+//            })
+//        }
+//
+//        self.list.setNeedsReloadData()
+//    }
+//}

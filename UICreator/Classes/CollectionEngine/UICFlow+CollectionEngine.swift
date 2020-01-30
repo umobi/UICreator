@@ -29,34 +29,29 @@ extension _CollectionView: ListSupport {
 
 public extension UICFlow {
     convenience init(_ contents: @escaping () -> [ViewCreator]) {
-        self.init(ListManager(content: contents()))
+        self.init(ListManager(contents: contents()))
     }
     
     private convenience init(_ manager: ListManager) {
         self.init()
-        let group = UICList.Group(manager)
-
-        if !group.isValid {
-            fatalError("Verify your content")
-        }
 
         guard let collectionView = self.uiView as? View else {
             return
         }
 
-        group.rowsIdentifier.forEach {
+        manager.rowsIdentifier.forEach {
             collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
         }
 
-        group.headersIdentifier.forEach {
+        manager.headersIdentifier.forEach {
             collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
         }
 
-        group.footersIdentifier.forEach {
+        manager.footersIdentifier.forEach {
             collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
         }
 
-        collectionView.group = group
+        collectionView.group = manager
         collectionView.dataSource = collectionView
         collectionView.delegate = collectionView
         manager.list = collectionView

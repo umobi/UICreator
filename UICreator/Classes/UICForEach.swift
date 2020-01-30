@@ -24,7 +24,7 @@ import Foundation
 
 protocol ForEachCreator: ViewCreator {
     var viewType: ViewCreator.Type { get }
-    func startObservation()
+//    func startObservation()
 }
 
 private var kManager: UInt = 0
@@ -62,7 +62,7 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
     let relay: Relay<[Value]>
     let content: (Value) -> ViewCreator
 
-    func startObservation() {
+    private func startObservation() {
         let content = self.content
         self.manager?.viewsDidChange(placeholderView: self.uiView, relay.map {
             $0.map { item in
@@ -90,7 +90,7 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
 
         self.height(equalTo: 0, priority: .high)
             .width(equalTo: 0, priority: .high)
-            .onInTheScene { view in
+            .onRendered { view in
                 (view.viewCreator as? Self)?.startObservation()
                 (view.viewCreator as? Self)?.relay.post(value() ?? [])
             }

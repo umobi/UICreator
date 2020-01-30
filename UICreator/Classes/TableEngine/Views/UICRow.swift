@@ -118,7 +118,7 @@ public class UICContextualAction: RowAction {
 
     public func deleteAction(with animation: UITableView.RowAnimation, onCompletion handler: @escaping (IndexPath) -> Void) -> Self {
         self.onAction { [weak self] indexPath in
-            guard let group = self?.tableView?.group as? UICList.Group else {
+            guard let group = self?.tableView?.group as? ListManager else {
                 Fatal.UICList.deleteRows([indexPath]).warning()
                 return false
             }
@@ -183,7 +183,7 @@ public class UICRowAction: RowAction {
 
     public func deleteAction(with animation: UITableView.RowAnimation, onCompletion handler: @escaping (IndexPath) -> Void) -> Self {
         self.onAction { [weak self] indexPath in
-            guard let group = self?.tableView?.group as? UICList.Group else {
+            guard let group = self?.tableView?.group as? ListManager else {
                 Fatal.UICList.deleteRows([indexPath]).warning()
                 return
             }

@@ -46,13 +46,11 @@ extension TableView: UITableViewDataSource {
             fatalError()
         }
 
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: row.0, for: indexPath) as? TableViewCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: row.identifier, for: indexPath) as? TableViewCell else {
             fatalError()
         }
 
-        cell.prepareCell(payload: row.1)
-        self.creatorDataSource?.cell(at: indexPath, content: cell.builder)
-
+        cell.prepareCell(row)
         self.commitCell(cell)
         return cell
     }

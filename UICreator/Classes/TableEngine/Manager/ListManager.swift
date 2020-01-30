@@ -37,8 +37,8 @@ extension ListSupport {
     }
 }
 
-class ListManager {
-    var contents: [ContentSection] = []
+class ListManager: UICListCollectionElements {
+    var sections: [SectionManager] = []
     weak var list: ListSupport!
 
     private var identifierCount: Int = 0
@@ -48,65 +48,54 @@ class ListManager {
         return next
     }
 
-    var elements: [UICList.Element] {
-        return self.contents.map {
-            $0.section
-        }
-    }
-
-    private func mountSection(for elements: [ViewCreator]) -> [Content] {
-        elements.map { [unowned self] view in
-            if let header = view as? UICHeader {
-                return .init(.header(header))
-            }
-
-            if let footer = view as? UICFooter {
-                return .init(.footer(footer))
-            }
-
-            if let forEach = view as? ForEachCreator {
-                return Content.eachRow(identifier: self.nextIdentifier(), forEach, delegate: self)
-            }
-
-            if let row = view as? UICRow {
-                return .init(.row(row))
-            }
-
-            fatalError("Try using UICRow as wrapper for ViewCreators in list. It can be use UICForEach either")
-        }
-    }
-
-    init(content: [ViewCreator]) {
-        if content.allSatisfy({ $0 is UICSection }) {
-            self.contents = content.compactMap { [unowned self] in
-                guard let section = $0 as? UICSection else {
+    init(contents: [ViewCreator]) {
+        if contents.allSatisfy({ $0 is UICSection }) {
+            self.sections = contents.enumerated().compactMap {
+                guard let section = $0.element as? UICSection else {
                     return nil
                 }
 
-                return .init(contents: self.mountSection(for: section.content))
+                return SectionManager
+                    .mount(with: section.content)
+                    .index($0.offset)
+                    .identifier($0.offset)
+                    .isDynamic(false)
+                    .listManager(self)
             }
 
             return
         }
 
-        self.contents = content.compactMap {
-            if let forEach = $0 as? ForEachCreator, forEach.viewType is UICSection.Type {
-                return .eachSection(identifier: self.nextIdentifier(), forEach, delegate: self)
+        self.sections = contents.enumerated().compactMap {
+            if let forEach = $0.element as? ForEachCreator, forEach.viewType is UICSection.Type {
+                return SectionManager.forEach(forEach)
+                    .isDynamic(true)
+                    .index($0.offset)
+                    .identifier($0.offset)
+                    .listManager(self)
             }
 
-            if let section = $0 as? UICSection {
-                return .init(identifier: self.nextIdentifier(), self.mountSection(for: section.content))
+            if let section = $0.element as? UICSection {
+                return SectionManager.mount(with: section.content)
+                    .isDynamic(false)
+                    .index($0.offset)
+                    .identifier($0.offset)
+                    .listManager(self)
             }
 
             return nil
         }
 
-        if self.contents.isEmpty {
-            self.contents = [.init(contents: self.mountSection(for: content))]
+        if self.sections.isEmpty {
+            self.sections = [
+                SectionManager.mount(with: contents)
+                    .isDynamic(false)
+                    .listManager(self)
+            ]
             return
         }
 
-        if self.contents.count != content.count {
+        if self.sections.count != contents.count {
             fatalError("Verify your content")
         }
     }

@@ -247,7 +247,7 @@ extension UITableView {
 public extension UIViewCreator where View: UITableView {
     func deleteRows(with animation: UITableView.RowAnimation,_ value: Value<[IndexPath]>, onCompletion: @escaping ([IndexPath]) -> Void) -> Self {
         value.asRelay.next { [weak self] indexPaths in
-            guard let group = (self?.uiView as? View)?.group as? UICList.Group else {
+            guard let group = (self?.uiView as? View)?.group as? ListManager else {
                 Fatal.UICList.deleteRows(indexPaths).warning()
                 return
             }
@@ -280,7 +280,7 @@ public extension UIViewCreator where View: UITableView {
 
     func deleteSections(with animation: UITableView.RowAnimation,_ value: Value<[Int]>, onCompletion: @escaping ([Int]) -> Void) -> Self {
         value.asRelay.next { [weak self] sections in
-            guard let group = (self?.uiView as? View)?.group as? UICList.Group else {
+            guard let group = (self?.uiView as? View)?.group as? ListManager else {
                 Fatal.UICList.deleteSections(sections).warning()
                 return
             }
@@ -316,7 +316,7 @@ public extension UIViewCreator where View: UITableView {
 
     func insertRows(with animation: UITableView.RowAnimation,_ value: Value<[IndexPath]>, perform: @escaping ([IndexPath]) -> Void) -> Self {
         value.asRelay.next { [weak self] indexPaths in
-            guard let group = (self?.uiView as? View)?.group as? UICList.Group else {
+            guard let group = (self?.uiView as? View)?.group as? ListManager else {
                 Fatal.UICList.insertRows(indexPaths).warning()
                 return
             }
@@ -347,7 +347,7 @@ public extension UIViewCreator where View: UITableView {
 
     func insertSections(with animation: UITableView.RowAnimation,_ value: Value<[Int]>, perform: @escaping ([Int]) -> Void) -> Self {
         value.asRelay.next { [weak self] sections in
-            guard let group = (self?.uiView as? View)?.group as? UICList.Group else {
+            guard let group = (self?.uiView as? View)?.group as? ListManager else {
                 Fatal.UICList.insertSections(sections).warning()
                 return
             }

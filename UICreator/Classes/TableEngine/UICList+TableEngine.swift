@@ -26,7 +26,7 @@ extension TableView: ListSupport {}
 
 public extension UICList {
     convenience init(style: UITableView.Style,_ contents: @escaping () -> [ViewCreator]) {
-        self.init(style: style, ListManager(content: contents()))
+        self.init(style: style, ListManager(contents: contents()))
     }
 
     private convenience init(style: UITableView.Style,_ manager: ListManager) {
@@ -34,29 +34,24 @@ public extension UICList {
         #if os(iOS)
         (self.uiView as? View)?.separatorStyle = .none
         #endif
-        let group = UICList.Group(manager)
-
-        if !group.isValid {
-            fatalError("Verify your content")
-        }
 
         guard let tableView = self.uiView as? View else {
             return
         }
 
-        group.rowsIdentifier.forEach { [unowned tableView] in
+        manager.rowsIdentifier.forEach { [unowned tableView] in
             tableView.register(TableViewCell.self, forCellReuseIdentifier: $0)
         }
 
-        group.headersIdentifier.forEach { [unowned tableView] in
+        manager.headersIdentifier.forEach { [unowned tableView] in
             tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
         }
 
-        group.footersIdentifier.forEach { [unowned tableView] in
+        manager.footersIdentifier.forEach { [unowned tableView] in
             tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
         }
 
-        tableView.group = group
+        tableView.group = manager
         tableView.dataSource = tableView
         tableView.delegate = tableView
         manager.list = tableView

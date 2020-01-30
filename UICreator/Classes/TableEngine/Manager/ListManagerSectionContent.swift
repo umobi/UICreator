@@ -22,145 +22,270 @@
 
 import Foundation
 
-protocol ListSectionDelegate: ListContentDelegate {
-    func content(_ section: ListManager.ContentSection, updateSections: [ListManager.ContentSection])
+protocol ListSectionDelegate {
+    func content(_ section: ListManager.SectionManager.Copy, updateSections: [ListManager.SectionManager])
+    func content(updateSection: ListManager.SectionManager)
 }
 
 extension ListManager {
-    class ContentSection {
-        let section: UICList.Element
-        let contents: [Content]
-        weak var delegate: ListSectionDelegate!
-        weak var forEach: ForEachCreator!
+    final class SectionManager {
+        let rows: [RowManager]
+        let header: RowManager?
+        let footer: RowManager?
+
         let identifier: Int
+        let index: Int
         let isDynamic: Bool
 
-        var rows: [(Int, Content)] {
-            return self.contents.enumerated().filter {
-                $0.element.element.isRow
+        private(set) weak var listManager: (ListManager & ListSectionDelegate)!
+
+        init() {
+            self.rows = []
+            self.header = nil
+            self.footer = nil
+            self.identifier = 0
+            self.index = 0
+            self.isDynamic = false
+            self.listManager = nil
+        }
+
+        private init(_ original: SectionManager, editable: Editable) {
+            self.rows = editable.rows
+            self.header = editable.header
+            self.footer = editable.footer
+            self.identifier = editable.identifier
+            self.index = editable.index
+            self.isDynamic = editable.isDynamic
+            self.listManager = editable.listManager
+        }
+
+        private class Editable {
+            var rows: [RowManager]
+            var header: RowManager?
+            var footer: RowManager?
+
+            var identifier: Int
+            var index: Int
+            var isDynamic: Bool
+
+            weak var listManager: (ListManager & ListSectionDelegate)!
+
+            init(_ manager: SectionManager) {
+                self.rows = manager.rows
+                self.header = manager.header
+                self.footer = manager.footer
+
+                self.identifier = manager.identifier
+                self.index = manager.index
+                self.isDynamic = manager.isDynamic
+
+                self.listManager = manager.listManager
             }
         }
 
-        init(contents: [Content]) {
-            self.contents = contents
-            self.section = .section(contents.map {
-                $0.element
-            })
-            self.isDynamic = false
-            self.identifier = 0
+        private func edit(_ handler: (Editable) -> Void) -> SectionManager {
+            let editable = Editable(self)
+            handler(editable)
+            return SectionManager(self, editable: editable).assing()
         }
 
-        init(identifier: Int,_ contents: [Content]) {
-            self.contents = contents
-            self.identifier = identifier
-            self.isDynamic = true
-            self.section = .section(contents.map {
-                $0.element
-            })
+        func rows(_ rows: [RowManager]) -> SectionManager {
+            self.edit {
+                $0.rows = rows.enumerated().map {
+                    $0.element.index($0.offset)
+                }
+            }
         }
 
-        static func eachSection(identifier: Int, _ forEach: ForEachCreator, delegate: ListSectionDelegate) -> ContentSection {
-            let section = ContentSection(identifier: identifier, [
-                .init(.header(identifier: "\(ObjectIdentifier(delegate)).header.\(identifier)", UICHeader {
-                    UICSpacer()
-                        .height(equalTo: 0)
-                })),
-                .init(.row(identifier: "\(ObjectIdentifier(delegate)).row.\(identifier)", UICRow {
-                    forEach
-                })),
-                .init(.footer(identifier: "\(ObjectIdentifier(delegate)).footer.\(identifier)", UICFooter {
-                    UICSpacer()
-                        .height(equalTo: 0)
-                }))
-            ])
-            section.delegate = delegate
-            forEach.manager = section
-            section.forEach = forEach
-            return section
+        func header(_ header: RowManager?) -> SectionManager {
+            self.edit {
+                $0.header = header?.index(self.index)
+            }
         }
 
-        @discardableResult
-        func copy(from other: ListManager.ContentSection, relay: Relay<[() -> ViewCreator]>) -> Self {
-            self.delegate = other.delegate
-            self.forEach = other.forEach
-            self.forEach.manager = self
-            self.viewsDidChange(placeholderView: nil, relay)
+        func footer(_ footer: RowManager?) -> SectionManager {
+            self.edit {
+                $0.header = footer?.index(self.index)
+            }
+        }
+
+        func assing() -> SectionManager {
+            self.rows.forEach {
+                $0.update(section: self)
+            }
+
+            self.footer?.update(section: self)
+            self.header?.update(section: self)
             return self
+        }
+
+        func identifier(_ id: Int) -> SectionManager {
+            self.edit {
+                $0.identifier = id
+            }
+        }
+
+        func isDynamic(_ flag: Bool) -> SectionManager {
+            self.edit {
+                $0.isDynamic = flag
+            }
+        }
+
+        func index(_ index: Int) -> SectionManager {
+            self.edit {
+                $0.index = index
+            }
+        }
+
+        func listManager(_ listManager: ListManager & ListSectionDelegate) -> SectionManager {
+            self.edit {
+                $0.listManager = listManager
+            }
+        }
+
+        func update(listManager: ListManager & ListSectionDelegate) {
+            self.listManager = listManager
+        }
+
+        static func forEach(_ forEachCreator: ForEachCreator) -> SectionManager {
+            let manager = SectionManager().rows([RowManager.Payload(row: UICRow {
+                forEachCreator
+            }).asRowManager])
+
+            forEachCreator.manager = manager
+            return manager
+        }
+
+        struct Copy {
+            let header: RowManager?
+            let footer: RowManager?
+            let identifier: Int
+            let isDynamic: Bool
+            let index: Int
+            weak var listManager: (ListManager & ListSectionDelegate)!
+
+            init(_ content: SectionManager) {
+                self.header = content.header
+                self.footer = content.footer
+                self.identifier = content.identifier
+                self.isDynamic = content.isDynamic
+                self.listManager = content.listManager
+                self.index = content.index
+            }
+
+            fileprivate func restore(rows: [RowManager]) -> SectionManager {
+                SectionManager()
+                    .rows(rows)
+                    .header(self.header)
+                    .footer(self.footer)
+                    .identifier(self.identifier)
+                    .isDynamic(self.isDynamic)
+                    .listManager(self.listManager)
+                    .index(self.index)
+            }
+        }
+
+        var compactCopy: Copy {
+            return .init(self)
         }
     }
 }
 
-extension ListManager.ContentSection: SupportForEach {
-    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
-        let delegateIdentifier = "\(ObjectIdentifier(self.delegate))"
-        let identifier = self.identifier
-        weak var delegate = self.delegate
+extension ListManager.SectionManager: ListContentDelegate {
+    func content(_ compactCopy: ListManager.RowManager.Copy, updatedWith sequence: [ListManager.RowManager]) {
+        var updateRows = sequence
+        let rows = self.rows.reduce([ListManager.RowManager]()) { sum, next -> [ListManager.RowManager] in
+            if next.identifier == compactCopy.identifier {
+                let toAppend = updateRows
+                updateRows = []
+                return sum + toAppend.enumerated().map {
+                    $0.element.index(sum.count + $0.offset)
+                }
+            }
 
-        var activeRowIdentifiers: [Int] = []
-        var lastRowIdentifierIndex = 0
+            return sum + [next.index(sum.count)]
+        }
 
-        var onErase: (() -> Void)? = nil
+        self.listManager.content(updateSection: self.rows(rows))
+    }
+}
 
-        var handler: (([() -> ViewCreator]) -> Void)? = { [weak self, onErase] in
-            guard let self = self else {
+extension ListManager.SectionManager: SupportForEach {
+    static func mount(with contents: [ViewCreator]) -> ListManager.SectionManager {
+        var footer: ListManager.RowManager? = nil
+        var header: ListManager.RowManager? = nil
+        var rows: [ListManager.RowManager] = []
+        var identifier = -1
+
+        contents.forEach {
+            identifier += 1
+
+            if let rowCreator = $0 as? UICRow {
+                rows.append(ListManager.RowManager.Payload(row: rowCreator)
+                    .asRowManager
+                    .isDynamic(false)
+                    .identifier(identifier)
+                )
                 return
             }
 
-            let sections = $0.compactMap {
+            if let headerCreator = $0 as? UICHeader {
+                header = ListManager.RowManager.Payload(header: headerCreator)
+                    .asRowManager
+                    .isDynamic(false)
+                return
+            }
+
+            if let footerCreator = $0 as? UICFooter {
+                footer = ListManager.RowManager.Payload(footer: footerCreator)
+                    .asRowManager
+                    .isDynamic(false)
+                return
+            }
+
+            if let forEachCreator = $0 as? ForEachCreator {
+                rows.append(ListManager.RowManager
+                    .forEach(forEachCreator)
+                    .identifier(identifier)
+                )
+                return
+            }
+
+            fatalError("Try using UICRow as wrapper for ViewCreators in list. It can be use UICForEach either")
+        }
+
+        return ListManager.SectionManager()
+            .rows(rows)
+            .header(header)
+            .footer(footer)
+    }
+    
+    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
+        sequence.next { [compactCopy] contents in
+            let sections = contents.compactMap {
                 ($0() as? UICSection)?.content
             }
-
+            
             if sections.isEmpty {
-                let emptySection = ListManager.ContentSection(identifier: identifier, [])
-                delegate?.content(self, updateSections: [emptySection.copy(from: self, relay: sequence)])
-                onErase?()
+                compactCopy.listManager?.content(compactCopy, updateSections: [])
                 return
             }
 
-            let updateSections: [ListManager.ContentSection] = sections.map { section in
-                lastRowIdentifierIndex = 0
-                return .init(identifier: identifier, section.map { view in
-                    if let header = view as? UICHeader {
-                        return .init(.header(identifier: "\(delegateIdentifier).header.\(identifier)", header))
-                    }
+            let sectionManagers = sections.map { contents -> ListManager.SectionManager in
+                let manager = ListManager.SectionManager.mount(with: contents)
 
-                    if let footer = view as? UICFooter {
-                        return .init(.footer(identifier: "\(delegateIdentifier).footer.\(identifier)", footer))
-                    }
+                let footer = compactCopy.footer ?? manager.footer
+                let header = compactCopy.header ?? manager.header
+                let rows = manager.rows
 
-                    if let forEach = view as? ForEachCreator {
-                        return ListManager.Content.eachRow(identifier: identifier, forEach, delegate: delegate!)
-                    }
-
-                    if let row = view as? UICRow {
-                        return .init(.row(identifier: {
-                            if let identifier = activeRowIdentifiers.enumerated().first(where: { $0.element == lastRowIdentifierIndex })?.1 {
-                                lastRowIdentifierIndex += 1
-                                return "\(delegateIdentifier).row.\(identifier)"
-                            }
-
-                            let identifier = lastRowIdentifierIndex
-                            activeRowIdentifiers.append(lastRowIdentifierIndex)
-                            lastRowIdentifierIndex += 1
-                            return "\(delegateIdentifier).row.\(identifier)"
-                        }(), row))
-                    }
-
-                    fatalError("Try using UICRow as wrapper for ViewCreators in list. It can be use UICForEach either")
-                })
+                return compactCopy.restore(rows: rows.enumerated().map {
+                        $0.element.index($0.offset)
+                    })
+                    .header(header)
+                    .footer(footer)
             }
 
-            updateSections.first?.copy(from: self, relay: sequence)
-            delegate?.content(self, updateSections: updateSections)
-            onErase?()
-        }
-
-        sequence.next { [handler] in
-            handler?($0)
-        }
-
-        onErase = {
-            handler = nil
+            compactCopy.listManager.content(compactCopy, updateSections: sectionManagers)
         }
     }
 }

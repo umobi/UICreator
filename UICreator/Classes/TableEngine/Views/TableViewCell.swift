@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 
 internal class TableViewCell: UITableViewCell, ReusableView {
-    var builder: ViewCreator! = nil
+    var cellLoaded: UICCell.Loaded!
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)

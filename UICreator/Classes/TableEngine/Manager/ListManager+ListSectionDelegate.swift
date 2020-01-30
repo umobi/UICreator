@@ -23,20 +23,12 @@
 import Foundation
 
 extension ListManager: ListSectionDelegate {
-    func content(_ section: ListManager.ContentSection, updateSections: [ListManager.ContentSection]) {
-        var updateSections = updateSections
-        let oldRowIdentifier = self.list.group?.rowsIdentifier ?? []
-        self.contents = self.contents.reduce([]) {
-            if $1.identifier == section.identifier {
-                let toAppend = updateSections
-                updateSections = []
-                return $0 + toAppend
-            }
+    private func update(sections: [ListManager.SectionManager]) {
+        let oldRowIdentifier = self.rowsIdentifier
 
-            return $0 + [$1]
-        }
+        self.sections = sections
 
-        let newRows: [String] = (self.list.group?.rowsIdentifier ?? []).compactMap {
+        let newRows: [String] = self.rowsIdentifier.compactMap {
             if oldRowIdentifier.contains($0) {
                 return nil
             }
@@ -44,22 +36,47 @@ extension ListManager: ListSectionDelegate {
             return $0
         }
 
-        if !newRows.isEmpty {
-            switch self.list {
-            case let table as UITableView:
-                newRows.forEach {
-                    table.register(TableViewCell.self, forCellReuseIdentifier: $0)
-                }
+        guard !newRows.isEmpty else {
+            self.list.setNeedsReloadData()
+            return
+        }
 
-            case let collection as UICollectionView:
-                newRows.forEach {
-                    collection.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
-                }
-            default:
-                break
+        switch self.list {
+        case let table as UITableView:
+            newRows.forEach {
+                table.register(TableViewCell.self, forCellReuseIdentifier: $0)
             }
+
+        case let collection as UICollectionView:
+            newRows.forEach {
+                collection.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
+            }
+        default:
+            break
         }
 
         self.list.setNeedsReloadData()
+    }
+
+    func content(updateSection: ListManager.SectionManager) {
+        self.update(sections: self.sections.map {
+            $0.index == updateSection.index ? updateSection : $0
+        })
+    }
+
+    func content(_ section: ListManager.SectionManager.Copy, updateSections: [ListManager.SectionManager]) {
+        var updateSections = updateSections
+
+        self.update(sections: self.sections.reduce([]) { sum, next in
+            if next.identifier == section.identifier {
+                let toAppend = updateSections
+                updateSections = []
+                return sum + toAppend.enumerated().map {
+                    $0.element.index(sum.count + $0.offset)
+                }
+            }
+
+            return sum + [next.index(sum.count)]
+        })
     }
 }

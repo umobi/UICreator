@@ -47,12 +47,12 @@ extension _CollectionView: UICollectionViewDataSource {
             fatalError()
         }
 
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: row.0, for: indexPath) as? CollectionViewCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: row.identifier, for: indexPath) as? CollectionViewCell else {
             fatalError()
         }
 
-        cell.prepareCell(payload: row.1)
-        self.creatorDataSource?.cell(at: indexPath, content: cell.builder)
+        cell.prepareCell(row)
+//        self.creatorDataSource?.cell(at: indexPath, content: cell.builder)
         return cell
     }
 }

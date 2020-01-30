@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 
 public class CollectionViewCell: UICollectionViewCell, ReusableView {
-    var builder: ViewCreator! = nil
+    var cellLoaded: UICCell.Loaded!
 
     override init(frame: CGRect) {
         super.init(frame: frame)
