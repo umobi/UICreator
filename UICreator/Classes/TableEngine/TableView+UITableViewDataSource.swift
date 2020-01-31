@@ -52,6 +52,8 @@ extension TableView: UITableViewDataSource {
 
         cell.prepareCell(row)
         self.commitCell(cell)
+
+        self.appendReusable(cell: cell)
         return cell
     }
 }

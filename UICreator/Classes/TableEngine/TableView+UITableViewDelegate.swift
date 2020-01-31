@@ -22,6 +22,40 @@
 
 import Foundation
 
+extension UITableView {
+    struct WeakCell {
+        private(set) weak var view: ReusableView!
+        init(_ view: ReusableView) {
+            self.view = view
+        }
+    }
+}
+
+private var kLoadedCells: UInt = 0
+extension UITableView {
+    private var reusableCells: [WeakCell] {
+        get { objc_getAssociatedObject(self, &kLoadedCells) as? [WeakCell] ?? [] }
+        set { objc_setAssociatedObject(self, &kLoadedCells, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    }
+
+    func appendReusable(cell: ReusableView) {
+        guard !self.reusableCells.contains(where: { $0.view === cell }) else {
+            return
+        }
+        
+        self.reusableCells.append(.init(cell))
+        self.reusableCells = self.reusableCells.filter {
+            $0.view != nil
+        }
+    }
+
+    func reusableView(at indexPath: IndexPath) -> ReusableView? {
+        self.reusableCells.first(where: {
+            $0.view?.cellLoaded.cell.rowManager.indexPath == indexPath
+        })?.view
+    }
+}
+
 extension TableView: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard let header = self.group?.header(at: section) else {
@@ -163,13 +197,5 @@ extension TableView {
         }
 
         return self.creatorDelegate?.tableView(tableView, estimatedHeightForRowAt: indexPath) ?? tableView.estimatedRowHeight
-    }
-}
-
-extension UITableView {
-    func reusableView(at indexPath: IndexPath) -> ReusableView? {
-        self.visibleCells.first(where: {
-            ($0 as? ReusableView)?.cellLoaded.cell.rowManager.indexPath == indexPath
-        }) as? ReusableView
     }
 }

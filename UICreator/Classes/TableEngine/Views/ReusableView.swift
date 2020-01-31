@@ -22,12 +22,12 @@
 
 import Foundation
 
-protocol ReusableView {
+protocol ReusableView: class {
     var contentView: UIView { get }
 //    var builder: ViewCreator! { get nonmutating set }
     func prepareCell(_ cell: UICCell)
 
-    var cellLoaded: UICCell.Loaded! { get nonmutating set }
+    var cellLoaded: UICCell.Loaded! { get set }
 }
 
 extension ReusableView {
