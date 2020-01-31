@@ -76,13 +76,7 @@ extension UICListCollectionElements {
             return ($0.offset, footer)
         }
     }
-
-//    var rows: [(Int, ListManager.Content)] {
-//        return self.sections.compactMap {
-//            $0.contents
-//        }.enumerated().map { ($0.0, $0.1) }
-//    }
-
+    
     func numberOfRows(in section: ListManager.SectionManager) -> Int {
         return section.rows.count
     }
@@ -208,29 +202,3 @@ public extension UICList {
         }
     }
 }
-
-//public extension UICList.Element {
-//    struct Payload {
-//        let content: () -> ViewCreator
-//        let trailingActions: (() -> [RowAction])?
-//        let leadingActions: (() -> [RowAction])?
-//
-//        init(header: UICHeader) {
-//            self.content = header.content
-//            self.trailingActions = nil
-//            self.leadingActions = nil
-//        }
-//
-//        init(footer: UICFooter) {
-//            self.content = footer.content
-//            self.trailingActions = nil
-//            self.leadingActions = nil
-//        }
-//
-//        init(row: UICRow) {
-//            self.content = row.content
-//            self.trailingActions = row.trailingActions
-//            self.leadingActions = row.leadingActions
-//        }
-//    }
-//}

@@ -52,7 +52,6 @@ extension _CollectionView: UICollectionViewDataSource {
         }
 
         cell.prepareCell(row)
-//        self.creatorDataSource?.cell(at: indexPath, content: cell.builder)
         return cell
     }
 }

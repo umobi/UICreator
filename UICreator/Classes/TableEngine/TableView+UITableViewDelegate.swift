@@ -50,7 +50,7 @@ extension TableView: UITableViewDelegate {
     }
 
     public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        guard let reusableView = tableView.cellForRow(at: indexPath) as? ReusableView else {
+        guard let reusableView = tableView.reusableView(at: indexPath) else {
             return false
         }
 
@@ -59,7 +59,7 @@ extension TableView: UITableViewDelegate {
 
     @available(iOS 11.0, tvOS 11.0, *)
     public func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let reusableView = tableView.cellForRow(at: indexPath) as? ReusableView else {
+        guard let reusableView = tableView.reusableView(at: indexPath) else {
             return nil
         }
 
@@ -80,7 +80,7 @@ extension TableView: UITableViewDelegate {
 
     @available(iOS 11.0, tvOS 11.0, *)
     public func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let reusableView = tableView.cellForRow(at: indexPath) as? ReusableView else {
+        guard let reusableView = tableView.reusableView(at: indexPath) else {
             return nil
         }
 
@@ -100,7 +100,7 @@ extension TableView: UITableViewDelegate {
     }
 
     public func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        guard let reusableView = tableView.cellForRow(at: indexPath) as? ReusableView else {
+        guard let reusableView = tableView.reusableView(at: indexPath) else {
             return nil
         }
 
@@ -163,5 +163,13 @@ extension TableView {
         }
 
         return self.creatorDelegate?.tableView(tableView, estimatedHeightForRowAt: indexPath) ?? tableView.estimatedRowHeight
+    }
+}
+
+extension UITableView {
+    func reusableView(at indexPath: IndexPath) -> ReusableView? {
+        self.visibleCells.first(where: {
+            ($0 as? ReusableView)?.cellLoaded.cell.rowManager.indexPath == indexPath
+        }) as? ReusableView
     }
 }

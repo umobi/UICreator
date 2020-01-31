@@ -39,14 +39,14 @@ extension ListManager {
 
         private(set) weak var listManager: (ListManager & ListSectionDelegate)!
 
-        init() {
+        init(_ listManager: ListManager & ListSectionDelegate) {
             self.rows = []
             self.header = nil
             self.footer = nil
             self.identifier = 0
             self.index = 0
             self.isDynamic = false
-            self.listManager = nil
+            self.listManager = listManager
         }
 
         private init(_ original: SectionManager, editable: Editable) {
@@ -86,37 +86,33 @@ extension ListManager {
         private func edit(_ handler: (Editable) -> Void) -> SectionManager {
             let editable = Editable(self)
             handler(editable)
-            return SectionManager(self, editable: editable).assing()
+            return SectionManager(self, editable: editable)
         }
 
         func rows(_ rows: [RowManager]) -> SectionManager {
             self.edit {
                 $0.rows = rows.enumerated().map {
-                    $0.element.index($0.offset)
+                    $0.element
+                        .indexPath(.init(row: $0.offset, section: self.identifier))
+                        .listManager(self.listManager)
                 }
             }
         }
 
         func header(_ header: RowManager?) -> SectionManager {
             self.edit {
-                $0.header = header?.index(self.index)
+                $0.header = header?
+                    .indexPath(.init(row: 0, section: self.index))
+                    .listManager(self.listManager)
             }
         }
 
         func footer(_ footer: RowManager?) -> SectionManager {
             self.edit {
-                $0.header = footer?.index(self.index)
+                $0.footer = footer?
+                    .indexPath(.init(row: 0, section: self.index))
+                    .listManager(self.listManager)
             }
-        }
-
-        func assing() -> SectionManager {
-            self.rows.forEach {
-                $0.update(section: self)
-            }
-
-            self.footer?.update(section: self)
-            self.header?.update(section: self)
-            return self
         }
 
         func identifier(_ id: Int) -> SectionManager {
@@ -147,8 +143,8 @@ extension ListManager {
             self.listManager = listManager
         }
 
-        static func forEach(_ forEachCreator: ForEachCreator) -> SectionManager {
-            let manager = SectionManager().rows([RowManager.Payload(row: UICRow {
+        func forEach(_ forEachCreator: ForEachCreator) -> SectionManager {
+            let manager = self.rows([RowManager.Payload(row: UICRow {
                 forEachCreator
             }).asRowManager])
 
@@ -174,13 +170,12 @@ extension ListManager {
             }
 
             fileprivate func restore(rows: [RowManager]) -> SectionManager {
-                SectionManager()
+                SectionManager(self.listManager)
                     .rows(rows)
                     .header(self.header)
                     .footer(self.footer)
                     .identifier(self.identifier)
                     .isDynamic(self.isDynamic)
-                    .listManager(self.listManager)
                     .index(self.index)
             }
         }
@@ -198,12 +193,10 @@ extension ListManager.SectionManager: ListContentDelegate {
             if next.identifier == compactCopy.identifier {
                 let toAppend = updateRows
                 updateRows = []
-                return sum + toAppend.enumerated().map {
-                    $0.element.index(sum.count + $0.offset)
-                }
+                return sum + toAppend
             }
 
-            return sum + [next.index(sum.count)]
+            return sum + [next]
         }
 
         self.listManager.content(updateSection: self.rows(rows))
@@ -211,7 +204,7 @@ extension ListManager.SectionManager: ListContentDelegate {
 }
 
 extension ListManager.SectionManager: SupportForEach {
-    static func mount(with contents: [ViewCreator]) -> ListManager.SectionManager {
+    static func mount(_ manager: ListManager & ListSectionDelegate, with contents: [ViewCreator]) -> ListManager.SectionManager {
         var footer: ListManager.RowManager? = nil
         var header: ListManager.RowManager? = nil
         var rows: [ListManager.RowManager] = []
@@ -254,7 +247,7 @@ extension ListManager.SectionManager: SupportForEach {
             fatalError("Try using UICRow as wrapper for ViewCreators in list. It can be use UICForEach either")
         }
 
-        return ListManager.SectionManager()
+        return ListManager.SectionManager(manager)
             .rows(rows)
             .header(header)
             .footer(footer)
@@ -272,15 +265,13 @@ extension ListManager.SectionManager: SupportForEach {
             }
 
             let sectionManagers = sections.map { contents -> ListManager.SectionManager in
-                let manager = ListManager.SectionManager.mount(with: contents)
+                let manager = ListManager.SectionManager.mount(compactCopy.listManager, with: contents)
 
                 let footer = compactCopy.footer ?? manager.footer
                 let header = compactCopy.header ?? manager.header
                 let rows = manager.rows
 
-                return compactCopy.restore(rows: rows.enumerated().map {
-                        $0.element.index($0.offset)
-                    })
+                return compactCopy.restore(rows: rows)
                     .header(header)
                     .footer(footer)
             }

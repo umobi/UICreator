@@ -56,11 +56,10 @@ class ListManager: UICListCollectionElements {
                 }
 
                 return SectionManager
-                    .mount(with: section.content)
+                    .mount(self, with: section.content)
                     .index($0.offset)
                     .identifier($0.offset)
                     .isDynamic(false)
-                    .listManager(self)
             }
 
             return
@@ -68,19 +67,18 @@ class ListManager: UICListCollectionElements {
 
         self.sections = contents.enumerated().compactMap {
             if let forEach = $0.element as? ForEachCreator, forEach.viewType is UICSection.Type {
-                return SectionManager.forEach(forEach)
+                return SectionManager(self)
+                    .forEach(forEach)
                     .isDynamic(true)
                     .index($0.offset)
                     .identifier($0.offset)
-                    .listManager(self)
             }
 
             if let section = $0.element as? UICSection {
-                return SectionManager.mount(with: section.content)
+                return SectionManager.mount(self, with: section.content)
                     .isDynamic(false)
                     .index($0.offset)
                     .identifier($0.offset)
-                    .listManager(self)
             }
 
             return nil
@@ -88,9 +86,8 @@ class ListManager: UICListCollectionElements {
 
         if self.sections.isEmpty {
             self.sections = [
-                SectionManager.mount(with: contents)
+                SectionManager.mount(self, with: contents)
                     .isDynamic(false)
-                    .listManager(self)
             ]
             return
         }

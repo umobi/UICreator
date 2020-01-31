@@ -37,24 +37,6 @@ public protocol RowAction {
 
 }
 
-//protocol UIRowAction: RowAction {
-//    associatedtype UIAction
-//    var rowAction: UIAction { get set }
-//}
-//
-//private var kUIAction: UInt = 0
-//extension UIRowAction {
-//    var rowAction: UIAction! {
-//        get { objc_getAssociatedObject(self, &kUIAction) as? UIAction }
-//        set { objc_setAssociatedObject(self, &kUIAction, newValue, .OBJC_ASSOCIATION_RETAIN) }
-//    }
-//
-//    func releaseAction() -> UIAction {
-//        let rowAction = self.rowAction
-//
-//    }
-//}
-
 @available(iOS 11, tvOS 11, *)
 extension UIContextualAction {
     func editHandler(_ handler: @escaping UIContextualAction.Handler) -> UIContextualAction {
