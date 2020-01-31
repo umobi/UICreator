@@ -24,27 +24,37 @@ import Foundation
 
 extension ListManager: ListSectionDelegate {
     private func update(sections: [ListManager.SectionManager]) {
+        guard let list = self.list else {
+            self.sections = sections
+            return
+        }
+
         let oldRowIdentifier = self.rowsIdentifier
+        let oldHeadersIdentifier = self.headersIdentifier
+        let oldFootersIdentifier = self.footersIdentifier
 
         self.sections = sections
 
         let newRows: [String] = self.rowsIdentifier.compactMap {
-            if oldRowIdentifier.contains($0) {
-                return nil
-            }
-
-            return $0
+            oldRowIdentifier.contains($0) ? nil : $0
         }
 
-        guard !newRows.isEmpty else {
-            self.list.setNeedsReloadData()
-            return
+        let newHeaders: [String] = self.headersIdentifier.compactMap {
+            oldHeadersIdentifier.contains($0) ? nil: $0
         }
 
-        switch self.list {
+        let newFooters: [String] = self.footersIdentifier.compactMap {
+            oldFootersIdentifier.contains($0) ? nil: $0
+        }
+
+        switch list {
         case let table as UITableView:
             newRows.forEach {
                 table.register(TableViewCell.self, forCellReuseIdentifier: $0)
+            }
+
+            (newHeaders + newFooters).forEach {
+                table.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
             }
 
         case let collection as UICollectionView:
@@ -55,7 +65,7 @@ extension ListManager: ListSectionDelegate {
             break
         }
 
-        self.list.setNeedsReloadData()
+        list.setNeedsReloadData()
     }
 
     func content(updateSection: ListManager.SectionManager) {

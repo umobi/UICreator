@@ -134,6 +134,10 @@ extension ListManager {
             }
         }
 
+        func loadForEachIfNeeded() {
+            self.forEach?.load()
+        }
+
         static func forEach(_ forEachCreator: ForEachCreator) -> RowManager {
             let manager = Payload(row: UICRow {
                 forEachCreator

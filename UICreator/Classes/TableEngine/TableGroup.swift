@@ -90,31 +90,31 @@ extension UICListCollectionElements {
     }
 
     var rowsIdentifier: [String] {
-        return self.sections.map { section in
+        return Array(Set(self.sections.map { section in
             section.rows.map {
                 "\(section.identifier).\($0.identifier).row"
             }
-        }.reduce([]) { $0 + $1 }
+        }.reduce([]) { $0 + $1 }))
     }
 
     var headersIdentifier: [String] {
-        return self.sections.compactMap { section in
+        return Array(Set(self.sections.compactMap { section in
             guard section.header != nil else {
                 return nil
             }
 
             return "\(section.identifier).header"
-        }
+        }))
     }
 
     var footersIdentifier: [String] {
-        return self.sections.compactMap { section in
+        return Array(Set(self.sections.compactMap { section in
             guard section.footer != nil else {
                 return nil
             }
 
             return "\(section.identifier).footer"
-        }
+        }))
     }
 
     func row(at indexPath: IndexPath) -> UICCell {

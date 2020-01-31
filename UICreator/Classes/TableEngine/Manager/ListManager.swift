@@ -48,7 +48,18 @@ class ListManager: UICListCollectionElements {
         return next
     }
 
-    init(contents: [ViewCreator]) {
+    convenience init(contents: [ViewCreator]) {
+        self.init(contents)
+        self.sections.forEach {
+            $0.loadForEachIfNeeded()
+        }
+
+        self.sections.forEach {
+            $0.loadForEachIfNeeded()
+        }
+    }
+
+    private init(_ contents: [ViewCreator]) {
         if contents.allSatisfy({ $0 is UICSection }) {
             self.sections = contents.enumerated().compactMap {
                 guard let section = $0.element as? UICSection else {

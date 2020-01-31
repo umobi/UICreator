@@ -24,6 +24,8 @@ import Foundation
 
 protocol ForEachCreator: ViewCreator {
     var viewType: ViewCreator.Type { get }
+    func load()
+    var isLoaded: Bool { get }
 //    func startObservation()
 }
 
@@ -61,6 +63,7 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
 
     let relay: Relay<[Value]>
     let content: (Value) -> ViewCreator
+    private var syncLoad: ((UIView) -> Void)? = nil
 
     private func startObservation() {
         let content = self.content
@@ -88,11 +91,24 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
         self.viewType = View.self
         self.uiView = PlaceholderView(builder: self)
 
+        self.syncLoad = {
+            ($0.viewCreator as? Self)?.startObservation()
+            ($0.viewCreator as? Self)?.relay.post(value() ?? [])
+        }
+
         self.height(equalTo: 0, priority: .high)
             .width(equalTo: 0, priority: .high)
-            .onRendered { view in
-                (view.viewCreator as? Self)?.startObservation()
-                (view.viewCreator as? Self)?.relay.post(value() ?? [])
+            .onNotRendered { view in
+                (view.viewCreator as? Self)?.load()
             }
+    }
+
+    func load() {
+        self.syncLoad?(self.uiView)
+        self.syncLoad = nil
+    }
+
+    var isLoaded: Bool {
+        return self.syncLoad == nil
     }
 }

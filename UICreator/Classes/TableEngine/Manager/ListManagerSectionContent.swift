@@ -38,6 +38,7 @@ extension ListManager {
         let isDynamic: Bool
 
         private(set) weak var listManager: (ListManager & ListSectionDelegate)!
+        private(set) weak var forEach: ForEachCreator?
 
         init(_ listManager: ListManager & ListSectionDelegate) {
             self.rows = []
@@ -47,16 +48,21 @@ extension ListManager {
             self.index = 0
             self.isDynamic = false
             self.listManager = listManager
+            self.forEach = nil
         }
 
         private init(_ original: SectionManager, editable: Editable) {
-            self.rows = editable.rows
-            self.header = editable.header
-            self.footer = editable.footer
+            self.rows = editable.rows.enumerated().map {
+                $0.element.indexPath(.init(row: $0.offset, section: editable.index))
+            }
+            self.header = editable.header?.indexPath(.init(row: 0, section: editable.index))
+            self.footer = editable.footer?.indexPath(.init(row: 0, section: editable.index))
             self.identifier = editable.identifier
             self.index = editable.index
             self.isDynamic = editable.isDynamic
             self.listManager = editable.listManager
+            self.forEach = original.forEach
+            self.forEach?.manager = self
         }
 
         private class Editable {
@@ -149,7 +155,25 @@ extension ListManager {
             }).asRowManager])
 
             forEachCreator.manager = manager
+            manager.forEach = forEachCreator
             return manager
+        }
+
+        func loadForEachIfNeeded() {
+            guard self.forEach?.isLoaded ?? false else {
+                self.forEach?.load()
+                return
+            }
+
+            self.rows.forEach {
+                $0.loadForEachIfNeeded()
+            }
+        }
+
+        private func forEach(_ forEachCreator: ForEachCreator?) -> SectionManager {
+            self.forEach = forEachCreator
+            forEachCreator?.manager = self
+            return self
         }
 
         struct Copy {
@@ -159,6 +183,7 @@ extension ListManager {
             let isDynamic: Bool
             let index: Int
             weak var listManager: (ListManager & ListSectionDelegate)!
+            weak var forEach: ForEachCreator?
 
             init(_ content: SectionManager) {
                 self.header = content.header
@@ -167,6 +192,7 @@ extension ListManager {
                 self.isDynamic = content.isDynamic
                 self.listManager = content.listManager
                 self.index = content.index
+                self.forEach = content.forEach
             }
 
             fileprivate func restore(rows: [RowManager]) -> SectionManager {
@@ -177,6 +203,7 @@ extension ListManager {
                     .identifier(self.identifier)
                     .isDynamic(self.isDynamic)
                     .index(self.index)
+                    .forEach(self.forEach)
             }
         }
 
