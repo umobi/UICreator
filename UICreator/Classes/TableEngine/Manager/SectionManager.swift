@@ -268,7 +268,7 @@ extension ListManager.SectionManager: SupportForEach {
                 return
             }
 
-            if let forEachCreator = $0 as? ForEachCreator {
+            if let forEachCreator = $0 as? ForEachCreator, forEachCreator.viewType == UICRow.self {
                 rows.append(ListManager.RowManager
                     .forEach(forEachCreator)
                     .identifier(identifier)

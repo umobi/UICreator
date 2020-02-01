@@ -49,7 +49,8 @@ extension TableView: UITableViewDelegate {
         return cell
     }
 
-    @available(iOS 11.0, tvOS 11.0, *)
+    #if os(iOS)
+    @available(iOS 11.0, *)
     public func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let reusableView = tableView.reusableView(at: indexPath) else {
             return nil
@@ -70,7 +71,7 @@ extension TableView: UITableViewDelegate {
         return configurator
     }
 
-    @available(iOS 11.0, tvOS 11.0, *)
+    @available(iOS 11.0, *)
     public func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let reusableView = tableView.reusableView(at: indexPath) else {
             return nil
@@ -104,6 +105,7 @@ extension TableView: UITableViewDelegate {
                 .rowAction
         }
     }
+    #endif
 }
 
 extension TableView {

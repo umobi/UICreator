@@ -37,13 +37,15 @@ public protocol RowAction {
 
 }
 
-@available(iOS 11, tvOS 11, *)
+@available(iOS 11, *)
+@available(tvOS, unavailable)
 extension UIContextualAction {
     func editHandler(_ handler: @escaping UIContextualAction.Handler) -> UIContextualAction {
         .init(style: self.style, title: self.title, handler: handler)
     }
 }
 
+@available(tvOS, unavailable)
 extension UITableViewRowAction {
     func editHandler(_ handler: @escaping ((UITableViewRowAction, IndexPath) -> Void)) -> UITableViewRowAction {
         .init(style: self.style, title: self.title, handler: handler)
@@ -51,6 +53,7 @@ extension UITableViewRowAction {
 }
 
 @available(iOS 11, tvOS 11, *)
+@available(tvOS, unavailable)
 public class UICContextualAction: RowAction {
     private(set) var rowAction: UIContextualAction
     private(set) var handler: ((IndexPath) -> Bool)?
@@ -123,6 +126,7 @@ public class UICContextualAction: RowAction {
 }
 
 @available(iOS, deprecated: 13.0)
+@available(tvOS, unavailable)
 public class UICRowAction: RowAction {
     private(set) var rowAction: UITableViewRowAction
     private(set) var handler: ((IndexPath) -> Void)?
@@ -173,7 +177,7 @@ public class UICRowAction: RowAction {
             self?.tableView.manager = ListManager.Delete(manager)
                 .disableIndexPath(indexPath)
 
-            if #available(iOS 11.0, *) {
+            if #available(iOS 11.0, tvOS 11.0, *) {
                 self?.tableView?.performBatchUpdates({
                     self?.tableView.deleteRows(at: [indexPath], with: animation)
                 }, completion: { didEnd in
