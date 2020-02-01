@@ -22,22 +22,17 @@
 
 import Foundation
 
-public protocol TableDataSource {
-    func numberOfSections(_ estimatedSections: Int) -> Int
-    func numberOfRows(in section: Int, estimatedRows: Int) -> Int
-
-    func cell(at indexPath: IndexPath, content: ViewCreator)
+protocol ListSupport: class {
+    func reloadData()
+    var manager: ListCollectionManager? { get }
 }
 
-public extension TableDataSource {
-    func numberOfSections(_ estimatedSections: Int) -> Int {
-        return estimatedSections
-    }
-    
-    func numberOfRows(in section: Int, estimatedRows: Int) -> Int {
-        return estimatedRows
-    }
+extension ListSupport {
+    func setNeedsReloadData() {
+        guard manager == nil || !(manager is ListManager.Append) else {
+            return
+        }
 
-    func cell(at indexPath: IndexPath, content: ViewCreator) {}
+        self.reloadData()
+    }
 }
-

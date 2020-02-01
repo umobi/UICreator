@@ -22,38 +22,30 @@
 
 import Foundation
 
-extension TableView: ListSupport {}
+struct UICCell {
+    let rowManager: ListManager.RowManager
+    let identifier: String
 
-public extension UICList {
-    convenience init(style: UITableView.Style,_ contents: @escaping () -> [ViewCreator]) {
-        self.init(style: style, ListManager(contents: contents()))
+    init(_ identifier: String,_ manager: ListManager.RowManager) {
+        self.rowManager = manager
+        self.identifier = identifier
+    }
+}
+
+extension UICCell {
+    struct Loaded {
+        let cell: UICCell
+        let trailingActions: [RowAction]
+        let leadingActions: [RowAction]
+
+        fileprivate init(_ cell: UICCell) {
+            self.cell = cell
+            self.trailingActions = cell.rowManager.payload.trailingActions?() ?? []
+            self.leadingActions = cell.rowManager.payload.leadingActions?() ?? []
+        }
     }
 
-    private convenience init(style: UITableView.Style,_ manager: ListManager) {
-        self.init(style: style)
-        #if os(iOS)
-        (self.uiView as? View)?.separatorStyle = .none
-        #endif
-
-        guard let tableView = self.uiView as? View else {
-            return
-        }
-
-        manager.rowsIdentifier.forEach { [unowned tableView] in
-            tableView.register(TableViewCell.self, forCellReuseIdentifier: $0)
-        }
-
-        manager.headersIdentifier.forEach { [unowned tableView] in
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-        }
-
-        manager.footersIdentifier.forEach { [unowned tableView] in
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-        }
-
-        tableView.manager = manager
-        tableView.dataSource = tableView
-        tableView.delegate = tableView
-        manager.list = tableView
+    var load: Loaded {
+        return .init(self)
     }
 }

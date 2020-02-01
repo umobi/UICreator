@@ -247,12 +247,12 @@ extension UITableView {
 public extension UIViewCreator where View: UITableView {
     func deleteRows(with animation: UITableView.RowAnimation,_ value: Value<[IndexPath]>, onCompletion: @escaping ([IndexPath]) -> Void) -> Self {
         value.asRelay.next { [weak self] indexPaths in
-            guard let group = (self?.uiView as? View)?.group as? ListManager else {
+            guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
                 Fatal.UICList.deleteRows(indexPaths).warning()
                 return
             }
 
-            (self?.uiView as? View)?.group = ListManager.Delete(group)
+            (self?.uiView as? View)?.manager = ListManager.Delete(manager)
                 .disableIndexPaths(indexPaths)
 
             if #available(iOS 11, tvOS 11, *) {
@@ -260,7 +260,7 @@ public extension UIViewCreator where View: UITableView {
                     (self?.uiView as? View)?.deleteRows(at: indexPaths, with: animation)
                 }, completion: { didEnd in
                     if didEnd {
-                        (self?.uiView as? View)?.group = group
+                        (self?.uiView as? View)?.manager = manager
                         onCompletion(indexPaths)
                     }
                 })
@@ -271,7 +271,7 @@ public extension UIViewCreator where View: UITableView {
             (self?.uiView as? View)?.deleteRows(at: indexPaths, with: animation)
             (self?.uiView as? View)?.endUpdates()
 
-            (self?.uiView as? View)?.group = group
+            (self?.uiView as? View)?.manager = manager
             onCompletion(indexPaths)
         }
 
@@ -280,12 +280,12 @@ public extension UIViewCreator where View: UITableView {
 
     func deleteSections(with animation: UITableView.RowAnimation,_ value: Value<[Int]>, onCompletion: @escaping ([Int]) -> Void) -> Self {
         value.asRelay.next { [weak self] sections in
-            guard let group = (self?.uiView as? View)?.group as? ListManager else {
+            guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
                 Fatal.UICList.deleteSections(sections).warning()
                 return
             }
 
-            (self?.uiView as? View)?.group = ListManager.Delete(group)
+            (self?.uiView as? View)?.manager = ListManager.Delete(manager)
                 .disableSections(sections)
 
             if #available(iOS 11, tvOS 11, *) {
@@ -293,7 +293,7 @@ public extension UIViewCreator where View: UITableView {
                     (self?.uiView as? View)?.deleteSections(.init(sections), with: animation)
                 }, completion: { didEnd in
                     if didEnd {
-                        (self?.uiView as? View)?.group = group
+                        (self?.uiView as? View)?.manager = manager
                         onCompletion(sections)
                     }
                 })
@@ -304,7 +304,7 @@ public extension UIViewCreator where View: UITableView {
             (self?.uiView as? View)?.deleteSections(.init(sections), with: animation)
             (self?.uiView as? View)?.endUpdates()
 
-            (self?.uiView as? View)?.group = group
+            (self?.uiView as? View)?.manager = manager
             onCompletion(sections)
         }
 
@@ -316,12 +316,12 @@ public extension UIViewCreator where View: UITableView {
 
     func insertRows(with animation: UITableView.RowAnimation,_ value: Value<[IndexPath]>, perform: @escaping ([IndexPath]) -> Void) -> Self {
         value.asRelay.next { [weak self] indexPaths in
-            guard let group = (self?.uiView as? View)?.group as? ListManager else {
+            guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
                 Fatal.UICList.insertRows(indexPaths).warning()
                 return
             }
             
-            (self?.uiView as? View)?.group = ListManager.Append(group)
+            (self?.uiView as? View)?.manager = ListManager.Append(manager)
             perform(indexPaths)
 
             if #available(iOS 11, tvOS 11, *) {
@@ -329,7 +329,7 @@ public extension UIViewCreator where View: UITableView {
                     (self?.uiView as? View)?.insertRows(at: indexPaths, with: animation)
                 }, completion: { didEnd in
                     if didEnd {
-                        (self?.uiView as? View)?.group = group
+                        (self?.uiView as? View)?.manager = manager
                     }
                 })
                 return
@@ -339,7 +339,7 @@ public extension UIViewCreator where View: UITableView {
             (self?.uiView as? View)?.insertRows(at: indexPaths, with: animation)
             (self?.uiView as? View)?.endUpdates()
 
-            (self?.uiView as? View)?.group = group
+            (self?.uiView as? View)?.manager = manager
         }
 
         return self
@@ -347,12 +347,12 @@ public extension UIViewCreator where View: UITableView {
 
     func insertSections(with animation: UITableView.RowAnimation,_ value: Value<[Int]>, perform: @escaping ([Int]) -> Void) -> Self {
         value.asRelay.next { [weak self] sections in
-            guard let group = (self?.uiView as? View)?.group as? ListManager else {
+            guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
                 Fatal.UICList.insertSections(sections).warning()
                 return
             }
 
-            (self?.uiView as? View)?.group = ListManager.Append(group)
+            (self?.uiView as? View)?.manager = ListManager.Append(manager)
             perform(sections)
 
             if #available(iOS 11, tvOS 11, *) {
@@ -360,7 +360,7 @@ public extension UIViewCreator where View: UITableView {
                     (self?.uiView as? View)?.insertSections(.init(sections), with: animation)
                 }, completion: { didEnd in
                     if didEnd {
-                        (self?.uiView as? View)?.group = group
+                        (self?.uiView as? View)?.manager = manager
                         if let listSupport = self?.uiView as? ListSupport {
                             listSupport.setNeedsReloadData()
                             return
@@ -375,7 +375,7 @@ public extension UIViewCreator where View: UITableView {
             (self?.uiView as? View)?.insertSections(.init(sections), with: animation)
             (self?.uiView as? View)?.endUpdates()
 
-            (self?.uiView as? View)?.group = group
+            (self?.uiView as? View)?.manager = manager
             if let listSupport = self?.uiView as? ListSupport {
                 listSupport.setNeedsReloadData()
                 return

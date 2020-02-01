@@ -22,43 +22,9 @@
 
 import Foundation
 
-extension UITableView {
-    struct WeakCell {
-        private(set) weak var view: ReusableView!
-        init(_ view: ReusableView) {
-            self.view = view
-        }
-    }
-}
-
-private var kLoadedCells: UInt = 0
-extension UITableView {
-    private var reusableCells: [WeakCell] {
-        get { objc_getAssociatedObject(self, &kLoadedCells) as? [WeakCell] ?? [] }
-        set { objc_setAssociatedObject(self, &kLoadedCells, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    func appendReusable(cell: ReusableView) {
-        guard !self.reusableCells.contains(where: { $0.view === cell }) else {
-            return
-        }
-        
-        self.reusableCells.append(.init(cell))
-        self.reusableCells = self.reusableCells.filter {
-            $0.view != nil
-        }
-    }
-
-    func reusableView(at indexPath: IndexPath) -> ReusableView? {
-        self.reusableCells.first(where: {
-            $0.view?.cellLoaded.cell.rowManager.indexPath == indexPath
-        })?.view
-    }
-}
-
 extension TableView: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = self.group?.header(at: section) else {
+        guard let header = self.manager?.header(at: section) else {
             return nil
         }
 
@@ -71,7 +37,7 @@ extension TableView: UITableViewDelegate {
     }
 
     public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        guard let footer = self.group?.footer(at: section) else {
+        guard let footer = self.manager?.footer(at: section) else {
             return nil
         }
 
@@ -81,14 +47,6 @@ extension TableView: UITableViewDelegate {
 
         cell.prepareCell(footer)
         return cell
-    }
-
-    public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        guard let reusableView = tableView.reusableView(at: indexPath) else {
-            return false
-        }
-
-        return !(reusableView.cellLoaded.trailingActions + reusableView.cellLoaded.leadingActions).isEmpty
     }
 
     @available(iOS 11.0, tvOS 11.0, *)
@@ -150,52 +108,52 @@ extension TableView: UITableViewDelegate {
 
 extension TableView {
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        guard self.group?.header(at: section) != nil else {
+        guard self.manager?.header(at: section) != nil else {
             return .zero
         }
 
-        return self.creatorDelegate?.tableView(tableView, heightForHeaderAt: section) ?? tableView.sectionHeaderHeight
+        return tableView.sectionHeaderHeight
     }
 
     public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        guard self.group?.footer(at: section) != nil else {
+        guard self.manager?.footer(at: section) != nil else {
             return .zero
         }
 
-        return self.creatorDelegate?.tableView(tableView, heightForHeaderAt: section) ?? tableView.sectionFooterHeight
+        return tableView.sectionFooterHeight
     }
 
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard self.group?.row(at: indexPath) != nil else {
+        guard self.manager?.row(at: indexPath) != nil else {
             return .zero
         }
 
-        return self.creatorDelegate?.tableView(tableView, heightForRowAt: indexPath) ?? tableView.rowHeight
+        return tableView.rowHeight
     }
 }
 
 extension TableView {
     public func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
-        guard self.group?.header(at: section) != nil else {
+        guard self.manager?.header(at: section) != nil else {
             return .zero
         }
 
-        return self.creatorDelegate?.tableView(tableView, estimatedHeightForHeaderAt: section) ?? 1
+        return 1
     }
 
     public func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection section: Int) -> CGFloat {
-        guard self.group?.footer(at: section) != nil else {
+        guard self.manager?.footer(at: section) != nil else {
             return .zero
         }
 
-        return self.creatorDelegate?.tableView(tableView, estimatedHeightForHeaderAt: section) ?? 1
+        return 1
     }
 
     public func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard self.group?.row(at: indexPath) != nil else {
+        guard self.manager?.row(at: indexPath) != nil else {
             return .zero
         }
 
-        return self.creatorDelegate?.tableView(tableView, estimatedHeightForRowAt: indexPath) ?? tableView.estimatedRowHeight
+        return tableView.estimatedRowHeight
     }
 }

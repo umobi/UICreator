@@ -21,15 +21,16 @@
 //
 
 import Foundation
+extension ListManager {
+    class Append: ListCollectionManager {
+        private let manager: ListManager
 
-public extension UIViewCreator where View: TableView {
-    func dynamicDataSource(_ dataSource: TableDataSource) -> Self {
-        (self.uiView as? View)?.creatorDataSource = dataSource
-        return self
-    }
+        var sections: [ListManager.SectionManager] {
+            return self.manager.sections
+        }
 
-    func dynamicDelegate(_ delegate: TableDelegate) -> Self {
-        (self.uiView as? View)?.creatorDelegate = delegate
-        return self
+        init(_ manager: ListManager) {
+            self.manager = manager
+        }
     }
 }

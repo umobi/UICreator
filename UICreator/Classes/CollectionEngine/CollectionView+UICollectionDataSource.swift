@@ -25,25 +25,19 @@ import UIKit
 
 extension _CollectionView: UICollectionViewDataSource {
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
-        let estimatedSections = self.group?.numberOfSections ?? 0
-        return creatorDataSource?.numberOfSections(estimatedSections) ?? estimatedSections
+        self.manager?.numberOfSections ?? 0
     }
 
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let group = self.group else {
+        guard let manager = self.manager else {
             return 0
         }
 
-        let numberOfRows = group.numberOfRows(in: group.section(at: section))
-        if let creatorDataSource = self.creatorDataSource {
-            return creatorDataSource.numberOfRows(in: section, estimatedRows: numberOfRows)
-        }
-
-        return numberOfRows
+        return manager.numberOfRows(in: manager.section(at: section))
     }
 
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let row = self.group?.row(at: indexPath) else {
+        guard let row = self.manager?.row(at: indexPath) else {
             fatalError()
         }
 

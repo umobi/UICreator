@@ -23,15 +23,14 @@
 import Foundation
 import UIKit
 
-private var kCollectionGroup: UInt = 0
+private var kCollectionListManager: UInt = 0
 private var kCollectionDataSource: UInt = 0
-private var kCollectionDelegate: UInt = 0
 private var kCollectionLayoutGroup: UInt = 0
 
 extension UICollectionView {
-    var group: UICListCollectionElements? {
-        get { objc_getAssociatedObject(self, &kCollectionGroup) as? UICListCollectionElements }
-        set { objc_setAssociatedObject(self, &kCollectionGroup, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    var manager: ListCollectionManager? {
+        get { objc_getAssociatedObject(self, &kCollectionListManager) as? ListCollectionManager }
+        set { objc_setAssociatedObject(self, &kCollectionListManager, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
     var layoutGroup: [CollectionLayoutSection]? {
@@ -42,10 +41,5 @@ extension UICollectionView {
     var creatorDataSource: CollectionDataSource? {
         get { objc_getAssociatedObject(self, &kCollectionDataSource) as? CollectionDataSource }
         set { objc_setAssociatedObject(self, &kCollectionDataSource, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    var creatorDelegate: TableDelegate? {
-        get { objc_getAssociatedObject(self, &kCollectionDelegate) as? TableDelegate }
-        set { objc_setAssociatedObject(self, &kCollectionDelegate, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 }

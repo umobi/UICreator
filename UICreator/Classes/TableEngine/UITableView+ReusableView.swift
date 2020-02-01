@@ -22,40 +22,36 @@
 
 import Foundation
 
-extension TableView: UITableViewDataSource {
-    public func numberOfSections(in tableView: UITableView) -> Int {
-        self.manager?.numberOfSections ?? 0
+extension UITableView {
+    struct WeakCell {
+        private(set) weak var view: ReusableView!
+        init(_ view: ReusableView) {
+            self.view = view
+        }
+    }
+}
+
+private var kLoadedCells: UInt = 0
+extension UITableView {
+    private var reusableCells: [WeakCell] {
+        get { objc_getAssociatedObject(self, &kLoadedCells) as? [WeakCell] ?? [] }
+        set { objc_setAssociatedObject(self, &kLoadedCells, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let manager = self.manager else {
-            return 0
+    func appendReusable(cell: ReusableView) {
+        guard !self.reusableCells.contains(where: { $0.view === cell }) else {
+            return
         }
 
-        return manager.numberOfRows(in: manager.section(at: section))
+        self.reusableCells.append(.init(cell))
+        self.reusableCells = self.reusableCells.filter {
+            $0.view != nil
+        }
     }
 
-    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let row = self.manager?.row(at: indexPath) else {
-            fatalError()
-        }
-
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: row.identifier, for: indexPath) as? TableViewCell else {
-            fatalError()
-        }
-
-        cell.prepareCell(row)
-        self.commitCell(cell)
-
-        self.appendReusable(cell: cell)
-        return cell
-    }
-
-    public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        guard let reusableView = tableView.reusableView(at: indexPath) else {
-            return false
-        }
-
-        return !(reusableView.cellLoaded.trailingActions + reusableView.cellLoaded.leadingActions).isEmpty
+    func reusableView(at indexPath: IndexPath) -> ReusableView? {
+        self.reusableCells.first(where: {
+            $0.view?.cellLoaded.cell.rowManager.indexPath == indexPath
+        })?.view
     }
 }

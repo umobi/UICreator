@@ -100,19 +100,19 @@ public class UICContextualAction: RowAction {
 
     public func deleteAction(with animation: UITableView.RowAnimation, onCompletion handler: @escaping (IndexPath) -> Void) -> Self {
         self.onAction { [weak self] indexPath in
-            guard let group = self?.tableView?.group as? ListManager else {
+            guard let manager = self?.tableView?.manager as? ListManager else {
                 Fatal.UICList.deleteRows([indexPath]).warning()
                 return false
             }
 
-            self?.tableView.group = ListManager.Delete(group)
+            self?.tableView.manager = ListManager.Delete(manager)
                 .disableIndexPath(indexPath)
 
             self?.tableView?.performBatchUpdates({
                 self?.tableView.deleteRows(at: [indexPath], with: animation)
             }, completion: { didEnd in
                 if didEnd {
-                    self?.tableView.group = group
+                    self?.tableView.manager = manager
                     handler(indexPath)
                 }
             })
@@ -165,12 +165,12 @@ public class UICRowAction: RowAction {
 
     public func deleteAction(with animation: UITableView.RowAnimation, onCompletion handler: @escaping (IndexPath) -> Void) -> Self {
         self.onAction { [weak self] indexPath in
-            guard let group = self?.tableView?.group as? ListManager else {
+            guard let manager = self?.tableView?.manager as? ListManager else {
                 Fatal.UICList.deleteRows([indexPath]).warning()
                 return
             }
 
-            self?.tableView.group = ListManager.Delete(group)
+            self?.tableView.manager = ListManager.Delete(manager)
                 .disableIndexPath(indexPath)
 
             if #available(iOS 11.0, *) {
@@ -178,7 +178,7 @@ public class UICRowAction: RowAction {
                     self?.tableView.deleteRows(at: [indexPath], with: animation)
                 }, completion: { didEnd in
                     if didEnd {
-                        self?.tableView.group = group
+                        self?.tableView.manager = manager
                         handler(indexPath)
                     }
                 })
@@ -190,7 +190,7 @@ public class UICRowAction: RowAction {
             self?.tableView?.deleteRows(at: [indexPath], with: animation)
             self?.tableView?.endUpdates()
 
-            self?.tableView?.group = group
+            self?.tableView?.manager = manager
             handler(indexPath)
         }
     }

@@ -22,33 +22,7 @@
 
 import Foundation
 
-struct UICCell {
-    let rowManager: ListManager.RowManager
-    let identifier: String
-
-    init(_ identifier: String,_ manager: ListManager.RowManager) {
-        self.rowManager = manager
-        self.identifier = identifier
-    }
-
-    struct Loaded {
-        let cell: UICCell
-        let trailingActions: [RowAction]
-        let leadingActions: [RowAction]
-
-        init(_ cell: UICCell) {
-            self.cell = cell
-            self.trailingActions = cell.rowManager.payload.trailingActions?() ?? []
-            self.leadingActions = cell.rowManager.payload.leadingActions?() ?? []
-        }
-    }
-
-    var load: Loaded {
-        return .init(self)
-    }
-}
-
-protocol UICListCollectionElements: class {
+protocol ListCollectionManager: class {
     var sections: [ListManager.SectionManager] { get }
 
     var numberOfSections: Int { get }
@@ -56,7 +30,7 @@ protocol UICListCollectionElements: class {
     func row(at indexPath: IndexPath) -> UICCell
 }
 
-extension UICListCollectionElements {
+extension ListCollectionManager {
     var headers: [(Int, ListManager.RowManager)] {
         return self.sections.enumerated().compactMap {
             guard let header = $0.element.header else {
@@ -142,63 +116,5 @@ extension UICListCollectionElements {
         }
 
         return .init("\(section.identifier).footer", footer)
-    }
-}
-
-extension ListManager {
-    class Append: UICListCollectionElements {
-        let manager: ListManager
-
-        var sections: [ListManager.SectionManager] {
-            return self.manager.sections
-        }
-
-        init(_ manager: ListManager) {
-            self.manager = manager
-        }
-    }
-
-    class Delete: UICListCollectionElements {
-        let manager: ListManager
-
-        var sections: [ListManager.SectionManager] {
-            return self.manager.sections
-        }
-
-        private var disableIndexPath: [IndexPath] = []
-        private var disableSections: [Int] = []
-
-        init(_ manager: ListManager) {
-            self.manager = manager
-        }
-
-        func disableIndexPath(_ indexPath: IndexPath) -> Self {
-            self.disableIndexPath.append(indexPath)
-            return self
-        }
-
-        func disableIndexPaths(_ indexPaths: [IndexPath]) -> Self {
-            self.disableIndexPath = indexPaths
-            return self
-        }
-
-        func disableSections(_ sections: [Int]) -> Self {
-            self.disableSections = sections
-            return self
-        }
-
-        func numberOfRows(in section: ListManager.SectionManager) -> Int {
-            let numberOfRows = self.manager.numberOfRows(in: section)
-
-            guard self.disableIndexPath.contains(where: {
-                $0.section == section.index
-            }) else { return numberOfRows }
-
-            return numberOfRows - self.disableIndexPath.reduce(0) { $0 + ($1.section == section.index ? 1 : 0 )}
-        }
-
-        var numberOfSections: Int {
-            return self.manager.numberOfSections - IndexSet(self.disableSections).count
-        }
     }
 }

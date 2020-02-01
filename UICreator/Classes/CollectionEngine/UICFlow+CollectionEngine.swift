@@ -51,7 +51,7 @@ public extension UICFlow {
             collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
         }
 
-        collectionView.group = manager
+        collectionView.manager = manager
         collectionView.dataSource = collectionView
         collectionView.delegate = collectionView
         manager.list = collectionView

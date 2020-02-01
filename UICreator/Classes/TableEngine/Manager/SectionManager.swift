@@ -65,36 +65,6 @@ extension ListManager {
             self.forEach?.manager = self
         }
 
-        private class Editable {
-            var rows: [RowManager]
-            var header: RowManager?
-            var footer: RowManager?
-
-            var identifier: Int
-            var index: Int
-            var isDynamic: Bool
-
-            weak var listManager: (ListManager & ListSectionDelegate)!
-
-            init(_ manager: SectionManager) {
-                self.rows = manager.rows
-                self.header = manager.header
-                self.footer = manager.footer
-
-                self.identifier = manager.identifier
-                self.index = manager.index
-                self.isDynamic = manager.isDynamic
-
-                self.listManager = manager.listManager
-            }
-        }
-
-        private func edit(_ handler: (Editable) -> Void) -> SectionManager {
-            let editable = Editable(self)
-            handler(editable)
-            return SectionManager(self, editable: editable)
-        }
-
         func rows(_ rows: [RowManager]) -> SectionManager {
             self.edit {
                 $0.rows = rows.enumerated().map {
@@ -176,41 +146,75 @@ extension ListManager {
             forEachCreator?.manager = self
             return self
         }
+    }
+}
 
-        struct Copy {
-            let header: RowManager?
-            let footer: RowManager?
-            let identifier: Int
-            let isDynamic: Bool
-            let index: Int
-            weak var listManager: (ListManager & ListSectionDelegate)!
-            weak var forEach: ForEachCreator?
+private extension ListManager.SectionManager {
+    class Editable {
+        var rows: [ListManager.RowManager]
+        var header: ListManager.RowManager?
+        var footer: ListManager.RowManager?
 
-            init(_ content: SectionManager) {
-                self.header = content.header
-                self.footer = content.footer
-                self.identifier = content.identifier
-                self.isDynamic = content.isDynamic
-                self.listManager = content.listManager
-                self.index = content.index
-                self.forEach = content.forEach
-            }
+        var identifier: Int
+        var index: Int
+        var isDynamic: Bool
 
-            fileprivate func restore(rows: [RowManager]) -> SectionManager {
-                SectionManager(self.listManager)
-                    .rows(rows)
-                    .header(self.header)
-                    .footer(self.footer)
-                    .identifier(self.identifier)
-                    .isDynamic(self.isDynamic)
-                    .index(self.index)
-                    .forEach(self.forEach)
-            }
+        weak var listManager: (ListManager & ListSectionDelegate)!
+
+        fileprivate init(_ manager: ListManager.SectionManager) {
+            self.rows = manager.rows
+            self.header = manager.header
+            self.footer = manager.footer
+
+            self.identifier = manager.identifier
+            self.index = manager.index
+            self.isDynamic = manager.isDynamic
+
+            self.listManager = manager.listManager
+        }
+    }
+
+    func edit(_ handler: (Editable) -> Void) -> ListManager.SectionManager {
+        let editable = Editable(self)
+        handler(editable)
+        return ListManager.SectionManager(self, editable: editable)
+    }
+}
+
+extension ListManager.SectionManager {
+    struct Copy {
+        let header: ListManager.RowManager?
+        let footer: ListManager.RowManager?
+        let identifier: Int
+        let isDynamic: Bool
+        let index: Int
+        weak var listManager: (ListManager & ListSectionDelegate)!
+        weak var forEach: ForEachCreator?
+
+        fileprivate init(_ content: ListManager.SectionManager) {
+            self.header = content.header
+            self.footer = content.footer
+            self.identifier = content.identifier
+            self.isDynamic = content.isDynamic
+            self.listManager = content.listManager
+            self.index = content.index
+            self.forEach = content.forEach
         }
 
-        var compactCopy: Copy {
-            return .init(self)
+        fileprivate func restore(rows: [ListManager.RowManager]) -> ListManager.SectionManager {
+            ListManager.SectionManager(self.listManager)
+                .rows(rows)
+                .header(self.header)
+                .footer(self.footer)
+                .identifier(self.identifier)
+                .isDynamic(self.isDynamic)
+                .index(self.index)
+                .forEach(self.forEach)
         }
+    }
+
+    var compactCopy: Copy {
+        return .init(self)
     }
 }
 

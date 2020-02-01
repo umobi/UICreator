@@ -22,22 +22,7 @@
 
 import Foundation
 
-protocol ListSupport: class {
-    func reloadData()
-    var group: UICListCollectionElements? { get }
-}
-
-extension ListSupport {
-    func setNeedsReloadData() {
-        guard group == nil || !(group is ListManager.Append) else {
-            return
-        }
-
-        self.reloadData()
-    }
-}
-
-class ListManager: UICListCollectionElements {
+class ListManager: ListCollectionManager, ListContentSectionRestore {
     var sections: [SectionManager] = []
     weak var list: ListSupport!
 
