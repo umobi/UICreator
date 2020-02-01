@@ -145,8 +145,8 @@ extension UICListCollectionElements {
     }
 }
 
-public extension UICList {
-    class GroupAddingAction: UICListCollectionElements {
+extension ListManager {
+    class Append: UICListCollectionElements {
         let manager: ListManager
 
         var sections: [ListManager.SectionManager] {
@@ -158,7 +158,7 @@ public extension UICList {
         }
     }
 
-    class GroupRemovingAction: UICListCollectionElements {
+    class Delete: UICListCollectionElements {
         let manager: ListManager
 
         var sections: [ListManager.SectionManager] {

@@ -29,7 +29,7 @@ protocol ListSupport: class {
 
 extension ListSupport {
     func setNeedsReloadData() {
-        guard group == nil || !(group is UICList.GroupAddingAction) else {
+        guard group == nil || !(group is ListManager.Append) else {
             return
         }
 

@@ -105,7 +105,7 @@ public class UICContextualAction: RowAction {
                 return false
             }
 
-            self?.tableView.group = UICList.GroupRemovingAction(group)
+            self?.tableView.group = ListManager.Delete(group)
                 .disableIndexPath(indexPath)
 
             self?.tableView?.performBatchUpdates({
@@ -170,7 +170,7 @@ public class UICRowAction: RowAction {
                 return
             }
 
-            self?.tableView.group = UICList.GroupRemovingAction(group)
+            self?.tableView.group = ListManager.Delete(group)
                 .disableIndexPath(indexPath)
 
             if #available(iOS 11.0, *) {

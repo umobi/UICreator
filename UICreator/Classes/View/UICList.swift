@@ -252,7 +252,7 @@ public extension UIViewCreator where View: UITableView {
                 return
             }
 
-            (self?.uiView as? View)?.group = UICList.GroupRemovingAction(group)
+            (self?.uiView as? View)?.group = ListManager.Delete(group)
                 .disableIndexPaths(indexPaths)
 
             if #available(iOS 11, tvOS 11, *) {
@@ -285,7 +285,7 @@ public extension UIViewCreator where View: UITableView {
                 return
             }
 
-            (self?.uiView as? View)?.group = UICList.GroupRemovingAction(group)
+            (self?.uiView as? View)?.group = ListManager.Delete(group)
                 .disableSections(sections)
 
             if #available(iOS 11, tvOS 11, *) {
@@ -320,8 +320,8 @@ public extension UIViewCreator where View: UITableView {
                 Fatal.UICList.insertRows(indexPaths).warning()
                 return
             }
-
-            (self?.uiView as? View)?.group = UICList.GroupAddingAction(group)
+            
+            (self?.uiView as? View)?.group = ListManager.Append(group)
             perform(indexPaths)
 
             if #available(iOS 11, tvOS 11, *) {
@@ -352,7 +352,7 @@ public extension UIViewCreator where View: UITableView {
                 return
             }
 
-            (self?.uiView as? View)?.group = UICList.GroupAddingAction(group)
+            (self?.uiView as? View)?.group = ListManager.Append(group)
             perform(sections)
 
             if #available(iOS 11, tvOS 11, *) {

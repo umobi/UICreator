@@ -134,8 +134,14 @@ extension ListManager {
             }
         }
 
-        func loadForEachIfNeeded() {
-            self.forEach?.load()
+        @discardableResult
+        func loadForEachIfNeeded() -> Bool {
+            guard let forEach = self.forEach, !forEach.isLoaded else {
+                return false
+            }
+
+            forEach.load()
+            return forEach.isLoaded
         }
 
         static func forEach(_ forEachCreator: ForEachCreator) -> RowManager {

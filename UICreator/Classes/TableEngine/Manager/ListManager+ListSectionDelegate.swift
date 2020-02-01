@@ -29,11 +29,18 @@ extension ListManager: ListSectionDelegate {
             return
         }
 
+        self.list = nil
+
         let oldRowIdentifier = self.rowsIdentifier
         let oldHeadersIdentifier = self.headersIdentifier
         let oldFootersIdentifier = self.footersIdentifier
 
         self.sections = sections
+        sections.forEach {
+            $0.loadForEachIfNeeded()
+        }
+
+        self.list = list
 
         let newRows: [String] = self.rowsIdentifier.compactMap {
             oldRowIdentifier.contains($0) ? nil : $0

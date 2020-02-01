@@ -159,15 +159,16 @@ extension ListManager {
             return manager
         }
 
-        func loadForEachIfNeeded() {
-            guard self.forEach?.isLoaded ?? false else {
-                self.forEach?.load()
-                return
+        @discardableResult
+        func loadForEachIfNeeded() -> Bool {
+            guard let forEach = self.forEach, !forEach.isLoaded else {
+                return self.rows.reduce(false) {
+                    $0 || $1.loadForEachIfNeeded()
+                }
             }
 
-            self.rows.forEach {
-                $0.loadForEachIfNeeded()
-            }
+            forEach.load()
+            return forEach.isLoaded
         }
 
         private func forEach(_ forEachCreator: ForEachCreator?) -> SectionManager {

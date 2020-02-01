@@ -104,8 +104,9 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
     }
 
     func load() {
-        self.syncLoad?(self.uiView)
+        let syncLoad = self.syncLoad
         self.syncLoad = nil
+        syncLoad?(self.uiView)
     }
 
     var isLoaded: Bool {
