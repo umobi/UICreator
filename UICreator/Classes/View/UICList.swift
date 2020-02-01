@@ -210,3 +210,201 @@ public extension UIViewCreator where View: UITableView {
         }
     }
 }
+
+public extension UIViewCreator where View: UITableView {
+    func accessoryType(_ type: UITableViewCell.AccessoryType) -> Self {
+        (self.uiView as? View)?.appendCellHandler {
+            $0.accessoryType = type
+        }
+
+        return self
+    }
+}
+
+private var kTableViewCellHandler: UInt = 0
+extension UITableView {
+    private var tableViewCellHandler: ((UITableViewCell) -> Void)? {
+        get { objc_getAssociatedObject(self, &kTableViewCellHandler) as? (UITableViewCell) -> Void }
+        set { objc_setAssociatedObject(self, &kTableViewCellHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    }
+
+    @discardableResult
+    func appendCellHandler(handler: @escaping (UITableViewCell) -> Void) -> Self {
+        let all = self.tableViewCellHandler
+        self.tableViewCellHandler = {
+            all?($0)
+            handler($0)
+        }
+
+        return self
+    }
+
+    func commitCell(_ cell: UITableViewCell) {
+        self.tableViewCellHandler?(cell)
+    }
+}
+
+public extension UIViewCreator where View: UITableView {
+    func deleteRows(with animation: UITableView.RowAnimation,_ value: Value<[IndexPath]>, onCompletion: @escaping ([IndexPath]) -> Void) -> Self {
+        value.asRelay.next { [weak self] indexPaths in
+            guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
+                Fatal.UICList.deleteRows(indexPaths).warning()
+                return
+            }
+
+            (self?.uiView as? View)?.manager = ListManager.Delete(manager)
+                .disableIndexPaths(indexPaths)
+
+            if #available(iOS 11, tvOS 11, *) {
+                (self?.uiView as? View)?.performBatchUpdates({
+                    (self?.uiView as? View)?.deleteRows(at: indexPaths, with: animation)
+                }, completion: { didEnd in
+                    if didEnd {
+                        (self?.uiView as? View)?.manager = manager
+                        onCompletion(indexPaths)
+                    }
+                })
+                return
+            }
+
+            (self?.uiView as? View)?.beginUpdates()
+            (self?.uiView as? View)?.deleteRows(at: indexPaths, with: animation)
+            (self?.uiView as? View)?.endUpdates()
+
+            (self?.uiView as? View)?.manager = manager
+            onCompletion(indexPaths)
+        }
+
+        return self
+    }
+
+    func deleteSections(with animation: UITableView.RowAnimation,_ value: Value<[Int]>, onCompletion: @escaping ([Int]) -> Void) -> Self {
+        value.asRelay.next { [weak self] sections in
+            guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
+                Fatal.UICList.deleteSections(sections).warning()
+                return
+            }
+
+            (self?.uiView as? View)?.manager = ListManager.Delete(manager)
+                .disableSections(sections)
+
+            if #available(iOS 11, tvOS 11, *) {
+                (self?.uiView as? View)?.performBatchUpdates({
+                    (self?.uiView as? View)?.deleteSections(.init(sections), with: animation)
+                }, completion: { didEnd in
+                    if didEnd {
+                        (self?.uiView as? View)?.manager = manager
+                        onCompletion(sections)
+                    }
+                })
+                return
+            }
+
+            (self?.uiView as? View)?.beginUpdates()
+            (self?.uiView as? View)?.deleteSections(.init(sections), with: animation)
+            (self?.uiView as? View)?.endUpdates()
+
+            (self?.uiView as? View)?.manager = manager
+            onCompletion(sections)
+        }
+
+        return self
+    }
+}
+
+public extension UIViewCreator where View: UITableView {
+
+    func insertRows(with animation: UITableView.RowAnimation,_ value: Value<[IndexPath]>, perform: @escaping ([IndexPath]) -> Void) -> Self {
+        value.asRelay.next { [weak self] indexPaths in
+            guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
+                Fatal.UICList.insertRows(indexPaths).warning()
+                return
+            }
+            
+            (self?.uiView as? View)?.manager = ListManager.Append(manager)
+            perform(indexPaths)
+
+            if #available(iOS 11, tvOS 11, *) {
+                (self?.uiView as? View)?.performBatchUpdates({
+                    (self?.uiView as? View)?.insertRows(at: indexPaths, with: animation)
+                }, completion: { didEnd in
+                    if didEnd {
+                        (self?.uiView as? View)?.manager = manager
+                    }
+                })
+                return
+            }
+
+            (self?.uiView as? View)?.beginUpdates()
+            (self?.uiView as? View)?.insertRows(at: indexPaths, with: animation)
+            (self?.uiView as? View)?.endUpdates()
+
+            (self?.uiView as? View)?.manager = manager
+        }
+
+        return self
+    }
+
+    func insertSections(with animation: UITableView.RowAnimation,_ value: Value<[Int]>, perform: @escaping ([Int]) -> Void) -> Self {
+        value.asRelay.next { [weak self] sections in
+            guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
+                Fatal.UICList.insertSections(sections).warning()
+                return
+            }
+
+            (self?.uiView as? View)?.manager = ListManager.Append(manager)
+            perform(sections)
+
+            if #available(iOS 11, tvOS 11, *) {
+                (self?.uiView as? View)?.performBatchUpdates({
+                    (self?.uiView as? View)?.insertSections(.init(sections), with: animation)
+                }, completion: { didEnd in
+                    if didEnd {
+                        (self?.uiView as? View)?.manager = manager
+                        if let listSupport = self?.uiView as? ListSupport {
+                            listSupport.setNeedsReloadData()
+                            return
+                        }
+                        (self?.uiView as? View)?.reloadData()
+                    }
+                })
+                return
+            }
+
+            (self?.uiView as? View)?.beginUpdates()
+            (self?.uiView as? View)?.insertSections(.init(sections), with: animation)
+            (self?.uiView as? View)?.endUpdates()
+
+            (self?.uiView as? View)?.manager = manager
+            if let listSupport = self?.uiView as? ListSupport {
+                listSupport.setNeedsReloadData()
+                return
+            }
+            (self?.uiView as? View)?.reloadData()
+        }
+
+        return self
+    }
+}
+
+extension Fatal {
+    enum UICList: FatalType {
+        case deleteRows([IndexPath])
+        case deleteSections([Int])
+        case insertRows([IndexPath])
+        case insertSections([Int])
+
+        var error: String {
+            switch self {
+            case .deleteRows(let indexPaths):
+                return "UICList can't perform action deleteRows for indexPaths \(indexPaths)."
+            case .deleteSections(let sectionPaths):
+                return "UICList can't perform action deleteSections for sectionPaths \(sectionPaths)"
+            case .insertRows(let indexPaths):
+                return "UICList can't perform action insertRows for indexPaths \(indexPaths)."
+            case .insertSections(let sectionPaths):
+                return "UICList can't perform action insertSections for sectionPaths \(sectionPaths)"
+            }
+        }
+    }
+}

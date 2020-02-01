@@ -51,6 +51,7 @@ public class UICGradient: UIViewCreator {
 
     public init(_ colors: [UIColor], direction: View.Direction = .right) {
         self.uiView = View.init(builder: self)
+        self.uiView.updateBuilder(self)
         (self.uiView as? View)?.colors = colors
         (self.uiView as? View)?.direction = direction
     }

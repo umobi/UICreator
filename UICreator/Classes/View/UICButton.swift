@@ -51,6 +51,7 @@ public class UICButton: UIViewCreator, Control {
     public init(_ title: String?, type: UIButton.ButtonType? = nil) {
         if let type = type {
             self.uiView = View.init(type: type)
+            self.uiView.updateBuilder(self)
             (self.uiView as? View)?.setTitle(title, for: .normal)
             return
         }

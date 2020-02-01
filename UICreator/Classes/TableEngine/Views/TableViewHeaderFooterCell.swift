@@ -23,8 +23,8 @@
 import Foundation
 import UIKit
 
-internal class TableViewHeaderFooterCell: UITableViewHeaderFooterView {
-    private(set) var builder: ViewCreator! = nil
+internal class TableViewHeaderFooterCell: UITableViewHeaderFooterView, ReusableView {
+    var cellLoaded: UICCell.Loaded!
 
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
@@ -54,16 +54,6 @@ internal class TableViewHeaderFooterCell: UITableViewHeaderFooterView {
     override public func layoutSubviews() {
         super.layoutSubviews()
         self.commitLayout()
-    }
-
-    func prepareCell(builder: UICList.Element.Builder) {
-        guard self.builder == nil else {
-            return
-        }
-
-        let builder = builder()
-        self.builder = builder
-        _ = self.contentView.add(builder.releaseUIView())
     }
 
     public override var watchingViews: [UIView] {

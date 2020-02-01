@@ -21,23 +21,11 @@
 //
 
 import Foundation
-import UIKit
 
-public protocol CollectionDataSource {
-    func numberOfSections(_ estimatedSections: Int) -> Int
-    func numberOfRows(in section: Int, estimatedRows: Int) -> Int
+public class UICFooter: ViewCreator {
+    let content: () -> ViewCreator
 
-    func cell(at indexPath: IndexPath, content: ViewCreator)
-}
-
-public extension CollectionDataSource {
-    func numberOfSections(_ estimatedSections: Int) -> Int {
-        return estimatedSections
+    public init(content: @escaping () -> ViewCreator) {
+        self.content = content
     }
-
-    func numberOfRows(in section: Int, estimatedRows: Int) -> Int {
-        return estimatedRows
-    }
-
-    func cell(at indexPath: IndexPath, content: ViewCreator) {}
 }

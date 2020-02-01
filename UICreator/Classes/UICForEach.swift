@@ -23,7 +23,10 @@
 import Foundation
 
 protocol ForEachCreator: ViewCreator {
-    func startObservation()
+    var viewType: ViewCreator.Type { get }
+    func load()
+    var isLoaded: Bool { get }
+//    func startObservation()
 }
 
 private var kManager: UInt = 0
@@ -35,7 +38,7 @@ extension ForEachCreator {
 }
 
 protocol SupportForEach: class {
-    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>)
+    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>)
 }
 
 public class PlaceholderView: UIView {
@@ -55,27 +58,58 @@ public class PlaceholderView: UIView {
     }
 }
 
-public class UICForEach<Value>: ViewCreator, ForEachCreator {
+public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
+    let viewType: ViewCreator.Type
+
     let relay: Relay<[Value]>
     let content: (Value) -> ViewCreator
+    private var syncLoad: ((UIView) -> Void)? = nil
 
-    func startObservation() {
+    private func startObservation() {
         let content = self.content
         self.manager?.viewsDidChange(placeholderView: self.uiView, relay.map {
-            $0.map {
-                content($0)
+            $0.map { item in
+                {
+                    content(item)
+                }
             }
         })
     }
 
-    public init(_ value: UICreator.Value<[Value]>, content: @escaping (Value) -> ViewCreator) {
-        self.relay = value.asRelay
+    public convenience init(_ value: UICreator.Value<[Value]>, content: @escaping (Value) -> View) {
+        self.init(value.asRelay, value: { [weak value] in value?.value }, content: content)
+    }
+
+    public convenience init(_ value: [Value], content: @escaping (Value) -> View) {
+        let value = UICreator.Value(value: value)
+        self.init(value.asRelay, value: { value.value }, content: content)
+    }
+
+    private init(_ relay: Relay<[Value]>, value: @escaping () -> [Value]?, content: @escaping (Value) -> View) {
+        self.relay = relay
         self.content = content
+        self.viewType = View.self
         self.uiView = PlaceholderView(builder: self)
 
-        self.onInTheScene { [weak value] view in
-            (view.viewCreator as? Self)?.startObservation()
-            (view.viewCreator as? Self)?.relay.post(value?.value ?? [])
+        self.syncLoad = {
+            ($0.viewCreator as? Self)?.startObservation()
+            ($0.viewCreator as? Self)?.relay.post(value() ?? [])
         }
+
+        self.height(equalTo: 0, priority: .high)
+            .width(equalTo: 0, priority: .high)
+            .onNotRendered { view in
+                (view.viewCreator as? Self)?.load()
+            }
+    }
+
+    func load() {
+        let syncLoad = self.syncLoad
+        self.syncLoad = nil
+        syncLoad?(self.uiView)
+    }
+
+    var isLoaded: Bool {
+        return self.syncLoad == nil
     }
 }

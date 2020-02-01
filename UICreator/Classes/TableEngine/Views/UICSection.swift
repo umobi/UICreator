@@ -21,13 +21,15 @@
 //
 
 import Foundation
-import UIContainer
 
-public extension ViewControllerType where Self: ViewCreator {
-    var content: ViewControllerMaker {
-        return .dynamic { [unowned self] in
-            _ = $0.view.add(self.releaseUIView())
-            $0.view.backgroundColor = .clear
-        }
+public class UICSection: ViewCreator {
+    public let content: [ViewCreator]
+
+    public convenience init(_ contents: @escaping () -> [ViewCreator]) {
+        self.init(contents())
+    }
+
+    internal init(_ content: [ViewCreator]) {
+        self.content = content
     }
 }

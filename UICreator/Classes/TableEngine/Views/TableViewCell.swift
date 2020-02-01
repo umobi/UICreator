@@ -23,8 +23,8 @@
 import Foundation
 import UIKit
 
-internal class TableViewCell: UITableViewCell {
-    private(set) var builder: ViewCreator! = nil
+internal class TableViewCell: UITableViewCell, ReusableView {
+    var cellLoaded: UICCell.Loaded!
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -55,27 +55,6 @@ internal class TableViewCell: UITableViewCell {
     override public func layoutSubviews() {
         super.layoutSubviews()
         self.commitLayout()
-    }
-
-    func prepareCell(builder: UICList.Element.Builder) {
-        if self.contentView.subviews.first is PlaceholderView {
-            self.contentView.subviews.forEach {
-                $0.removeFromSuperview()
-            }
-            
-            self.builder = nil
-        }
-
-        if let creator = self.builder {
-            if let currentViewContext = creator as? ViewContext, let newViewContext = builder() as? ViewContext {
-                currentViewContext.update(context: newViewContext.context)
-            }
-            return
-        }
-
-        let builder = builder()
-        self.builder = builder
-        _ = self.contentView.add(builder.releaseUIView())
     }
 
     public override var watchingViews: [UIView] {

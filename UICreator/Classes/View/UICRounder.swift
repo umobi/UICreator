@@ -51,6 +51,7 @@ public class UICRounder: UIViewCreator {
 
     public init(radius: CGFloat, content: @escaping () -> ViewCreator) {
         self.uiView = View.init(content().releaseUIView(), radius: radius)
+        self.uiView.updateBuilder(self)
     }
 }
 

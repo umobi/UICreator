@@ -21,12 +21,16 @@
 //
 
 import Foundation
+extension ListManager {
+    class Append: ListCollectionManager {
+        private let manager: ListManager
 
-extension UICList {
-    public enum Content {
-        case group(Group)
-        case content(_ content: () -> ViewCreator)
-        case empty
-        case sections([UICList.Element.Section])
+        var sections: [ListManager.SectionManager] {
+            return self.manager.sections
+        }
+
+        init(_ manager: ListManager) {
+            self.manager = manager
+        }
     }
 }

@@ -22,14 +22,17 @@
 
 import Foundation
 
-public extension UIViewCreator where View: _CollectionView {
-    func dynamicDataSource(_ dataSource: CollectionDataSource) -> Self {
-        (self.uiView as? View)?.creatorDataSource = dataSource
-        return self
-    }
+protocol ListSupport: class {
+    func reloadData()
+    var manager: ListCollectionManager? { get }
+}
 
-//    func dynamicDelegate(_ delegate: TableDelegate) -> Self {
-//        (self.uiView as? View)?.creatorDelegate = delegate
-//        return self
-//    }
+extension ListSupport {
+    func setNeedsReloadData() {
+        guard manager == nil || !(manager is ListManager.Append) else {
+            return
+        }
+
+        self.reloadData()
+    }
 }

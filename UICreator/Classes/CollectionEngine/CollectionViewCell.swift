@@ -23,8 +23,8 @@
 import Foundation
 import UIKit
 
-public class CollectionViewCell: UICollectionViewCell {
-    private(set) var builder: ViewCreator! = nil
+public class CollectionViewCell: UICollectionViewCell, ReusableView {
+    var cellLoaded: UICCell.Loaded!
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -53,16 +53,6 @@ public class CollectionViewCell: UICollectionViewCell {
     override public func layoutSubviews() {
         super.layoutSubviews()
         self.commitLayout()
-    }
-
-    func prepareCell(builder: UICList.Element.Builder) {
-        guard self.builder == nil else {
-            return
-        }
-
-        let builder = builder()
-        self.builder = builder
-        _ = self.contentView.add(builder.releaseUIView())
     }
 
     public override var watchingViews: [UIView] {

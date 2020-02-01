@@ -49,15 +49,34 @@ public class UICImage: UIViewCreator {
 
     public init(mode: View.ContentMode = .scaleToFill) {
         self.uiView = View.init(image: nil, highlightedImage: nil)
+        self.uiView.updateBuilder(self)
         self.uiView.contentMode = mode
     }
 
     public init(image: UIImage?, highlightedImage: UIImage? = nil) {
         self.uiView = View.init(image: image, highlightedImage: nil)
+        self.uiView.updateBuilder(self)
     }
 
     public init() {
         self.uiView = View.init(image: nil, highlightedImage: nil)
+        self.uiView.updateBuilder(self)
+    }
+
+    private var imageRelay: Relay<UIImage?>? = nil
+    public convenience init(_ imageRelay: Relay<UIImage?>) {
+        self.init(image: nil)
+
+        self.imageRelay = imageRelay
+        self.context.image.connect(to: imageRelay)
+    }
+}
+
+public extension Value {
+    func connect(to relay: Relay<Value>) {
+        relay.sync { [weak self] in
+            self?.value = $0
+        }
     }
 }
 
@@ -106,3 +125,15 @@ public extension UIViewCreator where View: UIImageView {
     }
 }
 #endif
+
+extension UICImage: UIViewContext {
+    public func bindContext(_ context: UICImage.Context) {
+        context.image.sync { [weak self] in
+            (self?.uiView as? View)?.image = $0
+        }
+    }
+
+    public class Context: UICreator.Context {
+        let image: Value<UIImage?> = .init(value: nil)
+    }
+}

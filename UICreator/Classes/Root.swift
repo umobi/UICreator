@@ -24,6 +24,7 @@ import Foundation
 import UIKit
 import UIContainer
 
+/// RootView is an internal view that is used to be the UIView of some view creator to support lazy loads.
 public class RootView: UIView {
     var willCommitNotRenderedHandler: (() -> Void)?
     var didCommitNotRenderedHandler: (() -> Void)?
@@ -76,11 +77,17 @@ private var kViewDidLoad: UInt = 0
         set { (objc_setAssociatedObject(self, &kViewDidLoad, newValue, .OBJC_ASSOCIATION_RETAIN)) }
     }
 
+    /// The viewDidLoad function is a similar method used by UIKit for view controllers. This method means in UICreator that it is now allowed to directly access the subviews or manipulate data without having some errors thrown.
     open func viewDidLoad() {
         self.didViewLoad = true
     }
 }
 
+/**
+ The root is the base view creator class for some of the view creators. You shouldn’t use this directly, instead, check `UICView` or `UICViewRepresentable`.
+
+ Root support some of the protocols that is used in some of representable of view controllers like the protocol `ViewControllerAppearStates`.
+ */
 open class Root: ViewCreator {
     public typealias View = RootView
 

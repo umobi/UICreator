@@ -53,6 +53,7 @@ public class UICDashed: UIViewCreator {
         self.uiView = View.init(content().releaseUIView(), dash: pattern)
             .apply(strokeColor: color)
             .apply(lineWidth: 1)
+        self.uiView.updateBuilder(self)
     }
 }
 

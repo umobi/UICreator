@@ -87,14 +87,10 @@ public class UICTabCreator<TabController: UITabBarController>: UIViewCreator {
         return self._tabBarController ?? self.tabBarController
     }
 
-    public convenience init(_ sequence: ViewCreator...) {
-        self.init(sequence)
-    }
-
-    public init(_ sequence: [ViewCreator]) {
+    public init(_ contents: @escaping () -> [ViewCreator]) {
         self.uiView = View.init(builder: self)
 
-        self.tabController.viewControllers = sequence.map { view in
+        self.tabController.viewControllers = contents().map { view in
             let controller = ContainerController(UICHost {
                 view
             })

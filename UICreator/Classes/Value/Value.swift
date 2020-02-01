@@ -23,9 +23,27 @@
 import Foundation
 
 public final class Value<Value>: Getter, Setter {
+    private var _value: Value
+    public var value: Value {
+        get { return self._value }
+        set {
+            self._value = newValue
+            ReactiveCenter.shared.valueDidChange(self.identifier, newValue: newValue)
+        }
+    }
+
     required public init(value: Value) {
+        self._value = value
         ReactiveCenter.shared.start(self.identifier)
-        self.value = value
+        ReactiveCenter.shared.valueDidChange(self.identifier, newValue: value)
+
+        ReactiveCenter.shared.privateResquestLatestValue(self.identifier) { [weak self] in
+            guard let self = self else {
+                return
+            }
+
+            ReactiveCenter.shared.privateLatestValue(self.identifier, newValue: self.value)
+        }
     }
 
     deinit {
@@ -37,5 +55,23 @@ public final class Value<Value>: Getter, Setter {
 public extension Value {
     var asRelay: Relay<Value> {
         return .init(identifier: self.identifier)
+    }
+}
+
+public extension Value {
+    func bind<Object, ObjectValue>(_ keyPath: KeyPath<Object, ObjectValue>) -> Relay<ObjectValue?> where Value == Optional<Object> {
+        return self.asRelay.map {
+            guard let object = $0 else {
+                return nil
+            }
+
+            return object[keyPath: keyPath]
+        }
+    }
+
+    func bind<ObjectValue>(_ keyPath: KeyPath<Value, ObjectValue>) -> Relay<ObjectValue>? {
+        return self.asRelay.map {
+            $0[keyPath: keyPath]
+        }
     }
 }

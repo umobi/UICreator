@@ -24,82 +24,138 @@ import Foundation
 
 extension TableView: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = self.group?.header(at: section) else {
+        guard let header = self.manager?.header(at: section) else {
             return nil
         }
 
-        guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: header.0) as? TableViewHeaderFooterCell else {
+        guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: header.identifier) as? TableViewHeaderFooterCell else {
             fatalError()
         }
         
-        cell.prepareCell(builder: header.1)
-        self.creatorDelegate?.header(at: section, content: cell.builder)
+        cell.prepareCell(header)
         return cell
     }
 
     public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        guard let footer = self.group?.footer(at: section) else {
+        guard let footer = self.manager?.footer(at: section) else {
             return nil
         }
 
-        guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: footer.0) as? TableViewHeaderFooterCell else {
+        guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: footer.identifier) as? TableViewHeaderFooterCell else {
             fatalError()
         }
 
-        cell.prepareCell(builder: footer.1)
-        self.creatorDelegate?.footer(at: section, content: cell.builder)
+        cell.prepareCell(footer)
         return cell
     }
+
+    #if os(iOS)
+    @available(iOS 11.0, *)
+    public func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard let reusableView = tableView.reusableView(at: indexPath) else {
+            return nil
+        }
+
+        let configurator = UISwipeActionsConfiguration(actions: reusableView.cellLoaded.trailingActions.compactMap {
+            let contextualAction = $0 as? UICContextualAction
+            return contextualAction?
+                .indexPath(indexPath)
+                .tableView(tableView)
+                .rowAction
+        })
+
+        reusableView.cellLoaded.trailingActions.forEach {
+            ($0 as? UICContextualAction)?.commitConfigurator(configurator)
+        }
+
+        return configurator
+    }
+
+    @available(iOS 11.0, *)
+    public func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard let reusableView = tableView.reusableView(at: indexPath) else {
+            return nil
+        }
+
+        let configurator = UISwipeActionsConfiguration(actions: reusableView.cellLoaded.leadingActions.compactMap {
+            let contextualAction = $0 as? UICContextualAction
+            return contextualAction?
+                .indexPath(indexPath)
+                .tableView(tableView)
+                .rowAction
+        })
+
+        reusableView.cellLoaded.leadingActions.forEach {
+            ($0 as? UICContextualAction)?.commitConfigurator(configurator)
+        }
+
+        return configurator
+    }
+
+    public func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        guard let reusableView = tableView.reusableView(at: indexPath) else {
+            return nil
+        }
+
+        return (reusableView.cellLoaded.leadingActions + reusableView.cellLoaded.trailingActions).compactMap {
+            let action = ($0 as? UICRowAction)
+            return action?
+                .indexPath(indexPath)
+                .tableView(tableView)
+                .rowAction
+        }
+    }
+    #endif
 }
 
 extension TableView {
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        guard self.group?.header(at: section) != nil else {
+        guard self.manager?.header(at: section) != nil else {
             return .zero
         }
 
-        return self.creatorDelegate?.tableView(tableView, heightForHeaderAt: section) ?? tableView.sectionHeaderHeight
+        return tableView.sectionHeaderHeight
     }
 
     public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        guard self.group?.footer(at: section) != nil else {
+        guard self.manager?.footer(at: section) != nil else {
             return .zero
         }
 
-        return self.creatorDelegate?.tableView(tableView, heightForHeaderAt: section) ?? tableView.sectionFooterHeight
+        return tableView.sectionFooterHeight
     }
 
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard self.group?.row(at: indexPath) != nil else {
+        guard self.manager?.row(at: indexPath) != nil else {
             return .zero
         }
 
-        return self.creatorDelegate?.tableView(tableView, heightForRowAt: indexPath) ?? tableView.rowHeight
+        return tableView.rowHeight
     }
 }
 
 extension TableView {
     public func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
-        guard self.group?.header(at: section) != nil else {
+        guard self.manager?.header(at: section) != nil else {
             return .zero
         }
 
-        return self.creatorDelegate?.tableView(tableView, estimatedHeightForHeaderAt: section) ?? 1
+        return 1
     }
 
     public func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection section: Int) -> CGFloat {
-        guard self.group?.footer(at: section) != nil else {
+        guard self.manager?.footer(at: section) != nil else {
             return .zero
         }
 
-        return self.creatorDelegate?.tableView(tableView, estimatedHeightForHeaderAt: section) ?? 1
+        return 1
     }
 
     public func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard self.group?.row(at: indexPath) != nil else {
+        guard self.manager?.row(at: indexPath) != nil else {
             return .zero
         }
 
-        return self.creatorDelegate?.tableView(tableView, estimatedHeightForRowAt: indexPath) ?? tableView.estimatedRowHeight
+        return tableView.estimatedRowHeight
     }
 }

@@ -24,20 +24,24 @@ import Foundation
 
 public final class Relay<Value> {
     let identifier: String
+
     init(identifier: String) {
         self.identifier = identifier
         self.handler = nil
-        print("[Relay] init")
-    }
-
-    deinit {
-        print("[Relay] deinit")
     }
 
     public func next(_ handler: @escaping (Value) -> Void) {
         Self.collapse(self)() { value in
             handler(value)
         }
+    }
+
+    public func sync(_ handler: @escaping (Value) -> Void) {
+        Self.collapse(self)() { value in
+            handler(value)
+        }
+        
+        ReactiveCenter.shared.privateResquestLatestValue(self.identifier)
     }
 
     private static func collapse<Value>(_ relay: Relay<Value>) -> ((@escaping (Value) -> Void) -> Void) {
@@ -60,6 +64,10 @@ public final class Relay<Value> {
             ReactiveCenter.shared.privateValueDidChange(identifier) {
                 externalHandler($0)
             }
+
+            ReactiveCenter.shared.privateLatestValue(identifier) {
+                externalHandler($0)
+            }
         }
     }
 
@@ -67,7 +75,6 @@ public final class Relay<Value> {
     init(_ identifier: String, handler: @escaping ((@escaping (Value) -> Void) -> Void)) {
         self.identifier = identifier
         self.handler = handler
-        print("[Relay] init")
     }
 
     public func map<Other>(_ handler: @escaping  (Value) -> Other) -> Relay<Other> {
@@ -82,4 +89,5 @@ public final class Relay<Value> {
     func `post`(_ value: Value) {
         ReactiveCenter.shared.privateValueDidChange(self.identifier, newValue: value)
     }
+
 }

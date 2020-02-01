@@ -99,8 +99,8 @@ public extension CollectionLayoutElement {
 }
 
 public extension CollectionLayoutElement {
-    static func sequence(_ elements: CollectionLayoutElement...) -> Self {
-        return .init(sequence: elements.map {
+    static func sequence(_ elements: @escaping () -> [CollectionLayoutElement]) -> Self {
+        return .init(sequence: elements().map {
             guard case .single(let content) = $0.elements else {
                 fatalError()
             }
@@ -155,8 +155,8 @@ public extension CollectionLayoutSection {
 }
 
 public extension Array where Element == CollectionLayoutSection {
-    static func sequence(_ sections: Element...) -> [Element] {
-        return sections
+    static func sequence(_ sections: @escaping () -> [Element]) -> [Element] {
+        return sections()
     }
 
     static func section(content: @escaping () -> CollectionLayoutElement) -> [Element] {

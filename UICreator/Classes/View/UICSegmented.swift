@@ -125,14 +125,9 @@ public class Segment {
 public class UICSegmented: UIViewCreator, Control {
     public typealias View = _SegmentedControl
 
-    public init(_ segments: Segment...) {
+    public init(_ segments: @escaping () -> [Segment]) {
         self.uiView = View.init(builder: self)
-        self.addSegments(segments)
-    }
-
-    public init(_ segments: [Segment]) {
-        self.uiView = View.init(builder: self)
-        self.addSegments(segments)
+        self.addSegments(segments())
     }
 
     private func addSegments(_ segments: [Segment]) {

@@ -26,13 +26,3 @@ public protocol Setter: Getter {
     var value: Value { get set }
     init(value: Value)
 }
-
-public extension Setter {
-    var value: Value {
-        get { transform(objc_getAssociatedObject(self, &kGetterValue)) }
-        set {
-            objc_setAssociatedObject(self, &kGetterValue, newValue, .OBJC_ASSOCIATION_RETAIN)
-            ReactiveCenter.shared.valueDidChange(self.identifier, newValue: newValue)
-        }
-    }
-}

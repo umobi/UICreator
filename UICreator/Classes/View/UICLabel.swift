@@ -50,12 +50,22 @@ public class UICLabel: UIViewCreator, TextElement {
 
     required public init(_ text: String?) {
         self.uiView = View.init(builder: self)
+        self.uiView.updateBuilder(self)
         (self.uiView as? View)?.text = text
     }
 
     required public init(_ attributedText: NSAttributedString?) {
         self.uiView = View.init(builder: self)
+        self.uiView.updateBuilder(self)
         (self.uiView as? View)?.attributedText = attributedText
+    }
+
+    private var textRelay: Relay<String?>? = nil
+    public convenience init(_ textRelay: Relay<String?>) {
+        self.init(String?(nil))
+
+        self.textRelay = textRelay
+        self.context.text.connect(to: textRelay)
     }
 }
 
@@ -116,5 +126,17 @@ public extension TextElement where View: UILabel {
         self.onNotRendered {
             ($0 as? View)?.adjustsFontSizeToFitWidth = flag
         }
+    }
+}
+
+extension UICLabel: UIViewContext {
+    public func bindContext(_ context: Context) {
+        context.text.sync { [weak self] in
+            (self?.uiView as? View)?.text = $0
+        }
+    }
+
+    public class Context: UICreator.Context {
+        let text: Value<String?> = .init(value: nil)
     }
 }

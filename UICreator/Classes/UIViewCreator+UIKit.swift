@@ -290,7 +290,6 @@ public extension ViewCreator {
     }
 }
 
-
 public extension ViewCreator {
     @discardableResult
     func animate(_ duration: TimeInterval, animations: @escaping (UIView) -> Void) -> Self {

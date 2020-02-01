@@ -52,6 +52,7 @@ public class UICContent: UIViewCreator {
 
     public init(mode: View.ContentMode = .center, priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) {
         self.uiView = View(content().releaseUIView(), contentMode: mode, priority: priority)
+        self.uiView.updateBuilder(self)
     }
 }
 

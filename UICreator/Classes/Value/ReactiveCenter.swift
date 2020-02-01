@@ -28,37 +28,31 @@ final class ReactiveCenter: NotificationCenter {
         return _reactive
     }
 
-    private var activeIdentifiers: Set<String> = []
-    private var activeObservables: [(String, NSObjectProtocol)] = []
+    private var activeObservables: [String: [NSObjectProtocol]] = [:]
 
     func start(_ identifier: String) {
         self.unregister(identifier)
 
-        self.activeIdentifiers.insert(identifier)
+        self.activeObservables[identifier] = []
     }
 
     func unregister(_ identifier: String) {
-        self.activeObservables = self.activeObservables.filter {
-            $0.0 == identifier ? {
-                ReactiveCenter.shared.removeObserver($0)
-                return false
-            }($0.1) : true
+        self.activeObservables[identifier]?.forEach {
+            ReactiveCenter.shared.removeObserver($0)
         }
 
-        self.activeIdentifiers = self.activeIdentifiers.filter {
-            $0 != identifier
-        }
+        self.activeObservables[identifier] = nil
     }
 
     private func isRegisteredOrDie(_ identifier: String) {
-        guard self.activeIdentifiers.contains(identifier) else {
+        guard self.activeObservables[identifier] != nil else {
             Fatal.ReactiveCenter.unregistered.die()
             return
         }
     }
 
     private func track(_ identifier: String,_ observable: NSObjectProtocol) {
-        self.activeObservables.append((identifier, observable))
+        self.activeObservables[identifier]?.append(observable)
     }
 
     private static let kNotificationNewValue = "kNotificationNewValue"
@@ -71,7 +65,7 @@ final class ReactiveCenter: NotificationCenter {
         self.isRegisteredOrDie(identifier)
 
         self.track(identifier, self.addObserver(forName: .init(rawValue: "\(identifier).valueChanged"), object: nil, queue: nil) { notification in
-            handler(transform(notification.userInfo?[Self.kNotificationNewValue]))
+            handler(notification.userInfo?[Self.kNotificationNewValue] as! Value)
         })
     }
 
@@ -85,7 +79,7 @@ final class ReactiveCenter: NotificationCenter {
         self.isRegisteredOrDie(identifier)
 
         self.track(identifier, self.addObserver(forName: .init(rawValue: "\(identifier).private.valueChanged"), object: nil, queue: nil) { notification in
-            handler(transform(notification.userInfo?[Self.kNotificationNewValue]))
+            handler(notification.userInfo?[Self.kNotificationNewValue] as! Value)
         })
     }
 
@@ -102,6 +96,35 @@ final class ReactiveCenter: NotificationCenter {
             handler()
         })
     }
+
+    func privateLatestValue<Value>(_ identifier: String, newValue: Value) {
+        self.isRegisteredOrDie(identifier)
+
+        self.post(name: .init(rawValue: "\(identifier).private.latestValue"), object: nil, userInfo: [Self.kNotificationNewValue: newValue])
+    }
+
+    func privateLatestValue<Value>(_ identifier: String, handler: @escaping (Value) -> Void) {
+        self.isRegisteredOrDie(identifier)
+
+        self.track(identifier, self.addObserver(forName: .init(rawValue: "\(identifier).private.latestValue"), object: nil, queue: nil) { notification in
+            handler(notification.userInfo?[Self.kNotificationNewValue] as! Value)
+        })
+    }
+
+    func privateResquestLatestValue(_ identifier: String) {
+        self.isRegisteredOrDie(identifier)
+
+        self.post(name: .init(rawValue: "\(identifier).private.request.latestValue"), object: nil)
+    }
+
+    func privateResquestLatestValue(_ identifier: String, handler: @escaping () -> Void) {
+        self.isRegisteredOrDie(identifier)
+
+        self.track(identifier, self.addObserver(forName: .init(rawValue: "\(identifier).private.request.latestValue"), object: nil, queue: nil) { _ in
+            handler()
+        })
+    }
+
 }
 
 extension Fatal {

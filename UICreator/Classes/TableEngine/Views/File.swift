@@ -22,25 +22,21 @@
 
 import Foundation
 
-public protocol TextElement: UIViewCreator {
-    func text(_ string: String?) -> Self
-    func text(_ attributedText: NSAttributedString?) -> Self
-
-    func text(color: UIColor?) -> Self
-    func font(_ font: UIFont, isDynamicTextSize: Bool) -> Self
-
-    func text(scale: CGFloat) -> Self
-    func text(alignment: NSTextAlignment) -> Self
-
-    init(_ text: String?)
-    init(_ attributedText: NSAttributedString?)
-
-    func adjustsFont(forContentSizeCategory flag: Bool) -> Self
+public class Link: UICHost {
+    public init(content: @escaping () -> ViewCreator) {
+        super.init(content: content)
+    }
 }
 
-public extension TextElement {
-    func text(scale: CGFloat) -> Self {
-        print("[warning] text(scale:) not implemented")
-        return self
+public extension Link {
+    func destination(content: @escaping () -> ViewCreator) -> Self {
+        self.onInTheScene {
+            _ = $0.viewCreator?.onTap {
+                if $0.navigationController != nil {
+                    $0.navigation?.push(animated: true, content: content)
+                    return
+                }
+            }
+        }
     }
 }

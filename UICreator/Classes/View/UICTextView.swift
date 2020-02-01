@@ -59,7 +59,7 @@ public class UICTextView: UIViewCreator, TextElement, TextKeyboard, HasViewDeleg
     }
 
     required public init(_ attributedText: NSAttributedString?) {
-        self.uiView = .init()
+        self.uiView = View.init(builder: self)
         (self.uiView as? View)?.attributedText = attributedText
     }
 }

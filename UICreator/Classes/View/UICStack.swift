@@ -65,41 +65,17 @@ public class UICStack: UIViewCreator {
         (self.uiView as? View)?.spacing = spacing
     }
 
-    public init(axis: NSLayoutConstraint.Axis, spacing: CGFloat = 0,_ subviews: Subview) {
-        self.prepare(axis: axis, spacing: spacing, subviews.views)
-    }
-
-    public init(axis: NSLayoutConstraint.Axis = .vertical, spacing: CGFloat = 0, _ views: ViewCreator...) {
-        self.prepare(axis: axis, spacing: spacing, views)
-    }
-
-    public init(axis: NSLayoutConstraint.Axis = .vertical, spacing: CGFloat = 0, _ views: [ViewCreator]) {
-        self.prepare(axis: axis, spacing: spacing, views)
+    public init(axis: NSLayoutConstraint.Axis, spacing: CGFloat = 0,_ contents: @escaping () -> [ViewCreator]) {
+        self.prepare(axis: axis, spacing: spacing, contents())
     }
 }
 
-public func UICHStack(spacing: CGFloat = 0, _ subviews: Subview) -> UICStack {
-    return .init(axis: .horizontal, spacing: spacing, subviews)
+public func UICHStack(spacing: CGFloat = 0, _ contents: @escaping () -> [ViewCreator]) -> UICStack {
+    return .init(axis: .horizontal, spacing: spacing, contents)
 }
 
-public func UICVStack(spacing: CGFloat = 0, _ subviews: Subview) -> UICStack {
-    return .init(axis: .vertical, spacing: spacing, subviews)
-}
-
-public func UICHStack(spacing: CGFloat = 0, _ subviews: ViewCreator...) -> UICStack {
-    return .init(axis: .horizontal, spacing: spacing, subviews)
-}
-
-public func UICVStack(spacing: CGFloat = 0, _ subviews: ViewCreator...) -> UICStack {
-    return .init(axis: .vertical, spacing: spacing, subviews)
-}
-
-public func UICHStack(spacing: CGFloat = 0, _ subviews: [ViewCreator]) -> UICStack {
-    return .init(axis: .horizontal, spacing: spacing, subviews)
-}
-
-public func UICVStack(spacing: CGFloat = 0, _ subviews: [ViewCreator]) -> UICStack {
-    return .init(axis: .vertical, spacing: spacing, subviews)
+public func UICVStack(spacing: CGFloat = 0, _ contents: @escaping () -> [ViewCreator]) -> UICStack {
+    return .init(axis: .vertical, spacing: spacing, contents)
 }
 
 public extension UIViewCreator where View: UIStackView {
@@ -130,12 +106,14 @@ public extension UIViewCreator where View: UIStackView {
 }
 
 extension UICStack: SupportForEach {
-    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[ViewCreator]>) {
+    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
         weak var firstView: UIView? = placeholderView
         weak var lastView: UIView? = placeholderView
 
         weak var view = self.uiView as? View
-        sequence.next { values in
+        sequence.map {
+            $0.map { $0() }
+        }.next { views in
             if firstView != nil {
                 let startIndex = view?.arrangedSubviews.enumerated().first(where: {
                     $0.element == firstView
@@ -149,12 +127,12 @@ extension UICStack: SupportForEach {
                 }
             }
 
-            values.forEach {
+            views.forEach {
                 view?.addArrangedSubview($0.releaseUIView())
             }
 
-            firstView = values.first?.uiView
-            lastView = values.last?.uiView
+            firstView = views.first?.uiView
+            lastView = views.last?.uiView
         }
     }
 }

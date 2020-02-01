@@ -21,13 +21,23 @@
 //
 
 import Foundation
-import UIContainer
 
-public extension ViewControllerType where Self: ViewCreator {
-    var content: ViewControllerMaker {
-        return .dynamic { [unowned self] in
-            _ = $0.view.add(self.releaseUIView())
-            $0.view.backgroundColor = .clear
+protocol ReusableView: class {
+    var contentView: UIView { get }
+//    var builder: ViewCreator! { get nonmutating set }
+    func prepareCell(_ cell: UICCell)
+
+    var cellLoaded: UICCell.Loaded! { get set }
+}
+
+extension ReusableView {
+    func prepareCell(_ cell: UICCell) {
+        self.contentView.subviews.forEach {
+            $0.removeFromSuperview()
         }
+
+        self.cellLoaded = cell.load
+        let host = UICHost(content: cell.rowManager.payload.content)
+        _ = self.contentView.add(host.releaseUIView())
     }
 }

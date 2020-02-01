@@ -22,23 +22,11 @@
 
 import Foundation
 
-private var kTableGroup: UInt = 0
-private var kTableDataSource: UInt = 0
-private var kTableDelegate: UInt = 0
+private var kTableManager: UInt = 0
 
 extension UITableView {
-    var group: UICList.Group? {
-        get { objc_getAssociatedObject(self, &kTableGroup) as? UICList.Group }
-        set { objc_setAssociatedObject(self, &kTableGroup, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    var creatorDataSource: TableDataSource? {
-        get { objc_getAssociatedObject(self, &kTableDataSource) as? TableDataSource }
-        set { objc_setAssociatedObject(self, &kTableDataSource, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    var creatorDelegate: TableDelegate? {
-        get { objc_getAssociatedObject(self, &kTableDelegate) as? TableDelegate }
-        set { objc_setAssociatedObject(self, &kTableDelegate, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    var manager: ListCollectionManager? {
+        get { objc_getAssociatedObject(self, &kTableManager) as? ListCollectionManager }
+        set { objc_setAssociatedObject(self, &kTableManager, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 }

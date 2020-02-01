@@ -22,12 +22,30 @@
 
 import Foundation
 
-extension UICList {
-    public enum ContentType {
-        case header
-        case row
-        case footer
-        case section
-        case group
+struct UICCell {
+    let rowManager: ListManager.RowManager
+    let identifier: String
+
+    init(_ identifier: String,_ manager: ListManager.RowManager) {
+        self.rowManager = manager
+        self.identifier = identifier
+    }
+}
+
+extension UICCell {
+    struct Loaded {
+        let cell: UICCell
+        let trailingActions: [RowAction]
+        let leadingActions: [RowAction]
+
+        fileprivate init(_ cell: UICCell) {
+            self.cell = cell
+            self.trailingActions = cell.rowManager.payload.trailingActions?() ?? []
+            self.leadingActions = cell.rowManager.payload.leadingActions?() ?? []
+        }
+    }
+
+    var load: Loaded {
+        return .init(self)
     }
 }

@@ -22,14 +22,10 @@
 
 import Foundation
 
-public extension UIViewCreator where View: TableView {
-    func dynamicDataSource(_ dataSource: TableDataSource) -> Self {
-        (self.uiView as? View)?.creatorDataSource = dataSource
-        return self
-    }
+public class UICHeader: ViewCreator {
+    let content: () -> ViewCreator
 
-    func dynamicDelegate(_ delegate: TableDelegate) -> Self {
-        (self.uiView as? View)?.creatorDelegate = delegate
-        return self
+    public init(content: @escaping () -> ViewCreator) {
+        self.content = content
     }
 }

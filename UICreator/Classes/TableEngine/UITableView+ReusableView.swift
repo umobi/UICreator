@@ -22,22 +22,36 @@
 
 import Foundation
 
-public protocol TableDataSource {
-    func numberOfSections(_ estimatedSections: Int) -> Int
-    func numberOfRows(in section: Int, estimatedRows: Int) -> Int
-
-    func cell(at indexPath: IndexPath, content: ViewCreator)
+extension UITableView {
+    struct WeakCell {
+        private(set) weak var view: ReusableView!
+        init(_ view: ReusableView) {
+            self.view = view
+        }
+    }
 }
 
-public extension TableDataSource {
-    func numberOfSections(_ estimatedSections: Int) -> Int {
-        return estimatedSections
-    }
-    
-    func numberOfRows(in section: Int, estimatedRows: Int) -> Int {
-        return estimatedRows
+private var kLoadedCells: UInt = 0
+extension UITableView {
+    private var reusableCells: [WeakCell] {
+        get { objc_getAssociatedObject(self, &kLoadedCells) as? [WeakCell] ?? [] }
+        set { objc_setAssociatedObject(self, &kLoadedCells, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
-    func cell(at indexPath: IndexPath, content: ViewCreator) {}
+    func appendReusable(cell: ReusableView) {
+        guard !self.reusableCells.contains(where: { $0.view === cell }) else {
+            return
+        }
+
+        self.reusableCells.append(.init(cell))
+        self.reusableCells = self.reusableCells.filter {
+            $0.view != nil
+        }
+    }
+
+    func reusableView(at indexPath: IndexPath) -> ReusableView? {
+        self.reusableCells.first(where: {
+            $0.view?.cellLoaded.cell.rowManager.indexPath == indexPath
+        })?.view
+    }
 }
-
