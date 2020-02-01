@@ -8,8 +8,8 @@
 
 Pod::Spec.new do |s|
   s.name             = 'UICreator'
-  s.version          = '1.0.0-alpha.6'
-  s.summary          = 'Creating view using declarative statements'
+  s.version          = '1.0.0-alpha.7'
+  s.summary          = 'Create UI using declarative components'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,7 +18,8 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-UICreator is a replacement for storyboard and xib files. Like Fluter, ReactNative and SwiftUI, but keeping the same structure used in MVC projects.
+UICreator is a replacement for storyboard and xib files. It directly communicates with UIKit to build views, so at the end of the process, the application will be using all UIKit components. This helps to implement a lot of utility functions to set attributes or do stuff using declarative sentences.
+
                        DESC
 
   s.homepage         = 'https://github.com/umobi/UICreator'

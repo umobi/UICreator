@@ -7,9 +7,7 @@
 
 ## Example
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
-
-## Requirements
+Go check this repository [UICreator Examples](https://github.com/brennobemoura/UICreator-Examples) to learn and test the library.
 
 ## Installation
 
