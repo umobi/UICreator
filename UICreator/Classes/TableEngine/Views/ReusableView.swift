@@ -38,6 +38,6 @@ extension ReusableView {
 
         self.cellLoaded = cell.load
         let host = UICHost(content: cell.rowManager.payload.content)
-        _ = self.contentView.add(host.releaseUIView())
+        self.contentView.add(priority: .init(751), host.releaseUIView())
     }
 }

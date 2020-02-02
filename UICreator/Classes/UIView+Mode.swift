@@ -154,18 +154,13 @@ internal extension UIView {
         return self
     }
 
-    /// The `add(_:)` function is used internally to add views inside view and constraint with 751 of priority in all edges.
-    func add(priority: ConstraintPriority? = nil,_ view: UIView) -> Self {
+    /// The `add(_:)` function is used internally to add views inside view and constraint with required priority in all edges.
+    func add(priority: ConstraintPriority? = nil,_ view: UIView) {
         self.addSubview(view)
 
-        let priority: ConstraintPriority = priority ?? ((self as UIView) is RootView && view is RootView ? .required :
-        .init(751))
-
         view.snp.makeConstraints {
-            $0.edges.equalTo(0).priority(priority)
+            $0.edges.equalTo(0).priority(priority ?? .required)
         }
-        
-        return self
     }
 
     // Mark: - append methods for each state. All them get the old Handler callback associated to the state and add one more in the stack. The engine here stack each callback and execute them starting by the last command to the first command added in to stack
