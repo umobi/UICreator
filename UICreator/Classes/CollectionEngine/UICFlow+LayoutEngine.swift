@@ -22,8 +22,67 @@
 
 import Foundation
 
+public protocol UICCollectionLayoutElement: CollectionLayoutConstraintable {
+
+}
+
+public protocol UICCollectionLayoutSectionElement {
+
+}
+
 public protocol CollectionLayoutConstraintable {
-    
+
+}
+
+public class UICCollectionLayoutSection: UICCollectionLayoutSectionElement {
+    let content: UICCollectionLayoutGroup
+
+    public init(_ contents: @escaping () -> [UICCollectionLayoutElement]) {
+        self.content = UICCollectionLayoutGroup(contents)
+    }
+
+    func size(inside size: CGSize, forItem index: Int) -> CGSize {
+        self.content.size(inside: size, forItem: index)
+    }
+
+    var numberOfItems: Int {
+        self.content.numberOfItems
+    }
+}
+
+class UICCollectionLayoutManager {
+    let contents: [UICCollectionLayoutSection]
+
+    convenience init(contents: [UICCollectionLayoutSectionElement]) {
+        self.init(contents)
+    }
+
+    private init(_ contents: [UICCollectionLayoutSectionElement]) {
+        if contents.contains(where: { $0 is UICCollectionLayoutSection }) {
+            if !contents.allSatisfy { $0 is UICCollectionLayoutSection } {
+                fatalError()
+            }
+
+            self.contents = contents.map {
+                $0 as! UICCollectionLayoutSection
+            }
+            return
+        }
+
+        self.contents = [UICCollectionLayoutSection {
+            contents.map {
+                $0 as! UICCollectionLayoutElement
+            }
+        }]
+    }
+
+    func section(at index: Int) -> UICCollectionLayoutSection {
+        return self.contents[index % self.contents.count]
+    }
+
+    var numberOfSections: Int {
+        self.contents.count
+    }
 }
 
 internal extension CollectionLayoutConstraintable {
@@ -41,142 +100,10 @@ internal extension CollectionLayoutConstraintable {
      }
 }
 
-public struct CollectionLayoutElement {
-    enum Count {
-        case single(CollectionLayoutContent)
-        case sequence([CollectionLayoutContent])
-    }
-
-    let elements: Count
-
-    init(_ single: CollectionLayoutContent) {
-        self.elements = .single(single)
-    }
-
-    init(sequence: [CollectionLayoutContent]) {
-        self.elements = .sequence(sequence)
-    }
-}
-
-public extension CollectionLayoutElement {
-    static func item(vertical: CollectionLayoutSizeConstraint) -> Self {
-        return .init(.item(.init(vertical: vertical)))
-    }
-
-    static func item(horizontal: CollectionLayoutSizeConstraint) -> Self {
-        return .init(.item(.init(horizontal: horizontal)))
-    }
-
-    static func item(vertical: CollectionLayoutSizeConstraint, horizontal: CollectionLayoutSizeConstraint) -> Self {
-        return .init(.item(.init(vertical: vertical, horizontal: horizontal)))
-    }
-}
-
-public extension CollectionLayoutElement {
-    static func items(vertical: CollectionLayoutSizeConstraint, quantity: Int) -> Self {
-        if quantity <= 0 {
-            fatalError()
-        }
-
-        return .init(.items(.init(vertical: vertical), quantity: quantity))
-    }
-
-    static func items(horizontal: CollectionLayoutSizeConstraint, quantity: Int) -> Self {
-        if quantity <= 0 {
-            fatalError()
-        }
-
-        return .init(.items(.init(horizontal: horizontal), quantity: quantity))
-    }
-
-    static func items(vertical: CollectionLayoutSizeConstraint, horizontal: CollectionLayoutSizeConstraint, quantity: Int) -> Self {
-        if quantity <= 0 {
-            fatalError()
-        }
-
-        return .init(.items(.init(vertical: vertical, horizontal: horizontal), quantity: quantity))
-    }
-}
-
-public extension CollectionLayoutElement {
-    static func sequence(_ elements: @escaping () -> [CollectionLayoutElement]) -> Self {
-        return .init(sequence: elements().map {
-            guard case .single(let content) = $0.elements else {
-                fatalError()
-            }
-
-            return content
-        })
-    }
-
-    var asArray: [CollectionLayoutContent] {
-        switch self.elements {
-        case .sequence(let array):
-            return array
-        case .single(let content):
-            return [content]
-        }
-    }
-
-    var asGroup: CollectionLayoutGroup {
-        return .init(vertical: .flexible(1), content: self.asArray)
-    }
-}
-
-public extension CollectionLayoutElement {
-    static func group(vertical: CollectionLayoutSizeConstraint, content: @escaping () -> CollectionLayoutElement) -> Self {
-        return .init(.group(.init(vertical: vertical, content: content().asArray)))
-    }
-
-    static func group(horizontal: CollectionLayoutSizeConstraint, content: @escaping () -> CollectionLayoutElement) -> Self {
-        return .init(.group(.init(horizontal: horizontal, content: content().asArray)))
-    }
-
-    static func group(vertical: CollectionLayoutSizeConstraint, horizontal: CollectionLayoutSizeConstraint, content: @escaping () -> CollectionLayoutElement) -> Self {
-        return .init(.group(.init(vertical: vertical, horizontal: horizontal, content: content().asArray)))
-    }
-}
-
-public struct CollectionLayoutSection {
-    let element: CollectionLayoutElement
-    init(_ element: CollectionLayoutElement) {
-        self.element = element
-    }
-
-    func size(inside size: CGSize, forItem index: Int) -> CGSize {
-        return element.asGroup.size(inside: size, forItem: index)
-    }
-}
-
-public extension CollectionLayoutSection {
-    static func section(content: @escaping () -> CollectionLayoutElement) -> Self {
-        return .init(content())
-    }
-}
-
-public extension Array where Element == CollectionLayoutSection {
-    static func sequence(_ sections: @escaping () -> [Element]) -> [Element] {
-        return sections()
-    }
-
-    static func section(content: @escaping () -> CollectionLayoutElement) -> [Element] {
-        return [.section(content: content)]
-    }
-
-    func section(at index: Int) -> CollectionLayoutSection? {
-        if self.isEmpty {
-            return nil
-        }
-
-        let index = index % self.count
-        return self[index]
-    }
-}
-
 public extension UICFlow {
-    func layoutMaker(content: @escaping () -> [CollectionLayoutSection]) -> Self {
+    func layoutMaker(content: @escaping () -> [UICCollectionLayoutSectionElement]) -> Self {
         return self.onInTheScene {
-            ($0 as? View)?.layoutGroup = content()
+            ($0 as? View)?.layoutManager = UICCollectionLayoutManager(contents: content())
             ($0 as? View)?.collectionViewLayout.invalidateLayout()
         }
     }

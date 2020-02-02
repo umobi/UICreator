@@ -22,26 +22,29 @@
 
 import Foundation
 
-public class CollectionLayoutItem: CollectionLayoutConstraintable {
+public class UICCollectionLayoutItem: UICCollectionLayoutSectionElement, UICCollectionLayoutElement {
     let vertical: CollectionLayoutSizeConstraint?
     let horizontal: CollectionLayoutSizeConstraint?
+    let numberOfElements: Int?
 
-    public init() {
-        self.vertical = nil
-        self.horizontal = nil
+    convenience public init(vertical: CollectionLayoutSizeConstraint, horizontal: CollectionLayoutSizeConstraint, numberOfElements: Int? = nil) {
+        self.init(vertical, horizontal, numberOfElements)
     }
 
-    public init(vertical: CollectionLayoutSizeConstraint) {
-        self.vertical = vertical
-        self.horizontal = nil
+    convenience public init(horizontal: CollectionLayoutSizeConstraint, numberOfElements: Int? = nil) {
+        self.init(nil, horizontal, numberOfElements)
     }
 
-    public init(horizontal: CollectionLayoutSizeConstraint) {
-        self.horizontal = horizontal
-        self.vertical = nil
+    convenience public init(vertical: CollectionLayoutSizeConstraint, numberOfElements: Int? = nil) {
+        self.init(vertical, nil, numberOfElements)
     }
 
-    public init(vertical: CollectionLayoutSizeConstraint, horizontal: CollectionLayoutSizeConstraint) {
+    convenience public init(numberOfElements: Int? = nil) {
+        self.init(nil, nil, numberOfElements)
+    }
+
+    private init(_ vertical: CollectionLayoutSizeConstraint?,_ horizontal: CollectionLayoutSizeConstraint?,_ numberOfElements: Int?) {
+        self.numberOfElements = numberOfElements
         self.vertical = vertical
         self.horizontal = horizontal
     }

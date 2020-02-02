@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 
 private var kCollectionListManager: UInt = 0
-private var kCollectionLayoutGroup: UInt = 0
+private var kCollectionLayoutManager: UInt = 0
 
 extension UICollectionView {
     var manager: ListCollectionManager? {
@@ -32,8 +32,8 @@ extension UICollectionView {
         set { objc_setAssociatedObject(self, &kCollectionListManager, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
-    var layoutGroup: [CollectionLayoutSection]? {
-        get { objc_getAssociatedObject(self, &kCollectionLayoutGroup) as? [CollectionLayoutSection] }
-        set { objc_setAssociatedObject(self, &kCollectionLayoutGroup, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    var layoutManager: UICCollectionLayoutManager? {
+        get { objc_getAssociatedObject(self, &kCollectionLayoutManager) as? UICCollectionLayoutManager }
+        set { objc_setAssociatedObject(self, &kCollectionLayoutManager, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 }

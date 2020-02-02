@@ -25,10 +25,10 @@ import UIKit
 
 extension _CollectionView: UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        guard let wrapper = self.layoutGroup?.section(at: indexPath.section) else {
+        guard let section = self.layoutManager?.section(at: indexPath.section) else {
             return .zero
         }
 
-        return wrapper.size(inside: collectionView.frame.size, forItem: indexPath.row)
+        return section.size(inside: collectionView.frame.size, forItem: indexPath.row)
     }
 }
