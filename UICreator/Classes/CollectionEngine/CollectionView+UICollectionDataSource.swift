@@ -49,6 +49,10 @@ extension _CollectionView: UICollectionViewDataSource {
 
         if let item = self.layoutManager?.item(at: indexPath), item.isDynamic, let loaded = cell.cellLoaded {
             _ = cell.contentView.subviews.first?.appendLayout { [weak self, loaded] view in
+                guard view.frame.size != .zero else {
+                    return
+                }
+
                 guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath)
                     .horizontal(.equalTo(view.frame.width))
                     .vertical(.equalTo(view.frame.height))) else { return }
@@ -74,6 +78,9 @@ extension _CollectionView: UICollectionViewDataSource {
 
             if let item = self.layoutManager?.header(at: indexPath.section), item.isDynamic, let loaded = cell.cellLoaded {
                 _ = cell.contentView.subviews.first?.appendLayout { [weak self, loaded] view in
+                    guard view.frame.size != .zero else {
+                        return
+                    }
                     guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath.section)
                         .horizontal(.equalTo(view.frame.width))
                         .vertical(.equalTo(view.frame.height))) else { return }
@@ -96,6 +103,9 @@ extension _CollectionView: UICollectionViewDataSource {
 
             if let item = self.layoutManager?.footer(at: indexPath.section), item.isDynamic, let loaded = cell.cellLoaded {
                 _ = cell.contentView.subviews.first?.appendLayout { [weak self, loaded] view in
+                    guard view.frame.size != .zero else {
+                        return
+                    }
                     guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath.section)
                         .horizontal(.equalTo(view.frame.width))
                         .vertical(.equalTo(view.frame.height))) else { return }
