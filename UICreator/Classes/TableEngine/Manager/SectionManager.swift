@@ -220,6 +220,11 @@ extension ListManager.SectionManager {
 
 extension ListManager.SectionManager: ListContentDelegate {
     func content(_ compactCopy: ListManager.RowManager.Copy, updatedWith sequence: [ListManager.RowManager]) {
+        if self.rows.isEmpty {
+            self.listManager.content(updateSection: self.rows(sequence))
+            return
+        }
+        
         var updateRows = sequence
         let rows = self.rows.reduce([ListManager.RowManager]()) { sum, next -> [ListManager.RowManager] in
             if next.identifier == compactCopy.identifier {
