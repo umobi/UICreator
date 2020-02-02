@@ -27,6 +27,7 @@ public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCol
     let contents: [UICCollectionLayoutElement]
     let vertical: CollectionLayoutSizeConstraint?
     let horizontal: CollectionLayoutSizeConstraint?
+    private(set) var insets: UIEdgeInsets = .zero
 
     convenience public init(vertical: CollectionLayoutSizeConstraint, horizontal: CollectionLayoutSizeConstraint,_ contents: @escaping () -> [UICCollectionLayoutElement]) {
         self.init(vertical, horizontal, contents)
@@ -50,14 +51,31 @@ public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCol
         self.horizontal = horizontal
     }
 
+    public func insets(_ margins: Margin..., equalTo constant: CGFloat) -> UICCollectionLayoutGroup {
+        margins.forEach {
+            switch $0 {
+            case .top:
+                self.insets = .init(top: constant, left: self.insets.left, bottom: self.insets.bottom, right: self.insets.right)
+            case .bottom:
+                self.insets = .init(top: self.insets.top, left: self.insets.left, bottom: constant, right: self.insets.right)
+            case .leading:
+                self.insets = .init(top: self.insets.top, left: constant, bottom: self.insets.bottom, right: self.insets.right)
+            case .trailing:
+                self.insets = .init(top: self.insets.top, left: self.insets.left, bottom: self.insets.bottom, right: constant)
+            }
+        }
+
+        return self
+    }
+
     private func size(_ size: CGSize) -> CGSize {
         return .init(
-            width: self.size(relatedTo: size.width, applying: self.horizontal),
-            height: self.size(relatedTo: size.height, applying: self.vertical)
+            width: (self.size(relatedTo: size.width, applying: self.horizontal)) - (self.insets.left + self.insets.right),
+            height: self.size(relatedTo: size.height, applying: self.vertical) - (self.insets.top + self.insets.bottom)
         )
     }
 
-    func size(inside size: CGSize, forItem index: Int) -> CGSize {
+    private func size(inside size: CGSize, forItem index: Int, at indexPath: IndexPath) -> CGSize {
         let size = self.size(size)
         var index = index % self.numberOfItems
         for content in self.contents {
@@ -65,14 +83,14 @@ public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCol
             case let item as UICCollectionLayoutItem:
                 if let numberOfElements = item.numberOfElements {
                     if (0 ..< numberOfElements).contains(index) {
-                        return item.size(size)
+                        return item.size(size, at: indexPath)
                     }
 
                     index -= numberOfElements
 
                 } else {
                     if index == 0 {
-                        return item.size(size)
+                        return item.size(size, at: indexPath)
                     }
 
                     index -= 1
@@ -81,7 +99,7 @@ public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCol
             case let group as UICCollectionLayoutGroup:
                 let groupNumberOfItems = group.numberOfItems
                 if groupNumberOfItems > index {
-                    return group.size(inside: size, forItem: index)
+                    return group.size(inside: size, forItem: index, at: indexPath)
                 }
                 index -= groupNumberOfItems
 
@@ -91,6 +109,10 @@ public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCol
         }
 
         return size
+    }
+
+    func size(inside size: CGSize, at indexPath: IndexPath) -> CGSize {
+        self.size(inside: size, forItem: indexPath.row, at: indexPath)
     }
 
     var numberOfItems: Int {
@@ -104,5 +126,41 @@ public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCol
                 fatalError()
             }
         }
+    }
+
+    func item(at index: Int) -> UICCollectionLayoutItem {
+        var index = index % self.numberOfItems
+
+        for content in self.contents {
+            switch content {
+            case let item as UICCollectionLayoutItem:
+                if let numberOfElements = item.numberOfElements {
+                    if (0 ..< numberOfElements).contains(index) {
+                        return item
+                    }
+
+                    index -= numberOfElements
+
+                } else {
+                    if index == 0 {
+                        return item
+                    }
+
+                    index -= 1
+                }
+
+            case let group as UICCollectionLayoutGroup:
+                let groupNumberOfItems = group.numberOfItems
+                if groupNumberOfItems > index {
+                    return group.item(at: index)
+                }
+                index -= groupNumberOfItems
+
+            default:
+                 break
+            }
+        }
+
+        fatalError()
     }
 }

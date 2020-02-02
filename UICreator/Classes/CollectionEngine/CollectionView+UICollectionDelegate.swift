@@ -24,5 +24,4 @@ import Foundation
 import UIKit
 
 extension _CollectionView: UICollectionViewDelegate {
-
 }

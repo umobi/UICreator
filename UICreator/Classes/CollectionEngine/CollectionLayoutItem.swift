@@ -22,10 +22,120 @@
 
 import Foundation
 
+struct UICCollectionLayoutModifiedItem: CollectionLayoutConstraintable {
+    let indexPath: IndexPath
+    let vertical: CollectionLayoutSizeConstraint?
+    let horizontal: CollectionLayoutSizeConstraint?
+
+    init(_ item: UICCollectionLayoutItem, at indexPath: IndexPath) {
+        self.vertical = item.vertical
+        self.horizontal = item.horizontal
+        self.indexPath = indexPath
+    }
+
+    init(_ item: UICCollectionLayoutSupplementary, at indexPath: IndexPath) {
+        self.vertical = item.vertical
+        self.horizontal = item.horizontal
+        self.indexPath = indexPath
+    }
+
+    private init(_ original: UICCollectionLayoutModifiedItem, editable: Editable) {
+        self.vertical = editable.vertical
+        self.horizontal = editable.horizontal
+        self.indexPath = original.indexPath
+    }
+
+    private func edit(_ edit: @escaping (Editable) -> Void) -> Self {
+        let editable = Editable(self)
+        edit(editable)
+        return .init(self, editable: editable)
+    }
+
+    func vertical(_ constraint: CollectionLayoutSizeConstraint) -> Self {
+        guard self.vertical?.isDynamic ?? false else {
+            return self
+        }
+
+        return self.edit {
+            $0.vertical = constraint
+        }
+    }
+
+    func horizontal(_ constraint: CollectionLayoutSizeConstraint) -> Self {
+        guard self.horizontal?.isDynamic ?? false else {
+            return self
+        }
+
+        return self.edit {
+            $0.horizontal = constraint
+        }
+    }
+
+    func size(_ size: CGSize) -> CGSize {
+        return .init(
+            width: self.size(relatedTo: size.width, applying: self.horizontal),
+            height: self.size(relatedTo: size.height, applying: self.vertical)
+        )
+    }
+
+    func willChangeSize(whenReplacedWith copy: UICCollectionLayoutModifiedItem) -> Bool {
+        var didChangedSize = true
+
+        if case .equalTo(let constant)? = self.vertical {
+            if case .equalTo(let newConstant)? = copy.vertical {
+                didChangedSize = didChangedSize && constant != newConstant
+            }
+        }
+
+        if case .equalTo(let constant)? = self.horizontal {
+            if case .equalTo(let newConstant)? = copy.horizontal {
+                didChangedSize = didChangedSize && constant != newConstant
+            }
+        }
+
+        return didChangedSize
+    }
+
+    private class Editable {
+        var vertical: CollectionLayoutSizeConstraint?
+        var horizontal: CollectionLayoutSizeConstraint?
+
+        init(_ modifiedItem: UICCollectionLayoutModifiedItem) {
+            self.vertical = modifiedItem.vertical
+            self.horizontal = modifiedItem.horizontal
+        }
+    }
+}
+
+extension UICCollectionLayoutItem {
+    func modify(at indexPath: IndexPath) -> UICCollectionLayoutModifiedItem {
+        return .init(self, at: indexPath)
+    }
+
+    func modified(_ modified: UICCollectionLayoutModifiedItem) -> Bool {
+        var modified: UICCollectionLayoutModifiedItem? = modified
+
+        var needToInvalidadeSize = true
+        self.modifiedItems = self.modifiedItems.compactMap {
+            if let copyModified = modified, $0.indexPath == copyModified.indexPath {
+                modified = nil
+                needToInvalidadeSize = $0.willChangeSize(whenReplacedWith: copyModified)
+                return copyModified
+            }
+
+            return $0
+            } + [modified].compactMap { $0 }
+
+        return needToInvalidadeSize
+    }
+}
+
 public class UICCollectionLayoutItem: UICCollectionLayoutSectionElement, UICCollectionLayoutElement {
     let vertical: CollectionLayoutSizeConstraint?
     let horizontal: CollectionLayoutSizeConstraint?
     let numberOfElements: Int?
+
+    fileprivate var modifiedItems: [UICCollectionLayoutModifiedItem] = []
 
     convenience public init(vertical: CollectionLayoutSizeConstraint, horizontal: CollectionLayoutSizeConstraint, numberOfElements: Int? = nil) {
         self.init(vertical, horizontal, numberOfElements)
@@ -49,7 +159,15 @@ public class UICCollectionLayoutItem: UICCollectionLayoutSectionElement, UICColl
         self.horizontal = horizontal
     }
 
-    func size(_ size: CGSize) -> CGSize {
+    var isDynamic: Bool {
+        return (self.vertical?.isDynamic ?? false) || (self.horizontal?.isDynamic ?? false)
+    }
+
+    func size(_ size: CGSize, at indexPath: IndexPath) -> CGSize {
+        if let modified = self.modifiedItems.first(where: { $0.indexPath == indexPath }) {
+            return modified.size(size)
+        }
+        
         return .init(
             width: self.size(relatedTo: size.width, applying: self.horizontal),
             height: self.size(relatedTo: size.height, applying: self.vertical)

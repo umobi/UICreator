@@ -21,39 +21,45 @@
 //
 
 import Foundation
+import UIKit
 
-
-extension _CollectionView: ListSupport {
-
-}
-
-public extension UICFlow {
-    convenience init(_ contents: @escaping () -> [ViewCreator]) {
-        self.init(ListManager(contents: contents()))
+public class CollectionReusableView: UICollectionReusableView, ReusableView {
+    var contentView: UIView {
+        return self
     }
-    
-    private convenience init(_ manager: ListManager) {
-        self.init()
 
-        guard let collectionView = self.uiView as? View else {
-            return
-        }
+    var cellLoaded: UICCell.Loaded!
 
-        manager.rowsIdentifier.forEach {
-            collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
-        }
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.backgroundColor = .clear
+    }
 
-        manager.headersIdentifier.forEach {
-            collectionView.register(CollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: $0)
-        }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
-        manager.footersIdentifier.forEach {
-            collectionView.register(CollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: $0)
-        }
+    override public func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        self.commitNotRendered()
+    }
 
-        collectionView.manager = manager
-        collectionView.dataSource = collectionView
-        collectionView.delegate = collectionView
-        manager.list = collectionView
+    override public func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        self.commitRendered()
+    }
+
+    override public func didMoveToWindow() {
+        super.didMoveToWindow()
+        self.commitInTheScene()
+    }
+
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        self.commitLayout()
+    }
+
+    public override var watchingViews: [UIView] {
+        return self.contentView.subviews
     }
 }
