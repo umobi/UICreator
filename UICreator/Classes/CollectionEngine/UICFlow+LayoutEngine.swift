@@ -107,8 +107,9 @@ public class UICCollectionLayoutSection: UICCollectionLayoutSectionElement {
     let content: UICCollectionLayoutGroup
     let header: UICCollectionLayoutHeader?
     let footer: UICCollectionLayoutFooter?
+    let numberOfSections: Int?
 
-    public init(_ contents: @escaping () -> [UICCollectionLayoutSectionElement]) {
+    public init(numberOfSections: Int? = nil, _ contents: @escaping () -> [UICCollectionLayoutSectionElement]) {
         let contents = contents()
 
         if contents.contains(where: { $0 is UICCollectionLayoutSection }) {
@@ -123,6 +124,7 @@ public class UICCollectionLayoutSection: UICCollectionLayoutSectionElement {
             fatalError()
         }
 
+        self.numberOfSections = numberOfSections
         self.content = UICCollectionLayoutGroup {
             contents.compactMap {
                 $0 as? UICCollectionLayoutElement
@@ -188,11 +190,31 @@ class UICCollectionLayoutManager {
     }
 
     func section(at index: Int) -> UICCollectionLayoutSection {
-        return self.contents[index % self.contents.count]
+        var index = index % self.numberOfSections
+
+        for section in self.contents {
+            if let numberOfSections = section.numberOfSections {
+                if (0..<numberOfSections).contains(index) {
+                    return section
+                }
+
+                index -= numberOfSections
+            } else {
+                if index == 0 {
+                    return section
+                }
+
+                index -= 1
+            }
+        }
+
+        fatalError()
     }
 
     var numberOfSections: Int {
-        self.contents.count
+        self.contents.reduce(0) {
+            $0 + ($1.numberOfSections ?? 1)
+        }
     }
 
     func header(at section: Int) -> UICCollectionLayoutHeader? {

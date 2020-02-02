@@ -26,23 +26,27 @@ struct UICCollectionLayoutModifiedItem: CollectionLayoutConstraintable {
     let indexPath: IndexPath
     let vertical: CollectionLayoutSizeConstraint?
     let horizontal: CollectionLayoutSizeConstraint?
+    weak var delegate: UICCollectionLayoutGroupDelegate?
 
     init(_ item: UICCollectionLayoutItem, at indexPath: IndexPath) {
         self.vertical = item.vertical
         self.horizontal = item.horizontal
         self.indexPath = indexPath
+        self.delegate = item.delegate
     }
 
     init(_ item: UICCollectionLayoutSupplementary, at indexPath: IndexPath) {
         self.vertical = item.vertical
         self.horizontal = item.horizontal
         self.indexPath = indexPath
+        self.delegate = nil
     }
 
     private init(_ original: UICCollectionLayoutModifiedItem, editable: Editable) {
         self.vertical = editable.vertical
         self.horizontal = editable.horizontal
         self.indexPath = original.indexPath
+        self.delegate = original.delegate
     }
 
     private func edit(_ edit: @escaping (Editable) -> Void) -> Self {
@@ -52,7 +56,7 @@ struct UICCollectionLayoutModifiedItem: CollectionLayoutConstraintable {
     }
 
     func vertical(_ constraint: CollectionLayoutSizeConstraint) -> Self {
-        guard self.vertical?.isDynamic ?? false else {
+        guard !(self.delegate?.isVerticalValid ?? true) || (self.vertical?.isDynamic ?? false) else {
             return self
         }
 
@@ -62,7 +66,7 @@ struct UICCollectionLayoutModifiedItem: CollectionLayoutConstraintable {
     }
 
     func horizontal(_ constraint: CollectionLayoutSizeConstraint) -> Self {
-        guard self.horizontal?.isDynamic ?? false else {
+        guard !(self.delegate?.isHorizontalValid ?? true) || (self.horizontal?.isDynamic ?? false) else {
             return self
         }
 
@@ -130,10 +134,17 @@ extension UICCollectionLayoutItem {
     }
 }
 
+protocol UICCollectionLayoutGroupDelegate: class {
+    var isVerticalValid: Bool { get }
+    var isHorizontalValid: Bool { get }
+}
+
 public class UICCollectionLayoutItem: UICCollectionLayoutSectionElement, UICCollectionLayoutElement {
     let vertical: CollectionLayoutSizeConstraint?
     let horizontal: CollectionLayoutSizeConstraint?
     let numberOfElements: Int?
+
+    weak var delegate: UICCollectionLayoutGroupDelegate!
 
     fileprivate var modifiedItems: [UICCollectionLayoutModifiedItem] = []
 
@@ -160,7 +171,7 @@ public class UICCollectionLayoutItem: UICCollectionLayoutSectionElement, UICColl
     }
 
     var isDynamic: Bool {
-        return (self.vertical?.isDynamic ?? false) || (self.horizontal?.isDynamic ?? false)
+        return !self.delegate.isVerticalValid || !self.delegate.isHorizontalValid || (self.vertical?.isDynamic ?? false ) || (self.horizontal?.isDynamic ?? false)
     }
 
     func size(_ size: CGSize, at indexPath: IndexPath) -> CGSize {

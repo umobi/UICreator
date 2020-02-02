@@ -22,12 +22,23 @@
 
 import Foundation
 
+extension UICCollectionLayoutGroup: UICCollectionLayoutGroupDelegate {
+    var isVerticalValid: Bool {
+        !(self.vertical?.isDynamic ?? true) || (self.delegate?.isVerticalValid ?? false)
+    }
+
+    var isHorizontalValid: Bool {
+        !(self.horizontal?.isDynamic ?? true) || (self.delegate?.isHorizontalValid ?? false)
+    }
+}
+
 public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCollectionLayoutElement {
 
     let contents: [UICCollectionLayoutElement]
     let vertical: CollectionLayoutSizeConstraint?
     let horizontal: CollectionLayoutSizeConstraint?
     private(set) var insets: UIEdgeInsets = .zero
+    weak var delegate: UICCollectionLayoutGroupDelegate!
 
     convenience public init(vertical: CollectionLayoutSizeConstraint, horizontal: CollectionLayoutSizeConstraint,_ contents: @escaping () -> [UICCollectionLayoutElement]) {
         self.init(vertical, horizontal, contents)
@@ -49,6 +60,15 @@ public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCol
         self.contents = contents()
         self.vertical = vertical
         self.horizontal = horizontal
+
+        self.contents.forEach {
+            if let group = $0 as? UICCollectionLayoutGroup {
+                group.delegate = self
+                return
+            }
+
+            ($0 as? UICCollectionLayoutItem)?.delegate = self
+        }
     }
 
     public func insets(_ margins: Margin..., equalTo constant: CGFloat) -> UICCollectionLayoutGroup {
