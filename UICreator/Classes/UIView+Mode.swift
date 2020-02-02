@@ -158,8 +158,11 @@ internal extension UIView {
     func add(priority: ConstraintPriority? = nil,_ view: UIView) {
         self.addSubview(view)
 
+        let priority: ConstraintPriority = priority ?? ((self as UIView) is RootView && view is RootView ? .required :
+        .init(751))
+
         view.snp.makeConstraints {
-            $0.edges.equalTo(0).priority(priority ?? .required)
+            $0.edges.equalTo(0).priority(priority)
         }
     }
 
