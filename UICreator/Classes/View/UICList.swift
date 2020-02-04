@@ -24,6 +24,22 @@ import Foundation
 import UIKit
 
 public class TableView: UITableView {
+    var _backgroundView: UIView? = nil
+
+    override open var backgroundView: UIView? {
+        get { _backgroundView ?? super.backgroundView }
+        set {
+            if let newValue = newValue {
+                _backgroundView = newValue
+                self.setNeedsLayout()
+                return
+            }
+
+            _backgroundView = nil
+            super.backgroundView = nil
+        }
+    }
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.commitNotRendered()
@@ -42,6 +58,12 @@ public class TableView: UITableView {
     override public func layoutSubviews() {
         super.layoutSubviews()
         self.commitLayout()
+
+        if let backgroundView = self._backgroundView {
+            self._backgroundView = nil
+
+            super.backgroundView = backgroundView
+        }
     }
 }
 
@@ -199,61 +221,97 @@ public extension UIViewCreator where View: UITableView {
     }
 
     func header(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> Self {
-        return self.onRendered {
-            if let size = size {
+        if let size = size {
+            return self.onRendered {
                 ($0 as? View)?.tableHeaderView = UICHost(size: size, content: content).releaseUIView()
-                return
+            }
+        }
+
+        return self.onLayout { view in
+            if (view as? View)?.tableHeaderView == nil {
+                (view as? View)?.tableHeaderView = UICHost(content: content).onLayout { _ in
+                    (view as? View)?.reloadHeaderViewSize()
+                }.releaseUIView()
             }
 
-            guard let tableView = $0 as? View else {
-                return
-            }
-
-            tableView.tableHeaderView = HeaderFooterResizableView(content) { [weak tableView] in
-                tableView?.tableHeaderView = $0
-            }
-
+            (view as? View)?.reloadHeaderViewSize()
         }
     }
 
     func footer(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> Self {
-        return self.onRendered {
-            if let size = size {
+        if let size = size {
+            return self.onRendered {
                 ($0 as? View)?.tableFooterView = UICHost(size: size, content: content).releaseUIView()
-                return
+            }
+        }
+
+        return self.onLayout { view in
+            if (view as? View)?.tableFooterView == nil {
+                (view as? View)?.tableFooterView = UICHost(content: content).onLayout { _ in
+                    (view as? View)?.reloadFooterViewSize()
+                }.releaseUIView()
             }
 
-            guard let tableView = $0 as? View else {
-                return
-            }
-
-            tableView.tableFooterView = HeaderFooterResizableView(content) { [weak tableView] in
-                tableView?.tableFooterView = $0
-            }
+            (view as? View)?.reloadFooterViewSize()
         }
     }
 }
 
-class HeaderFooterResizableView: UIView {
-    init(_ content: @escaping () -> ViewCreator, onLayoutChanged: @escaping (UIView) -> Void) {
-        super.init(frame: .zero)
+private var kHeaderHeight: UInt = 0
+private var kFooterHeight: UInt = 0
 
-        let hostView: UIView! = UICHost(content: content).releaseUIView()
-        self.add(priority: .low, hostView.appendLayout { [weak self] in
-            guard let self = self else {
-                return
-            }
-            self.frame.size = $0.frame.size
-            onLayoutChanged(self)
-        })
+extension UITableView {
+    var lastHeaderHeight: CGFloat {
+        get { (objc_getAssociatedObject(self, &kHeaderHeight) as? CGFloat) ?? .zero }
+        set { objc_setAssociatedObject(self, &kHeaderHeight, newValue, .OBJC_ASSOCIATION_RETAIN)}
     }
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    var lastFooterHeight: CGFloat {
+        get { (objc_getAssociatedObject(self, &kFooterHeight) as? CGFloat) ?? .zero }
+        set { objc_setAssociatedObject(self, &kFooterHeight, newValue, .OBJC_ASSOCIATION_RETAIN)}
     }
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    private func layoutHeaderFooterView(_ someView: UIView) -> CGFloat {
+        let oldSize = CGSize(width: self.frame.width, height: someView.frame.height)
+        someView.frame.size = oldSize
+
+        let height = someView.systemLayoutSizeFitting(.init(width: self.frame.width, height: 0), withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel).height
+        let size = CGSize(width: self.frame.width, height: height)
+
+        someView.frame.size = size
+        return height
+    }
+
+    func reloadFooterViewSize() {
+        guard let footerView = self.tableFooterView else {
+            return
+        }
+
+        let newHeight = self.layoutHeaderFooterView(footerView)
+
+        guard newHeight != self.lastFooterHeight else {
+            return
+        }
+
+        self.lastFooterHeight = newHeight
+        self.tableFooterView = footerView
+    }
+
+    func reloadHeaderViewSize() {
+        guard let headerView = self.tableHeaderView else {
+            return
+        }
+
+
+        let newHeight = self.layoutHeaderFooterView(headerView)
+
+        guard newHeight != self.lastHeaderHeight else {
+            return
+        }
+
+        self.lastHeaderHeight = newHeight
+
+        self.tableHeaderView = headerView
     }
 }
 

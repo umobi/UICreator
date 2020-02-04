@@ -29,7 +29,7 @@ public class UICHost: Root, ViewControllerType, UIViewCreator {
         super.init()
 //        super.init(loader: nil)
         self.uiView.frame = .init(origin: self.uiView.frame.origin, size: size)
-        self.uiView.add(content().releaseUIView())
+        self.uiView.add(priority: .required, content().releaseUIView())
     }
 }
 
