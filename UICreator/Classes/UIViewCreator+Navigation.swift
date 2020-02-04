@@ -42,7 +42,7 @@ internal extension ViewCreator {
 
 public extension ViewCreator {
     var navigation: NavigationRepresentable? {
-        return self.uiView.navigation
+        return self.uiView.viewController.navigationController?.view.navigation
     }
 }
 

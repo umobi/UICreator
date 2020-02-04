@@ -109,18 +109,24 @@ public extension NavigationRepresentable {
     @discardableResult
     func popTo(view: ViewCreator, animated: Bool) -> Self {
         guard let viewController = self.navigationController.viewControllers.first(where: {
-            guard let controller = $0 as? ContainerController<UICHost> else {
-                return false
-            }
-
-            return controller.contentView.uiView.subviews.first(where: {
-                $0 === view.uiView
-            }) != nil
+            $0.view.contains(view: view.uiView)
         }) else {
             fatalError("\(type(of: view)) is not on first hierarchy")
         }
 
         self.navigationController.popToViewController(viewController, animated: animated)
         return self
+    }
+}
+
+extension UIView {
+    func contains(view: UIView) -> Bool {
+        if self === view {
+            return true
+        }
+
+        return self.subviews.first(where: {
+            $0.contains(view: view)
+        }) != nil
     }
 }
