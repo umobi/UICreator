@@ -198,16 +198,62 @@ public extension UIViewCreator where View: UITableView {
         }
     }
 
-    func header(size: CGSize = .zero, _ content: @escaping () -> ViewCreator) -> Self {
+    func header(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> Self {
         return self.onRendered {
-            ($0 as? View)?.tableHeaderView = UICHost(size: size, content: content).releaseUIView()
+            if let size = size {
+                ($0 as? View)?.tableHeaderView = UICHost(size: size, content: content).releaseUIView()
+                return
+            }
+
+            guard let tableView = $0 as? View else {
+                return
+            }
+
+            tableView.tableHeaderView = HeaderFooterResizableView(content) { [weak tableView] in
+                tableView?.tableHeaderView = $0
+            }
+
         }
     }
 
-    func footer(size: CGSize = .zero, _ content: @escaping () -> ViewCreator) -> Self {
+    func footer(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> Self {
         return self.onRendered {
-            ($0 as? View)?.tableFooterView = UICHost(size: size, content: content).releaseUIView()
+            if let size = size {
+                ($0 as? View)?.tableFooterView = UICHost(size: size, content: content).releaseUIView()
+                return
+            }
+
+            guard let tableView = $0 as? View else {
+                return
+            }
+
+            tableView.tableFooterView = HeaderFooterResizableView(content) { [weak tableView] in
+                tableView?.tableFooterView = $0
+            }
         }
+    }
+}
+
+class HeaderFooterResizableView: UIView {
+    init(_ content: @escaping () -> ViewCreator, onLayoutChanged: @escaping (UIView) -> Void) {
+        super.init(frame: .zero)
+
+        let hostView: UIView! = UICHost(content: content).releaseUIView()
+        self.add(priority: .low, hostView.appendLayout { [weak self] in
+            guard let self = self else {
+                return
+            }
+            self.frame.size = $0.frame.size
+            onLayoutChanged(self)
+        })
+    }
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 

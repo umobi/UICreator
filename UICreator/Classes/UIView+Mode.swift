@@ -203,3 +203,13 @@ internal extension UIView {
         }
     }
 }
+
+extension UIView {
+    override open var debugDescription: String {
+        if let viewCreator = self.viewCreator {
+            return "\(type(of: viewCreator))"
+        }
+
+        return "\(type(of: self))"
+    }
+}
