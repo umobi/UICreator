@@ -29,8 +29,14 @@ public class UIViewWrapper {
         self.wrap = wrap
     }
 
+    /// This will retain view on viewCreator
     public weak var uiView: UIView! {
         return self.wrap.uiView
+    }
+
+    /// This changes the keeper reference to UIView
+    public func releaseUIView() -> UIView! {
+        return self.wrap.releaseUIView()
     }
 }
 
