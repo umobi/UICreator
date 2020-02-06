@@ -24,21 +24,6 @@ import Foundation
 import UIKit
 
 public class TableView: UITableView {
-    var _backgroundView: UIView? = nil
-
-    override open var backgroundView: UIView? {
-        get { _backgroundView ?? super.backgroundView }
-        set {
-            if let newValue = newValue {
-                _backgroundView = newValue
-                self.setNeedsLayout()
-                return
-            }
-
-            _backgroundView = nil
-            super.backgroundView = nil
-        }
-    }
 
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
@@ -58,13 +43,6 @@ public class TableView: UITableView {
     override public func layoutSubviews() {
         super.layoutSubviews()
         self.commitLayout()
-
-        if let backgroundView = self._backgroundView {
-            self._backgroundView = nil
-
-            backgroundView.translatesAutoresizingMaskIntoConstraints = true
-            super.backgroundView = backgroundView
-        }
     }
 }
 
@@ -183,8 +161,17 @@ public extension UIViewCreator where View: UITableView {
     }
 
     func background(_ content: @escaping () -> ViewCreator) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.backgroundView = UICHost(content: content).releaseUIView()
+        self.onNotRendered { tableView in
+            UICResized(superview: (tableView as? View)?.backgroundView)
+                .onAdd {
+                    (tableView as? View)?.backgroundView = $0
+                }.addSubview(
+                    UICHost(content: content)
+                        .releaseUIView()
+                )
+                .height(.required)
+                .width(.required)
+                .watch()
         }
     }
 
@@ -222,38 +209,30 @@ public extension UIViewCreator where View: UITableView {
     }
 
     func header(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> Self {
-        if let size = size {
-            return self.onRendered {
-                ($0 as? View)?.tableHeaderView = UICHost(size: size, content: content).releaseUIView()
-            }
-        }
-
-        return self.onLayout { view in
-            if (view as? View)?.tableHeaderView == nil {
-                (view as? View)?.tableHeaderView = UICHost(content: content).onLayout { _ in
-                    (view as? View)?.reloadHeaderViewSize()
-                }.releaseUIView()
-            }
-
-            (view as? View)?.reloadHeaderViewSize()
+        self.onRendered { tableView in
+            UICResized(size: size, superview: (tableView as? View)?.tableHeaderView)
+                .onAdd {
+                    (tableView as? View)?.tableHeaderView = $0
+                }.addSubview(
+                    UICHost(content: content)
+                        .releaseUIView()
+                )
+                .width(.required)
+                .watch(in: tableView)
         }
     }
 
     func footer(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> Self {
-        if let size = size {
-            return self.onRendered {
-                ($0 as? View)?.tableFooterView = UICHost(size: size, content: content).releaseUIView()
-            }
-        }
-
-        return self.onLayout { view in
-            if (view as? View)?.tableFooterView == nil {
-                (view as? View)?.tableFooterView = UICHost(content: content).onLayout { _ in
-                    (view as? View)?.reloadFooterViewSize()
-                }.releaseUIView()
-            }
-
-            (view as? View)?.reloadFooterViewSize()
+        self.onRendered { tableView in
+            UICResized(size: size, superview: (tableView as? View)?.tableFooterView)
+                .onAdd {
+                    (tableView as? View)?.tableFooterView = $0
+                }.addSubview(
+                    UICHost(content: content)
+                        .releaseUIView()
+                )
+                .width(.required)
+                .watch(in: tableView)
         }
     }
 }
@@ -453,89 +432,5 @@ extension Fatal {
                 return "UICList can't perform action insertSections for sectionPaths \(sectionPaths)"
             }
         }
-    }
-}
-
-private var kHeaderHeight: UInt = 0
-private var kFooterHeight: UInt = 0
-private var kHeaderSize: UInt = 0
-private var kFooterSize: UInt = 0
-
-extension UITableView {
-    var lastHeaderHeight: CGFloat {
-        get { (objc_getAssociatedObject(self, &kHeaderHeight) as? CGFloat) ?? .zero }
-        set { objc_setAssociatedObject(self, &kHeaderHeight, newValue, .OBJC_ASSOCIATION_RETAIN)}
-    }
-
-    var lastFooterHeight: CGFloat {
-        get { (objc_getAssociatedObject(self, &kFooterHeight) as? CGFloat) ?? .zero }
-        set { objc_setAssociatedObject(self, &kFooterHeight, newValue, .OBJC_ASSOCIATION_RETAIN)}
-    }
-
-    var lastHeaderSize: CGSize {
-        get { (objc_getAssociatedObject(self, &kHeaderSize) as? CGSize) ?? .zero }
-        set { objc_setAssociatedObject(self, &kHeaderSize, newValue, .OBJC_ASSOCIATION_RETAIN)}
-    }
-
-    var lastFooterSize: CGSize {
-        get { (objc_getAssociatedObject(self, &kFooterSize) as? CGSize) ?? .zero }
-        set { objc_setAssociatedObject(self, &kFooterSize, newValue, .OBJC_ASSOCIATION_RETAIN)}
-    }
-
-    private func layoutHeaderFooterView(_ someView: UIView) -> CGFloat {
-        let oldSize = CGSize(width: self.frame.width, height: someView.frame.height)
-        someView.frame.size = oldSize
-
-        let height = someView.systemLayoutSizeFitting(.init(width: self.frame.width, height: 0), withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel).height
-        let size = CGSize(width: self.frame.width, height: height)
-
-        someView.frame.size = size
-        return height
-    }
-
-    func reloadFooterViewSize() {
-        guard let footerView = self.tableFooterView else {
-            return
-        }
-
-        footerView.translatesAutoresizingMaskIntoConstraints = true
-
-        guard self.lastFooterSize != footerView.frame.size else {
-            return
-        }
-
-        self.lastFooterSize = footerView.frame.size
-
-        let newHeight = self.layoutHeaderFooterView(footerView)
-
-        guard newHeight != self.lastFooterHeight else {
-            return
-        }
-
-        self.lastFooterHeight = newHeight
-        self.tableFooterView = footerView
-    }
-
-    func reloadHeaderViewSize() {
-        guard let headerView = self.tableHeaderView else {
-            return
-        }
-        headerView.translatesAutoresizingMaskIntoConstraints = true
-
-        guard self.lastHeaderSize != headerView.frame.size else {
-            return
-        }
-
-        self.lastHeaderSize = headerView.frame.size
-
-        let newHeight = self.layoutHeaderFooterView(headerView)
-
-        guard newHeight != self.lastHeaderHeight else {
-            return
-        }
-
-        self.lastHeaderHeight = newHeight
-
-        self.tableHeaderView = headerView
     }
 }

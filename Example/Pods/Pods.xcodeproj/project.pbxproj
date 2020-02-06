@@ -54,6 +54,7 @@
 		0C30C7E123E5F7B100D37A87 /* UICCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30C7E023E5F7B100D37A87 /* UICCell.swift */; };
 		0C30C7E323E5FA7900D37A87 /* UITableView+ReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30C7E223E5FA7900D37A87 /* UITableView+ReusableView.swift */; };
 		0C31DAF123CB5D8A0044B70B /* UICTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31DAF023CB5D8A0044B70B /* UICTab.swift */; };
+		0C3542AF23EC634C0087C35E /* UICResized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3542AE23EC634C0087C35E /* UICResized.swift */; };
 		0C3883CB23BBB5FC009E6FF6 /* TouchGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3883CA23BBB5FC009E6FF6 /* TouchGesture.swift */; };
 		0C3E8C1923BA68CA0045C86E /* SystemFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C1823BA68CA0045C86E /* SystemFont.swift */; };
 		0C3E8C1C23BA7CC80045C86E /* TableViewHeaderFooterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3E8C1B23BA7CC80045C86E /* TableViewHeaderFooterCell.swift */; };
@@ -191,6 +192,7 @@
 		0C30C7E023E5F7B100D37A87 /* UICCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICCell.swift; sourceTree = "<group>"; };
 		0C30C7E223E5FA7900D37A87 /* UITableView+ReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView+ReusableView.swift"; sourceTree = "<group>"; };
 		0C31DAF023CB5D8A0044B70B /* UICTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICTab.swift; sourceTree = "<group>"; };
+		0C3542AE23EC634C0087C35E /* UICResized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UICResized.swift; path = UICreator/Classes/UICResized.swift; sourceTree = "<group>"; };
 		0C3883CA23BBB5FC009E6FF6 /* TouchGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchGesture.swift; sourceTree = "<group>"; };
 		0C3E8C1823BA68CA0045C86E /* SystemFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemFont.swift; sourceTree = "<group>"; };
 		0C3E8C1B23BA7CC80045C86E /* TableViewHeaderFooterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewHeaderFooterCell.swift; sourceTree = "<group>"; };
@@ -546,6 +548,7 @@
 		23482E1745BD744A1B8DC0CDFA317DBA /* UICreator */ = {
 			isa = PBXGroup;
 			children = (
+				0C3542AE23EC634C0087C35E /* UICResized.swift */,
 				0C4B86B523CCAA9B006FBAA1 /* UICForEach.swift */,
 				0C0D306A23D517BF00D2AE79 /* Fatal.swift */,
 				0C7E8A9523B3FA5D007E480B /* TextKeyboard.swift */,
@@ -897,6 +900,7 @@
 				0C3E8C1F23BA7CEA0045C86E /* TableViewCell.swift in Sources */,
 				0C27DDD523D9F45C00BB9AFD /* UICRow.swift in Sources */,
 				0C0B0B9123B4E54100FAF1E6 /* UICSlider.swift in Sources */,
+				0C3542AF23EC634C0087C35E /* UICResized.swift in Sources */,
 				0C08F82723BF7D2400C52B8E /* UICFlow+CollectionEngine.swift in Sources */,
 				0C27DDD123D9F44700BB9AFD /* UICHeader.swift in Sources */,
 				0C3E8C2523BA7FE00045C86E /* ListCollectionManager.swift in Sources */,
