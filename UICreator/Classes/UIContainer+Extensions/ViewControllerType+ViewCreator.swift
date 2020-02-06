@@ -27,6 +27,9 @@ public extension ViewControllerType where Self: ViewCreator {
     var content: ViewControllerMaker {
         return .dynamic { [unowned self] in
             AddSubview($0.view)?.addSubview(self.releaseUIView())
+            self.uiView.snp.makeConstraints {
+                $0.edges.equalTo(0)
+            }
             $0.view.backgroundColor = .clear
         }
     }
