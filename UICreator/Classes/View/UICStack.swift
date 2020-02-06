@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import UIContainer
 
 public class StackView: UIStackView {
     override public func willMove(toSuperview newSuperview: UIView?) {
@@ -128,7 +129,7 @@ extension UICStack: SupportForEach {
             }
 
             views.forEach {
-                view?.addArrangedSubview($0.releaseUIView())
+                AddSubview(view)?.addArrangedSubview($0.releaseUIView())
             }
 
             firstView = views.first?.uiView

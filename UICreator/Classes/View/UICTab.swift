@@ -51,7 +51,7 @@ public class UICTabContainer: UIView {
                 return viewController
             })
 
-            self.addSubview(container)
+            AddSubview(self).addSubview(container)
             container.snp.makeConstraints {
                 $0.edges.equalTo(0)
             }

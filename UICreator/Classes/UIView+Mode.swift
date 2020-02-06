@@ -23,6 +23,7 @@
 import Foundation
 import UIKit
 import SnapKit
+import UIContainer
 
 private var kNotRenderedHandler: UInt = 0
 private var kRenderedHandler: UInt = 0
@@ -156,7 +157,7 @@ internal extension UIView {
 
     /// The `add(_:)` function is used internally to add views inside view and constraint with required priority in all edges.
     func add(priority: ConstraintPriority? = nil,_ view: UIView) {
-        self.addSubview(view)
+        AddSubview(self).addSubview(view)
 
         let priority: ConstraintPriority = priority ?? ((self as UIView) is RootView && view is RootView ? .required :
         .init(751))

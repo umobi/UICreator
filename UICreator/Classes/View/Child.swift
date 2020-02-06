@@ -23,6 +23,7 @@
 import Foundation
 import UIKit
 import SnapKit
+import UIContainer
 
 public class ChildView: UIView {
     override public func willMove(toSuperview newSuperview: UIView?) {
@@ -54,10 +55,10 @@ public class Child: UIViewCreator {
         self.uiView = View.init(builder: self)
 
         contents().forEach {
-                self.uiView.addSubview($0.releaseUIView())
-                $0.uiView.snp.makeConstraints {
-                    $0.edges.equalTo(0).priority(.low)
-                }
+            AddSubview(self.uiView).addSubview($0.releaseUIView())
+            $0.uiView.snp.makeConstraints {
+                $0.edges.equalTo(0).priority(.low)
             }
+        }
     }
 }

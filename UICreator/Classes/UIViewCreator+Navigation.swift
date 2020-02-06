@@ -55,7 +55,7 @@ public extension UIView {
 }
 
 #if os(iOS)
-public extension UIViewCreator {
+public extension ViewCreator {
     func toolbar(_ contents: @escaping () -> [ViewCreator]) -> Self {
         self.onInTheScene {
             $0.viewController.toolbarItems = contents().map { view in
@@ -128,7 +128,7 @@ public extension UIViewCreator {
 }
 #endif
 
-public extension UIViewCreator {
+public extension ViewCreator {
 
     func navigation(isHidden flag: Bool) -> Self {
         self.onInTheScene {
@@ -209,7 +209,7 @@ public extension UIViewCreator {
     #endif
 }
 
-public extension UIViewCreator {
+public extension ViewCreator {
     func navigation(titleColor color: UIColor) -> Self {
         return self.onInTheScene {
            guard let navigationBar = $0.navigation?.navigationController?.navigationBar else {
@@ -238,7 +238,7 @@ public extension UIViewCreator {
 }
 
 #if os(iOS)
-public extension UIViewCreator {
+public extension ViewCreator {
     @available(iOS 11.0, *)
     func navigation(largeTitleMode mode: UINavigationItem.LargeTitleDisplayMode) -> Self {
         return self.onInTheScene {

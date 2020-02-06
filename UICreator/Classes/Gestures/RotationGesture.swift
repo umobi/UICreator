@@ -36,7 +36,7 @@ public class Rotation: UIGesture {
 public extension UIViewCreator {
 
     func onRotationMaker(_ rotationConfigurator: (Rotation) -> Rotation) -> Self {
-        self.uiView.addGesture(rotationConfigurator(Rotation(target: self.uiView)))
+        self.uiView.addGestureRecognizer(rotationConfigurator(Rotation(target: self.uiView)).releaseGesture())
         return self
     }
 

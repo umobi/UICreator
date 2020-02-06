@@ -168,7 +168,7 @@ public class UICPageContainer: UIView {
                 return viewController
             })
 
-            self.addSubview(container)
+            AddSubview(self).addSubview(container)
             container.snp.makeConstraints {
                 $0.edges.equalTo(0)
             }
@@ -279,10 +279,10 @@ public class UICPageContainer: UIView {
         }
 
         let stackView = UIStackView()
-        self.addSubview(stackView)
+        AddSubview(self).addSubview(stackView)
         self.positionSV(stackView, orientedBy: location)
         views.forEach {
-            stackView.addArrangedSubview($0)
+            AddSubview(stackView).addArrangedSubview($0)
         }
 
         self.stackView = stackView

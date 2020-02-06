@@ -40,15 +40,28 @@ public protocol UIGesture: Gesture {
     associatedtype Gesture: UIGestureRecognizer
 }
 
+public extension UIGesture {
+    func add() {
+        self.gesture.targetView?.addGestureRecognizer(self.releaseGesture())
+    }
+}
+
 private var kGesture: UInt = 0
+private var kTargetView: UInt = 0
 internal extension UIGestureRecognizer {
     var parent: Gesture? {
         get { objc_getAssociatedObject(self, &kGesture) as? Gesture }
         set { objc_setAssociatedObject(self, &kGesture, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
+    var targetView: UIView? {
+        get { (objc_getAssociatedObject(self, &kTargetView) as? UIView) ?? self.view }
+        set { objc_setAssociatedObject(self, &kTargetView, newValue, .OBJC_ASSOCIATION_ASSIGN) }
+    }
+
     convenience init(target view: UIView!) {
         self.init(target: view, action: #selector(view.someGestureRecognized(_:)))
+        self.targetView = view
     }
 }
 
@@ -63,16 +76,11 @@ internal extension Gesture {
     func setGesture(_ uiGesture: UIGestureRecognizer, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN) {
         objc_setAssociatedObject(self, &kGestureRecognized, uiGesture, policity)
     }
-}
 
-internal extension UIView {
-    func addGesture(_ gesture: Gesture) {
-        guard let gestureRecognize = gesture.gesture else {
-            return
-        }
-
-        self.addGestureRecognizer(gestureRecognize)
-        gesture.setGesture(gestureRecognize, policity: .OBJC_ASSOCIATION_ASSIGN)
+    func releaseGesture() -> UIGestureRecognizer! {
+        let gesture: UIGestureRecognizer! = self.gesture
+        self.setGesture(gesture, policity: .OBJC_ASSOCIATION_ASSIGN)
+        return gesture
     }
 }
 
