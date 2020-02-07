@@ -114,7 +114,7 @@ public extension ViewCreator {
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
                     $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottomMargin)
-                        .offset(constant)
+                        .offset(-constant)
                         .priority(priority)
                 }
                 return
@@ -122,7 +122,7 @@ public extension ViewCreator {
 
             $0.snp.makeConstraints {
                 $0.bottom.equalTo(view.snp.bottomMargin)
-                    .offset(constant)
+                    .offset(-constant)
                     .priority(priority)
             }
 
@@ -138,7 +138,7 @@ public extension ViewCreator {
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
                     $0.bottom.greaterThanOrEqualTo(view.safeAreaLayoutGuide.snp.bottomMargin)
-                        .offset(constant)
+                        .offset(-constant)
                         .priority(priority)
                 }
                 return
@@ -147,7 +147,7 @@ public extension ViewCreator {
 
             $0.snp.makeConstraints {
                 $0.bottom.greaterThanOrEqualTo(view.snp.bottomMargin)
-                    .offset(constant)
+                    .offset(-constant)
                     .priority(priority)
             }
         }
@@ -162,13 +162,13 @@ public extension ViewCreator {
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
                     $0.bottom.lessThanOrEqualTo(view.safeAreaLayoutGuide.snp.bottomMargin)
-                        .offset(constant)
+                        .offset(-constant)
                         .priority(priority)
                 }
             } else {
                 $0.snp.makeConstraints {
                     $0.bottom.lessThanOrEqualTo(view.snp.bottomMargin)
-                        .offset(constant)
+                        .offset(-constant)
                         .priority(priority)
                 }
             }
@@ -250,13 +250,13 @@ public extension ViewCreator {
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
                     $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailingMargin)
-                        .offset(constant)
+                        .offset(-constant)
                         .priority(priority)
                 }
             } else {
                 $0.snp.makeConstraints {
                     $0.trailing.equalTo(view.snp.trailingMargin)
-                        .offset(constant)
+                        .offset(-constant)
                         .priority(priority)
                 }
             }
@@ -272,13 +272,13 @@ public extension ViewCreator {
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
                     $0.trailing.greaterThanOrEqualTo(view.safeAreaLayoutGuide.snp.trailingMargin)
-                        .offset(constant)
+                        .offset(-constant)
                         .priority(priority)
                 }
             } else {
                 $0.snp.makeConstraints {
                     $0.trailing.greaterThanOrEqualTo(view.snp.trailingMargin)
-                        .offset(constant)
+                        .offset(-constant)
                         .priority(priority)
                 }
             }
@@ -294,13 +294,13 @@ public extension ViewCreator {
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
                     $0.trailing.lessThanOrEqualTo(view.safeAreaLayoutGuide.snp.trailingMargin)
-                        .offset(constant)
+                        .offset(-constant)
                         .priority(priority)
                 }
             } else {
                 $0.snp.makeConstraints {
                     $0.trailing.lessThanOrEqualTo(view.snp.trailingMargin)
-                        .offset(constant)
+                        .offset(-constant)
                         .priority(priority)
                 }
             }
