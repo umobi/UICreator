@@ -24,6 +24,13 @@ import Foundation
 import SnapKit
 
 extension UIView {
+    @available(iOS 11.0, tvOS 11, *)
+    var safeAreaGuide: UILayoutGuide {
+        return self.viewController?.view.safeAreaLayoutGuide ?? self.safeAreaLayoutGuide
+    }
+}
+
+extension UIView {
     fileprivate var realSuperview: UIView? {
         guard let superview = self.superview else {
             return nil
@@ -44,7 +51,7 @@ public extension ViewCreator {
 
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
-                    $0.top.equalTo(view.safeAreaLayoutGuide.snp.topMargin)
+                    $0.top.equalTo(view.safeAreaGuide.snp.topMargin)
                         .offset(constant)
                         .priority(priority)
                 }
@@ -67,7 +74,7 @@ public extension ViewCreator {
 
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
-                    $0.top.greaterThanOrEqualTo(view.safeAreaLayoutGuide.snp.topMargin)
+                    $0.top.greaterThanOrEqualTo(view.safeAreaGuide.snp.topMargin)
                         .offset(constant)
                         .priority(priority)
                 }
@@ -90,7 +97,7 @@ public extension ViewCreator {
 
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
-                    $0.top.lessThanOrEqualTo(view.safeAreaLayoutGuide.snp.topMargin)
+                    $0.top.lessThanOrEqualTo(view.safeAreaGuide.snp.topMargin)
                         .offset(constant)
                         .priority(priority)
                 }
@@ -113,7 +120,7 @@ public extension ViewCreator {
 
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
-                    $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottomMargin)
+                    $0.bottom.equalTo(view.safeAreaGuide.snp.bottomMargin)
                         .offset(-constant)
                         .priority(priority)
                 }
@@ -137,7 +144,7 @@ public extension ViewCreator {
             
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
-                    $0.bottom.greaterThanOrEqualTo(view.safeAreaLayoutGuide.snp.bottomMargin)
+                    $0.bottom.greaterThanOrEqualTo(view.safeAreaGuide.snp.bottomMargin)
                         .offset(-constant)
                         .priority(priority)
                 }
@@ -161,7 +168,7 @@ public extension ViewCreator {
 
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
-                    $0.bottom.lessThanOrEqualTo(view.safeAreaLayoutGuide.snp.bottomMargin)
+                    $0.bottom.lessThanOrEqualTo(view.safeAreaGuide.snp.bottomMargin)
                         .offset(-constant)
                         .priority(priority)
                 }
@@ -183,7 +190,7 @@ public extension ViewCreator {
 
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
-                    $0.leading.lessThanOrEqualTo(view.safeAreaLayoutGuide.snp.leadingMargin)
+                    $0.leading.lessThanOrEqualTo(view.safeAreaGuide.snp.leadingMargin)
                         .offset(constant)
                         .priority(priority)
                 }
@@ -205,7 +212,7 @@ public extension ViewCreator {
 
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
-                    $0.leading.greaterThanOrEqualTo(view.safeAreaLayoutGuide.snp.leadingMargin)
+                    $0.leading.greaterThanOrEqualTo(view.safeAreaGuide.snp.leadingMargin)
                         .offset(constant)
                         .priority(priority)
                 }
@@ -227,7 +234,7 @@ public extension ViewCreator {
 
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
-                    $0.leading.lessThanOrEqualTo(view.safeAreaLayoutGuide.snp.leadingMargin)
+                    $0.leading.lessThanOrEqualTo(view.safeAreaGuide.snp.leadingMargin)
                         .offset(constant)
                         .priority(priority)
                 }
@@ -249,7 +256,7 @@ public extension ViewCreator {
 
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
-                    $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailingMargin)
+                    $0.trailing.equalTo(view.safeAreaGuide.snp.trailingMargin)
                         .offset(-constant)
                         .priority(priority)
                 }
@@ -271,7 +278,7 @@ public extension ViewCreator {
 
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
-                    $0.trailing.greaterThanOrEqualTo(view.safeAreaLayoutGuide.snp.trailingMargin)
+                    $0.trailing.greaterThanOrEqualTo(view.safeAreaGuide.snp.trailingMargin)
                         .offset(-constant)
                         .priority(priority)
                 }
@@ -293,7 +300,7 @@ public extension ViewCreator {
 
             if #available(iOS 11, tvOS 11, *) {
                 $0.snp.makeConstraints {
-                    $0.trailing.lessThanOrEqualTo(view.safeAreaLayoutGuide.snp.trailingMargin)
+                    $0.trailing.lessThanOrEqualTo(view.safeAreaGuide.snp.trailingMargin)
                         .offset(-constant)
                         .priority(priority)
                 }
@@ -568,11 +575,11 @@ public extension ViewCreator {
 }
 
 public extension ViewCreator {
-    func insets(equalTo value: CGFloat, priority: ConstraintPriority = .required) -> Self {
-        return self.top(equalTo: value, priority: priority)
-            .bottom(equalTo: value, priority: priority)
-            .leading(equalTo: value, priority: priority)
-            .trailing(equalTo: value, priority: priority)
+    func insets(equalTo value: CGFloat, priority: ConstraintPriority = .required, orRelatedView view: UIView? = nil) -> Self {
+        return self.top(equalTo: value, priority: priority, toView: view)
+            .bottom(equalTo: value, priority: priority, toView: view)
+            .leading(equalTo: value, priority: priority, toView: view)
+            .trailing(equalTo: value, priority: priority, toView: view)
     }
 }
 

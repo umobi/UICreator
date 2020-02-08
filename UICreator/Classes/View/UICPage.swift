@@ -151,12 +151,12 @@ public class UICPageContainer: UIView {
 
     override open func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
+        RenderManager(self).willMove(toSuperview: newSuperview)
     }
 
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self).didMoveToSuperview()
     }
 
     override open func didMoveToWindow() {
@@ -174,12 +174,12 @@ public class UICPageContainer: UIView {
             }
             return container
         }()
-        self.commitInTheScene()
+        RenderManager(self).didMoveToWindow()
     }
 
     override open func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
+        RenderManager(self).layoutSubviews()
 
         if #available(iOS 11, tvOS 11, *), let view = self.container.view {
             if let stackView = self.stackView, let location = indicatorLocation {

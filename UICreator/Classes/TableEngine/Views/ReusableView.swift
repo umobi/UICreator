@@ -31,7 +31,7 @@ protocol ReusableView: class {
 }
 
 extension ReusableView {
-    func prepareCell(_ cell: UICCell) {
+    func reuseCell(_ cell: UICCell) {
         self.contentView.subviews.forEach {
             $0.removeFromSuperview()
         }
@@ -39,5 +39,9 @@ extension ReusableView {
         self.cellLoaded = cell.load
         let host = UICHost(content: cell.rowManager.payload.content)
         self.contentView.add(priority: .medium, host.releaseUIView())
+    }
+
+    func prepareCell(_ cell: UICCell) {
+        self.reuseCell(cell)
     }
 }

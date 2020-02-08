@@ -115,23 +115,27 @@ extension ListManager.RowManager {
         let content: () -> ViewCreator
         let trailingActions: (() -> [RowAction])?
         let leadingActions: (() -> [RowAction])?
+        let accessoryType: UITableViewCell.AccessoryType
 
         init(header: UICHeader) {
             self.content = header.content
             self.trailingActions = nil
             self.leadingActions = nil
+            self.accessoryType = .none
         }
 
         init(footer: UICFooter) {
             self.content = footer.content
             self.trailingActions = nil
             self.leadingActions = nil
+            self.accessoryType = .none
         }
 
         init(row: UICRow) {
             self.content = row.content
             self.trailingActions = row.trailingActions
             self.leadingActions = row.leadingActions
+            self.accessoryType = row.accessoryType
         }
 
         var asRowManager: ListManager.RowManager {

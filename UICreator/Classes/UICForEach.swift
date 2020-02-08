@@ -44,17 +44,17 @@ protocol SupportForEach: class {
 public class PlaceholderView: UIView {
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self).didMoveToSuperview()
     }
 
     override open func didMoveToWindow() {
         super.didMoveToWindow()
-        self.commitInTheScene()
+        RenderManager(self).didMoveToWindow()
     }
 
     override open func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
+        RenderManager(self).layoutSubviews()
     }
 }
 

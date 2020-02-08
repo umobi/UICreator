@@ -24,6 +24,92 @@ import Foundation
 import UIKit
 import UIContainer
 
+protocol RenderWillMoveToSuperviewState {
+    func render_willMoveToSuperview()
+}
+
+protocol RenderDidMoveToSuperviewState {
+    func render_didMoveToSuperview()
+}
+
+protocol RenderDidMoveToWindowState {
+    func render_didMoveToWindow()
+}
+
+protocol RenderLayoutSubviewsState {
+    func render_layoutSubviews()
+}
+
+struct RenderManager {
+    weak var view: UIView!
+
+    init(_ view: UIView) {
+        self.view = view
+    }
+}
+
+extension RenderManager {
+    func willMove(toSuperview newSuperview: UIView?) {
+        guard newSuperview != nil else {
+            return
+        }
+
+        if let override = self.view as? RenderWillMoveToSuperviewState {
+            override.render_willMoveToSuperview()
+            return
+        }
+
+        view.commitNotRendered()
+    }
+
+    func didMoveToSuperview() {
+        guard self.view.superview != nil else {
+            return
+        }
+
+        if let override = self.view as? RenderDidMoveToSuperviewState {
+            override.render_didMoveToSuperview()
+            return
+        }
+
+        view.commitRendered()
+    }
+
+    func didMoveToWindow() {
+        guard self.view.window != nil else {
+            return
+        }
+
+        if let override = self.view as? RenderDidMoveToWindowState {
+            override.render_didMoveToWindow()
+            return
+        }
+
+        view.commitInTheScene()
+    }
+
+    func layoutSubviews() {
+        if let override = self.view as? RenderLayoutSubviewsState {
+            override.render_layoutSubviews()
+            return
+        }
+
+        view.commitLayout()
+    }
+}
+
+extension RootView: RenderWillMoveToSuperviewState {
+    func render_willMoveToSuperview() {
+        self.willCommitNotRenderedHandler?()
+        self.willCommitNotRenderedHandler = nil
+
+        self.commitNotRendered()
+
+        self.didCommitNotRenderedHandler?()
+        self.didCommitNotRenderedHandler = nil
+    }
+}
+
 /// RootView is an internal view that is used to be the UIView of some view creator to support lazy loads.
 public class RootView: UIView {
     var willCommitNotRenderedHandler: (() -> Void)?
@@ -39,29 +125,22 @@ public class RootView: UIView {
 
     override open func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-
-        self.willCommitNotRenderedHandler?()
-        self.willCommitNotRenderedHandler = nil
-
-        self.commitNotRendered()
-
-        self.didCommitNotRenderedHandler?()
-        self.didCommitNotRenderedHandler = nil
+        RenderManager(self).willMove(toSuperview: newSuperview)
     }
 
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self).didMoveToSuperview()
     }
 
     override open func didMoveToWindow() {
         super.didMoveToWindow()
-        self.commitInTheScene()
+        RenderManager(self).didMoveToWindow()
     }
 
     override open func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
+        RenderManager(self).layoutSubviews()
     }
 
     override var watchingViews: [UIView] {

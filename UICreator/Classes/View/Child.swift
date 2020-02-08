@@ -28,22 +28,22 @@ import UIContainer
 public class ChildView: UIView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
+        RenderManager(self).willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self).didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        self.commitInTheScene()
+        RenderManager(self).didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
+        RenderManager(self).layoutSubviews()
     }
 }
 
@@ -57,7 +57,7 @@ public class Child: UIViewCreator {
         contents().forEach {
             AddSubview(self.uiView).addSubview($0.releaseUIView())
             $0.uiView.snp.makeConstraints {
-                $0.edges.equalTo(0).priority(.low)
+                $0.edges.equalTo(0).priority(UILayoutPriority.fittingSizeLevel)
             }
         }
     }
