@@ -25,15 +25,10 @@ import UIContainer
 
 public struct UICResized {
 
-    private weak var weakSuperview: UIView!
-    private var _superview: UIView!
+    private let superview: UIView
 
-    var superview: UIView! {
-        _superview ?? weakSuperview
-    }
-
-    public init(_ superview: UIView!) {
-        self._superview = superview
+    public init(_ superview: UIView) {
+        self.superview = superview
         self.addHandler = nil
     }
 
@@ -47,21 +42,17 @@ public struct UICResized {
                 return .zero
             }()
             self.addHandler = nil
+            self.superview = superview
             return
         }
 
-        self._superview = UIView(frame: .init(origin: .zero, size: size ?? .zero))
+        self.superview = UIView(frame: .init(origin: .zero, size: size ?? .zero))
         self.addHandler = nil
     }
 
     private init(_ original: UICResized, addHandler: @escaping (UIView) -> Void) {
-        self._superview = original.superview
+        self.superview = original.superview
         self.addHandler = addHandler
-    }
-
-    private init(weakSuperview: UIView) {
-        self.weakSuperview = weakSuperview
-        self.addHandler = nil
     }
 
     private let addHandler: ((UIView) -> Void)?
@@ -71,8 +62,6 @@ public struct UICResized {
 
     public func addSubview(_ subview: UIView) -> UICWeakResized {
         AddSubview(self.superview)?.addSubview(subview)
-
-        self.superview.translatesAutoresizingMaskIntoConstraints = true
 
         weak var _subview = subview
         subview.appendLayout { _ in
@@ -138,11 +127,20 @@ public extension UICWeakResized {
         }
 
         func size(for subview: UIView, with size: CGSize) -> CGSize {
-            subview.systemLayoutSizeFitting(
+            guard self.superview.translatesAutoresizingMaskIntoConstraints else {
+                return subview.frame.size
+            }
+
+            return subview.systemLayoutSizeFitting(
                 size,
                 withHorizontalFittingPriority: self.width ?? .fittingSizeLevel,
                 verticalFittingPriority: self.height ?? .fittingSizeLevel
             )
+        }
+
+        fileprivate func updateSuperview(_ size: CGSize) {
+            self.superview.frame.size = size
+            self.superview.translatesAutoresizingMaskIntoConstraints = self.superview.translatesAutoresizingMaskIntoConstraints || size != .zero
         }
     }
 
@@ -164,8 +162,9 @@ public extension UICWeakResized {
                 return
             }
 
-            $0.frame.size = copy.size(for: $0, with: copy.superview.frame.size)
-            copy.superview.frame.size = $0.frame.size
+            let size = copy.size(for: $0, with: copy.superview.frame.size)
+            copy.updateSuperview(size)
+            $0.frame.size = size
         }
 
         resizableView.appendLayout { [self] in
@@ -174,19 +173,18 @@ public extension UICWeakResized {
                 return
             }
 
-            copy.superview.frame.size = $0.frame.size
+            copy.updateSuperview($0.frame.size)
             copy.subview.setNeedsLayout()
         }
 
         if resizableView.frame.size != .zero {
-            muttable?.superview?.frame.size = resizableView.frame.size
+            muttable?.copy()?.updateSuperview(resizableView.frame.size)
             muttable?.subview?.setNeedsLayout()
         }
     }
 
     func watch() {
         var muttable: UICWeakResized? = self
-        print("[UICWeakResized]", self.superview.frame.size)
 
         muttable?.subview.appendLayout { [self] in
             guard let copy = self.copy() else {
@@ -194,8 +192,9 @@ public extension UICWeakResized {
                 return
             }
 
-            $0.frame.size = copy.size(for: $0, with: copy.superview.frame.size)
-            copy.superview.frame.size = $0.frame.size
+            let size = copy.size(for: $0, with: copy.superview.frame.size)
+            copy.updateSuperview(size)
+            $0.frame.size = size
         }
 
         muttable?.superview.appendLayout { [self] _ in
