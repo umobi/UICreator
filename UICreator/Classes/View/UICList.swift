@@ -171,7 +171,7 @@ public extension UIViewCreator where View: UITableView {
                 )
                 .height(.required)
                 .width(.required)
-                .watch()
+                .watch(in: tableView)
         }
     }
 
@@ -209,7 +209,7 @@ public extension UIViewCreator where View: UITableView {
     }
 
     func header(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> Self {
-        self.onRendered { tableView in
+        self.onInTheScene { tableView in
             UICResized(size: size, superview: (tableView as? View)?.tableHeaderView)
                 .onAdd {
                     (tableView as? View)?.tableHeaderView = $0
@@ -223,7 +223,7 @@ public extension UIViewCreator where View: UITableView {
     }
 
     func footer(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> Self {
-        self.onRendered { tableView in
+        self.onInTheScene { tableView in
             UICResized(size: size, superview: (tableView as? View)?.tableFooterView)
                 .onAdd {
                     (tableView as? View)?.tableFooterView = $0

@@ -323,7 +323,9 @@ public class Controller: UIViewCreator {
         _ = self.onInTheScene {
             ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: {
                 ContainerController(UICHost {
-                    content()
+                    Child {[
+                        content()
+                    ]}
                 })
             })
         }
