@@ -74,7 +74,7 @@ public struct UICResized {
 
         self.addHandler?(self.superview)
 
-        return .init(self.superview, subview: subview)
+        return .init(self.superview, subview: subview, self.addHandler)
     }
 }
 
@@ -84,12 +84,14 @@ public struct UICWeakResized {
 
     fileprivate let height: UILayoutPriority?
     fileprivate let width: UILayoutPriority?
+    fileprivate let addHandler: ((UIView) -> Void)?
 
-    init(_ superview: UIView!, subview: UIView!) {
+    init(_ superview: UIView!, subview: UIView!,_ addHandler: ((UIView) -> Void)?) {
         self.superview = superview
         self.subview = subview
         self.height = nil
         self.width = nil
+        self.addHandler = addHandler
     }
 
     private init(_ original: UICWeakResized, height: UILayoutPriority?, width: UILayoutPriority?) {
@@ -97,6 +99,7 @@ public struct UICWeakResized {
         self.subview = original.subview
         self.height = height ?? original.height
         self.width = width ?? original.width
+        self.addHandler = original.addHandler
     }
 
     public func height(_ priority: UILayoutPriority) -> Self {
@@ -114,9 +117,14 @@ public extension UICWeakResized {
         let superview: UIView
         let height: UILayoutPriority?
         let width: UILayoutPriority?
+        let addHandler: ((UIView) -> Void)?
 
         init?(_ original: UICWeakResized) {
             guard let superview = original.superview, let subview = original.subview else {
+                return nil
+            }
+
+            guard subview.superview === superview, superview.subviews.contains(subview) else {
                 return nil
             }
 
@@ -124,10 +132,11 @@ public extension UICWeakResized {
             self.subview = original.subview
             self.height = original.height
             self.width = original.width
+            self.addHandler = original.addHandler
         }
 
         func size(for subview: UIView, with size: CGSize) -> CGSize {
-            guard self.superview.translatesAutoresizingMaskIntoConstraints else {
+            guard size != .zero else {
                 return subview.frame.size
             }
 
@@ -139,8 +148,20 @@ public extension UICWeakResized {
         }
 
         fileprivate func updateSuperview(_ size: CGSize) {
+            let oldSize = self.superview.frame.size
             self.superview.frame.size = size
-            self.superview.translatesAutoresizingMaskIntoConstraints = self.superview.translatesAutoresizingMaskIntoConstraints || size != .zero
+
+            self.subview.snp.remakeConstraints {
+                $0.trailing.leading.equalTo(0).priority(self.width ?? .fittingSizeLevel)
+                $0.top.bottom.equalTo(0).priority(self.height ?? .fittingSizeLevel)
+            }
+
+            self.superview.snp.remakeConstraints {
+                $0.width.equalTo(size.width).priority(self.width ?? .fittingSizeLevel)
+                $0.height.equalTo(size.height).priority(self.height ?? .fittingSizeLevel)
+            }
+
+            self.addHandler?(self.superview)
         }
     }
 
