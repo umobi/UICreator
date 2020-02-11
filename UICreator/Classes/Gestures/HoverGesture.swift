@@ -30,7 +30,7 @@ public class Hover: UIGesture {
     public typealias Gesture = UIHoverGestureRecognizer
 
     public required init(target view: UIView!) {
-        self.setGesture(Gesture.init(target: view))
+        self.gesture = Gesture.init(target: view)
         self.gesture.parent = self
     }
 }
@@ -39,7 +39,7 @@ public extension UIViewCreator {
 
     @available(iOS 13.0, *)
     func onHoverMaker(_ hoverConfigurator: (Hover) -> Hover) -> Self {
-        self.uiView.addGestureRecognizer(hoverConfigurator(Hover(target: self.uiView)).releaseGesture())
+        hoverConfigurator(Hover(target: self.uiView)).add()
         return self
     }
 

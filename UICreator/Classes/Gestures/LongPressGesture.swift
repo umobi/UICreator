@@ -47,7 +47,7 @@ public extension UIGesture where Gesture: UILongPressGestureRecognizer {
 public extension UIViewCreator {
 
     func onLongPressMaker(_ longPressConfigurator: (LongPress) -> LongPress) -> Self {
-        self.uiView.addGestureRecognizer(longPressConfigurator(LongPress(target: self.uiView)).releaseGesture())
+        longPressConfigurator(LongPress(target: self.uiView)).add()
         return self
     }
 

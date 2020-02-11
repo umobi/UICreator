@@ -37,7 +37,7 @@ public class Pinch: UIGesture {
 public extension UIViewCreator {
 
     func onPinchMaker(_ pinchConfigurator: (Pinch) -> Pinch) -> Self {
-        self.uiView.addGestureRecognizer(pinchConfigurator(Pinch(target: self.uiView)).releaseGesture())
+        pinchConfigurator(Pinch(target: self.uiView)).add()
         return self
     }
 

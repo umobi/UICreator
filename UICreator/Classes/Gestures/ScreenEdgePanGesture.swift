@@ -35,7 +35,7 @@ public class ScreenEdgePan: UIGesture {
 
 public extension UIViewCreator {
     func onScreenEdgePanMaker(_ screenEdgePanConfigurator: (ScreenEdgePan) -> ScreenEdgePan) -> Self {
-        self.uiView.addGestureRecognizer(screenEdgePanConfigurator(ScreenEdgePan(target: self.uiView)).releaseGesture())
+        screenEdgePanConfigurator(ScreenEdgePan(target: self.uiView)).add()
         return self
     }
 

@@ -53,13 +53,23 @@ class ContentHandler {
     }
 }
 
+private extension UIView {
+    var lowerNavigationController: UINavigationController? {
+        if self.next is UINavigationController {
+            return self.next as? UINavigationController
+        }
+
+        return self.subviews.first(where: {
+            $0.lowerNavigationController != nil
+        })?.lowerNavigationController
+    }
+}
+
 private var kContentHandler: UInt = 0
 private var kNavigationController: UInt = 0
 public extension NavigationRepresentable {
     internal weak var navigationController: UINavigationController! {
-        return (self.uiView.subviews.first(where: {
-            $0 is _Container<UIViewController>
-        }) as? _Container<UIViewController>)?.view as? UINavigationController
+        return self.uiView.lowerNavigationController
     }
 
     var navigationBar: UINavigationBar {
