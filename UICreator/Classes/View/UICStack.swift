@@ -44,10 +44,6 @@ public class StackView: UIStackView {
         super.layoutSubviews()
         RenderManager(self).layoutSubviews()
     }
-
-    public override var watchingViews: [UIView] {
-        return self.arrangedSubviews
-    }
 }
 
 public class UICStack: UIViewCreator {
