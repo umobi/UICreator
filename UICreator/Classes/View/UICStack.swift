@@ -111,21 +111,21 @@ extension UICStack: SupportForEach {
         sequence.map {
             $0.map { $0() }
         }.next { views in
-            if firstView != nil {
-                let startIndex = view?.arrangedSubviews.enumerated().first(where: {
-                    $0.element == firstView
-                })?.offset ?? 0
-                let endIndex = view?.arrangedSubviews.enumerated().first(where: {
-                    $0.element == lastView
-                })?.offset ?? 0
+            let startIndex = view?.arrangedSubviews.enumerated().first(where: {
+                $0.element == firstView
+            })?.offset ?? 0
+            let endIndex = view?.arrangedSubviews.enumerated().first(where: {
+                $0.element == lastView
+            })?.offset ?? 0
 
+            if firstView != nil {
                 view?.arrangedSubviews[startIndex...endIndex].forEach {
                     $0.removeFromSuperview()
                 }
             }
 
-            views.forEach {
-                AddSubview(view)?.addArrangedSubview($0.releaseUIView())
+            views.enumerated().forEach {
+                AddSubview(view)?.insertArrangedSubview($0.element.releaseUIView(), at: startIndex + $0.offset)
             }
 
             firstView = views.first?.uiView

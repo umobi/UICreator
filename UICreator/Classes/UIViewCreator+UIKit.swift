@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public extension UIViewCreator {
+public extension ViewCreator {
     func background(color: UIColor?) -> Self {
         return self.onNotRendered {
             $0.backgroundColor = color
@@ -85,7 +85,7 @@ public extension UIViewCreator {
     }
 }
 
-public extension UIViewCreator {
+public extension ViewCreator {
     func shadow(radius: CGFloat) -> Self {
         return self.onNotRendered {
             $0.layer.shadowRadius = radius
