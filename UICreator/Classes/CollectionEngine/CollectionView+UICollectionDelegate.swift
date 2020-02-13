@@ -24,13 +24,16 @@ import Foundation
 import UIKit
 
 extension _CollectionView: UICollectionViewDelegate {
+    var size: CGSize {
+        return .init(width: self.frame.size.width - (self.contentInset.top + self.contentInset.bottom), height: self.frame.height - (self.contentInset.left + self.contentInset.right))
+    }
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         guard let section = self.layoutManager?.section(at: indexPath.section) else {
             return .zero
         }
 
-        return section.size(inside: collectionView.frame.size, at: indexPath)
+        return section.size(inside: self.size, at: indexPath)
     }
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
@@ -38,7 +41,7 @@ extension _CollectionView: UICollectionViewDelegate {
             return .zero
         }
 
-        return header.size(self.frame.size, at: section)
+        return header.size(self.size, at: section)
     }
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
@@ -46,6 +49,6 @@ extension _CollectionView: UICollectionViewDelegate {
             return .zero
         }
 
-        return footer.size(self.frame.size, at: section)
+        return footer.size(self.size, at: section)
     }
 }

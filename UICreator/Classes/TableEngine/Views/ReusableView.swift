@@ -31,14 +31,39 @@ protocol ReusableView: class {
 }
 
 extension ReusableView {
-    func reuseCell(_ cell: UICCell) {
+    func addView() {
+        guard let cellLoaded = self.cellLoaded else {
+            return
+        }
+
         self.contentView.subviews.forEach {
             $0.removeFromSuperview()
         }
 
-        self.cellLoaded = cell.load
-        let host = UICHost(content: cell.rowManager.payload.content)
+        let host = UICHost(content: cellLoaded.cell.rowManager.payload.content)
         self.contentView.add(priority: .medium, host.releaseUIView())
+    }
+
+    func reuseCell(_ cell: UICCell) {
+        if self.cellLoaded == nil {
+            self.cellLoaded = cell.load
+            self.addView()
+            return
+        }
+
+        guard self.cellLoaded?.cell.rowManager !== cell.rowManager else {
+            return
+        }
+
+        self.cellLoaded = cell.load
+
+        OperationQueue.main.addOperation { [cell] in
+            guard self.cellLoaded?.cell.rowManager === cell.rowManager else {
+                return
+            }
+
+            self.addView()
+        }
     }
 
     func prepareCell(_ cell: UICCell) {

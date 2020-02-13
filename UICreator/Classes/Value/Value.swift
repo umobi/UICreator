@@ -69,7 +69,13 @@ public extension Value {
         }
     }
 
-    func bind<ObjectValue>(_ keyPath: KeyPath<Value, ObjectValue>) -> Relay<ObjectValue>? {
+    func bind<ObjectValue>(_ keyPath: KeyPath<Value, ObjectValue>) -> Relay<ObjectValue?> {
+        return self.asRelay.map {
+            $0[keyPath: keyPath]
+        }
+    }
+
+    func bind<ObjectValue>(_ keyPath: KeyPath<Value, ObjectValue>) -> Relay<ObjectValue> {
         return self.asRelay.map {
             $0[keyPath: keyPath]
         }
