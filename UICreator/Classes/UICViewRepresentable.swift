@@ -57,6 +57,7 @@ internal extension UIViewMaker {
         }
 
         let view = self.loadView
+        view.updateBuilder(self)
         objc_setAssociatedObject(self, &kUIView, view, .OBJC_ASSOCIATION_RETAIN)
         return view
     }
@@ -64,12 +65,12 @@ internal extension UIViewMaker {
 
 public extension UICViewRepresentable {
     var loadView: UIView {
-        return self.makeUIView().appendInTheScene {
+        return self.makeUIView().appendInTheScene { [weak self] in
             guard let view = ($0 as? View) else {
                 return
             }
 
-            self.updateView(view)
+            self?.updateView(view)
         }
     }
 

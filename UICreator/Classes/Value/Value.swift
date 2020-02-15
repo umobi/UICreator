@@ -47,8 +47,7 @@ public final class Value<Value>: Getter, Setter {
     }
 
     deinit {
-        ReactiveCenter.shared.privateDeinit(self.identifier)
-        ReactiveCenter.shared.unregister(self.identifier)
+        ReactiveCenter.shared.remove(self.identifier)
     }
 }
 

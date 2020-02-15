@@ -57,7 +57,7 @@ public protocol ViewCreator: class {
 internal var kUIView: UInt = 0
 internal extension ViewCreator {
     var uiView: UIView! {
-        get { (self as? UIViewMaker)?.makeView() ?? objc_getAssociatedObject(self, &kUIView) as? UIView }
+        get { objc_getAssociatedObject(self, &kUIView) as? UIView ?? (self as? UIViewMaker)?.makeView() }
         set { setView(newValue, policity: newValue?.superview != nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
     }
 

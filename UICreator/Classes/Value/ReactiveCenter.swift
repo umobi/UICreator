@@ -22,6 +22,54 @@
 
 import Foundation
 
+class Destructor {
+    var identifiers: [String] = []
+
+    weak static var shared: Destructor!
+
+    static func remove(_ id: String) {
+        if let shared = Self.shared {
+            shared.append(id)
+            return
+        }
+
+        let destructor = Destructor()
+        Self.shared = destructor
+        destructor.append(id)
+    }
+
+    private var queue: DispatchQueue? = nil
+    func run() {
+        guard queue == nil else {
+            return
+        }
+
+        self.queue = DispatchQueue.main
+        self.queue?.async {
+            while let id = self.identifiers.first {
+                self.identifiers.removeFirst()
+
+                ReactiveCenter.shared.privateDeinit(id)
+                ReactiveCenter.shared.unregister(id)
+            }
+
+            self.queue = nil
+            Self.shared = nil
+        }
+    }
+
+    func append(_ id: String) {
+        self.identifiers.append(id)
+        self.run()
+    }
+
+    deinit {
+        if !self.identifiers.isEmpty {
+            fatalError()
+        }
+    }
+}
+
 private let _reactive = ReactiveCenter()
 final class ReactiveCenter: NotificationCenter {
     static var shared: ReactiveCenter {
@@ -125,6 +173,9 @@ final class ReactiveCenter: NotificationCenter {
         })
     }
 
+    func remove(_ id: String) {
+        Destructor.remove(id)
+    }
 }
 
 extension Fatal {
