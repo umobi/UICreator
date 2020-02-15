@@ -92,8 +92,12 @@ final class ReactiveCenter: NotificationCenter {
         self.activeObservables[identifier] = nil
     }
 
+    private func isWatching(_ id: String) -> Bool {
+        self.activeObservables[id] != nil
+    }
+
     private func isRegisteredOrDie(_ identifier: String) {
-        guard self.activeObservables[identifier] != nil else {
+        guard self.isWatching(identifier) else {
             Fatal.ReactiveCenter.unregistered.die()
             return
         }
@@ -132,7 +136,9 @@ final class ReactiveCenter: NotificationCenter {
     }
 
     func privateDeinit(_ identifier: String) {
-        self.isRegisteredOrDie(identifier)
+        guard self.isWatching(identifier) else {
+            return
+        }
 
         self.post(name: .init(rawValue: "\(identifier).private.deinit"), object: nil)
     }
