@@ -92,6 +92,36 @@ extension UIView: UIViewRender {
         }
     }
 
+    func commitAppear() {
+        guard self.appearState != .appeared else {
+            return
+        }
+
+        self.watchingViews.forEach {
+            guard $0.appearState != .appeared else {
+                return
+            }
+
+            $0.appearHandler?.commit(in: $0)
+            $0.appearState = .appeared
+        }
+    }
+
+    func commitDisappear() {
+        guard self.appearState == .appeared else {
+            return
+        }
+
+        self.watchingViews.forEach {
+            guard $0.appearState == .appeared else {
+                return
+            }
+            
+            $0.disappearHandler?.commit(in: $0)
+            $0.appearState = .disappeared
+        }
+    }
+
     @objc
     var watchingViews: [UIView] {
         return self.subviews

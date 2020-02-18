@@ -52,6 +52,10 @@ public protocol ViewCreator: class {
     func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self
 
     func onLayout(_ handler: @escaping (UIView) -> Void) -> Self
+
+    func onAppear(_ handler: @escaping (UIView) -> Void) -> Self
+
+    func onDisappear(_ handler: @escaping (UIView) -> Void) -> Self
 }
 
 internal var kUIView: UInt = 0
@@ -82,7 +86,9 @@ public extension ViewCreator {
     @discardableResult
     func onNotRendered(_ handler: @escaping (UIView) -> Void) -> Self {
         guard self.uiView.renderState == .notRendered else {
-            handler(self.uiView)
+            self.uiView.appendBeforeRendering(handler)
+            self.uiView.notRenderedHandler?.commit(in: self.uiView)
+            self.uiView.notRenderedHandler = nil
             return self
         }
 
@@ -93,7 +99,9 @@ public extension ViewCreator {
     @discardableResult
     func onRendered(_ handler: @escaping (UIView) -> Void) -> Self {
         guard self.uiView.renderState < .rendered else {
-            handler(self.uiView)
+            self.uiView.appendRendered(handler)
+            self.uiView.renderedHandler?.commit(in: self.uiView)
+            self.uiView.renderedHandler = nil
             return self
         }
         _ = self.uiView.appendRendered(handler)
@@ -103,7 +111,9 @@ public extension ViewCreator {
     @discardableResult
     func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
         guard self.uiView.renderState < .inTheScene else {
-            handler(self.uiView)
+            self.uiView.appendInTheScene(handler)
+            self.uiView.inTheSceneHandler?.commit(in: self.uiView)
+            self.uiView.inTheSceneHandler = nil
             return self
         }
         _ = self.uiView.appendInTheScene(handler)
@@ -113,6 +123,18 @@ public extension ViewCreator {
     @discardableResult
     func onLayout(_ handler: @escaping (UIView) -> Void) -> Self {
         _ = self.uiView.appendLayout(handler)
+        return self
+    }
+
+    @discardableResult
+    func onAppear(_ handler: @escaping (UIView) -> Void) -> Self {
+        _ = self.uiView.appendAppear(handler)
+        return self
+    }
+
+    @discardableResult
+    func onDisappear(_ handler: @escaping (UIView) -> Void) -> Self {
+        _ = self.uiView.appendDisappear(handler)
         return self
     }
 }

@@ -77,24 +77,50 @@ extension RenderManager {
 
     func didMoveToWindow() {
         guard self.view.window != nil else {
+            view.commitDisappear()
             return
         }
 
         if let override = self.view as? RenderDidMoveToWindowState {
             override.render_didMoveToWindow()
+            self.frame(view.frame)
             return
         }
 
         view.commitInTheScene()
+        self.frame(view.frame)
     }
 
     func layoutSubviews() {
         if let override = self.view as? RenderLayoutSubviewsState {
             override.render_layoutSubviews()
+            self.frame(view.frame)
             return
         }
 
         view.commitLayout()
+        self.frame(view.frame)
+    }
+
+    func frame(_ rect: CGRect) {
+        guard view.window != nil, !view.isHidden else {
+            return
+        }
+
+        guard rect.size.height != .zero && rect.size.width != .zero else {
+            return
+        }
+
+        view.commitAppear()
+    }
+
+    func isHidden(_ isHidden: Bool) {
+        guard isHidden else {
+            view.commitDisappear()
+            return
+        }
+
+        self.frame(view.frame)
     }
 }
 
@@ -126,6 +152,22 @@ public class RootView: UIView {
     override open func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         RenderManager(self).willMove(toSuperview: newSuperview)
+    }
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self).isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self).frame(newValue)
+        }
     }
 
     override open func didMoveToSuperview() {

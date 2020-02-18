@@ -42,6 +42,28 @@ protocol SupportForEach: class {
 }
 
 public class PlaceholderView: UIView {
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self).isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self).frame(newValue)
+        }
+    }
+
+    override public func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        RenderManager(self).willMove(toSuperview: newSuperview)
+    }
+    
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
         RenderManager(self).didMoveToSuperview()

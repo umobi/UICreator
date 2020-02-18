@@ -68,6 +68,7 @@ extension _CollectionView: UICollectionViewDataSource {
         case UICollectionView.elementKindSectionHeader:
             guard let header = self.manager?.header(at: indexPath.section) else {
                 assert(false)
+                return .init()
             }
 
             guard let cell = self.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: header.identifier, for: indexPath) as? CollectionReusableView else {
@@ -93,6 +94,7 @@ extension _CollectionView: UICollectionViewDataSource {
         case UICollectionView.elementKindSectionFooter:
             guard let footer = self.manager?.footer(at: indexPath.section) else {
                 assert(false)
+                return .init()
             }
 
             guard let cell = self.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: footer.identifier, for: indexPath) as? CollectionReusableView else {
@@ -117,6 +119,7 @@ extension _CollectionView: UICollectionViewDataSource {
 
         default:
             assert(false)
+            return .init()
         }
     }
 }

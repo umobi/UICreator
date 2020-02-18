@@ -29,6 +29,9 @@ private var kNotRenderedHandler: UInt = 0
 private var kRenderedHandler: UInt = 0
 private var kInTheSceneHandler: UInt = 0
 private var kOnLayoutHandler: UInt = 0
+private var kOnAppearHandler: UInt = 0
+private var kOnDisappearHandler: UInt = 0
+private var kAppearState: UInt = 0
 
 internal extension UIView {
 
@@ -132,6 +135,16 @@ internal extension UIView {
         set { objc_setAssociatedObject(self, &kOnLayoutHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
+    var appearHandler: Handler? {
+        get { objc_getAssociatedObject(self, &kOnAppearHandler) as? Handler }
+        set { objc_setAssociatedObject(self, &kOnAppearHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    }
+
+    var disappearHandler: Handler? {
+        get { objc_getAssociatedObject(self, &kOnDisappearHandler) as? Handler }
+        set { objc_setAssociatedObject(self, &kOnDisappearHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    }
+
     /// This create the `Handler` for callback associated to`UIView.Mode.notRendered`
     private func beforeRendering(_ handler: @escaping (UIView) -> Void) -> Self {
         self.notRenderedHandler = .init(handler)
@@ -152,6 +165,16 @@ internal extension UIView {
 
     private func layout(_ handler: @escaping (UIView) -> Void) -> Self {
         self.layoutHandler = .init(handler)
+        return self
+    }
+
+    private func appear(_ handler: @escaping (UIView) -> Void) -> Self {
+        self.appearHandler = .init(handler)
+        return self
+    }
+
+    private func disappear(_ handler: @escaping (UIView) -> Void) -> Self {
+        self.disappearHandler = .init(handler)
         return self
     }
 
@@ -202,6 +225,35 @@ internal extension UIView {
             handler($0)
             allLayout?.commit(in: $0)
         }
+    }
+
+    func appendAppear(_ handler: @escaping (UIView) -> Void) -> Self {
+        let allAppear = self.appearHandler
+        return self.appear {
+            handler($0)
+            allAppear?.commit(in: $0)
+        }
+    }
+
+    func appendDisappear(_ handler: @escaping (UIView) -> Void) -> Self {
+        let allDisappear = self.disappearHandler
+        return self.disappear {
+            handler($0)
+            allDisappear?.commit(in: $0)
+        }
+    }
+}
+
+extension UIView {
+    enum AppearState {
+        case appeared
+        case disappeared
+        case unset
+    }
+
+    var appearState: AppearState {
+        get { (objc_getAssociatedObject(self, &kAppearState) as? AppearState) ?? .unset }
+        set { objc_setAssociatedObject(self, &kAppearState, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 }
 
