@@ -245,16 +245,54 @@ public extension UIViewCreator where Self: Control, View: UITextField {
 
 public extension UIViewCreator where View: UITextField {
     func leftView(_ mode: UITextField.ViewMode = .always, content: @escaping () -> ViewCreator) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.leftView = UICHost(content: content).releaseUIView()
-            ($0 as? View)?.leftViewMode = mode
+        return self.onRendered { view in
+            let host: UICHost = UICHost(content: content)
+            (view as? View)?.leftView = host.releaseUIView()
+            (view as? View)?.leftViewMode = mode
+
+            var needsToAddConstraints = true
+            host.onAppear { [weak host, weak view] in
+                guard needsToAddConstraints, let view = view else {
+                    return
+                }
+
+                $0.snp.makeConstraints {
+                    $0.centerY.equalTo(view.snp.centerY)
+                    $0.leading.equalTo(0)
+                }
+
+                needsToAddConstraints = false
+            }
+
+            host.onDisappear {
+                needsToAddConstraints = $0.window == nil
+            }
         }
     }
 
     func rightView(_ mode: UITextField.ViewMode = .always, content: @escaping () -> ViewCreator) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.rightView = UICHost(content: content).releaseUIView()
-            ($0 as? View)?.rightViewMode = mode
+        return self.onRendered { view in
+            let host: UICHost = UICHost(content: content)
+            (view as? View)?.rightView = host.releaseUIView()
+            (view as? View)?.rightViewMode = mode
+
+            var needsToAddConstraints = true
+            host.onAppear { [weak host, weak view] in
+                guard needsToAddConstraints, let view = view else {
+                    return
+                }
+
+                $0.snp.makeConstraints {
+                    $0.centerY.equalTo(view.snp.centerY)
+                    $0.trailing.equalTo(0)
+                }
+
+                needsToAddConstraints = false
+            }
+
+            host.onDisappear {
+                needsToAddConstraints = $0.window == nil
+            }
         }
     }
 }
@@ -271,7 +309,6 @@ public extension TextKeyboard where View: UITextField {
             ($0 as? View)?.autocorrectionType = type
         }
     }
-
 
     func keyboard(type: UIKeyboardType) -> Self {
         return self.onNotRendered {

@@ -124,7 +124,7 @@ extension UIView {
         }
 
         self.appearState = .disappeared
-        self.appearHandler?.commit(in: self)
+        self.disappearHandler?.commit(in: self)
     }
     
 
