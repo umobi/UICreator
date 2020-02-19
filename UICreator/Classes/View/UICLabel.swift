@@ -82,8 +82,12 @@ public extension UIViewCreator where View: UILabel, Self: TextElement {
     init(_ text: Value<String?>) {
         self.init(text.value)
 
-        text.next { [weak self] in
-            _ = self?.text($0)
+        let relay = text.asRelay
+        self.onInTheScene {
+            weak var view = $0 as? View
+            relay.sync {
+                view?.text = $0
+            }
         }
     }
 }

@@ -92,38 +92,47 @@ extension UIView: UIViewRender {
         }
     }
 
-    func commitAppear() {
+    @objc
+    var watchingViews: [UIView] {
+        return self.subviews
+    }
+
+}
+
+extension UIView {
+
+    private func _recursiveAppear() {
         guard self.appearState != .appeared else {
             return
         }
 
-        self.watchingViews.forEach {
-            guard $0.appearState != .appeared else {
-                return
-            }
-
-            $0.appearHandler?.commit(in: $0)
-            $0.appearState = .appeared
+        self.subviews.forEach {
+            $0._recursiveAppear()
         }
+
+        self.appearState = .appeared
+        self.appearHandler?.commit(in: self)
     }
 
-    func commitDisappear() {
+    private func _recursiveDisappear() {
         guard self.appearState == .appeared else {
             return
         }
 
-        self.watchingViews.forEach {
-            guard $0.appearState == .appeared else {
-                return
-            }
-            
-            $0.disappearHandler?.commit(in: $0)
-            $0.appearState = .disappeared
+        self.subviews.forEach {
+            $0._recursiveDisappear()
         }
+
+        self.appearState = .disappeared
+        self.appearHandler?.commit(in: self)
+    }
+    
+
+    func commitAppear() {
+        self._recursiveAppear()
     }
 
-    @objc
-    var watchingViews: [UIView] {
-        return self.subviews
+    func commitDisappear() {
+        self._recursiveDisappear()
     }
 }

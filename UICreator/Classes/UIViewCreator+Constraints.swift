@@ -1034,47 +1034,47 @@ public enum Margin: CaseIterable {
 }
 
 public extension ViewCreator {
-    func safeArea(priority: ConstraintPriority = .required,_ margins: Margin...) -> Self {
+    func safeArea(priority: ConstraintPriority = .required,_ margins: Margin..., equalTo value: CGFloat = 0) -> Self {
         Set(margins.isEmpty ? Margin.allCases : margins).reduce(self) {
             switch $1 {
             case .top:
-                return self.safeArea(topEqualTo: 0, priority: priority)
+                return self.safeArea(topEqualTo: value, priority: priority)
             case .bottom:
-                return self.safeArea(bottomEqualTo: 0, priority: priority)
+                return self.safeArea(bottomEqualTo: value, priority: priority)
             case .leading:
-                return self.safeArea(leadingEqualTo: 0, priority: priority)
+                return self.safeArea(leadingEqualTo: value, priority: priority)
             case .trailing:
-                return self.safeArea(trailingEqualTo: 0, priority: priority)
+                return self.safeArea(trailingEqualTo: value, priority: priority)
             }
         }
     }
 
-    func insets(priority: ConstraintPriority = .required,_ margins: Margin...) -> Self {
+    func insets(priority: ConstraintPriority = .required,_ margins: Margin..., equalTo value: CGFloat = 0) -> Self {
         Set(margins.isEmpty ? Margin.allCases : margins).reduce(self) {
             switch $1 {
             case .top:
-                return self.top(priority: priority)
+                return self.top(equalTo: value, priority: priority)
             case .bottom:
-                return self.bottom(priority: priority)
+                return self.bottom(equalTo: value, priority: priority)
             case .leading:
-                return self.leading(priority: priority)
+                return self.leading(equalTo: value, priority: priority)
             case .trailing:
-                return self.trailing(priority: priority)
+                return self.trailing(equalTo: value, priority: priority)
             }
         }
     }
 
-    func margin(priority: ConstraintPriority = .required,_ margins: Margin...) -> Self {
+    func margin(priority: ConstraintPriority = .required,_ margins: Margin..., equalTo value: CGFloat = 0) -> Self {
         Set(margins.isEmpty ? Margin.allCases : margins).reduce(self) {
             switch $1 {
             case .top:
-                return self.topMargin(priority: priority)
+                return self.topMargin(equalTo: value, priority: priority)
             case .bottom:
-                return self.bottomMargin(priority: priority)
+                return self.bottomMargin(equalTo: value, priority: priority)
             case .leading:
-                return self.leadingMargin(priority: priority)
+                return self.leadingMargin(equalTo: value, priority: priority)
             case .trailing:
-                return self.trailingMargin(priority: priority)
+                return self.trailingMargin(equalTo: value, priority: priority)
             }
         }
     }
