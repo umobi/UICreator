@@ -21,7 +21,6 @@
 //
 
 import Foundation
-import SnapKit
 import EasyAnchor
 
 extension UIView {

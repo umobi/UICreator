@@ -22,7 +22,6 @@
 
 import Foundation
 import UIKit
-import SnapKit
 import EasyAnchor
 import UIContainer
 

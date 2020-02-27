@@ -23,7 +23,6 @@
 import Foundation
 import UIKit
 import EasyAnchor
-import SnapKit
 import UIContainer
 
 internal extension UIView {
