@@ -37,6 +37,7 @@ UICreator is a replacement for storyboard and xib files. It directly communicate
 
   s.dependency 'UIContainer', '~> 1.2.0-beta.4'
   s.dependency 'SnapKit', '~> 5.0.1'
+  s.dependency 'EasyAnchor', '~> 3.0.0'
   # s.resource_bundles = {
   #   'UICreator' => ['UICreator/Assets/*.png']
   # }

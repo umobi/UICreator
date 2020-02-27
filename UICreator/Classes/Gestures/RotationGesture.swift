@@ -35,9 +35,10 @@ public class Rotation: UIGesture {
 
 public extension UIViewCreator {
 
-    func onRotationMaker(_ rotationConfigurator: (Rotation) -> Rotation) -> Self {
-        rotationConfigurator(Rotation(target: self.uiView)).add()
-        return self
+    func onRotationMaker(_ rotationConfigurator: @escaping (Rotation) -> Rotation) -> Self {
+        self.onNotRendered {
+            rotationConfigurator(Rotation(target: $0)).add()
+        }
     }
 
     func onRotation(_ handler: @escaping (UIView) -> Void) -> Self {

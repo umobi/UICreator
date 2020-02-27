@@ -28,7 +28,12 @@ public class UICHost: Root, ViewControllerType, UIViewCreator {
     public init(size: CGSize = .zero, content: @escaping () -> ViewCreator) {
         super.init()
 
-        self.uiView.frame = .init(origin: self.uiView.frame.origin, size: size)
-        self.uiView.add(priority: .required, content().releaseUIView())
+        let content = content()
+        self.tree.append(content)
+
+        self.onNotRendered { [content] in
+            $0.frame = .init(origin: $0.frame.origin, size: size)
+            $0.add(priority: .required, content.releaseUIView())
+        }
     }
 }

@@ -23,11 +23,20 @@
 import Foundation
 
 protocol ReusableView: class {
+    var hostedView: ViewCreator! { get }
     var contentView: UIView { get }
 //    var builder: ViewCreator! { get nonmutating set }
     func prepareCell(_ cell: UICCell)
 
     var cellLoaded: UICCell.Loaded! { get set }
+}
+
+private var kHostedView: UInt = 0
+extension ReusableView {
+    fileprivate(set) weak var hostedView: ViewCreator! {
+        get { objc_getAssociatedObject(self, &kHostedView) as? ViewCreator }
+        set { objc_setAssociatedObject(self, &kHostedView, newValue, .OBJC_ASSOCIATION_ASSIGN) }
+    }
 }
 
 extension ReusableView {
@@ -41,7 +50,8 @@ extension ReusableView {
         }
 
         let host = UICHost(content: cellLoaded.cell.rowManager.payload.content)
-        self.contentView.add(priority: .medium, host.releaseUIView())
+        self.hostedView = host
+        self.contentView.add(priority: .init(500), host.releaseUIView())
     }
 
     func reuseCell(_ cell: UICCell) {

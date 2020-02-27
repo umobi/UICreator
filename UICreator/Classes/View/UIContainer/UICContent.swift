@@ -24,6 +24,7 @@ import Foundation
 import UIKit
 import UIContainer
 import SnapKit
+import EasyAnchor
 
 public class _ContentView: ContentView {
 
@@ -31,7 +32,7 @@ public class _ContentView: ContentView {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self).isHidden(newValue)
+            RenderManager(self)?.isHidden(newValue)
         }
     }
 
@@ -39,28 +40,28 @@ public class _ContentView: ContentView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self).frame(newValue)
+            RenderManager(self)?.frame(newValue)
         }
     }
     
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self).willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self).didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self).didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self).layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
@@ -68,8 +69,14 @@ public class UICContent: UIViewCreator {
     public typealias View = _ContentView
 
     public init(mode: View.ContentMode = .center, priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) {
-        self.uiView = View(content().releaseUIView(), contentMode: mode, priority: priority)
-        self.uiView.updateBuilder(self)
+        let content = content()
+        self.tree.append(content)
+
+        self.loadView { [unowned self] in
+            let view = View(content.releaseUIView(), contentMode: mode, priority: priority)
+            view.updateBuilder(self)
+            return view
+        }
     }
 }
 
@@ -112,12 +119,14 @@ public func UICBottomRight(priority: ConstraintPriority = .required, content: @e
 public extension UIViewCreator where View: ContentView {
 
     func content(mode: UIView.ContentMode) -> Self {
-        (self.uiView as? View)?.apply(contentMode: mode)
-        return self
+        self.onNotRendered {
+            ($0 as? View)?.apply(contentMode: mode)
+        }
     }
 
     func fitting(priority: ConstraintPriority) -> Self {
-        (self.uiView as? View)?.apply(priority: priority)
-        return self
+        self.onNotRendered {
+            ($0 as? View)?.apply(priority: priority)
+        }
     }
 }

@@ -33,7 +33,7 @@ public class _CollectionView: UICollectionView {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self).isHidden(newValue)
+            RenderManager(self)?.isHidden(newValue)
         }
     }
 
@@ -41,46 +41,39 @@ public class _CollectionView: UICollectionView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self).frame(newValue)
+            RenderManager(self)?.frame(newValue)
         }
     }
 
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self).willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self).didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self).didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self).layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
-public class UICCollection: UIViewCreator, HasViewDelegate, HasViewDataSource {
+public class UICCollection: UIViewCreator {
     public typealias View = _CollectionView
-    init(layout: () -> UICollectionViewLayout) {
-        self.uiView = View(frame: .zero, collectionViewLayout: layout())
-        self.uiView.updateBuilder(self)
-    }
-
-    public func delegate(_ delegate: UICollectionViewDelegate?) -> Self {
-        (self.uiView as? View)?.delegate = delegate
-        return self
-    }
-
-    public func dataSource(_ dataSource: UICollectionViewDataSource?) -> Self {
-        (self.uiView as? View)?.dataSource = dataSource
-        return self
+    init(layout: @escaping () -> UICollectionViewLayout) {
+        self.loadView { [unowned self] in
+            let view = View(frame: .zero, collectionViewLayout: layout())
+            view.updateBuilder(self)
+            return view
+        }
     }
 }
 

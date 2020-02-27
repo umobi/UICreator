@@ -22,16 +22,9 @@
 
 import Foundation
 import UIKit
+import EasyAnchor
 import SnapKit
 import UIContainer
-
-private var kNotRenderedHandler: UInt = 0
-private var kRenderedHandler: UInt = 0
-private var kInTheSceneHandler: UInt = 0
-private var kOnLayoutHandler: UInt = 0
-private var kOnAppearHandler: UInt = 0
-private var kOnDisappearHandler: UInt = 0
-private var kAppearState: UInt = 0
 
 internal extension UIView {
 
@@ -42,9 +35,10 @@ internal extension UIView {
         case notRendered
         case rendered
         case inTheScene
+        case unset
 
         private static var allCases: [RenderState] {
-            return [.notRendered, .rendered, .inTheScene]
+            return [.unset, .notRendered, .rendered, .inTheScene]
         }
 
         static func >(left: RenderState, right: RenderState) -> Bool {
@@ -82,6 +76,14 @@ internal extension UIView {
 
             return allCases[leftOffset..<allCases.count].contains(right)
         }
+
+        var prev: RenderState? {
+            Self.allCases.split(separator: self).first?.last
+        }
+
+        var next: RenderState? {
+            Self.allCases.split(separator: self).last?.first
+        }
     }
 
     /// The current state of the view
@@ -112,157 +114,341 @@ internal extension UIView {
         }
     }
 
-    /// This holds the callback for `UIView.Mode.notRendered`
-    var notRenderedHandler: Handler? {
-        get { objc_getAssociatedObject(self, &kNotRenderedHandler) as? Handler }
-        set { objc_setAssociatedObject(self, &kNotRenderedHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    /// This holds the callback for `UIView.Mode.rendered`
-    var renderedHandler: Handler? {
-        get { objc_getAssociatedObject(self, &kRenderedHandler) as? Handler }
-        set { objc_setAssociatedObject(self, &kRenderedHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    /// This holds the callback for `UIView.Mode.inTheScene`
-    var inTheSceneHandler: Handler? {
-        get { objc_getAssociatedObject(self, &kInTheSceneHandler) as? Handler }
-        set { objc_setAssociatedObject(self, &kInTheSceneHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    var layoutHandler: Handler? {
-        get { objc_getAssociatedObject(self, &kOnLayoutHandler) as? Handler }
-        set { objc_setAssociatedObject(self, &kOnLayoutHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    var appearHandler: Handler? {
-        get { objc_getAssociatedObject(self, &kOnAppearHandler) as? Handler }
-        set { objc_setAssociatedObject(self, &kOnAppearHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    var disappearHandler: Handler? {
-        get { objc_getAssociatedObject(self, &kOnDisappearHandler) as? Handler }
-        set { objc_setAssociatedObject(self, &kOnDisappearHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    /// This create the `Handler` for callback associated to`UIView.Mode.notRendered`
-    private func beforeRendering(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.notRenderedHandler = .init(handler)
-        return self
-    }
-
-    /// This create the `Handler` for callback associated to `UIView.Mode.rendered`
-    private func rendered(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.renderedHandler = .init(handler)
-        return self
-    }
-
-    /// This create the `Handler` for callback associated to `UIView.Mode.inTheScene`
-    private func inTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.inTheSceneHandler = .init(handler)
-        return self
-    }
-
-    private func layout(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.layoutHandler = .init(handler)
-        return self
-    }
-
-    private func appear(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.appearHandler = .init(handler)
-        return self
-    }
-
-    private func disappear(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.disappearHandler = .init(handler)
-        return self
-    }
-
     /// The `add(_:)` function is used internally to add views inside view and constraint with required priority in all edges.
-    func add(priority: ConstraintPriority? = nil,_ view: UIView) {
+    func add(priority: UILayoutPriority? = nil,_ view: UIView) {
         AddSubview(self).addSubview(view)
 
-        let priority: ConstraintPriority = priority ?? ((self as UIView) is RootView && view is RootView ? .required :
+        let priority: UILayoutPriority = priority ?? ((self as UIView) is RootView && view is RootView ? .required :
         .init(751))
 
-        view.snp.makeConstraints {
-            $0.edges.equalTo(0).priority(priority)
-        }
+        activate(
+            view.anchor
+                .edges
+                .priority(priority.rawValue)
+        )
+    }
+}
+
+public extension ViewCreator {
+
+    @discardableResult
+    func onNotRendered(_ handler: @escaping (UIView) -> Void) -> Self {
+        self.render.onNotRendered(handler)
+        return self
     }
 
-    // Mark: - append methods for each state. All them get the old Handler callback associated to the state and add one more in the stack. The engine here stack each callback and execute them starting by the last command to the first command added in to stack
-
-    /// The `appendBeforeRendering(_:)` function is used internally to add more callbacks for `UIView.Mode.notRendered` state.
-    func appendBeforeRendering(_ handler: @escaping (UIView) -> Void) -> Self {
-        let allBefore = self.notRenderedHandler
-        return self.beforeRendering {
-            handler($0)
-            allBefore?.commit(in: $0)
-        }
+    @discardableResult
+    func onRendered(_ handler: @escaping (UIView) -> Void) -> Self {
+        self.render.onRendered(handler)
+        return self
     }
 
-    /// The `appendRendered(_:)` function is used internally to add more callbacks for `UIView.Mode.rendered` state.
-    func appendRendered(_ handler: @escaping (UIView) -> Void) -> Self {
-        let allRendered = self.renderedHandler
-        return self.rendered {
-            handler($0)
-            allRendered?.commit(in: $0)
-        }
+    @discardableResult
+    func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
+        self.render.onInTheScene(handler)
+        return self
+    }
+}
+
+extension ViewCreator {
+    var root: ViewCreator? {
+        sequence(first: self as ViewCreator, next: { $0.tree.supertree?.root })
+            .reversed()
+            .first
+    }
+}
+
+class Tree {
+    private(set) weak var root: ViewCreator!
+    private(set) var leafs: [Leaf]
+    private(set) weak var supertree: Tree?
+
+    init(_ root: ViewCreator) {
+        self.root = root
+        self.leafs = []
+        supertree = nil
     }
 
-    /// The `appendInTheScene(_:)` function is used internally to add more callbacks for `UIView.Mode.inTheScene` state.
-    func appendInTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
-        let allinTheScene = self.inTheSceneHandler
-        return self.inTheScene {
-            handler($0)
-            allinTheScene?.commit(in: $0)
+    func appendAssert(_ leaf: ViewCreator) {
+        guard self.root !== leaf else {
+            fatalError()
         }
+
+        guard !self.leafs.contains(where: {
+            $0.leaf === leaf
+        }) else {
+            fatalError()
+        }
+
+        leaf.tree.supertree = self
     }
 
-    func appendLayout(_ handler: @escaping (UIView) -> Void) -> Self {
-        let allLayout = self.layoutHandler
-        return self.layout {
-            handler($0)
-            allLayout?.commit(in: $0)
-        }
+    func append(_ leaf: ViewCreator) {
+        self.appendAssert(leaf)
+        self.leafs.append(.init(leaf))
     }
 
-    func appendAppear(_ handler: @escaping (UIView) -> Void) -> Self {
-        let allAppear = self.appearHandler
-        return self.appear {
-            handler($0)
-            allAppear?.commit(in: $0)
-        }
+    func insert(_ leaf: ViewCreator, at index: Int) {
+        self.appendAssert(leaf)
+
+        self.leafs = (Array(self.leafs[0..<index]) + [.init(leaf)] + {
+            guard index+1 < self.leafs.count else {
+                return []
+            }
+
+            return Array(self.leafs[index+1..<self.leafs.count])
+        }())
     }
 
-    func appendDisappear(_ handler: @escaping (UIView) -> Void) -> Self {
-        let allDisappear = self.disappearHandler
-        return self.disappear {
-            handler($0)
-            allDisappear?.commit(in: $0)
+    func remove(_ leaf: ViewCreator) {
+        guard self.leafs.contains(where: {
+            $0.leaf === leaf
+        }) else {
+            fatalError()
+        }
+
+        self.leafs = self.leafs.filter {
+            $0.leaf !== leaf
+        }
+
+        leaf.tree.supertree = nil
+    }
+
+    func printTrace(_ count: Int = 0) {
+        print("\((0..<count).map {_ in "\t"}.joined())", self.root!)
+        
+        self.leafs.forEach {
+            $0.leaf.tree.printTrace(count + 1)
         }
     }
 }
 
-extension UIView {
-    enum AppearState {
-        case appeared
-        case disappeared
-        case unset
-    }
-
-    var appearState: AppearState {
-        get { (objc_getAssociatedObject(self, &kAppearState) as? AppearState) ?? .unset }
-        set { objc_setAssociatedObject(self, &kAppearState, newValue, .OBJC_ASSOCIATION_RETAIN) }
+private var kTree: UInt = 0
+extension ViewCreator {
+    var tree: Tree {
+        get {
+            (objc_getAssociatedObject(self, &kTree) as? Tree) ?? {
+                let tree = Tree(self)
+                self.tree = tree
+                return tree
+            }()
+        }
+        set { objc_setAssociatedObject(self, &kTree, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 }
 
-extension UIView {
-    override open var debugDescription: String {
-        if let viewCreator = self.viewCreator {
-            return "\(type(of: viewCreator))"
+extension Tree {
+    struct Leaf {
+        private(set) weak var leaf: ViewCreator!
+
+        init(_ leaf: ViewCreator) {
+            self.leaf = leaf
+        }
+    }
+}
+
+public extension UIView {
+    func printCreatorTrace() {
+        if let root = self.superCreator?.root {
+            root.tree.printTrace()
+            return
         }
 
-        return "\(type(of: self))"
+        self.viewCreators.forEach {
+            $0.tree.printTrace()
+        }
+    }
+}
+
+private var kRender: UInt = 0
+extension ViewCreator {
+    var render: Render {
+        get { (objc_getAssociatedObject(self, &kRender) as? Render) ?? .create(self) }
+        set { objc_setAssociatedObject(self, &kRender, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    }
+}
+
+class Render {
+    weak var manager: ViewCreator!
+    var state: UIView.RenderState = .unset
+
+    private var needs: Set<UIView.RenderState> = []
+
+    private init(_ manager: ViewCreator) {
+        self.manager = manager
+    }
+
+    static func create(_ manager: ViewCreator) -> Render {
+        let render = Render(manager)
+        manager.render = render
+        return render
+    }
+
+    private var isRunningOutsideCicle: Bool = false
+    func append(_ state: UIView.RenderState) {
+        self.needs.insert(state)
+
+        if self.state >= state, !self.isRunningOutsideCicle {
+            self.isRunningOutsideCicle = true
+            OperationQueue.main.addOperation { [weak self] in
+                self?.isRunningOutsideCicle = false
+                self?.needs.filter {
+                    $0 <= self?.state ?? .unset
+                }
+                .forEach {
+                    self?.commit($0)
+                }
+            }
+        }
+    }
+
+    func needs(_ state: UIView.RenderState) -> Bool {
+        self.needs.contains(state)
+    }
+
+    private var notRenderedHandler: ((UIView) -> Void)? = nil
+    private var renderedHandler: ((UIView) -> Void)? = nil
+    private var inTheSceneHandler: ((UIView) -> Void)? = nil
+
+    private var countingNotRendered: Int = 0
+    private var countingRendered: Int = 0
+    private var countingInTheScene: Int = 0
+
+    func onNotRendered(_ handler: @escaping (UIView) -> Void) {
+        let old = self.notRenderedHandler
+        self.notRenderedHandler = {
+            old?($0)
+            handler($0)
+        }
+        self.countingNotRendered += 1
+        self.append(.notRendered)
+    }
+
+    func onRendered(_ handler: @escaping (UIView) -> Void) {
+        let old = self.renderedHandler
+        self.renderedHandler = {
+            old?($0)
+            handler($0)
+        }
+
+        self.countingRendered += 1
+        self.append(.rendered)
+    }
+
+    func onInTheScene(_ handler: @escaping (UIView) -> Void) {
+        let old = self.inTheSceneHandler
+        self.inTheSceneHandler = {
+            old?($0)
+            handler($0)
+        }
+
+        self.countingInTheScene += 1
+        self.append(.inTheScene)
+    }
+
+    func pop(_ state: UIView.RenderState) {
+        guard self.needs(state) else {
+            fatalError()
+        }
+
+        self.needs.remove(state)
+
+        switch state {
+        case .notRendered:
+            self.notRenderedHandler?(self.manager.uiView)
+            self.notRenderedHandler = nil
+            self.countingNotRendered = 0
+
+        case .rendered:
+            self.renderedHandler?(self.manager.uiView)
+            self.renderedHandler = nil
+            self.countingRendered = 0
+
+        case .inTheScene:
+            self.inTheSceneHandler?(self.manager.uiView)
+            self.inTheSceneHandler = nil
+            self.countingInTheScene = 0
+
+        default:
+            break
+        }
+    }
+
+    func commit(_ state: UIView.RenderState) {
+        if self.state < state {
+            self.state = state
+        }
+
+        guard self.needs.contains(state) else {
+            return
+        }
+
+        self.recursive(commit: state)
+    }
+}
+
+private extension ViewCreator {
+    var notRendered: [ViewCreator] {
+        guard self.isViewLoaded else {
+            return []
+        }
+
+        guard self.render.needs(.notRendered) else {
+            return []
+        }
+
+        return [self] + self.tree.leafs.reduce([]) {
+            $0 + $1.leaf.notRendered
+        }
+    }
+
+    var rendered: [ViewCreator] {
+        guard self.isViewLoaded else {
+            return []
+        }
+
+        guard self.render.needs(.rendered) else {
+            return []
+        }
+
+        return [self] + self.tree.leafs.reduce([]) {
+            $0 + $1.leaf.rendered
+        }
+    }
+
+    var inTheScene: [ViewCreator] {
+        guard self.isViewLoaded else {
+            return []
+        }
+
+        guard self.render.needs(.inTheScene) else {
+            return []
+        }
+
+        return [self] + self.tree.leafs.reduce([]) {
+            $0 + $1.leaf.inTheScene
+        }
+    }
+}
+
+private extension Render {
+    func recursive(commit state: UIView.RenderState){
+        switch state {
+        case .notRendered:
+            self.manager.notRendered.forEach {
+                $0.render.pop(state)
+            }
+        case .rendered:
+            self.manager.rendered.forEach {
+                $0.render.pop(state)
+            }
+        case .inTheScene:
+            self.manager.inTheScene.forEach {
+                $0.render.pop(state)
+            }
+
+        default:
+            break
+        }
     }
 }

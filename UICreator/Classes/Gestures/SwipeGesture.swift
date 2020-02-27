@@ -34,9 +34,10 @@ public class Swipe: UIGesture {
 
 public extension UIViewCreator {
 
-    func onSwipeMaker(_ swipeConfigurator: (Swipe) -> Swipe) -> Self {
-        swipeConfigurator(Swipe(target: self.uiView)).add()
-        return self
+    func onSwipeMaker(_ swipeConfigurator: @escaping (Swipe) -> Swipe) -> Self {
+        self.onNotRendered {
+            swipeConfigurator(Swipe(target: $0)).add()
+        }
     }
 
     func onSwipe(_ handler: @escaping (UIView) -> Void) -> Self {

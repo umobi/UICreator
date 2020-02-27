@@ -36,9 +36,10 @@ public class Pinch: UIGesture {
 
 public extension UIViewCreator {
 
-    func onPinchMaker(_ pinchConfigurator: (Pinch) -> Pinch) -> Self {
-        pinchConfigurator(Pinch(target: self.uiView)).add()
-        return self
+    func onPinchMaker(_ pinchConfigurator: @escaping (Pinch) -> Pinch) -> Self {
+        self.onNotRendered {
+            pinchConfigurator(Pinch(target: $0)).add()
+        }
     }
 
     func onPinch(_ handler: @escaping (UIView) -> Void) -> Self {

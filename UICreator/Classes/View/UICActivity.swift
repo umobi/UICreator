@@ -29,7 +29,7 @@ public class UICActivityIndicatorView: UIActivityIndicatorView {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self).isHidden(newValue)
+            RenderManager(self)?.isHidden(newValue)
         }
     }
 
@@ -37,28 +37,28 @@ public class UICActivityIndicatorView: UIActivityIndicatorView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self).frame(newValue)
+            RenderManager(self)?.frame(newValue)
         }
     }
     
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self).willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self).didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self).didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self).layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
@@ -66,8 +66,11 @@ public class UICActivity: UIViewCreator {
     public typealias View = UICActivityIndicatorView
 
     public init(style: View.Style) {
-        self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.style = style
+        self.loadView { [unowned self] in
+            let view = View.init(builder: self)
+            view.style = style
+            return view
+        }
     }
 }
 

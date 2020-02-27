@@ -23,6 +23,7 @@
 import Foundation
 import UIKit
 import UIContainer
+import EasyAnchor
 
 public class UICPageViewController: UIPageViewController {
     private var queuedViewControllers: [UIViewController]!
@@ -153,7 +154,7 @@ public class UICPageContainer: UIView {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self).isHidden(newValue)
+            RenderManager(self)?.isHidden(newValue)
         }
     }
 
@@ -161,18 +162,18 @@ public class UICPageContainer: UIView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self).frame(newValue)
+            RenderManager(self)?.frame(newValue)
         }
     }
 
     override open func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self).willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self).didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override open func didMoveToWindow() {
@@ -185,17 +186,15 @@ public class UICPageContainer: UIView {
             })
 
             AddSubview(self).addSubview(container)
-            container.snp.makeConstraints {
-                $0.edges.equalTo(0)
-            }
+            activate(container.anchor.edges)
             return container
         }()
-        RenderManager(self).didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override open func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self).layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
 
         if #available(iOS 11, tvOS 11, *), let view = self.container.view {
             if let stackView = self.stackView, let location = indicatorLocation {
@@ -224,7 +223,7 @@ public class UICPageContainer: UIView {
     }
 
     override var watchingViews: [UIView] {
-        return [self] + self.subviews
+        return self.subviews
     }
 
     public enum IndicatorViewPosition {
@@ -240,50 +239,110 @@ public class UICPageContainer: UIView {
         switch location {
         case .topRespectedToSafeArea:
             stackView.axis = .vertical
-            stackView.snp.makeConstraints {
-                $0.leading.trailing.equalTo(0)
-                if #available(iOS 11.0, tvOS 11, *) {
-                    $0.top.equalTo(self.safeAreaLayoutGuide.snp.topMargin)
-                } else {
-                    $0.top.equalTo(self.snp.topMargin)
-                }
-                $0.bottom.lessThanOrEqualTo(0)
+
+            activate(
+                stackView.anchor
+                    .leading
+                    .trailing,
+
+                stackView.anchor
+                    .bottom
+                    .greaterThanOrEqual
+            )
+
+            if #available(iOS 11.0, tvOS 11, *) {
+                activate(
+                    stackView.anchor
+                        .top
+                        .equal.to(self.safeAreaLayoutGuide.anchor.topMargin)
+                )
+            } else {
+                activate(
+                    stackView.anchor
+                        .top
+                        .equal.to(self.anchor.topMargin)
+                )
             }
         case .bottomRespectedToSafeArea:
             stackView.axis = .vertical
-            stackView.snp.makeConstraints {
-                $0.leading.trailing.equalTo(0)
-                if #available(iOS 11.0, tvOS 11, *) {
-                    $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottomMargin)
-                } else {
-                    $0.bottom.equalTo(self.snp.bottomMargin)
-                }
-                $0.top.greaterThanOrEqualTo(0)
+
+            activate(
+                stackView.anchor
+                    .leading
+                    .trailing,
+
+                stackView.anchor
+                    .top
+                    .greaterThanOrEqual
+            )
+
+            if #available(iOS 11.0, tvOS 11, *) {
+                activate(
+                    stackView.anchor
+                        .bottom
+                        .equal.to(self.safeAreaLayoutGuide.anchor.bottomMargin)
+                )
+            } else {
+                activate(
+                    stackView.anchor
+                        .bottom
+                        .equal.to(self.anchor.bottomMargin)
+                )
             }
+
         case .left:
             stackView.axis = .horizontal
-            stackView.snp.makeConstraints {
-                $0.bottom.top.leading.equalTo(0)
-                $0.trailing.lessThanOrEqualTo(0)
-            }
+
+            activate(
+                stackView.anchor
+                    .bottom
+                    .leading
+                    .top,
+
+                stackView.anchor
+                    .trailing
+                    .greaterThanOrEqual
+            )
         case .right:
             stackView.axis = .horizontal
-            stackView.snp.makeConstraints {
-                $0.bottom.top.trailing.equalTo(0)
-                $0.leading.greaterThanOrEqualTo(0)
-            }
+
+            activate(
+                stackView.anchor
+                    .bottom
+                    .trailing
+                    .top,
+
+                stackView.anchor
+                    .leading
+                    .greaterThanOrEqual
+            )
         case .top:
             stackView.axis = .vertical
-            stackView.snp.makeConstraints {
-                $0.leading.top.trailing.equalTo(0)
-                $0.bottom.lessThanOrEqualTo(0)
-            }
+
+            activate(
+                stackView.anchor
+                    .leading
+                    .trailing
+                    .top,
+
+                stackView.anchor
+                    .bottom
+                    .greaterThanOrEqual
+            )
+
         case .bottom:
             stackView.axis = .vertical
-            stackView.snp.makeConstraints {
-                $0.leading.bottom.trailing.equalTo(0)
-                $0.top.greaterThanOrEqualTo(0)
-            }
+
+            activate(
+                stackView.anchor
+                    .leading
+                    .trailing
+                    .bottom,
+
+                stackView.anchor
+                    .top
+                    .greaterThanOrEqual
+            )
         }
     }
 
@@ -334,30 +393,42 @@ public class UICPage: UIViewCreator {
     }
 
     public init(transitionStyle: UIPageViewController.TransitionStyle, navigationOrientation: UIPageViewController.NavigationOrientation, options: [UIPageViewController.OptionsKey: Any]?) {
-        self.transitionStyle = transitionStyle
-        self.navigationOrientation = navigationOrientation
-        self.options = options
-        self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.setContent { [unowned self] in
-            let pageViewController = self._pageViewController!
-            self.pageViewController = pageViewController
-            return pageViewController
+        self.loadView { [unowned self] in
+            self.transitionStyle = transitionStyle
+            self.navigationOrientation = navigationOrientation
+            self.options = options
+            let view = View.init(builder: self)
+            view.setContent { [unowned self] in
+                let pageViewController = self._pageViewController!
+                self.pageViewController = pageViewController
+                return pageViewController
+            }
+            return view
         }
     }
 }
 
 public extension UICPage {
-    func `as`<Controller: UIPageViewController>(_ ref: inout Controller!) -> Self {
-        ref = self.pageController as? Controller
-        return self
+    func `as`<Controller: UIPageViewController>(_ ref: inout UIReference<Controller>!) -> Self {
+        let reference = UIReference<Controller>()
+        ref = reference
+        return self.onInTheScene { [weak self, weak reference] _ in
+            reference?.ref(self?.pageController as? Controller)
+        }
     }
     
     func pages(direction: UIPageViewController.NavigationDirection,_ contents: @escaping () -> [ViewCreator]) -> Self {
-        self.onInTheScene { [unowned self] _ in
-            self.pageController.updateViewControllers(contents().enumerated().map { slice in
-                ContainerController(UICHost {
-                    slice.element
-                })
+        let contents = contents().map { content in
+            UICHost(content: { content })
+        }
+
+        contents.forEach {
+            self.tree.append($0)
+        }
+
+        return self.onInTheScene { [unowned self] _ in
+            self.pageController.updateViewControllers(contents.map { content in
+                ContainerController(content)
             }, direction: direction, animated: false, completion: nil)
         }
     }
@@ -383,10 +454,11 @@ public extension UICPage {
     }
 
     func addIndicator(atLocation location: View.IndicatorViewPosition, content: @escaping () -> ViewCreator) -> Self {
-        self.onInTheScene {
-            ($0 as? View)?.setIndicatorViews(location: location, views: [UICHost {
-                content()
-            }.uiView])
+        let content = UICHost(content: content)
+        self.tree.append(content)
+
+        return self.onInTheScene {
+            ($0 as? View)?.setIndicatorViews(location: location, views: [content.releaseUIView()])
         }
     }
 }

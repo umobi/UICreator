@@ -48,7 +48,7 @@ extension _CollectionView: UICollectionViewDataSource {
         cell.prepareCell(row)
 
         if let item = self.layoutManager?.item(at: indexPath), item.isDynamic, let loaded = cell.cellLoaded {
-            _ = cell.contentView.subviews.first?.appendLayout { [weak self, loaded] view in
+            _ = cell.hostedView.onLayout { [weak self, loaded] view in
                 guard view.frame.size != .zero else {
                     return
                 }
@@ -78,7 +78,7 @@ extension _CollectionView: UICollectionViewDataSource {
             cell.prepareCell(header)
 
             if let item = self.layoutManager?.header(at: indexPath.section), item.isDynamic, let loaded = cell.cellLoaded {
-                _ = cell.contentView.subviews.first?.appendLayout { [weak self, loaded] view in
+                _ = cell.hostedView.onLayout { [weak self, loaded] view in
                     guard view.frame.size != .zero else {
                         return
                     }
@@ -104,7 +104,7 @@ extension _CollectionView: UICollectionViewDataSource {
             cell.prepareCell(footer)
 
             if let item = self.layoutManager?.footer(at: indexPath.section), item.isDynamic, let loaded = cell.cellLoaded {
-                _ = cell.contentView.subviews.first?.appendLayout { [weak self, loaded] view in
+                _ = cell.hostedView.onLayout { [weak self, loaded] view in
                     guard view.frame.size != .zero else {
                         return
                     }

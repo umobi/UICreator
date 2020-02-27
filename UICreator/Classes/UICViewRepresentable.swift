@@ -50,31 +50,96 @@ public protocol UICViewRepresentable: UIViewCreator, UIViewMaker {
     func updateView(_ view: View)
 }
 
+class ViewMaker: RootView {
+    weak var hosted: UIView!
+
+    override open func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        RenderManager(self.hosted)?.willMove(toSuperview: newSuperview)
+    }
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self.hosted)?.isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self.hosted)?.frame(newValue)
+        }
+    }
+
+    override open func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        RenderManager(self.hosted)?.didMoveToSuperview()
+    }
+
+    override open func didMoveToWindow() {
+        super.didMoveToWindow()
+        RenderManager(self.hosted)?.didMoveToWindow()
+    }
+
+    override open func layoutSubviews() {
+        super.layoutSubviews()
+        RenderManager(self.hosted)?.layoutSubviews()
+    }
+}
+
+class Maker: ViewCreator {
+    public typealias View = ViewMaker
+
+    public init(_ viewCreator: ViewCreator) {
+        viewCreator.tree.supertree?.append(self)
+        viewCreator.tree.supertree?.remove(viewCreator)
+        self.tree.append(viewCreator)
+
+        self.loadView { [unowned self] in
+            let view = View.init(builder: self)
+            let hostedView: UIView! = viewCreator.releaseUIView()
+            view.hosted = hostedView
+            view.add(priority: .required, hostedView)
+            return view
+        }
+    }
+}
+
 internal extension UIViewMaker {
     func makeView() -> UIView {
-        if let view = objc_getAssociatedObject(self, &kUIView) as? UIView {
+        if let view = self.uiView {
             return view
         }
 
-        let view = self.loadView
-        view.updateBuilder(self)
-        objc_setAssociatedObject(self, &kUIView, view, .OBJC_ASSOCIATION_RETAIN)
-        return view
+        self.loadView { [unowned self] in
+            let view = self.loadView
+            view.updateBuilder(self)
+            return view
+        }
+        
+        return Maker(self).releaseUIView()
     }
 }
 
 public extension UICViewRepresentable {
     var loadView: UIView {
-        return self.makeUIView().appendInTheScene { [weak self] in
+        return self.onInTheScene { [weak self] in
             guard let view = ($0 as? View) else {
                 return
             }
 
             self?.updateView(view)
-        }
+        }.makeUIView()
     }
 
-    var uiView: View! {
+    weak var uiView: View! {
         return (self as ViewCreator).uiView as? View
+    }
+
+    weak var wrapper: UIView! {
+        return self.uiView.superview
     }
 }

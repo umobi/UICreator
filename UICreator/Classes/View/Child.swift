@@ -23,6 +23,7 @@
 import Foundation
 import UIKit
 import SnapKit
+import EasyAnchor
 import UIContainer
 
 public class ChildView: UIView {
@@ -31,7 +32,7 @@ public class ChildView: UIView {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self).isHidden(newValue)
+            RenderManager(self)?.isHidden(newValue)
         }
     }
 
@@ -39,28 +40,28 @@ public class ChildView: UIView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self).frame(newValue)
+            RenderManager(self)?.frame(newValue)
         }
     }
     
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self).willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self).didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self).didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self).layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
@@ -69,13 +70,17 @@ public class Child: UIViewCreator {
     public typealias View = ChildView
 
     public init(_ contents: @escaping () -> [ViewCreator]) {
-        self.uiView = View.init(builder: self)
+        let contents = contents()
+        contents.forEach {
+            self.tree.append($0)
+        }
 
-        contents().forEach {
-            AddSubview(self.uiView).addSubview($0.releaseUIView())
-            $0.uiView.snp.makeConstraints {
-                $0.edges.equalTo(0).priority(UILayoutPriority.fittingSizeLevel)
+        self.onNotRendered { view in
+            contents.forEach {
+                view.add(priority: .init(UILayoutPriority.fittingSizeLevel.rawValue), $0.releaseUIView())
             }
+        }.loadView { [unowned self] in
+            View.init(builder: self)
         }
     }
 }

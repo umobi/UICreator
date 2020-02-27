@@ -29,7 +29,7 @@ public class _Button: UIButton {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self).isHidden(newValue)
+            RenderManager(self)?.isHidden(newValue)
         }
     }
 
@@ -37,28 +37,28 @@ public class _Button: UIButton {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self).frame(newValue)
+            RenderManager(self)?.frame(newValue)
         }
     }
 
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self).willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self).didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self).didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self).layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
@@ -66,15 +66,18 @@ public class UICButton: UIViewCreator, Control {
     public typealias View = _Button
 
     public init(_ title: String?, type: UIButton.ButtonType? = nil) {
-        if let type = type {
-            self.uiView = View.init(type: type)
-            self.uiView.updateBuilder(self)
-            (self.uiView as? View)?.setTitle(title, for: .normal)
-            return
-        }
+        self.loadView { [unowned self] in
+            if let type = type {
+                let view = View.init(type: type)
+                view.updateBuilder(self)
+                view.setTitle(title, for: .normal)
+                return view
+            }
 
-        self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.setTitle(title, for: .normal)
+            let view = View.init(builder: self)
+            view.setTitle(title, for: .normal)
+            return view
+        }
     }
 }
 

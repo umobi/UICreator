@@ -28,7 +28,7 @@ public class _ImageView: UIImageView {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self).isHidden(newValue)
+            RenderManager(self)?.isHidden(newValue)
         }
     }
 
@@ -36,28 +36,36 @@ public class _ImageView: UIImageView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self).frame(newValue)
+            RenderManager(self)?.frame(newValue)
         }
     }
 
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self).willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self).didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self).didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self).layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
+    }
+
+    override public func removeConstraint(_ constraint: NSLayoutConstraint) {
+        super.removeConstraint(constraint)
+    }
+
+    override public func removeConstraints(_ constraints: [NSLayoutConstraint]) {
+        super.removeConstraints(constraints)
     }
 }
 
@@ -65,27 +73,41 @@ public class UICImage: UIViewCreator {
     public typealias View = _ImageView
 
     public init(mode: View.ContentMode = .scaleToFill) {
-        self.uiView = View.init(image: nil, highlightedImage: nil)
-        self.uiView.updateBuilder(self)
-        self.uiView.contentMode = mode
+        self.loadView { [unowned self] in
+            let view = View.init(image: nil, highlightedImage: nil)
+            view.updateBuilder(self)
+            view.contentMode = mode
+            return view
+        }
     }
 
     public init(image: UIImage?, highlightedImage: UIImage? = nil) {
-        self.uiView = View.init(image: image, highlightedImage: nil)
-        self.uiView.updateBuilder(self)
+        self.loadView { [unowned self] in
+            let view = View.init(image: image, highlightedImage: nil)
+            view.updateBuilder(self)
+            view.contentMode = .scaleToFill
+            return view
+        }
     }
 
     public init() {
-        self.uiView = View.init(image: nil, highlightedImage: nil)
-        self.uiView.updateBuilder(self)
+        self.loadView { [unowned self] in
+            let view = View.init(image: nil, highlightedImage: nil)
+            view.updateBuilder(self)
+            view.contentMode = .scaleToFill
+            return view
+        }
     }
 
-    private var imageRelay: Relay<UIImage?>? = nil
     public convenience init(_ imageRelay: Relay<UIImage?>) {
         self.init(image: nil)
 
-        self.imageRelay = imageRelay
-        self.context.image.connect(to: imageRelay)
+        _ = self.onInTheScene {
+            weak var view = $0 as? View
+            imageRelay.sync {
+                view?.image = $0
+            }
+        }
     }
 }
 
@@ -142,15 +164,3 @@ public extension UIViewCreator where View: UIImageView {
     }
 }
 #endif
-
-extension UICImage: UIViewContext {
-    public func bindContext(_ context: UICImage.Context) {
-        context.image.sync { [weak self] in
-            (self?.uiView as? View)?.image = $0
-        }
-    }
-
-    public class Context: UICreator.Context {
-        let image: Value<UIImage?> = .init(value: nil)
-    }
-}

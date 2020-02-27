@@ -47,9 +47,10 @@ extension UIGesture where Gesture: UITapGestureRecognizer {
 }
 
 public extension ViewCreator {
-    func onTapMaker(_ tapConfigurator: (Tap) -> Tap) -> Self {
-        tapConfigurator(Tap(target: self.uiView)).add()
-        return self
+    func onTapMaker(_ tapConfigurator: @escaping (Tap) -> Tap) -> Self {
+        self.onNotRendered {
+            tapConfigurator(Tap(target: $0)).add()
+        }
     }
 
     func onTap(_ handler: @escaping (UIView) -> Void) -> Self {

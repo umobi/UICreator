@@ -29,7 +29,7 @@ public class TableView: UITableView {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self).isHidden(newValue)
+            RenderManager(self)?.isHidden(newValue)
         }
     }
 
@@ -37,28 +37,36 @@ public class TableView: UITableView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self).frame(newValue)
+            RenderManager(self)?.frame(newValue)
         }
     }
 
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self).willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self).didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self).didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
+    }
+
+    override public func setNeedsLayout() {
+        super.setNeedsLayout()
+    }
+
+    override public func layoutIfNeeded() {
+        super.layoutIfNeeded()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self).layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
@@ -78,8 +86,11 @@ public class UICList: UIViewCreator, HasViewDelegate, HasViewDataSource {
     }
 
     public init(style: UITableView.Style) {
-        self.uiView = View.init(frame: .zero, style: style)
-        self.uiView.updateBuilder(self)
+        self.loadView { [unowned self] in
+            let view = View.init(frame: .zero, style: style)
+            view.updateBuilder(self)
+            return view
+        }
     }
 }
 
@@ -261,11 +272,11 @@ public extension UIViewCreator where View: UITableView {
 
 public extension UIViewCreator where View: UITableView {
     func accessoryType(_ type: UITableViewCell.AccessoryType) -> Self {
-        (self.uiView as? View)?.appendCellHandler {
-            $0.accessoryType = type
+        self.onNotRendered {
+            ($0 as? View)?.appendCellHandler {
+                $0.accessoryType = type
+            }
         }
-
-        return self
     }
 }
 

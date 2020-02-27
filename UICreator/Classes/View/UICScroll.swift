@@ -30,7 +30,7 @@ public class _ScrollView: ScrollView {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self).isHidden(newValue)
+            RenderManager(self)?.isHidden(newValue)
         }
     }
 
@@ -38,42 +38,43 @@ public class _ScrollView: ScrollView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self).frame(newValue)
+            RenderManager(self)?.frame(newValue)
         }
     }
 
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self).willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self).didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self).didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self).layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
-public class UICScroll: UIViewCreator, HasViewDelegate {
+public class UICScroll: UIViewCreator {
     public typealias View = _ScrollView
 
     public init(axis: View.Axis = .vertical, content: @escaping () -> ViewCreator) {
-        self.uiView = View.init(content().releaseUIView(), axis: axis)
-        self.uiView.updateBuilder(self)
-    }
+        let content = content()
+        self.tree.append(content)
 
-    public func delegate(_ delegate: UIScrollViewDelegate?) -> Self {
-        (self.uiView as? View)?.delegate = delegate
-        return self
+        self.loadView { [unowned self] in
+            let view = View.init(content.releaseUIView(), axis: axis)
+            view.updateBuilder(self)
+            return view
+        }
     }
 }
 

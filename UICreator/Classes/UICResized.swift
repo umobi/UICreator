@@ -22,6 +22,7 @@
 
 import Foundation
 import UIContainer
+import EasyAnchor
 
 public struct UICResized {
 
@@ -63,14 +64,14 @@ public struct UICResized {
     public func addSubview(_ subview: UIView) -> UICWeakResized {
         AddSubview(self.superview)?.addSubview(subview)
 
-        weak var _subview = subview
-        subview.appendLayout { _ in
-            _subview?.snp.makeConstraints {
-                $0.edges.equalTo(0)
-            }
+        self.superview.translatesAutoresizingMaskIntoConstraints = true
+        self.superview.autoresizingMask = [.flexibleHeight, .flexibleWidth]
 
-            _subview = nil
-        }
+        activate(
+            subview.anchor
+                .center
+                .equal.to(self.superview.anchor.center)
+        )
 
         self.addHandler?(self.superview)
 
@@ -134,35 +135,6 @@ public extension UICWeakResized {
             self.width = original.width
             self.addHandler = original.addHandler
         }
-
-        func size(for subview: UIView, with size: CGSize) -> CGSize {
-            guard size != .zero else {
-                return subview.frame.size
-            }
-
-            return subview.systemLayoutSizeFitting(
-                size,
-                withHorizontalFittingPriority: self.width ?? .fittingSizeLevel,
-                verticalFittingPriority: self.height ?? .fittingSizeLevel
-            )
-        }
-
-        fileprivate func updateSuperview(_ size: CGSize) {
-            let oldSize = self.superview.frame.size
-            self.superview.frame.size = size
-
-            self.subview.snp.remakeConstraints {
-                $0.trailing.leading.equalTo(0).priority(self.width ?? .fittingSizeLevel)
-                $0.top.bottom.equalTo(0).priority(self.height ?? .fittingSizeLevel)
-            }
-
-            self.superview.snp.remakeConstraints {
-                $0.width.equalTo(size.width).priority(self.width ?? .fittingSizeLevel)
-                $0.height.equalTo(size.height).priority(self.height ?? .fittingSizeLevel)
-            }
-
-            self.addHandler?(self.superview)
-        }
     }
 
     private func copy() -> Copy? {
@@ -177,58 +149,80 @@ public extension UICWeakResized {
     func watch(in resizableView: UIView!) {
         var muttable: UICWeakResized? = self
 
-        muttable?.subview.appendLayout { [self] in
+//        var oldSize = self.subview.frame.size
+        muttable?.subview.onLayout { [self] in
             guard let copy = self.copy() else {
                 muttable?.dealloac()
                 return
             }
 
-            let size = copy.size(for: $0, with: copy.superview.frame.size)
-            copy.updateSuperview(size)
-            $0.frame.size = size
+//            let size = copy.size(for: $0, with: resizableView.frame.size)
+            guard copy.superview.frame.size != $0.frame.size else {
+                return
+            }
+//            oldSize = $0.frame.size
+            copy.superview.frame.size = $0.frame.size
+            copy.addHandler?(copy.superview)
+//            copy.updateSuperview(size)
         }
 
-        resizableView.appendLayout { [self] in
-            guard let copy = self.copy() else {
-                muttable?.dealloac()
-                return
+        muttable?.superview.autoresizingMask = []
+
+        if let muttable = muttable {
+            if let width = self.width {
+                activate(
+                    muttable.subview.anchor
+                        .width
+                        .equal.to(resizableView.anchor.width)
+                        .priority(width.rawValue)
+                )
+
+                muttable.superview.autoresizingMask.insert(.flexibleWidth)
             }
 
-            copy.updateSuperview($0.frame.size)
-            copy.subview.setNeedsLayout()
+            if let height = self.height {
+                activate(
+                    muttable.subview.anchor
+                        .height
+                        .equal.to(resizableView.anchor.height)
+                        .priority(height.rawValue)
+                )
+
+                muttable.superview.autoresizingMask.insert(.flexibleHeight)
+            }
         }
 
         if resizableView.frame.size != .zero {
-            muttable?.copy()?.updateSuperview(resizableView.frame.size)
+//            muttable?.copy()?.updateSuperview(resizableView.frame.size)
             muttable?.subview?.setNeedsLayout()
         }
     }
 
-    func watch() {
-        var muttable: UICWeakResized? = self
-
-        muttable?.subview.appendLayout { [self] in
-            guard let copy = self.copy() else {
-                muttable?.dealloac()
-                return
-            }
-
-            let size = copy.size(for: $0, with: copy.superview.frame.size)
-            copy.updateSuperview(size)
-            $0.frame.size = size
-        }
-
-        muttable?.superview.appendLayout { [self] _ in
-            guard let copy = self.copy() else {
-                muttable?.dealloac()
-                return
-            }
-
-            copy.subview.setNeedsLayout()
-        }
-
-        if muttable?.superview.frame.size != .zero {
-            muttable?.subview?.setNeedsLayout()
-        }
-    }
+//    func watch() {
+//        var muttable: UICWeakResized? = self
+//
+//        muttable?.subview.onLayout { [self] in
+//            guard let copy = self.copy() else {
+//                muttable?.dealloac()
+//                return
+//            }
+//
+//            let size = copy.size(for: $0, with: copy.superview.frame.size)
+//            copy.updateSuperview(size)
+//            $0.frame.size = size
+//        }
+//
+//        muttable?.superview.onLayout { [self] _ in
+//            guard let copy = self.copy() else {
+//                muttable?.dealloac()
+//                return
+//            }
+//
+//            copy.subview.setNeedsLayout()
+//        }
+//
+//        if muttable?.superview.frame.size != .zero {
+//            muttable?.subview?.setNeedsLayout()
+//        }
+//    }
 }

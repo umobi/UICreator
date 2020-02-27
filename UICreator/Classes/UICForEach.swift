@@ -47,7 +47,7 @@ public class PlaceholderView: UIView {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self).isHidden(newValue)
+            RenderManager(self)?.isHidden(newValue)
         }
     }
 
@@ -55,28 +55,28 @@ public class PlaceholderView: UIView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self).frame(newValue)
+            RenderManager(self)?.frame(newValue)
         }
     }
 
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self).willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
     
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self).didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override open func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self).didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override open func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self).layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
@@ -111,15 +111,16 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
         self.relay = relay
         self.content = content
         self.viewType = View.self
-        self.uiView = PlaceholderView(builder: self)
+        self.loadView {
+            PlaceholderView(builder: self)
+        }
 
         self.syncLoad = {
             ($0.viewCreator as? Self)?.startObservation()
-            ($0.viewCreator as? Self)?.relay.post(value() ?? [])
         }
 
-        self.height(equalTo: 0, priority: .high)
-            .width(equalTo: 0, priority: .high)
+        self.height(equalTo: 0, priority: .defaultHigh)
+            .width(equalTo: 0, priority: .defaultHigh)
             .onNotRendered { view in
                 (view.viewCreator as? Self)?.load()
             }
@@ -128,7 +129,7 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
     func load() {
         let syncLoad = self.syncLoad
         self.syncLoad = nil
-        syncLoad?(self.uiView)
+        syncLoad?(self.releaseUIView())
     }
 
     var isLoaded: Bool {

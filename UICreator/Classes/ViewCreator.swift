@@ -43,26 +43,32 @@ Definitions of UIView as ViewBuild:
 
 public protocol ViewCreator: class {
     /// It is executed in `willMove(toSubview:)` and depends of superview to call the `commitNotRendered()`.
+    @discardableResult
     func onNotRendered(_ handler: @escaping (UIView) -> Void) -> Self
 
     /// It is executed in `didMoveToSuperview()` and depends of superview to call the `commitRendered()`.
+    @discardableResult
     func onRendered(_ handler: @escaping (UIView) -> Void) -> Self
 
     /// It is executed in `didMoveToWindow()` and depends of superview to call the `commitInTheScene()`.
+    @discardableResult
     func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self
 
+    @discardableResult
     func onLayout(_ handler: @escaping (UIView) -> Void) -> Self
 
+    @discardableResult
     func onAppear(_ handler: @escaping (UIView) -> Void) -> Self
 
+    @discardableResult
     func onDisappear(_ handler: @escaping (UIView) -> Void) -> Self
 }
 
-internal var kUIView: UInt = 0
+private var kUIView: UInt = 0
 internal extension ViewCreator {
-    var uiView: UIView! {
-        get { objc_getAssociatedObject(self, &kUIView) as? UIView ?? (self as? UIViewMaker)?.makeView() }
-        set { setView(newValue, policity: newValue?.superview != nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
+    weak var uiView: UIView! {
+        get { (try? objc_getAssociatedObject(self, &kUIView)) as? UIView }
+//        set { setView(newValue, policity: newValue?.superview != nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
     }
 
     func setView(_ uiView: UIView, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN) {
@@ -74,67 +80,46 @@ internal extension ViewCreator {
     }
 
     func releaseUIView() -> UIView! {
-        let uiView = self.uiView!
+        let uiView: UIView! = self.loadViewIfNeeded()
+        guard uiView.viewCreator === self else {
+            print("[ViewCreator] no viewCreator set")
+            return uiView
+        }
         uiView.setCreator(self, policity: .OBJC_ASSOCIATION_RETAIN)
         self.setView(uiView, policity: .OBJC_ASSOCIATION_ASSIGN)
         return uiView
     }
 }
 
-public extension ViewCreator {
+private var kLoadView: UInt = 0
+extension ViewCreator {
+    private(set) var loadViewHandler: (() -> UIView)? {
+        get { objc_getAssociatedObject(self, &kLoadView) as? (() -> UIView) }
+        set { objc_setAssociatedObject(self, &kLoadView, newValue, .OBJC_ASSOCIATION_RETAIN)}
+    }
 
-    @discardableResult
-    func onNotRendered(_ handler: @escaping (UIView) -> Void) -> Self {
-        guard self.uiView.renderState == .notRendered else {
-            self.uiView.appendBeforeRendering(handler)
-            self.uiView.notRenderedHandler?.commit(in: self.uiView)
-            self.uiView.notRenderedHandler = nil
-            return self
+    var isViewLoaded: Bool {
+        self.uiView != nil
+    }
+
+    func loadViewIfNeeded() -> UIView! {
+        if self.isViewLoaded {
+            return self.uiView
         }
 
-        _ = self.uiView.appendBeforeRendering(handler)
-        return self
-    }
-
-    @discardableResult
-    func onRendered(_ handler: @escaping (UIView) -> Void) -> Self {
-        guard self.uiView.renderState < .rendered else {
-            self.uiView.appendRendered(handler)
-            self.uiView.renderedHandler?.commit(in: self.uiView)
-            self.uiView.renderedHandler = nil
-            return self
+        print("Loaded view  ")
+        let loadView: UIView! = self.loadViewHandler?() ?? (self as? UIViewMaker)?.makeView()
+        self.loadViewHandler = nil
+        if loadView.viewCreator === self {
+            self.setView(loadView, policity: .OBJC_ASSOCIATION_ASSIGN)
         }
-        _ = self.uiView.appendRendered(handler)
-        return self
+
+        return loadView
     }
 
     @discardableResult
-    func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
-        guard self.uiView.renderState < .inTheScene else {
-            self.uiView.appendInTheScene(handler)
-            self.uiView.inTheSceneHandler?.commit(in: self.uiView)
-            self.uiView.inTheSceneHandler = nil
-            return self
-        }
-        _ = self.uiView.appendInTheScene(handler)
-        return self
-    }
-
-    @discardableResult
-    func onLayout(_ handler: @escaping (UIView) -> Void) -> Self {
-        _ = self.uiView.appendLayout(handler)
-        return self
-    }
-
-    @discardableResult
-    func onAppear(_ handler: @escaping (UIView) -> Void) -> Self {
-        _ = self.uiView.appendAppear(handler)
-        return self
-    }
-
-    @discardableResult
-    func onDisappear(_ handler: @escaping (UIView) -> Void) -> Self {
-        _ = self.uiView.appendDisappear(handler)
+    func loadView(_ handler: @escaping () -> UIView) -> Self {
+        self.loadViewHandler = handler
         return self
     }
 }

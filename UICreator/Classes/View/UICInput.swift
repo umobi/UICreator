@@ -29,7 +29,7 @@ public class _InputView: UIInputView {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self).isHidden(newValue)
+            RenderManager(self)?.isHidden(newValue)
         }
     }
 
@@ -37,44 +37,51 @@ public class _InputView: UIInputView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self).frame(newValue)
+            RenderManager(self)?.frame(newValue)
         }
     }
 
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self).willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self).didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self).didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self).layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
 public class UICInput: UIViewCreator {
     public typealias View = _InputView
 
-    public init(size: CGSize = .zero, style: UIInputView.Style = .keyboard, content: () -> ViewCreator) {
-        self.uiView = View.init(frame: .init(origin: .zero, size: size), inputViewStyle: style)
-        self.uiView.updateBuilder(self)
-        self.uiView.add(content().releaseUIView())
+    public init(size: CGSize = .zero, style: UIInputView.Style = .keyboard, content: @escaping () -> ViewCreator) {
+        let content = UICHost(content: content)
+        self.tree.append(content)
+
+        self.loadView { [unowned self, content] in
+            let view = View.init(frame: .init(origin: .zero, size: size), inputViewStyle: style)
+            view.updateBuilder(self)
+            view.add(content.releaseUIView())
+            return view
+        }
     }
 }
 
 public extension UIViewCreator where View: UIInputView {
     func allowsSelfsSizing(_ flag: Bool) -> Self {
-        (self.uiView as? View)?.allowsSelfSizing = flag
-        return self
+        self.onNotRendered {
+            ($0 as? View)?.allowsSelfSizing = flag
+        }
     }
 }

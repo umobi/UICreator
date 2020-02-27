@@ -29,7 +29,7 @@ public class _SegmentedControl: UISegmentedControl {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self).isHidden(newValue)
+            RenderManager(self)?.isHidden(newValue)
         }
     }
 
@@ -37,28 +37,28 @@ public class _SegmentedControl: UISegmentedControl {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self).frame(newValue)
+            RenderManager(self)?.frame(newValue)
         }
     }
 
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self).willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self).didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self).didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self).layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
@@ -143,8 +143,12 @@ public class UICSegmented: UIViewCreator, Control {
     public typealias View = _SegmentedControl
 
     public init(_ segments: @escaping () -> [Segment]) {
-        self.uiView = View.init(builder: self)
-        self.addSegments(segments())
+        self.onNotRendered { [unowned self] _ in
+            self.addSegments(segments())
+
+        }.loadView { [unowned self] in
+            return View.init(builder: self)
+        }
     }
 
     private func addSegments(_ segments: [Segment]) {

@@ -72,16 +72,28 @@ public extension ViewCreator {
         }
     }
 
-    func `as`<UIElement: UIView>(_ reference: inout UIElement!) -> Self {
-        reference = self.uiView as? UIElement
-        return self
+    func `as`<UIElement: UIView>(_ reference: inout UIReference<UIElement>!) -> Self {
+        let ref = UIReference<UIElement>()
+        reference = ref
+        return self.onNotRendered { [weak ref] in
+            ref?.ref($0 as? UIElement)
+        }
+    }
+}
+
+public class UIReference<UI: AnyObject> {
+    public private(set) weak var reference: UI!
+
+    init(_ ref: UI! = nil) {
+        self.reference = ref
     }
 
-    func `as`<UIElement: UIView>(_ reference: inout [UIElement]) -> Self {
-        if let view = self.uiView as? UIElement {
-            reference.append(view)
-        }
-        return self
+    public func ref(_ ui: UI!) {
+        self.reference = ui
+    }
+
+    public static var empty: UIReference<UI> {
+        return .init()
     }
 }
 

@@ -35,25 +35,25 @@ public extension UICFlow {
     private convenience init(_ manager: ListManager) {
         self.init()
 
-        guard let collectionView = self.uiView as? View else {
-            return
-        }
+        self.onNotRendered { [manager] in
+            let collectionView: View! = $0 as? View
 
-        manager.rowsIdentifier.forEach {
-            collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
-        }
+            manager.rowsIdentifier.forEach {
+                collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
+            }
 
-        manager.headersIdentifier.forEach {
-            collectionView.register(CollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: $0)
-        }
+            manager.headersIdentifier.forEach {
+                collectionView.register(CollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: $0)
+            }
 
-        manager.footersIdentifier.forEach {
-            collectionView.register(CollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: $0)
-        }
+            manager.footersIdentifier.forEach {
+                collectionView.register(CollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: $0)
+            }
 
-        collectionView.manager = manager
-        collectionView.dataSource = collectionView
-        collectionView.delegate = collectionView
-        manager.list = collectionView
+            collectionView.manager = manager
+            collectionView.dataSource = collectionView
+            collectionView.delegate = collectionView
+            manager.list = collectionView
+        }
     }
 }

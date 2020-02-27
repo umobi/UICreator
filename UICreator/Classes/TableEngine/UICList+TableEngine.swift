@@ -31,29 +31,30 @@ public extension UICList {
 
     private convenience init(style: UITableView.Style,_ manager: ListManager) {
         self.init(style: style)
-        #if os(iOS)
-        (self.uiView as? View)?.separatorStyle = .none
-        #endif
 
-        guard let tableView = self.uiView as? View else {
-            return
+        self.onNotRendered { [manager] in
+            let tableView: View! = $0 as? View
+            #if os(iOS)
+            tableView.separatorStyle = .none
+            #endif
+            
+            manager.rowsIdentifier.forEach { [unowned tableView] in
+                tableView?.register(TableViewCell.self, forCellReuseIdentifier: $0)
+            }
+
+            manager.headersIdentifier.forEach { [unowned tableView] in
+                tableView?.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
+            }
+
+            manager.footersIdentifier.forEach { [unowned tableView] in
+                tableView?.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
+            }
+
+            tableView.manager = manager
+            tableView.dataSource = tableView
+            tableView.delegate = tableView
+            manager.list = tableView
+
         }
-
-        manager.rowsIdentifier.forEach { [unowned tableView] in
-            tableView.register(TableViewCell.self, forCellReuseIdentifier: $0)
-        }
-
-        manager.headersIdentifier.forEach { [unowned tableView] in
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-        }
-
-        manager.footersIdentifier.forEach { [unowned tableView] in
-            tableView.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-        }
-
-        tableView.manager = manager
-        tableView.dataSource = tableView
-        tableView.delegate = tableView
-        manager.list = tableView
     }
 }

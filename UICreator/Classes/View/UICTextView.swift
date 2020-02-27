@@ -29,7 +29,7 @@ public class _TextView: UITextView {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self).isHidden(newValue)
+            RenderManager(self)?.isHidden(newValue)
         }
     }
 
@@ -37,28 +37,28 @@ public class _TextView: UITextView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self).frame(newValue)
+            RenderManager(self)?.frame(newValue)
         }
     }
 
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self).willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self).didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self).didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self).layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
@@ -66,18 +66,25 @@ public class UICTextView: UIViewCreator, TextElement, TextKeyboard, HasViewDeleg
     public typealias View = _TextView
 
     public func delegate(_ delegate: UITextViewDelegate?) -> Self {
-        (self.uiView as? View)?.delegate = delegate
-        return self
+        self.onInTheScene { [weak delegate] in
+            ($0 as? View)?.delegate = delegate
+        }
     }
 
     required public init(_ text: String?) {
-        self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.text = text
+        self.loadView { [unowned self] in
+            let view = View.init(builder: self)
+            view.text = text
+            return view
+        }
     }
 
     required public init(_ attributedText: NSAttributedString?) {
-        self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.attributedText = attributedText
+        self.loadView { [unowned self] in
+            let view = View.init(builder: self)
+            view.attributedText = attributedText
+            return view
+        }
     }
 }
 
@@ -224,14 +231,20 @@ public extension TextKeyboard where View: UITextView {
     }
 
     func inputView(content: @escaping () -> ViewCreator) -> Self {
-        self.onRendered {
-            ($0 as? View)?.inputView = content().releaseUIView()
+        let content = content()
+        self.tree.append(content)
+
+        return self.onRendered {
+            ($0 as? View)?.inputView = content.releaseUIView()
         }
     }
 
     func inputAccessoryView(content: @escaping () -> ViewCreator) -> Self {
-        self.onRendered {
-            ($0 as? View)?.inputAccessoryView = content().releaseUIView()
+        let content = content()
+        self.tree.append(content)
+
+        return self.onRendered {
+            ($0 as? View)?.inputAccessoryView = content.releaseUIView()
         }
     }
 

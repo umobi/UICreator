@@ -41,69 +41,109 @@ protocol RenderLayoutSubviewsState {
 }
 
 struct RenderManager {
-    weak var view: UIView!
+    private(set) weak var manager: ViewCreator!
 
-    init(_ view: UIView) {
-        self.view = view
+    init?(_ view: UIView?) {
+        guard let manager = view?.viewCreator else {
+            return nil
+        }
+
+        self.manager = manager
+    }
+}
+
+extension UIView {
+    var superCreator: ViewCreator? {
+        guard let superview = self.superview else {
+            return nil
+        }
+
+        return sequence(first: superview, next: { $0.superview })
+            .first(where: { $0.viewCreator != nil })?
+            .viewCreator
+    }
+
+    var viewCreators: [ViewCreator] {
+        self.subviews.reduce([]) {
+            $0 + {
+                guard let creator = $0.viewCreator else {
+                    return $0.viewCreators
+                }
+
+                return [creator]
+            }($1)
+        }
     }
 }
 
 extension RenderManager {
     func willMove(toSuperview newSuperview: UIView?) {
-        guard newSuperview != nil else {
+        if newSuperview == nil {
+            self.manager.tree.supertree?.remove(self.manager)
             return
         }
 
-        if let override = self.view as? RenderWillMoveToSuperviewState {
+        if self.manager.tree.supertree == nil {
+            self.manager.uiView.superCreator?.tree.append(self.manager)
+        }
+
+        if let override = self.manager.uiView as? RenderWillMoveToSuperviewState {
             override.render_willMoveToSuperview()
             return
         }
-
-        view.commitNotRendered()
+        
+        manager.render.commit(.notRendered)
     }
 
     func didMoveToSuperview() {
-        guard self.view.superview != nil else {
+        guard self.manager.uiView.superview != nil else {
             return
         }
 
-        if let override = self.view as? RenderDidMoveToSuperviewState {
+        if let override = self.manager.uiView as? RenderDidMoveToSuperviewState {
             override.render_didMoveToSuperview()
             return
         }
 
-        view.commitRendered()
+        manager.render.commit(.rendered)
     }
 
     func didMoveToWindow() {
-        guard self.view.window != nil else {
-            view.commitDisappear()
+        guard self.manager.uiView.window != nil else {
+            if let root = self.manager.root {
+                root.tree.supertree?.remove(root)
+            }
+            manager.commitDisappear()
             return
         }
 
-        if let override = self.view as? RenderDidMoveToWindowState {
+        if self.manager.tree.supertree == nil {
+            self.manager.uiView.superCreator?.tree.append(self.manager)
+        }
+
+        if let override = self.manager.uiView as? RenderDidMoveToWindowState {
             override.render_didMoveToWindow()
-            self.frame(view.frame)
+            self.frame(manager.uiView.frame)
             return
         }
 
-        view.commitInTheScene()
-        self.frame(view.frame)
+        manager.render.commit(.inTheScene)
+        self.frame(manager.uiView.frame)
     }
 
     func layoutSubviews() {
-        if let override = self.view as? RenderLayoutSubviewsState {
+        if let override = self.manager.uiView as? RenderLayoutSubviewsState {
             override.render_layoutSubviews()
-            self.frame(view.frame)
+            self.frame(manager.uiView.frame)
             return
         }
 
-        view.commitLayout()
-        self.frame(view.frame)
+        manager.commitLayout()
+        self.frame(manager.uiView.frame)
     }
 
     func frame(_ rect: CGRect) {
-        guard view.window != nil, !view.isHidden else {
+        guard manager.uiView.window != nil, !manager.uiView.isHidden else {
             return
         }
 
@@ -111,16 +151,16 @@ extension RenderManager {
             return
         }
 
-        view.commitAppear()
+        manager.commitAppear()
     }
 
     func isHidden(_ isHidden: Bool) {
         guard isHidden else {
-            view.commitDisappear()
+            manager.commitDisappear()
             return
         }
 
-        self.frame(view.frame)
+        self.frame(manager.uiView.frame)
     }
 }
 
@@ -129,7 +169,7 @@ extension RootView: RenderWillMoveToSuperviewState {
         self.willCommitNotRenderedHandler?()
         self.willCommitNotRenderedHandler = nil
 
-        self.commitNotRendered()
+        self.viewCreator?.render.commit(.notRendered)
 
         self.didCommitNotRenderedHandler?()
         self.didCommitNotRenderedHandler = nil
@@ -151,14 +191,14 @@ public class RootView: UIView {
 
     override open func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self).willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override open var isHidden: Bool {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self).isHidden(newValue)
+            RenderManager(self)?.isHidden(newValue)
         }
     }
 
@@ -166,27 +206,27 @@ public class RootView: UIView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self).frame(newValue)
+            RenderManager(self)?.frame(newValue)
         }
     }
 
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self).didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override open func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self).didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override open func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self).layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
     }
 
     override var watchingViews: [UIView] {
-        return [self] + self.subviews
+        return self.subviews
     }
 }
 
@@ -213,7 +253,9 @@ open class Root: ViewCreator {
     public typealias View = RootView
 
     public init() {
-        self.uiView = View.init(builder: self)
+        self.loadView { [unowned self] in
+            View.init(builder: self)
+        }
     }
 }
 
@@ -230,10 +272,12 @@ extension TemplateView where Self: Root {
         }
 
         self.didConfiguredView = true
+        let body = self.body
+        self.tree.append(body)
 
         if self.uiView.subviews.isEmpty {
             (self.uiView as? View)?.willCommitNotRenderedHandler = { [unowned self] in
-                self.uiView.add(priority: .required, self.body.releaseUIView())
+                self.uiView.add(priority: .required, body.releaseUIView())
             }
         }
 

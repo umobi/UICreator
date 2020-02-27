@@ -237,245 +237,249 @@ extension Control {
     public func onEvent(_ event: UIControl.Event, _ handler: @escaping (UIView) -> Void) -> Self {
         self.appendEvent(event, handler)
 
-        (self.uiView as? UIControl)?.addTarget(self.uiView, action: {
-            switch event {
-            case .touchDown:
-                return #selector((self.uiView as? UIControl)?.onTouchDown)
-            case .touchDownRepeat:
-                return #selector((self.uiView as? UIControl)?.onTouchDownRepeat)
-            case .touchDragInside:
-                return #selector((self.uiView as? UIControl)?.onTouchDragInside)
-            case .touchDragOutside:
-                return #selector((self.uiView as? UIControl)?.onTouchDragOutside)
-            case .touchDragEnter:
-                return #selector((self.uiView as? UIControl)?.onTouchDragEnter)
-            case .touchDragExit:
-                return #selector((self.uiView as? UIControl)?.onTouchDragExit)
-            case .touchUpInside:
-                return #selector((self.uiView as? UIControl)?.onTouchUpInside)
-            case .touchUpOutside:
-                return #selector((self.uiView as? UIControl)?.onTouchUpOutside)
-            case .touchCancel:
-                return #selector((self.uiView as? UIControl)?.onTouchCancel)
+        return self.onNotRendered {
+            ($0 as? UIControl)?.addTarget($0, action: {
+                switch event {
+                case .touchDown:
+                    return #selector(($0 as? UIControl)?.onTouchDown)
+                case .touchDownRepeat:
+                    return #selector(($0 as? UIControl)?.onTouchDownRepeat)
+                case .touchDragInside:
+                    return #selector(($0 as? UIControl)?.onTouchDragInside)
+                case .touchDragOutside:
+                    return #selector(($0 as? UIControl)?.onTouchDragOutside)
+                case .touchDragEnter:
+                    return #selector(($0 as? UIControl)?.onTouchDragEnter)
+                case .touchDragExit:
+                    return #selector(($0 as? UIControl)?.onTouchDragExit)
+                case .touchUpInside:
+                    return #selector(($0 as? UIControl)?.onTouchUpInside)
+                case .touchUpOutside:
+                    return #selector(($0 as? UIControl)?.onTouchUpOutside)
+                case .touchCancel:
+                    return #selector(($0 as? UIControl)?.onTouchCancel)
 
-            case .valueChanged:
-                return #selector((self.uiView as? UIControl)?.onValueChanged)
-            case .primaryActionTriggered:
-                return #selector((self.uiView as? UIControl)?.onPrimaryActionTriggered)
+                case .valueChanged:
+                    return #selector(($0 as? UIControl)?.onValueChanged)
+                case .primaryActionTriggered:
+                    return #selector(($0 as? UIControl)?.onPrimaryActionTriggered)
 
-            case .editingDidBegin:
-                return #selector((self.uiView as? UIControl)?.onEditingDidBegin)
-            case .editingChanged:
-                return #selector((self.uiView as? UIControl)?.onEditingChanged)
-            case .editingDidEnd:
-                return #selector((self.uiView as? UIControl)?.onEditingDidEnd)
-            case .editingDidEndOnExit:
-                return #selector((self.uiView as? UIControl)?.onEditingDidEndOnExit)
+                case .editingDidBegin:
+                    return #selector(($0 as? UIControl)?.onEditingDidBegin)
+                case .editingChanged:
+                    return #selector(($0 as? UIControl)?.onEditingChanged)
+                case .editingDidEnd:
+                    return #selector(($0 as? UIControl)?.onEditingDidEnd)
+                case .editingDidEndOnExit:
+                    return #selector(($0 as? UIControl)?.onEditingDidEndOnExit)
 
-            case .allTouchEvents:
-                return #selector((self.uiView as? UIControl)?.onAllTouchEvents)
-            case .allEditingEvents:
-                return #selector((self.uiView as? UIControl)?.onAllEditingEvents)
-            case .applicationReserved:
-                return #selector((self.uiView as? UIControl)?.onApplicationReserved)
-            case .systemReserved:
-                return #selector((self.uiView as? UIControl)?.onSystemReserved)
-            case .allEvents:
-                return #selector((self.uiView as? UIControl)?.onAllEvents)
+                case .allTouchEvents:
+                    return #selector(($0 as? UIControl)?.onAllTouchEvents)
+                case .allEditingEvents:
+                    return #selector(($0 as? UIControl)?.onAllEditingEvents)
+                case .applicationReserved:
+                    return #selector(($0 as? UIControl)?.onApplicationReserved)
+                case .systemReserved:
+                    return #selector(($0 as? UIControl)?.onSystemReserved)
+                case .allEvents:
+                    return #selector(($0 as? UIControl)?.onAllEvents)
 
-            default:
-                return #selector((self.uiView as? UIControl)?.onAllEvents)
-            }
-        }(), for: event)
-
-        return self
+                default:
+                    return #selector(($0 as? UIControl)?.onAllEvents)
+                }
+            }($0), for: event)
+        }
     }
 
     public func removeEvent(_ event: UIControl.Event) {
-        (self.uiView as? UIControl)?.removeTarget(self.uiView, action: nil, for: event)
+        self.onRendered {
+            ($0 as? UIControl)?.removeTarget($0, action: nil, for: event)
 
-        switch event {
-        case .touchDown:
-            (self.uiView as? UIControl)?.touchDown = nil
-        case .touchDownRepeat:
-            (self.uiView as? UIControl)?.touchDownRepeat = nil
-        case .touchDragInside:
-            (self.uiView as? UIControl)?.touchDragInside = nil
-        case .touchDragOutside:
-            (self.uiView as? UIControl)?.touchDragOutside = nil
-        case .touchDragEnter:
-            (self.uiView as? UIControl)?.touchDragEnter = nil
-        case .touchDragExit:
-            (self.uiView as? UIControl)?.touchDragExit = nil
-        case .touchUpInside:
-            (self.uiView as? UIControl)?.touchUpInside = nil
-        case .touchUpOutside:
-            (self.uiView as? UIControl)?.touchUpOutside = nil
-        case .touchCancel:
-            (self.uiView as? UIControl)?.touchCancel = nil
+            switch event {
+            case .touchDown:
+                ($0 as? UIControl)?.touchDown = nil
+            case .touchDownRepeat:
+                ($0 as? UIControl)?.touchDownRepeat = nil
+            case .touchDragInside:
+                ($0 as? UIControl)?.touchDragInside = nil
+            case .touchDragOutside:
+                ($0 as? UIControl)?.touchDragOutside = nil
+            case .touchDragEnter:
+                ($0 as? UIControl)?.touchDragEnter = nil
+            case .touchDragExit:
+                ($0 as? UIControl)?.touchDragExit = nil
+            case .touchUpInside:
+                ($0 as? UIControl)?.touchUpInside = nil
+            case .touchUpOutside:
+                ($0 as? UIControl)?.touchUpOutside = nil
+            case .touchCancel:
+                ($0 as? UIControl)?.touchCancel = nil
 
-        case .valueChanged:
-            (self.uiView as? UIControl)?.valueChanged = nil
-        case .primaryActionTriggered:
-            (self.uiView as? UIControl)?.primaryActionTriggered = nil
+            case .valueChanged:
+                ($0 as? UIControl)?.valueChanged = nil
+            case .primaryActionTriggered:
+                ($0 as? UIControl)?.primaryActionTriggered = nil
 
-        case .editingDidBegin:
-            (self.uiView as? UIControl)?.editingDidBegin = nil
-        case .editingChanged:
-            (self.uiView as? UIControl)?.editingChanged = nil
-        case .editingDidEnd:
-            (self.uiView as? UIControl)?.editingDidEnd = nil
-        case .editingDidEndOnExit:
-            (self.uiView as? UIControl)?.editingDidEndOnExit = nil
+            case .editingDidBegin:
+                ($0 as? UIControl)?.editingDidBegin = nil
+            case .editingChanged:
+                ($0 as? UIControl)?.editingChanged = nil
+            case .editingDidEnd:
+                ($0 as? UIControl)?.editingDidEnd = nil
+            case .editingDidEndOnExit:
+                ($0 as? UIControl)?.editingDidEndOnExit = nil
 
-        case .allTouchEvents:
-            (self.uiView as? UIControl)?.allTouchEvents = nil
-        case .allEditingEvents:
-            (self.uiView as? UIControl)?.allEditingEvents = nil
-        case .applicationReserved:
-            (self.uiView as? UIControl)?.applicationReserved = nil
-        case .systemReserved:
-            (self.uiView as? UIControl)?.systemReserved = nil
-        case .allEvents:
-            (self.uiView as? UIControl)?.allEvents = nil
+            case .allTouchEvents:
+                ($0 as? UIControl)?.allTouchEvents = nil
+            case .allEditingEvents:
+                ($0 as? UIControl)?.allEditingEvents = nil
+            case .applicationReserved:
+                ($0 as? UIControl)?.applicationReserved = nil
+            case .systemReserved:
+                ($0 as? UIControl)?.systemReserved = nil
+            case .allEvents:
+                ($0 as? UIControl)?.allEvents = nil
 
-        default:
-            (self.uiView as? UIControl)?.allEvents = nil
+            default:
+                ($0 as? UIControl)?.allEvents = nil
+            }
         }
     }
 
     private func appendEvent(_ event: UIControl.Event, _ handler: @escaping (UIView) -> Void) {
-        switch event {
-        case .touchDown:
-            let old = (self.uiView as? UIControl)?.touchDown
-            (self.uiView as? UIControl)?.touchDown = .init {
-                handler($0)
-                old?.commit(in: $0)
+        self.onNotRendered {
+            switch event {
+            case .touchDown:
+                let old = ($0 as? UIControl)?.touchDown
+                ($0 as? UIControl)?.touchDown = .init {
+                    handler($0)
+                    old?.commit(in: $0)
+                }
+            case .touchDownRepeat:
+                let old = ($0 as? UIControl)?.touchDownRepeat
+                ($0 as? UIControl)?.touchDownRepeat = .init {
+                   handler($0)
+                   old?.commit(in: $0)
+               }
+            case .touchDragInside:
+                let old = ($0 as? UIControl)?.touchDragInside
+                ($0 as? UIControl)?.touchDragInside = .init {
+                   handler($0)
+                   old?.commit(in: $0)
+               }
+            case .touchDragOutside:
+                let old = ($0 as? UIControl)?.touchDragOutside
+                ($0 as? UIControl)?.touchDragOutside = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+            case .touchDragEnter:
+                let old = ($0 as? UIControl)?.touchDragEnter
+                ($0 as? UIControl)?.touchDragEnter = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+            case .touchDragExit:
+                let old = ($0 as? UIControl)?.touchDragExit
+                ($0 as? UIControl)?.touchDragExit = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+            case .touchUpInside:
+                let old = ($0 as? UIControl)?.touchUpInside
+                ($0 as? UIControl)?.touchUpInside = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+            case .touchUpOutside:
+                let old = ($0 as? UIControl)?.touchUpOutside
+                ($0 as? UIControl)?.touchUpOutside = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+            case .touchCancel:
+                let old = ($0 as? UIControl)?.touchCancel
+                ($0 as? UIControl)?.touchCancel = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+
+            case .valueChanged:
+                let old = ($0 as? UIControl)?.valueChanged
+                ($0 as? UIControl)?.valueChanged = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+            case .primaryActionTriggered:
+                let old = ($0 as? UIControl)?.primaryActionTriggered
+                ($0 as? UIControl)?.primaryActionTriggered = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+
+            case .editingDidBegin:
+                let old = ($0 as? UIControl)?.editingDidBegin
+                ($0 as? UIControl)?.editingDidBegin = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+            case .editingChanged:
+                let old = ($0 as? UIControl)?.editingChanged
+                ($0 as? UIControl)?.editingChanged = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+            case .editingDidEnd:
+                let old = ($0 as? UIControl)?.editingDidEnd
+                ($0 as? UIControl)?.editingDidEnd = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+            case .editingDidEndOnExit:
+                let old = ($0 as? UIControl)?.editingDidEndOnExit
+                ($0 as? UIControl)?.editingDidEndOnExit = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+
+            case .allTouchEvents:
+                let old = ($0 as? UIControl)?.allTouchEvents
+                ($0 as? UIControl)?.allTouchEvents = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+            case .allEditingEvents:
+                let old = ($0 as? UIControl)?.allEditingEvents
+                ($0 as? UIControl)?.allEditingEvents = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+            case .applicationReserved:
+                let old = ($0 as? UIControl)?.applicationReserved
+                ($0 as? UIControl)?.applicationReserved = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+            case .systemReserved:
+                let old = ($0 as? UIControl)?.systemReserved
+                ($0 as? UIControl)?.systemReserved = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+            case .allEvents:
+                let old = ($0 as? UIControl)?.allEvents
+                ($0 as? UIControl)?.allEvents = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
+
+            default:
+                let old = ($0 as? UIControl)?.allEvents
+                ($0 as? UIControl)?.allEvents = .init {
+                      handler($0)
+                      old?.commit(in: $0)
+                  }
             }
-        case .touchDownRepeat:
-            let old = (self.uiView as? UIControl)?.touchDownRepeat
-            (self.uiView as? UIControl)?.touchDownRepeat = .init {
-               handler($0)
-               old?.commit(in: $0)
-           }
-        case .touchDragInside:
-            let old = (self.uiView as? UIControl)?.touchDragInside
-            (self.uiView as? UIControl)?.touchDragInside = .init {
-               handler($0)
-               old?.commit(in: $0)
-           }
-        case .touchDragOutside:
-            let old = (self.uiView as? UIControl)?.touchDragOutside
-            (self.uiView as? UIControl)?.touchDragOutside = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-        case .touchDragEnter:
-            let old = (self.uiView as? UIControl)?.touchDragEnter
-            (self.uiView as? UIControl)?.touchDragEnter = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-        case .touchDragExit:
-            let old = (self.uiView as? UIControl)?.touchDragExit
-            (self.uiView as? UIControl)?.touchDragExit = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-        case .touchUpInside:
-            let old = (self.uiView as? UIControl)?.touchUpInside
-            (self.uiView as? UIControl)?.touchUpInside = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-        case .touchUpOutside:
-            let old = (self.uiView as? UIControl)?.touchUpOutside
-            (self.uiView as? UIControl)?.touchUpOutside = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-        case .touchCancel:
-            let old = (self.uiView as? UIControl)?.touchCancel
-            (self.uiView as? UIControl)?.touchCancel = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-
-        case .valueChanged:
-            let old = (self.uiView as? UIControl)?.valueChanged
-            (self.uiView as? UIControl)?.valueChanged = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-        case .primaryActionTriggered:
-            let old = (self.uiView as? UIControl)?.primaryActionTriggered
-            (self.uiView as? UIControl)?.primaryActionTriggered = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-
-        case .editingDidBegin:
-            let old = (self.uiView as? UIControl)?.editingDidBegin
-            (self.uiView as? UIControl)?.editingDidBegin = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-        case .editingChanged:
-            let old = (self.uiView as? UIControl)?.editingChanged
-            (self.uiView as? UIControl)?.editingChanged = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-        case .editingDidEnd:
-            let old = (self.uiView as? UIControl)?.editingDidEnd
-            (self.uiView as? UIControl)?.editingDidEnd = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-        case .editingDidEndOnExit:
-            let old = (self.uiView as? UIControl)?.editingDidEndOnExit
-            (self.uiView as? UIControl)?.editingDidEndOnExit = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-
-        case .allTouchEvents:
-            let old = (self.uiView as? UIControl)?.allTouchEvents
-            (self.uiView as? UIControl)?.allTouchEvents = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-        case .allEditingEvents:
-            let old = (self.uiView as? UIControl)?.allEditingEvents
-            (self.uiView as? UIControl)?.allEditingEvents = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-        case .applicationReserved:
-            let old = (self.uiView as? UIControl)?.applicationReserved
-            (self.uiView as? UIControl)?.applicationReserved = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-        case .systemReserved:
-            let old = (self.uiView as? UIControl)?.systemReserved
-            (self.uiView as? UIControl)?.systemReserved = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-        case .allEvents:
-            let old = (self.uiView as? UIControl)?.allEvents
-            (self.uiView as? UIControl)?.allEvents = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
-
-        default:
-            let old = (self.uiView as? UIControl)?.allEvents
-            (self.uiView as? UIControl)?.allEvents = .init {
-                  handler($0)
-                  old?.commit(in: $0)
-              }
         }
     }
 }

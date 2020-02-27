@@ -199,7 +199,7 @@ extension ListManager.RowManager {
 
 extension ListManager.RowManager: SupportForEach {
     func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
-        sequence.next { [compactCopy] in
+        sequence.sync { [compactCopy] in
             compactCopy.listManager
                 .section(at: compactCopy.indexPath.section)
                 .content(compactCopy, updatedWith: $0.map { content in
