@@ -352,21 +352,28 @@ class Render {
 
         self.needs.remove(state)
 
+        if self.state < state {
+            self.state = state
+        }
+
         switch state {
         case .notRendered:
-            self.notRenderedHandler?(self.manager.uiView)
+            let handler = self.notRenderedHandler
             self.notRenderedHandler = nil
             self.countingNotRendered = 0
+            handler?(self.manager.uiView)
 
         case .rendered:
-            self.renderedHandler?(self.manager.uiView)
+            let handler = self.renderedHandler
             self.renderedHandler = nil
             self.countingRendered = 0
+            handler?(self.manager.uiView)
 
         case .inTheScene:
-            self.inTheSceneHandler?(self.manager.uiView)
+            let handler = self.inTheSceneHandler
             self.inTheSceneHandler = nil
             self.countingInTheScene = 0
+            handler?(self.manager.uiView)
 
         default:
             break

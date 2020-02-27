@@ -64,29 +64,77 @@ public protocol ViewCreator: class {
     func onDisappear(_ handler: @escaping (UIView) -> Void) -> Self
 }
 
-private var kUIView: UInt = 0
-internal extension ViewCreator {
+private struct UIViewObject {
+    private weak var __weak_uiView: UIView!
+    private var __strong_uiView: UIView!
+
     weak var uiView: UIView! {
-        get { (try? objc_getAssociatedObject(self, &kUIView)) as? UIView }
-//        set { setView(newValue, policity: newValue?.superview != nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
+        self.__strong_uiView ?? self.__weak_uiView
     }
 
-    func setView(_ uiView: UIView, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN) {
-        objc_setAssociatedObject(self, &kUIView, uiView, policity)
+    private init(weak view: UIView!) {
+        self.__weak_uiView = view
+        self.__strong_uiView = nil
+    }
+
+    private init(strong view: UIView!) {
+        self.__weak_uiView = nil
+        self.__strong_uiView = view
+    }
+
+    static func `weak`(_ view: UIView) -> Self {
+        .init(weak: view)
+    }
+
+    static func strong(_ view: UIView) -> Self {
+        .init(strong: view)
+    }
+
+    static var `nil`: Self {
+        .init(weak: nil)
+    }
+}
+
+private var kUIView: UInt = 0
+private extension ViewCreator {
+    private(set) var viewObject: UIViewObject {
+        get {
+            objc_getAssociatedObject(self, &kUIView) as? UIViewObject ?? {
+                let object = UIViewObject.nil
+                self.viewObject = object
+                return object
+            }()
+        }
+        set { objc_setAssociatedObject(self, &kUIView, newValue, .OBJC_ASSOCIATION_COPY_NONATOMIC) }
+    }
+
+    func setView(_ uiView: UIView, asWeak: Bool = false) {
+        self.viewObject = {
+            if asWeak {
+                return .weak(uiView)
+            }
+
+            return .strong(uiView)
+        }()
 
         if let root = self as? (Root & TemplateView) {
             root.viewDidChanged()
         }
     }
+}
+
+internal extension ViewCreator {
+    weak var uiView: UIView! {
+        self.viewObject.uiView
+    }
 
     func releaseUIView() -> UIView! {
         let uiView: UIView! = self.loadViewIfNeeded()
         guard uiView.viewCreator === self else {
-            print("[ViewCreator] no viewCreator set")
             return uiView
         }
         uiView.setCreator(self, policity: .OBJC_ASSOCIATION_RETAIN)
-        self.setView(uiView, policity: .OBJC_ASSOCIATION_ASSIGN)
+        self.setView(uiView, asWeak: true)
         return uiView
     }
 }
@@ -107,11 +155,10 @@ extension ViewCreator {
             return self.uiView
         }
 
-        print("Loaded view  ")
         let loadView: UIView! = self.loadViewHandler?() ?? (self as? UIViewMaker)?.makeView()
         self.loadViewHandler = nil
         if loadView.viewCreator === self {
-            self.setView(loadView, policity: .OBJC_ASSOCIATION_ASSIGN)
+            self.setView(loadView, asWeak: true)
         }
 
         return loadView
