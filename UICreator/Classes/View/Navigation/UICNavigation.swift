@@ -144,23 +144,36 @@ public extension UICNavigation {
 
 public extension ViewCreator {
 
+    private var presentable: UIViewController! {
+        guard let viewController = self.uiView.window?.rootViewController else {
+            return nil
+        }
+
+        return sequence(
+            first: viewController,
+            next: { $0.presentedViewController }
+        )
+        .reversed()
+        .first
+    }
+
     @discardableResult
     func present<View: ViewCreator>(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> View) -> Self {
         let controller = ContainerController(UICHost(content: content))
-        self.uiView?.window?.rootViewController?.present(controller, animated: animated, completion: onCompletion)
+        self.presentable?.present(controller, animated: animated, completion: onCompletion)
         return self
     }
 
     @discardableResult
     func present<View: ViewControllerType>(animated: Bool, onCompletion: (() -> Void)? = nil,_ content: View) -> Self {
         let controller = ContainerController(content)
-        self.uiView?.window?.rootViewController?.present(controller, animated: animated, completion: onCompletion)
+        self.presentable?.present(controller, animated: animated, completion: onCompletion)
         return self
     }
 
     @discardableResult
     func present(animated: Bool, onCompletion: (() -> Void)? = nil, _ viewController: UIViewController) -> Self {
-        self.uiView?.window?.rootViewController?.present(viewController, animated: animated, completion: onCompletion)
+        self.presentable?.present(viewController, animated: animated, completion: onCompletion)
         return self
     }
 
@@ -172,7 +185,7 @@ public extension ViewCreator {
     func presentModal<View: ViewCreator>(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> View) -> Self {
         let controller = ContainerController(UICHost(content: content))
         controller.modalPresentationStyle = .overFullScreen
-        self.uiView?.window?.rootViewController?.present(controller, animated: animated, completion: onCompletion)
+        self.presentable?.present(controller, animated: animated, completion: onCompletion)
         return self
     }
 
@@ -180,14 +193,14 @@ public extension ViewCreator {
     func presentModal<View: ViewControllerType>(animated: Bool, onCompletion: (() -> Void)? = nil,_ content: View) -> Self {
         let controller = ContainerController(content)
         controller.modalPresentationStyle = .overFullScreen
-        self.uiView?.window?.rootViewController?.present(controller, animated: animated, completion: onCompletion)
+        self.presentable?.present(controller, animated: animated, completion: onCompletion)
         return self
     }
 
     @discardableResult
     func presentModal(animated: Bool, onCompletion: (() -> Void)? = nil, _ viewController: UIViewController) -> Self {
         viewController.modalPresentationStyle = .overFullScreen
-        self.uiView?.window?.rootViewController?.present(viewController, animated: animated, completion: onCompletion)
+        self.presentable?.present(viewController, animated: animated, completion: onCompletion)
         return self
     }
 

@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import UIContainer
 
 public extension ViewCreator {
     func background(color: UIColor?) -> Self {
@@ -150,6 +151,16 @@ public extension ViewCreator {
     func isExclusiveTouch(_ flag: Bool) -> Self {
         return self.onInTheScene {
             $0.isExclusiveTouch = flag
+        }
+    }
+    #endif
+}
+
+public extension ViewCreator {
+    #if os(iOS)
+    func statusBar(_ appearanceStyle: UIStatusBarStyle) -> Self {
+        self.onInTheScene {
+            ($0.viewController as? StatusBarAppearanceManager)?.statusBarStyle = appearanceStyle
         }
     }
     #endif

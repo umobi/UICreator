@@ -25,6 +25,14 @@ import UIKit
 import UIContainer
 
 public class _Container<View: UIViewController>: UIContainer.Container<View> {
+    weak var spacerView: SpacerView!
+
+    public func spacer<T>(_ view: T) -> SpacerView where T : UIView {
+        let spacerView = SpacerView(view, spacing: 0)
+        self.spacerView = spacerView
+        return spacerView
+    }
+
     override var watchingViews: [UIView] {
         return []
     }
@@ -71,9 +79,6 @@ public class UICContainer<ViewController: UIViewController>: UIViewCreator {
 
     public required init(_ content: @escaping () -> ViewController) {
         let content = content()
-        if let creator = content.view.viewCreators.first {
-            self.tree.append(creator)
-        }
 
         self.onInTheScene {
             ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: {
