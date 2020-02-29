@@ -23,7 +23,21 @@
 import Foundation
 import UIKit
 
-public class _InputView: UIInputView {
+public class CollectionReusableView: UICollectionReusableView, ReusableView {
+    var contentView: UIView {
+        return self
+    }
+
+    var cellLoaded: UICCell.Loaded!
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.backgroundColor = .clear
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -59,29 +73,5 @@ public class _InputView: UIInputView {
     override public func layoutSubviews() {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
-    }
-}
-
-public class UICInput: UIViewCreator {
-    public typealias View = _InputView
-
-    public init(size: CGSize = .zero, style: UIInputView.Style = .keyboard, content: @escaping () -> ViewCreator) {
-        let content = UICHost(content: content)
-        self.tree.append(content)
-
-        self.loadView { [unowned self, content] in
-            let view = View.init(frame: .init(origin: .zero, size: size), inputViewStyle: style)
-            view.updateBuilder(self)
-            view.add(content.releaseUIView())
-            return view
-        }
-    }
-}
-
-public extension UIViewCreator where View: UIInputView {
-    func allowsSelfsSizing(_ flag: Bool) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.allowsSelfSizing = flag
-        }
     }
 }

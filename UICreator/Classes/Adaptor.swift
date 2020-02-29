@@ -21,15 +21,20 @@
 //
 
 import Foundation
-import UIKit
 
-public class _InputView: UIInputView {
+class ViewAdaptor: RootView {
+    weak var hosted: UIView!
+
+    override open func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        RenderManager(self.hosted)?.willMove(toSuperview: newSuperview)
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
+            RenderManager(self.hosted)?.isHidden(newValue)
         }
     }
 
@@ -37,51 +42,40 @@ public class _InputView: UIInputView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self)?.frame(newValue)
+            RenderManager(self.hosted)?.frame(newValue)
         }
     }
 
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
-    }
-
-    override public func didMoveToSuperview() {
+    override open func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
+        RenderManager(self.hosted)?.didMoveToSuperview()
     }
 
-    override public func didMoveToWindow() {
+    override open func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self)?.didMoveToWindow()
+        RenderManager(self.hosted)?.didMoveToWindow()
     }
 
-    override public func layoutSubviews() {
+    override open func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self)?.layoutSubviews()
+        RenderManager(self.hosted)?.layoutSubviews()
     }
 }
 
-public class UICInput: UIViewCreator {
-    public typealias View = _InputView
+class Adaptor: ViewCreator {
+    public typealias View = ViewAdaptor
 
-    public init(size: CGSize = .zero, style: UIInputView.Style = .keyboard, content: @escaping () -> ViewCreator) {
-        let content = UICHost(content: content)
-        self.tree.append(content)
+    public init(_ viewCreator: ViewCreator) {
+        viewCreator.tree.supertree?.append(self)
+        viewCreator.tree.supertree?.remove(viewCreator)
+        self.tree.append(viewCreator)
 
-        self.loadView { [unowned self, content] in
-            let view = View.init(frame: .init(origin: .zero, size: size), inputViewStyle: style)
-            view.updateBuilder(self)
-            view.add(content.releaseUIView())
+        self.loadView { [unowned self] in
+            let view = View.init(builder: self)
+            let hostedView: UIView! = viewCreator.releaseUIView()
+            view.hosted = hostedView
+            view.add(priority: .required, hostedView)
             return view
-        }
-    }
-}
-
-public extension UIViewCreator where View: UIInputView {
-    func allowsSelfsSizing(_ flag: Bool) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.allowsSelfSizing = flag
         }
     }
 }

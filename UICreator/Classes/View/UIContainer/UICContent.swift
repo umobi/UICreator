@@ -23,84 +23,109 @@
 import Foundation
 import UIKit
 import UIContainer
-import SnapKit
+import EasyAnchor
 
 public class _ContentView: ContentView {
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
+        }
+    }
+    
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        self.commitInTheScene()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
 public class UICContent: UIViewCreator {
     public typealias View = _ContentView
 
-    public init(mode: View.ContentMode = .center, priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) {
-        self.uiView = View(content().releaseUIView(), contentMode: mode, priority: priority)
-        self.uiView.updateBuilder(self)
+    public init(mode: View.ContentMode = .center, priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) {
+        let content = content()
+        self.tree.append(content)
+
+        self.loadView { [unowned self] in
+            let view = View(content.releaseUIView(), contentMode: mode, priority: priority)
+            view.updateBuilder(self)
+            return view
+        }
     }
 }
 
-public func UICCenter(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
+public func UICCenter(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .center, priority: priority, content: content)
 }
 
-public func UICTopLeft(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
+public func UICTopLeft(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .topLeft, priority: priority, content: content)
 }
 
-public func UICTop(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
+public func UICTop(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .top, priority: priority, content: content)
 }
 
-public func UICTopRight(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
+public func UICTopRight(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .topRight, priority: priority, content: content)
 }
 
-public func UICLeft(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
+public func UICLeft(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .left, priority: priority, content: content)
 }
 
-public func UICRight(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
+public func UICRight(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .right, priority: priority, content: content)
 }
 
-public func UICBottomLeft(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
+public func UICBottomLeft(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .bottomLeft, priority: priority, content: content)
 }
 
-public func UICBottom(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
+public func UICBottom(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .bottom, priority: priority, content: content)
 }
 
-public func UICBottomRight(priority: ConstraintPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
+public func UICBottomRight(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
     return .init(mode: .bottomRight, priority: priority, content: content)
 }
 
 public extension UIViewCreator where View: ContentView {
 
     func content(mode: UIView.ContentMode) -> Self {
-        (self.uiView as? View)?.apply(contentMode: mode)
-        return self
+        self.onNotRendered {
+            ($0 as? View)?.apply(contentMode: mode)
+        }
     }
 
-    func fitting(priority: ConstraintPriority) -> Self {
-        (self.uiView as? View)?.apply(priority: priority)
-        return self
+    func fitting(priority: UILayoutPriority) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.apply(priority: priority)
+        }
     }
 }

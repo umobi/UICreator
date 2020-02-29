@@ -22,7 +22,7 @@
 
 import Foundation
 
-public protocol Setter: Getter {
-    var value: Value { get set }
-    init(value: Value)
-}
+//public protocol Setter: Getter {
+//    var value: Value { get set }
+//    init(value: Value)
+//}

@@ -21,18 +21,6 @@
 //
 
 import Foundation
-import UIKit
-
-public class UIViewWrapper {
-    private let wrap: ViewCreator
-    public init(_ wrap: ViewCreator) {
-        self.wrap = wrap
-    }
-
-    public weak var uiView: UIView! {
-        return self.wrap.uiView
-    }
-}
 
 public protocol UIViewMaker: ViewCreator {
     var loadView: UIView { get }
@@ -46,28 +34,36 @@ public protocol UICViewRepresentable: UIViewCreator, UIViewMaker {
 
 internal extension UIViewMaker {
     func makeView() -> UIView {
-        if let view = objc_getAssociatedObject(self, &kUIView) as? UIView {
+        if let view = self.uiView {
             return view
         }
 
-        let view = self.loadView
-        objc_setAssociatedObject(self, &kUIView, view, .OBJC_ASSOCIATION_RETAIN)
-        return view
+        self.loadView { [unowned self] in
+            let view = self.loadView
+            view.updateBuilder(self)
+            return view
+        }
+        
+        return Adaptor(self).releaseUIView()
     }
 }
 
 public extension UICViewRepresentable {
     var loadView: UIView {
-        return self.makeUIView().appendInTheScene {
+        return self.onInTheScene { [weak self] in
             guard let view = ($0 as? View) else {
                 return
             }
 
-            self.updateView(view)
-        }
+            self?.updateView(view)
+        }.makeUIView()
     }
 
-    var uiView: View! {
+    weak var uiView: View! {
         return (self as ViewCreator).uiView as? View
+    }
+
+    weak var wrapper: UIView! {
+        return self.uiView.superview
     }
 }

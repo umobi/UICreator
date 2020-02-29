@@ -21,30 +21,31 @@
 //
 
 import Foundation
-import UIKit
 
-public class Swipe: UIGesture {
-    public typealias Gesture = UISwipeGestureRecognizer
-
-    public required init(target view: UIView!) {
-        self.setGesture(Gesture.init(target: view))
-        self.gesture.parent = self
-    }
-}
-
-public extension UIViewCreator {
-
-    func onSwipeMaker(_ swipeConfigurator: @escaping (Swipe) -> Swipe) -> Self {
-        self.onNotRendered {
-            swipeConfigurator(Swipe(target: $0)).add()
-        }
+@propertyWrapper
+public struct UICOutlet<Value: AnyObject> {
+    private class Object {
+        weak var reference: Value!
     }
 
-    func onSwipe(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onSwipeMaker {
-            $0.onRecognized {
-                handler($0.view!)
-            }
-        }
+    private let object: Object
+
+    public var projectedValue: UICOutlet<Value> { return self }
+
+    public init(wrappedValue value: Value? = nil) {
+        self.object = .init()
+        self.object.reference = value
+    }
+
+    public var wrappedValue: Value! {
+        self.object.reference
+    }
+
+    public func ref(_ value: Value?) {
+        self.object.reference = value
+    }
+
+    static var empty: UICOutlet<Value> {
+        .init()
     }
 }

@@ -22,12 +22,8 @@
 
 import Foundation
 import UIKit
-import SnapKit
-
-private var kNotRenderedHandler: UInt = 0
-private var kRenderedHandler: UInt = 0
-private var kInTheSceneHandler: UInt = 0
-private var kOnLayoutHandler: UInt = 0
+import EasyAnchor
+import UIContainer
 
 internal extension UIView {
 
@@ -38,9 +34,10 @@ internal extension UIView {
         case notRendered
         case rendered
         case inTheScene
+        case unset
 
         private static var allCases: [RenderState] {
-            return [.notRendered, .rendered, .inTheScene]
+            return [.unset, .notRendered, .rendered, .inTheScene]
         }
 
         static func >(left: RenderState, right: RenderState) -> Bool {
@@ -78,6 +75,14 @@ internal extension UIView {
 
             return allCases[leftOffset..<allCases.count].contains(right)
         }
+
+        var prev: RenderState? {
+            Self.allCases.split(separator: self).first?.last
+        }
+
+        var next: RenderState? {
+            Self.allCases.split(separator: self).last?.first
+        }
     }
 
     /// The current state of the view
@@ -108,100 +113,38 @@ internal extension UIView {
         }
     }
 
-    /// This holds the callback for `UIView.Mode.notRendered`
-    var notRenderedHandler: Handler? {
-        get { objc_getAssociatedObject(self, &kNotRenderedHandler) as? Handler }
-        set { objc_setAssociatedObject(self, &kNotRenderedHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
+    /// The `add(_:)` function is used internally to add views inside view and constraint with required priority in all edges.
+    func add(priority: UILayoutPriority? = nil,_ view: UIView) {
+        AddSubview(self).addSubview(view)
 
-    /// This holds the callback for `UIView.Mode.rendered`
-    var renderedHandler: Handler? {
-        get { objc_getAssociatedObject(self, &kRenderedHandler) as? Handler }
-        set { objc_setAssociatedObject(self, &kRenderedHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    /// This holds the callback for `UIView.Mode.inTheScene`
-    var inTheSceneHandler: Handler? {
-        get { objc_getAssociatedObject(self, &kInTheSceneHandler) as? Handler }
-        set { objc_setAssociatedObject(self, &kInTheSceneHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    var layoutHandler: Handler? {
-        get { objc_getAssociatedObject(self, &kOnLayoutHandler) as? Handler }
-        set { objc_setAssociatedObject(self, &kOnLayoutHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    /// This create the `Handler` for callback associated to`UIView.Mode.notRendered`
-    private func beforeRendering(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.notRenderedHandler = .init(handler)
-        return self
-    }
-
-    /// This create the `Handler` for callback associated to `UIView.Mode.rendered`
-    private func rendered(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.renderedHandler = .init(handler)
-        return self
-    }
-
-    /// This create the `Handler` for callback associated to `UIView.Mode.inTheScene`
-    private func inTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.inTheSceneHandler = .init(handler)
-        return self
-    }
-
-    private func layout(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.layoutHandler = .init(handler)
-        return self
-    }
-
-    /// The `add(_:)` function is used internally to add views inside view and constraint with 751 of priority in all edges.
-    func add(priority: ConstraintPriority? = nil,_ view: UIView) -> Self {
-        self.addSubview(view)
-
-        let priority: ConstraintPriority = priority ?? ((self as UIView) is RootView && view is RootView ? .required :
+        let priority: UILayoutPriority = priority ?? ((self as UIView) is RootView && view is RootView ? .required :
         .init(751))
 
-        view.snp.makeConstraints {
-            $0.edges.equalTo(0).priority(priority)
-        }
-        
+        activate(
+            view.anchor
+                .edges
+                .priority(priority.rawValue)
+        )
+    }
+}
+
+public extension ViewCreator {
+
+    @discardableResult
+    func onNotRendered(_ handler: @escaping (UIView) -> Void) -> Self {
+        self.render.onNotRendered(handler)
         return self
     }
 
-    // Mark: - append methods for each state. All them get the old Handler callback associated to the state and add one more in the stack. The engine here stack each callback and execute them starting by the last command to the first command added in to stack
-
-    /// The `appendBeforeRendering(_:)` function is used internally to add more callbacks for `UIView.Mode.notRendered` state.
-    func appendBeforeRendering(_ handler: @escaping (UIView) -> Void) -> Self {
-        let allBefore = self.notRenderedHandler
-        return self.beforeRendering {
-            handler($0)
-            allBefore?.commit(in: $0)
-        }
+    @discardableResult
+    func onRendered(_ handler: @escaping (UIView) -> Void) -> Self {
+        self.render.onRendered(handler)
+        return self
     }
 
-    /// The `appendRendered(_:)` function is used internally to add more callbacks for `UIView.Mode.rendered` state.
-    func appendRendered(_ handler: @escaping (UIView) -> Void) -> Self {
-        let allRendered = self.renderedHandler
-        return self.rendered {
-            handler($0)
-            allRendered?.commit(in: $0)
-        }
-    }
-
-    /// The `appendInTheScene(_:)` function is used internally to add more callbacks for `UIView.Mode.inTheScene` state.
-    func appendInTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
-        let allinTheScene = self.inTheSceneHandler
-        return self.inTheScene {
-            handler($0)
-            allinTheScene?.commit(in: $0)
-        }
-    }
-
-    func appendLayout(_ handler: @escaping (UIView) -> Void) -> Self {
-        let allLayout = self.layoutHandler
-        return self.layout {
-            handler($0)
-            allLayout?.commit(in: $0)
-        }
+    @discardableResult
+    func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
+        self.render.onInTheScene(handler)
+        return self
     }
 }

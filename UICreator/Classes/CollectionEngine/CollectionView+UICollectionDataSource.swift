@@ -46,6 +46,80 @@ extension _CollectionView: UICollectionViewDataSource {
         }
 
         cell.prepareCell(row)
+
+        if let item = self.layoutManager?.item(at: indexPath), item.isDynamic, let loaded = cell.cellLoaded {
+            _ = cell.hostedView.onLayout { [weak self, loaded] view in
+                guard view.frame.size != .zero else {
+                    return
+                }
+
+                guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath)
+                    .horizontal(.equalTo(view.frame.width))
+                    .vertical(.equalTo(view.frame.height))) else { return }
+
+                self?.collectionViewLayout.invalidateLayout()
+            }
+        }
         return cell
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        switch kind {
+        case UICollectionView.elementKindSectionHeader:
+            guard let header = self.manager?.header(at: indexPath.section) else {
+                assert(false)
+                return .init()
+            }
+
+            guard let cell = self.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: header.identifier, for: indexPath) as? CollectionReusableView else {
+                fatalError()
+            }
+
+            cell.prepareCell(header)
+
+            if let item = self.layoutManager?.header(at: indexPath.section), item.isDynamic, let loaded = cell.cellLoaded {
+                _ = cell.hostedView.onLayout { [weak self, loaded] view in
+                    guard view.frame.size != .zero else {
+                        return
+                    }
+                    guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath.section)
+                        .horizontal(.equalTo(view.frame.width))
+                        .vertical(.equalTo(view.frame.height))) else { return }
+
+                    self?.collectionViewLayout.invalidateLayout()
+                }
+            }
+            return cell
+
+        case UICollectionView.elementKindSectionFooter:
+            guard let footer = self.manager?.footer(at: indexPath.section) else {
+                assert(false)
+                return .init()
+            }
+
+            guard let cell = self.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: footer.identifier, for: indexPath) as? CollectionReusableView else {
+                fatalError()
+            }
+
+            cell.prepareCell(footer)
+
+            if let item = self.layoutManager?.footer(at: indexPath.section), item.isDynamic, let loaded = cell.cellLoaded {
+                _ = cell.hostedView.onLayout { [weak self, loaded] view in
+                    guard view.frame.size != .zero else {
+                        return
+                    }
+                    guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath.section)
+                        .horizontal(.equalTo(view.frame.width))
+                        .vertical(.equalTo(view.frame.height))) else { return }
+
+                    self?.collectionViewLayout.invalidateLayout()
+                }
+            }
+            return cell
+
+        default:
+            assert(false)
+            return .init()
+        }
     }
 }

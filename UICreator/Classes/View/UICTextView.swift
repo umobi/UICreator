@@ -24,43 +24,61 @@ import Foundation
 import UIKit
 
 public class _TextView: UITextView {
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
+        }
+    }
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        self.commitInTheScene()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
-public class UICTextView: UIViewCreator, TextElement, TextKeyboard, HasViewDelegate {
+public class UICTextView: UIViewCreator, TextElement, TextKeyboard {
     public typealias View = _TextView
 
-    public func delegate(_ delegate: UITextViewDelegate?) -> Self {
-        (self.uiView as? View)?.delegate = delegate
-        return self
-    }
-
     required public init(_ text: String?) {
-        self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.text = text
+        self.loadView { [unowned self] in
+            let view = View.init(builder: self)
+            view.text = text
+            return view
+        }
     }
 
     required public init(_ attributedText: NSAttributedString?) {
-        self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.attributedText = attributedText
+        self.loadView { [unowned self] in
+            let view = View.init(builder: self)
+            view.attributedText = attributedText
+            return view
+        }
     }
 }
 
@@ -207,14 +225,20 @@ public extension TextKeyboard where View: UITextView {
     }
 
     func inputView(content: @escaping () -> ViewCreator) -> Self {
-        self.onRendered {
-            ($0 as? View)?.inputView = content().releaseUIView()
+        let content = content()
+        self.tree.append(content)
+
+        return self.onRendered {
+            ($0 as? View)?.inputView = content.releaseUIView()
         }
     }
 
     func inputAccessoryView(content: @escaping () -> ViewCreator) -> Self {
-        self.onRendered {
-            ($0 as? View)?.inputAccessoryView = content().releaseUIView()
+        let content = content()
+        self.tree.append(content)
+
+        return self.onRendered {
+            ($0 as? View)?.inputAccessoryView = content.releaseUIView()
         }
     }
 

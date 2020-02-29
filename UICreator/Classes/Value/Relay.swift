@@ -23,10 +23,10 @@
 import Foundation
 
 public final class Relay<Value> {
-    let identifier: String
+    let id: IDGetter
 
-    init(identifier: String) {
-        self.identifier = identifier
+    init(_ id: IDGetter) {
+        self.id = id
         self.handler = nil
     }
 
@@ -41,11 +41,11 @@ public final class Relay<Value> {
             handler(value)
         }
         
-        ReactiveCenter.shared.privateResquestLatestValue(self.identifier)
+        ReactiveCenter.shared.privateResquestLatestValue(self.id.identifier)
     }
 
     private static func collapse<Value>(_ relay: Relay<Value>) -> ((@escaping (Value) -> Void) -> Void) {
-        let identifier = relay.identifier
+        let id = relay.id
         let handler = relay.handler
 
         return  { externalHandler in
@@ -57,29 +57,29 @@ public final class Relay<Value> {
                 return
             }
 
-            ReactiveCenter.shared.valueDidChange(identifier) {
+            ReactiveCenter.shared.valueDidChange(id.identifier) {
                 externalHandler($0)
             }
 
-            ReactiveCenter.shared.privateValueDidChange(identifier) {
+            ReactiveCenter.shared.privateValueDidChange(id.identifier) {
                 externalHandler($0)
             }
 
-            ReactiveCenter.shared.privateLatestValue(identifier) {
+            ReactiveCenter.shared.privateLatestValue(id.identifier) {
                 externalHandler($0)
             }
         }
     }
 
     let handler: ((@escaping  (Value) -> Void) -> Void)?
-    init(_ identifier: String, handler: @escaping ((@escaping (Value) -> Void) -> Void)) {
-        self.identifier = identifier
+    init(_ id: IDGetter, handler: @escaping ((@escaping (Value) -> Void) -> Void)) {
+        self.id = id
         self.handler = handler
     }
 
     public func map<Other>(_ handler: @escaping  (Value) -> Other) -> Relay<Other> {
         let callbase = Self.collapse(self)
-        return Relay<Other>.init(self.identifier, handler: { function in
+        return Relay<Other>.init(self.id, handler: { function in
             return callbase() {
                 function(handler($0))
             }
@@ -87,7 +87,7 @@ public final class Relay<Value> {
     }
 
     func `post`(_ value: Value) {
-        ReactiveCenter.shared.privateValueDidChange(self.identifier, newValue: value)
+        ReactiveCenter.shared.privateValueDidChange(self.id.identifier, newValue: value)
     }
 
 }

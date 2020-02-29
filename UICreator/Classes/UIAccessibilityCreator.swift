@@ -25,163 +25,213 @@ import Foundation
 public struct UIAccessibilityCreator<UICreator: UIViewCreator> {
     public typealias View = UICreator.View
 
-    public weak var uiView: View!
+    fileprivate weak var manager: ViewCreator!
 
-    init(_ view: UIView) {
-        self.uiView = view as? View
-    }
-
-    init(_ creator: ViewCreator) {
-        self.init(creator.uiView)
+    init(_ manager: ViewCreator) {
+        self.manager = manager
     }
 }
 
 public extension UIAccessibilityCreator where View: UIView {
     @available(iOS 11.0, tvOS 11.0, *)
     func ignoresInvertColors(_ flag: Bool) -> Self {
-        self.uiView.accessibilityIgnoresInvertColors = flag
+        self.manager.onNotRendered {
+            $0.accessibilityIgnoresInvertColors = flag
+        }
         return self
     }
 
     func traits(_ traits: Set<UIAccessibilityTraits>) -> Self {
-        self.uiView.accessibilityTraits = .init(traits)
+        self.manager.onNotRendered {
+            $0.accessibilityTraits = .init(traits)
+        }
         return self
     }
 
     func isEnabled(_ flag: Bool) -> Self {
-        self.uiView.isAccessibilityElement = flag
+        self.manager.onNotRendered {
+            $0.isAccessibilityElement = flag
+        }
         return self
     }
 
     func identifier(_ string: String) -> Self {
-        self.uiView.accessibilityIdentifier = string
+        self.manager.onNotRendered {
+            $0.accessibilityIdentifier = string
+        }
         return self
     }
 
     func label(_ string: String) -> Self {
-        self.uiView.accessibilityLabel = string
+        self.manager.onNotRendered {
+            $0.accessibilityLabel = string
+        }
         return self
     }
 
     func value(_ string: String) -> Self {
-        self.uiView.accessibilityValue = string
+        self.manager.onNotRendered {
+            $0.accessibilityValue = string
+        }
         return self
     }
 
     func frame(_ frame: CGRect) -> Self {
-        self.uiView.accessibilityFrame = frame
+        self.manager.onNotRendered {
+            $0.accessibilityFrame = frame
+        }
         return self
     }
 
     func hint(_ string: String) -> Self {
-        self.uiView.accessibilityHint = string
+        self.manager.onNotRendered {
+            $0.accessibilityHint = string
+        }
         return self
     }
 
     func groupAccessibilityChildren(_ flag: Bool) -> Self {
-        self.uiView.shouldGroupAccessibilityChildren = flag
+        self.manager.onNotRendered {
+            $0.shouldGroupAccessibilityChildren = flag
+        }
         return self
     }
 
     @available(iOS 11.0, tvOS 11.0, *)
     func containerType(_ type: UIAccessibilityContainerType) -> Self {
-        self.uiView.accessibilityContainerType = type
+        self.manager.onNotRendered {
+            $0.accessibilityContainerType = type
+        }
         return self
     }
 
     @available(iOS 13.0, tvOS 13.0, *)
     func respondsToUserInteraction(_ flag: Bool) -> Self {
-        self.uiView.accessibilityRespondsToUserInteraction = flag
+        self.manager.onNotRendered {
+            $0.accessibilityRespondsToUserInteraction = flag
+        }
         return self
     }
 
     func path(_ path: UIBezierPath?) -> Self {
-        self.uiView.accessibilityPath = path
+        self.manager.onNotRendered {
+            $0.accessibilityPath = path
+        }
         return self
     }
 
     func language(_ string: String?) -> Self {
-        self.uiView.accessibilityLanguage = string
+        self.manager.onNotRendered {
+            $0.accessibilityLanguage = string
+        }
         return self
     }
 
     func isModal(_ flag: Bool) -> Self {
-        self.uiView.accessibilityViewIsModal = flag
+        self.manager.onNotRendered {
+            $0.accessibilityViewIsModal = flag
+        }
         return self
     }
 
     func customRotors(_ rotors: [UIAccessibilityCustomRotor]) -> Self {
-        self.uiView.accessibilityCustomRotors = rotors
+        self.manager.onNotRendered {
+            $0.accessibilityCustomRotors = rotors
+        }
         return self
     }
 
     func customActions(_ actions: [UIAccessibilityCustomAction]) -> Self {
-        self.uiView.accessibilityCustomActions = actions
+        self.manager.onNotRendered {
+            $0.accessibilityCustomActions = actions
+        }
         return self
     }
 
     @available(iOS 11.0, tvOS 11, *)
     func attributedHint(_ attributedString: NSAttributedString) -> Self {
-        self.uiView.accessibilityAttributedHint = attributedString
+        self.manager.onNotRendered {
+            $0.accessibilityAttributedHint = attributedString
+        }
         return self
     }
 
     func elementsHidden(_ flag: Bool) -> Self {
-        self.uiView.accessibilityElementsHidden = flag
+        self.manager.onNotRendered {
+            $0.accessibilityElementsHidden = flag
+        }
         return self
     }
 
     func activationPoint(_ point: CGPoint) -> Self {
-        self.uiView.accessibilityActivationPoint = point
+        self.manager.onNotRendered {
+            $0.accessibilityActivationPoint = point
+        }
         return self
     }
 
     @available(iOS 13.0, tvOS 13.0, *)
     func textualContext(_ context: UIAccessibilityTextualContext) -> Self {
-        self.uiView.accessibilityTextualContext = context
+        self.manager.onNotRendered {
+            $0.accessibilityTextualContext = context
+        }
         return self
     }
 
     @available(iOS 11.0, tvOS 11, *)
     func attributedLabel(_ attributedString: NSAttributedString) -> Self {
-        self.uiView.accessibilityAttributedLabel = attributedString
+        self.manager.onNotRendered {
+            $0.accessibilityAttributedLabel = attributedString
+        }
         return self
     }
 
     @available(iOS 11.0, tvOS 11, *)
     func attributedValue(_ attributedString: NSAttributedString) -> Self {
-        self.uiView.accessibilityAttributedValue = attributedString
+        self.manager.onNotRendered {
+            $0.accessibilityAttributedValue = attributedString
+        }
         return self
     }
 
     func navigationStyle(_ style: UIAccessibilityNavigationStyle) -> Self {
-        self.uiView.accessibilityNavigationStyle = style
+        self.manager.onNotRendered {
+            $0.accessibilityNavigationStyle = style
+        }
         return self
     }
 
     @available(iOS 13.0, tvOS 13.0, *)
     func userInputLabels(_ labels: [String]) -> Self {
-        self.uiView.accessibilityUserInputLabels = labels
+        self.manager.onNotRendered {
+            $0.accessibilityUserInputLabels = labels
+        }
         return self
     }
 
     #if os(iOS)
     @available(iOS 11.0, *)
     func dropPointDescriptors(_ points: [UIAccessibilityLocationDescriptor]) -> Self {
-        self.uiView.accessibilityDropPointDescriptors = points
+        self.manager.onNotRendered {
+            $0.accessibilityDropPointDescriptors = points
+        }
         return self
     }
 
     @available(iOS 11.0, *)
     func dragSourceDescriptors(_ points: [UIAccessibilityLocationDescriptor]) -> Self {
-        self.uiView.accessibilityDragSourceDescriptors = points
+        self.manager.onNotRendered {
+            $0.accessibilityDragSourceDescriptors = points
+        }
         return self
     }
     #endif
 
     @available(iOS 13.0, tvOS 13.0, *)
     func attributedUserInputLabels(_ labels: [NSAttributedString]) -> Self {
-        self.uiView.accessibilityAttributedUserInputLabels = labels
+        self.manager.onNotRendered {
+            $0.accessibilityAttributedUserInputLabels = labels
+        }
         return self
     }
 }
@@ -198,7 +248,9 @@ public extension UIAccessibilityCreator where View: UIView {
     @available(iOS 11.0, tvOS 11, *)
     func onVoiceOverChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.voiceOverStatusDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
@@ -206,129 +258,167 @@ public extension UIAccessibilityCreator where View: UIView {
         var isFocused = false
 
         return self.onNotification(UIAccessibility.elementFocusedNotification) { notification in
-            if let focused = notification.userInfo?[UIAccessibility.focusedElementUserInfoKey] as? View, focused === self.uiView {
-                isFocused = true
-                handler(self.uiView)
-                return
-            }
+            self.manager.onNotRendered {
+                if let focused = notification.userInfo?[UIAccessibility.focusedElementUserInfoKey] as? View, focused === $0 {
+                    isFocused = true
+                    handler($0)
+                    return
+                }
 
-            if isFocused && !self.uiView.accessibilityElementIsFocused() {
-                isFocused = false
-                handler(self.uiView)
+                if isFocused && !$0.accessibilityElementIsFocused() {
+                    isFocused = false
+                    handler($0)
+                }
             }
         }
     }
 
     func onBoldTextChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.boldTextStatusDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     func onMonoAudioChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.monoAudioStatusDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     func onClosedCaptionChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.closedCaptioningStatusDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     func onInvertColorsChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.invertColorsStatusDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     func onGuidedAccessChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.guidedAccessStatusDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     func onGrayScaleChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.grayscaleStatusDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     func onReduceTransparencyChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.reduceTransparencyStatusDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     func onReduceMotionChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.reduceMotionStatusDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     @available(iOS 13.0, tvOS 13.0, *)
     func onViewAutoplayChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.videoAutoplayStatusDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     @available(iOS 13.0, tvOS 13.0, *)
     func onDarkerSystemColorsChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.darkerSystemColorsStatusDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     func onSwitchControlChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.switchControlStatusDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     func onSpeakSelectionChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.speakSelectionStatusDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     func onSpeakScreenChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.speakScreenStatusDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     func onShakeToUndoChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.shakeToUndoDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     func onAssistiveTouchChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.assistiveTouchStatusDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     @available(iOS 13.0, tvOS 13.0, *)
     func onDifferentiateWithoutColorsChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(NSNotification.Name(rawValue: UIAccessibility.differentiateWithoutColorDidChangeNotification)) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     @available(iOS 13.0, tvOS 13.0, *)
     func onOnOffSwitchLabelsChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.onOffSwitchLabelsDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
 
     #if os(iOS)
     func onHearingDevicePairedEarChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.hearingDevicePairedEarDidChangeNotification) { _ in
-            handler(self.uiView)
+            self.manager.onNotRendered {
+                handler($0)
+            }
         }
     }
     #endif

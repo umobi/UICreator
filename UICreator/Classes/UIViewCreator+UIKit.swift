@@ -22,8 +22,9 @@
 
 import Foundation
 import UIKit
+import UIContainer
 
-public extension UIViewCreator {
+public extension ViewCreator {
     func background(color: UIColor?) -> Self {
         return self.onNotRendered {
             $0.backgroundColor = color
@@ -72,20 +73,14 @@ public extension UIViewCreator {
         }
     }
 
-    func `as`<UIElement: UIView>(_ reference: inout UIElement!) -> Self {
-        reference = self.uiView as? UIElement
-        return self
-    }
-
-    func `as`<UIElement: UIView>(_ reference: inout [UIElement]) -> Self {
-        if let view = self.uiView as? UIElement {
-            reference.append(view)
+    func `as`<UIElement: UIView>(_ reference: UICOutlet<UIElement>) -> Self {
+        return self.onNotRendered { [reference] in
+            reference.ref($0 as? UIElement)
         }
-        return self
     }
 }
 
-public extension UIViewCreator {
+public extension ViewCreator {
     func shadow(radius: CGFloat) -> Self {
         return self.onNotRendered {
             $0.layer.shadowRadius = radius
@@ -138,6 +133,16 @@ public extension UIViewCreator {
     func isExclusiveTouch(_ flag: Bool) -> Self {
         return self.onInTheScene {
             $0.isExclusiveTouch = flag
+        }
+    }
+    #endif
+}
+
+public extension ViewCreator {
+    #if os(iOS)
+    func statusBar(_ appearanceStyle: UIStatusBarStyle) -> Self {
+        self.onInTheScene {
+            ($0.viewController as? StatusBarAppearanceManager)?.statusBarStyle = appearanceStyle
         }
     }
     #endif

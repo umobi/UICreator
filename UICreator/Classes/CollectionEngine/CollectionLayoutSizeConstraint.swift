@@ -25,4 +25,15 @@ import Foundation
 public enum CollectionLayoutSizeConstraint {
     case flexible(CGFloat)
     case equalTo(CGFloat)
+    case estimated(CGFloat)
+}
+
+extension CollectionLayoutSizeConstraint {
+    var isDynamic: Bool {
+        if case .estimated = self {
+            return true
+        }
+
+        return false
+    }
 }

@@ -27,30 +27,13 @@ import UIContainer
 public class UICHost: Root, ViewControllerType, UIViewCreator {
     public init(size: CGSize = .zero, content: @escaping () -> ViewCreator) {
         super.init()
-//        super.init(loader: nil)
-        self.uiView.frame = .init(origin: self.uiView.frame.origin, size: size)
-        _ = self.uiView.add(content().releaseUIView())
-    }
-}
 
-extension UICHost: ViewControllerAppearStates {
-    var hosted: ViewCreator? {
-        return (self.uiView.subviews.first(where: { $0.viewCreator != nil }))?.viewCreator
-    }
+        let content = content()
+        self.tree.append(content)
 
-    public func viewWillAppear(_ animated: Bool) {
-        (self.hosted as? ViewControllerAppearStates)?.viewWillAppear(animated)
-    }
-
-    public func viewDidAppear(_ animated: Bool) {
-        (self.hosted as? ViewControllerAppearStates)?.viewDidAppear(animated)
-    }
-
-    public func viewWillDisappear(_ animated: Bool) {
-        (self.hosted as? ViewControllerAppearStates)?.viewWillDisappear(animated)
-    }
-
-    public func viewDidDisappear(_ animated: Bool) {
-        (self.hosted as? ViewControllerAppearStates)?.viewDidDisappear(animated)
+        self.onNotRendered { [content] in
+            $0.frame = .init(origin: $0.frame.origin, size: size)
+            $0.add(priority: .required, content.releaseUIView())
+        }
     }
 }

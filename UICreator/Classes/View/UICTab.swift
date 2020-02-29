@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import EasyAnchor
 import UIContainer
 
 public class UICTabContainer: UIView {
@@ -32,14 +33,30 @@ public class UICTabContainer: UIView {
         self.content = content
     }
 
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
+        }
+    }
+
     override open func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override open func didMoveToWindow() {
@@ -51,22 +68,19 @@ public class UICTabContainer: UIView {
                 return viewController
             })
 
-            self.addSubview(container)
-            container.snp.makeConstraints {
-                $0.edges.equalTo(0)
-            }
+            AddSubview(self).addSubview(container)
+            activate(
+                container.anchor
+                    .edges
+            )
             return container
         }()
-        self.commitInTheScene()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override open func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
-    }
-
-    override var watchingViews: [UIView] {
-        return [self] + self.subviews
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
@@ -88,20 +102,23 @@ public class UICTabCreator<TabController: UITabBarController>: UIViewCreator {
     }
 
     public init(_ contents: @escaping () -> [ViewCreator]) {
-        self.uiView = View.init(builder: self)
+        self.loadView { [unowned self] in
+            let view = View.init(builder: self)
 
-        self.tabController.viewControllers = contents().map { view in
-            let controller = ContainerController(UICHost {
-                view
-            })
-            controller.tabBarItem = view.uiView.tabBarItem
-            return controller
-        }
+            self.tabController.viewControllers = contents().map { view in
+                let hosted = UICHost { view }
+                let controller = ContainerController(hosted)
+                controller.tabBarItem = view.uiView.tabBarItem
+                return controller
+            }
 
-        (self.uiView as? View)?.setContent { [unowned self] in
-            let tabBarController = self._tabBarController!
-            self.tabBarController = tabBarController
-            return tabBarController
+            view.setContent { [unowned self] in
+                let tabBarController = self._tabBarController!
+                self.tabBarController = tabBarController
+                return tabBarController
+            }
+
+            return view
         }
     }
 }
@@ -110,13 +127,6 @@ public typealias UICTab = UICTabCreator<UITabBarController>
 
 extension UICTab {
     typealias Other<TabController: UITabBarController> = UICTabCreator<UITabBarController>
-}
-
-public extension UICTabCreator {
-    func `as`(_ ref: inout TabController!) -> Self {
-        ref = self.tabController
-        return self
-    }
 }
 
 public extension UICTabCreator {
@@ -319,13 +329,15 @@ public class Controller: UIViewCreator {
     public typealias View = _Container<ContainerController<UICHost>>
 
     public init(content: @escaping () -> ViewCreator) {
-        self.uiView = View.init(builder: self)
-        _ = self.onInTheScene {
+        let content = UICHost(content: content)
+        self.tree.append(content)
+
+        self.onInTheScene {
             ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: {
-                ContainerController(UICHost {
-                    content()
-                })
+                return ContainerController(content)
             })
+        }.loadView { [unowned self] in
+            View.init(builder: self)
         }
     }
 }

@@ -22,55 +22,79 @@
 
 import Foundation
 import UIKit
+import EasyAnchor
 
 public class _TextField: UITextField {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
+    }
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
+        }
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        self.commitInTheScene()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
-public class UICText: UIViewCreator, TextElement, TextKeyboard, Control, HasViewDelegate {
+public class UICText: UIViewCreator, TextElement, TextKeyboard, Control {
     public typealias View = _TextField
-    
-    public func delegate(_ delegate: UITextFieldDelegate?) -> Self {
-        (self.uiView as? View)?.delegate = delegate
-        return self
-    }
 
     required public init(_ text: String?) {
-        self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.text = text
+        self.loadView { [unowned self] in
+            let view = View.init(builder: self)
+            view.text = text
+            return view
+        }
     }
 
     required public init(_ attributedText: NSAttributedString?) {
-        self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.attributedText = attributedText
+        self.loadView { [unowned self] in
+            let view = View.init(builder: self)
+            view.attributedText = attributedText
+            return view
+        }
     }
 
     required public init(placeholder text: String?) {
-        self.uiView = View.init(builder: self)
-        _ = self.placeholder(text)
+        self.loadView { [unowned self] in
+            let view = View.init(builder: self)
+            _ = self.placeholder(text)
+            return view
+        }
     }
 
     required public init(placeholder attributed: NSAttributedString?) {
-        self.uiView = View.init(builder: self)
-        _ = self.placeholder(attributed)
+        self.loadView { [unowned self] in
+            let view = View.init(builder: self)
+            _ = self.placeholder(attributed)
+            return view
+        }
     }
 }
 
@@ -229,16 +253,66 @@ public extension UIViewCreator where Self: Control, View: UITextField {
 
 public extension UIViewCreator where View: UITextField {
     func leftView(_ mode: UITextField.ViewMode = .always, content: @escaping () -> ViewCreator) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.leftView = UICHost(content: content).releaseUIView()
-            ($0 as? View)?.leftViewMode = mode
+        let host = UICHost(content: content)
+        self.tree.append(host)
+
+        return self.onRendered { view in
+            (view as? View)?.leftView = host.releaseUIView()
+            (view as? View)?.leftViewMode = mode
+
+            var needsToAddConstraints = true
+            host.onAppear { [weak view] in
+                guard needsToAddConstraints, let view = view else {
+                    return
+                }
+
+                activate(
+                    $0.anchor
+                        .centerY
+                        .equal.to(view.anchor.centerY),
+
+                    $0.anchor
+                        .leading
+                )
+
+                needsToAddConstraints = false
+            }
+
+            host.onDisappear {
+                needsToAddConstraints = $0.window == nil
+            }
         }
     }
 
     func rightView(_ mode: UITextField.ViewMode = .always, content: @escaping () -> ViewCreator) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.rightView = UICHost(content: content).releaseUIView()
-            ($0 as? View)?.rightViewMode = mode
+        let host = UICHost(content: content)
+        self.tree.append(host)
+
+        return self.onRendered { view in
+            (view as? View)?.rightView = host.releaseUIView()
+            (view as? View)?.rightViewMode = mode
+
+            var needsToAddConstraints = true
+            host.onAppear { [weak view] in
+                guard needsToAddConstraints, let view = view else {
+                    return
+                }
+
+                activate(
+                    $0.anchor
+                        .centerY
+                        .equal.to(view.anchor.centerY),
+
+                    $0.anchor
+                        .trailing
+                )
+
+                needsToAddConstraints = false
+            }
+
+            host.onDisappear {
+                needsToAddConstraints = $0.window == nil
+            }
         }
     }
 }
@@ -255,7 +329,6 @@ public extension TextKeyboard where View: UITextField {
             ($0 as? View)?.autocorrectionType = type
         }
     }
-
 
     func keyboard(type: UIKeyboardType) -> Self {
         return self.onNotRendered {
@@ -322,14 +395,20 @@ public extension TextKeyboard where View: UITextField {
     }
 
     func inputView(content: @escaping () -> ViewCreator) -> Self {
-        self.onRendered {
-           ($0 as? View)?.inputView = content().releaseUIView()
+        let content = content()
+        self.tree.append(content)
+
+        return self.onRendered {
+           ($0 as? View)?.inputView = content.releaseUIView()
         }
     }
 
     func inputAccessoryView(content: @escaping () -> ViewCreator) -> Self {
-        self.onRendered {
-            ($0 as? View)?.inputAccessoryView = content().releaseUIView()
+        let content = content()
+        self.tree.append(content)
+
+        return self.onRendered {
+            ($0 as? View)?.inputAccessoryView = content.releaseUIView()
         }
     }
 

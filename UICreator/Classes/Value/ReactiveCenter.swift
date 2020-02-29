@@ -22,6 +22,54 @@
 
 import Foundation
 
+class Destructor {
+    var identifiers: [String] = []
+
+    weak static var shared: Destructor!
+
+    static func remove(_ id: String) {
+        if let shared = Self.shared {
+            shared.append(id)
+            return
+        }
+
+        let destructor = Destructor()
+        Self.shared = destructor
+        destructor.append(id)
+    }
+
+    private var queue: DispatchQueue? = nil
+    func run() {
+        guard queue == nil else {
+            return
+        }
+
+        self.queue = DispatchQueue.main
+        self.queue?.async {
+            while let id = self.identifiers.first {
+                self.identifiers.removeFirst()
+
+                ReactiveCenter.shared.privateDeinit(id)
+                ReactiveCenter.shared.unregister(id)
+            }
+
+            self.queue = nil
+            Self.shared = nil
+        }
+    }
+
+    func append(_ id: String) {
+        self.identifiers.append(id)
+        self.run()
+    }
+
+    deinit {
+        if !self.identifiers.isEmpty {
+            fatalError()
+        }
+    }
+}
+
 private let _reactive = ReactiveCenter()
 final class ReactiveCenter: NotificationCenter {
     static var shared: ReactiveCenter {
@@ -44,8 +92,12 @@ final class ReactiveCenter: NotificationCenter {
         self.activeObservables[identifier] = nil
     }
 
+    private func isWatching(_ id: String) -> Bool {
+        self.activeObservables[id] != nil
+    }
+
     private func isRegisteredOrDie(_ identifier: String) {
-        guard self.activeObservables[identifier] != nil else {
+        guard self.isWatching(identifier) else {
             Fatal.ReactiveCenter.unregistered.die()
             return
         }
@@ -84,7 +136,9 @@ final class ReactiveCenter: NotificationCenter {
     }
 
     func privateDeinit(_ identifier: String) {
-        self.isRegisteredOrDie(identifier)
+        guard self.isWatching(identifier) else {
+            return
+        }
 
         self.post(name: .init(rawValue: "\(identifier).private.deinit"), object: nil)
     }
@@ -125,6 +179,9 @@ final class ReactiveCenter: NotificationCenter {
         })
     }
 
+    func remove(_ id: String) {
+        Destructor.remove(id)
+    }
 }
 
 extension Fatal {

@@ -25,28 +25,48 @@ import UIKit
 import UIContainer
 
 public class _Container<View: UIViewController>: UIContainer.Container<View> {
-    override var watchingViews: [UIView] {
-        return []
+    weak var spacerView: SpacerView!
+
+    public func spacer<T>(_ view: T) -> SpacerView where T : UIView {
+        let spacerView = SpacerView(view, spacing: 0)
+        self.spacerView = spacerView
+        return spacerView
+    }
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
+        }
     }
 
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        self.commitInTheScene()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
@@ -54,9 +74,14 @@ public class UICContainer<ViewController: UIViewController>: UIViewCreator {
     public typealias View = _Container<ViewController>
 
     public required init(_ content: @escaping () -> ViewController) {
-        self.uiView = View.init(builder: self)
-        _ = self.onInTheScene {
-            ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: content)
+        let content = content()
+
+        self.onInTheScene {
+            ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: {
+                content
+            })
+        }.loadView { [unowned self] in
+            return View.init(builder: self)
         }
     }
 }

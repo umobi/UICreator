@@ -43,76 +43,130 @@ Definitions of UIView as ViewBuild:
 
 public protocol ViewCreator: class {
     /// It is executed in `willMove(toSubview:)` and depends of superview to call the `commitNotRendered()`.
+    @discardableResult
     func onNotRendered(_ handler: @escaping (UIView) -> Void) -> Self
 
     /// It is executed in `didMoveToSuperview()` and depends of superview to call the `commitRendered()`.
+    @discardableResult
     func onRendered(_ handler: @escaping (UIView) -> Void) -> Self
 
     /// It is executed in `didMoveToWindow()` and depends of superview to call the `commitInTheScene()`.
+    @discardableResult
     func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self
 
+    @discardableResult
     func onLayout(_ handler: @escaping (UIView) -> Void) -> Self
+
+    @discardableResult
+    func onAppear(_ handler: @escaping (UIView) -> Void) -> Self
+
+    @discardableResult
+    func onDisappear(_ handler: @escaping (UIView) -> Void) -> Self
 }
 
-internal var kUIView: UInt = 0
-internal extension ViewCreator {
-    var uiView: UIView! {
-        get { (self as? UIViewMaker)?.makeView() ?? objc_getAssociatedObject(self, &kUIView) as? UIView }
-        set { setView(newValue, policity: newValue?.superview != nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
+private struct UIViewObject {
+    private weak var __weak_uiView: UIView!
+    private var __strong_uiView: UIView!
+
+    weak var uiView: UIView! {
+        self.__strong_uiView ?? self.__weak_uiView
     }
 
-    func setView(_ uiView: UIView, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN) {
-        objc_setAssociatedObject(self, &kUIView, uiView, policity)
+    private init(weak view: UIView!) {
+        self.__weak_uiView = view
+        self.__strong_uiView = nil
+    }
+
+    private init(strong view: UIView!) {
+        self.__weak_uiView = nil
+        self.__strong_uiView = view
+    }
+
+    static func `weak`(_ view: UIView) -> Self {
+        .init(weak: view)
+    }
+
+    static func strong(_ view: UIView) -> Self {
+        .init(strong: view)
+    }
+
+    static var `nil`: Self {
+        .init(weak: nil)
+    }
+}
+
+private var kUIView: UInt = 0
+private extension ViewCreator {
+    private(set) var viewObject: UIViewObject {
+        get {
+            objc_getAssociatedObject(self, &kUIView) as? UIViewObject ?? {
+                let object = UIViewObject.nil
+                self.viewObject = object
+                return object
+            }()
+        }
+        set { objc_setAssociatedObject(self, &kUIView, newValue, .OBJC_ASSOCIATION_COPY_NONATOMIC) }
+    }
+
+    func setView(_ uiView: UIView, asWeak: Bool = false) {
+        self.viewObject = {
+            if asWeak {
+                return .weak(uiView)
+            }
+
+            return .strong(uiView)
+        }()
 
         if let root = self as? (Root & TemplateView) {
             root.viewDidChanged()
         }
     }
+}
+
+internal extension ViewCreator {
+    weak var uiView: UIView! {
+        self.viewObject.uiView
+    }
 
     func releaseUIView() -> UIView! {
-        let uiView = self.uiView!
+        let uiView: UIView! = self.loadViewIfNeeded()
+        guard uiView.viewCreator === self else {
+            return uiView
+        }
         uiView.setCreator(self, policity: .OBJC_ASSOCIATION_RETAIN)
-        self.setView(uiView, policity: .OBJC_ASSOCIATION_ASSIGN)
+        self.setView(uiView, asWeak: true)
         return uiView
     }
 }
 
-public extension ViewCreator {
+private var kLoadView: UInt = 0
+extension ViewCreator {
+    private(set) var loadViewHandler: (() -> UIView)? {
+        get { objc_getAssociatedObject(self, &kLoadView) as? (() -> UIView) }
+        set { objc_setAssociatedObject(self, &kLoadView, newValue, .OBJC_ASSOCIATION_RETAIN)}
+    }
 
-    @discardableResult
-    func onNotRendered(_ handler: @escaping (UIView) -> Void) -> Self {
-        guard self.uiView.renderState == .notRendered else {
-            handler(self.uiView)
-            return self
+    var isViewLoaded: Bool {
+        self.uiView != nil
+    }
+
+    func loadViewIfNeeded() -> UIView! {
+        if self.isViewLoaded {
+            return self.uiView
         }
 
-        _ = self.uiView.appendBeforeRendering(handler)
-        return self
+        let loadView: UIView! = self.loadViewHandler?() ?? (self as? UIViewMaker)?.makeView()
+        self.loadViewHandler = nil
+        if loadView.viewCreator === self {
+            self.setView(loadView, asWeak: true)
+        }
+
+        return loadView
     }
 
     @discardableResult
-    func onRendered(_ handler: @escaping (UIView) -> Void) -> Self {
-        guard self.uiView.renderState < .rendered else {
-            handler(self.uiView)
-            return self
-        }
-        _ = self.uiView.appendRendered(handler)
-        return self
-    }
-
-    @discardableResult
-    func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
-        guard self.uiView.renderState < .inTheScene else {
-            handler(self.uiView)
-            return self
-        }
-        _ = self.uiView.appendInTheScene(handler)
-        return self
-    }
-
-    @discardableResult
-    func onLayout(_ handler: @escaping (UIView) -> Void) -> Self {
-        _ = self.uiView.appendLayout(handler)
+    func loadView(_ handler: @escaping () -> UIView) -> Self {
+        self.loadViewHandler = handler
         return self
     }
 }

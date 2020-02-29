@@ -34,9 +34,10 @@ public class ScreenEdgePan: UIGesture {
 }
 
 public extension UIViewCreator {
-    func onScreenEdgePanMaker(_ screenEdgePanConfigurator: (ScreenEdgePan) -> ScreenEdgePan) -> Self {
-        self.uiView.addGesture(screenEdgePanConfigurator(ScreenEdgePan(target: self.uiView)))
-        return self
+    func onScreenEdgePanMaker(_ screenEdgePanConfigurator: @escaping (ScreenEdgePan) -> ScreenEdgePan) -> Self {
+        self.onNotRendered {
+            screenEdgePanConfigurator(ScreenEdgePan(target: $0)).add()
+        }
     }
 
     func onScreenEdgePan(_ handler: @escaping (UIView) -> Void) -> Self {

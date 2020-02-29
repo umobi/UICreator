@@ -25,24 +25,41 @@ import UIKit
 import UIContainer
 
 public class _RounderView: RounderView {
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
+        }
+    }
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        self.commitInTheScene()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
@@ -50,8 +67,14 @@ public class UICRounder: UIViewCreator {
     public typealias View = _RounderView
 
     public init(radius: CGFloat, content: @escaping () -> ViewCreator) {
-        self.uiView = View.init(content().releaseUIView(), radius: radius)
-        self.uiView.updateBuilder(self)
+        let content = content()
+        self.tree.append(content)
+
+        self.loadView { [unowned self] in
+            let view = View.init(content.releaseUIView(), radius: radius)
+            view.updateBuilder(self)
+            return view
+        }
     }
 }
 

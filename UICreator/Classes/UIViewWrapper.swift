@@ -21,8 +21,21 @@
 //
 
 import Foundation
+import UIKit
 
-public protocol HasViewDelegate {
-    associatedtype Delegate
-    func delegate(_ delegate: Delegate) -> Self
+public class UIViewWrapper {
+    private let wrap: ViewCreator
+    public init(_ wrap: ViewCreator) {
+        self.wrap = wrap
+    }
+
+    /// This will retain view on viewCreator
+    public weak var uiView: UIView! {
+        return self.wrap.uiView
+    }
+
+    /// This changes the keeper reference to UIView
+    public func releaseUIView() -> UIView! {
+        return self.wrap.releaseUIView()
+    }
 }

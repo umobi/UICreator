@@ -22,39 +22,42 @@
 
 import Foundation
 
-protocol ForEachCreator: ViewCreator {
-    var viewType: ViewCreator.Type { get }
-    func load()
-    var isLoaded: Bool { get }
-//    func startObservation()
-}
-
-private var kManager: UInt = 0
-extension ForEachCreator {
-    weak var manager: SupportForEach? {
-        get { objc_getAssociatedObject(self, &kManager) as? SupportForEach }
-        set { objc_setAssociatedObject(self, &kManager, newValue, .OBJC_ASSOCIATION_ASSIGN) }
-    }
-}
-
-protocol SupportForEach: class {
-    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>)
-}
-
 public class PlaceholderView: UIView {
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
+        }
+    }
+
+    override public func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
+    }
+    
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override open func didMoveToWindow() {
         super.didMoveToWindow()
-        self.commitInTheScene()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override open func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
@@ -77,27 +80,28 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
     }
 
     public convenience init(_ value: UICreator.Value<[Value]>, content: @escaping (Value) -> View) {
-        self.init(value.asRelay, value: { [weak value] in value?.value }, content: content)
+        self.init(value.asRelay, content: content)
     }
 
     public convenience init(_ value: [Value], content: @escaping (Value) -> View) {
-        let value = UICreator.Value(value: value)
-        self.init(value.asRelay, value: { value.value }, content: content)
+        let value = UICreator.Value(wrappedValue: value)
+        self.init(value.asRelay, content: content)
     }
 
-    private init(_ relay: Relay<[Value]>, value: @escaping () -> [Value]?, content: @escaping (Value) -> View) {
+    private init(_ relay: Relay<[Value]>, content: @escaping (Value) -> View) {
         self.relay = relay
         self.content = content
         self.viewType = View.self
-        self.uiView = PlaceholderView(builder: self)
+        self.loadView {
+            PlaceholderView(builder: self)
+        }
 
         self.syncLoad = {
             ($0.viewCreator as? Self)?.startObservation()
-            ($0.viewCreator as? Self)?.relay.post(value() ?? [])
         }
 
-        self.height(equalTo: 0, priority: .high)
-            .width(equalTo: 0, priority: .high)
+        self.height(equalTo: 0, priority: .defaultHigh)
+            .width(equalTo: 0, priority: .defaultHigh)
             .onNotRendered { view in
                 (view.viewCreator as? Self)?.load()
             }
@@ -106,7 +110,7 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
     func load() {
         let syncLoad = self.syncLoad
         self.syncLoad = nil
-        syncLoad?(self.uiView)
+        syncLoad?(self.releaseUIView())
     }
 
     var isLoaded: Bool {

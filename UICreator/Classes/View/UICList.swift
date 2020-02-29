@@ -24,45 +24,61 @@ import Foundation
 import UIKit
 
 public class TableView: UITableView {
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
+        }
+    }
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        self.commitInTheScene()
+        RenderManager(self)?.didMoveToWindow()
+    }
+
+    override public func setNeedsLayout() {
+        super.setNeedsLayout()
+    }
+
+    override public func layoutIfNeeded() {
+        super.layoutIfNeeded()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
-public class UICList: UIViewCreator, HasViewDelegate, HasViewDataSource {
+public class UICList: UIViewCreator {
     public typealias View = TableView
 
-    public func delegate(_ delegate: UITableViewDelegate?) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.delegate = delegate
-        }
-    }
-
-    public func dataSource(_ dataSource: UITableViewDataSource?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.dataSource = dataSource
-        }
-    }
-
     public init(style: UITableView.Style) {
-        self.uiView = View.init(frame: .zero, style: style)
-        self.uiView.updateBuilder(self)
+        self.loadView { [unowned self] in
+            let view = View.init(frame: .zero, style: style)
+            view.updateBuilder(self)
+            return view
+        }
     }
 }
 
@@ -160,8 +176,19 @@ public extension UIViewCreator where View: UITableView {
     }
 
     func background(_ content: @escaping () -> ViewCreator) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.backgroundView = UICHost(content: content).releaseUIView()
+        self.onNotRendered { tableView in
+            weak var tableView = tableView
+
+            UICResized(superview: (tableView as? View)?.backgroundView)
+                .onAdd {
+                    (tableView as? View)?.backgroundView = $0
+                }.addSubview(
+                    UICHost(content: content)
+                        .releaseUIView()
+                )
+                .height(.required)
+                .width(.required)
+                .watch(in: tableView)
         }
     }
 
@@ -198,26 +225,46 @@ public extension UIViewCreator where View: UITableView {
         }
     }
 
-    func header(size: CGSize = .zero, _ content: @escaping () -> ViewCreator) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.tableHeaderView = UICHost(size: size, content: content).releaseUIView()
+    func header(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> Self {
+        self.onInTheScene { tableView in
+            weak var tableView = tableView
+
+            UICResized(size: size, superview: (tableView as? View)?.tableHeaderView)
+                .onAdd {
+                    (tableView as? View)?.tableHeaderView = $0
+                }.addSubview(
+                    UICHost(content: content)
+                        .releaseUIView()
+                )
+                .width(.required)
+                .watch(in: tableView)
         }
     }
 
-    func footer(size: CGSize = .zero, _ content: @escaping () -> ViewCreator) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.tableFooterView = UICHost(size: size, content: content).releaseUIView()
+    func footer(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> Self {
+        self.onInTheScene { tableView in
+            weak var tableView = tableView
+
+            UICResized(size: size, superview: (tableView as? View)?.tableFooterView)
+                .onAdd {
+                    (tableView as? View)?.tableFooterView = $0
+                }.addSubview(
+                    UICHost(content: content)
+                        .releaseUIView()
+                )
+                .width(.required)
+                .watch(in: tableView)
         }
     }
 }
 
 public extension UIViewCreator where View: UITableView {
     func accessoryType(_ type: UITableViewCell.AccessoryType) -> Self {
-        (self.uiView as? View)?.appendCellHandler {
-            $0.accessoryType = type
+        self.onNotRendered {
+            ($0 as? View)?.appendCellHandler {
+                $0.accessoryType = type
+            }
         }
-
-        return self
     }
 }
 

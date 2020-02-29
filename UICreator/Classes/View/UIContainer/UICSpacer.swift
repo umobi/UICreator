@@ -25,24 +25,41 @@ import UIKit
 import UIContainer
 
 public class _SpacerView: SpacerView {
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
+        }
+    }
+    
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        self.commitInTheScene()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
@@ -50,8 +67,14 @@ public class UICSpacer: UIViewCreator {
     public typealias View = _SpacerView
 
     public required init(margin: View.Margin, content: @escaping () -> ViewCreator) {
-        self.uiView = View.init(content().releaseUIView(), margin: margin)
-        self.uiView.updateBuilder(self)
+        let content = content()
+        self.tree.append(content)
+
+        self.loadView { [unowned self] in
+            let view = View.init(content.releaseUIView(), margin: margin)
+            view.updateBuilder(self)
+            return view
+        }
     }
 }
 
@@ -59,7 +82,9 @@ public class UICEmpty: ViewCreator {
     public typealias View = UIView
 
     public init() {
-        self.uiView = .init(builder: self)
+        self.loadView { [unowned self] in
+            .init(builder: self)
+        }
     }
 }
 

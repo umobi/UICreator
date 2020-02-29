@@ -39,33 +39,65 @@ public class RootView: UIView {
 
     override open func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
+    }
 
-        self.willCommitNotRenderedHandler?()
-        self.willCommitNotRenderedHandler = nil
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
+        }
+    }
 
-        self.commitNotRendered()
-
-        self.didCommitNotRenderedHandler?()
-        self.didCommitNotRenderedHandler = nil
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
+        }
     }
 
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override open func didMoveToWindow() {
         super.didMoveToWindow()
-        self.commitInTheScene()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override open func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
+        RenderManager(self)?.layoutSubviews()
     }
+}
 
-    override var watchingViews: [UIView] {
-        return [self] + self.subviews
+extension RootView: RenderWillMoveToSuperviewState {
+    func render_willMoveToSuperview() {
+        self.willCommitNotRenderedHandler?()
+        self.willCommitNotRenderedHandler = nil
+
+        self.viewCreator?.render.commit(.notRendered)
+
+        self.didCommitNotRenderedHandler?()
+        self.didCommitNotRenderedHandler = nil
+    }
+}
+
+/**
+ The root is the base view creator class for some of the view creators. You shouldn’t use this directly, instead, check `UICView` or `UICViewRepresentable`.
+
+ Root support some of the protocols that is used in some of representable of view controllers like the protocol `ViewControllerAppearStates`.
+ */
+open class Root: ViewCreator {
+    public typealias View = RootView
+
+    public init() {
+        self.loadView { [unowned self] in
+            View.init(builder: self)
+        }
     }
 }
 
@@ -83,19 +115,6 @@ private var kViewDidLoad: UInt = 0
     }
 }
 
-/**
- The root is the base view creator class for some of the view creators. You shouldn’t use this directly, instead, check `UICView` or `UICViewRepresentable`.
-
- Root support some of the protocols that is used in some of representable of view controllers like the protocol `ViewControllerAppearStates`.
- */
-open class Root: ViewCreator {
-    public typealias View = RootView
-
-    public init() {
-        self.uiView = View.init(builder: self)
-    }
-}
-
 private var kTemplateViewDidConfiguredView: UInt = 0
 extension TemplateView where Self: Root {
     private var didConfiguredView: Bool {
@@ -109,10 +128,12 @@ extension TemplateView where Self: Root {
         }
 
         self.didConfiguredView = true
+        let body = self.body
+        self.tree.append(body)
 
         if self.uiView.subviews.isEmpty {
             (self.uiView as? View)?.willCommitNotRenderedHandler = { [unowned self] in
-                _ = self.uiView.add(self.body.releaseUIView())
+                self.uiView.add(priority: .required, body.releaseUIView())
             }
         }
 

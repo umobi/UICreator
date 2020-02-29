@@ -24,24 +24,41 @@ import Foundation
 import UIKit
 
 public class _SegmentedControl: UISegmentedControl {
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
+        }
+    }
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        self.commitInTheScene()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
@@ -126,8 +143,12 @@ public class UICSegmented: UIViewCreator, Control {
     public typealias View = _SegmentedControl
 
     public init(_ segments: @escaping () -> [Segment]) {
-        self.uiView = View.init(builder: self)
-        self.addSegments(segments())
+        self.onNotRendered { [unowned self] _ in
+            self.addSegments(segments())
+
+        }.loadView { [unowned self] in
+            return View.init(builder: self)
+        }
     }
 
     private func addSegments(_ segments: [Segment]) {

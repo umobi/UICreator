@@ -54,9 +54,10 @@ internal extension UIView {
 
 public extension UIViewCreator {
 
-    func onPanMaker(_ panConfigurator: (Pan) -> Pan) -> Self {
-        self.uiView.addGesture(panConfigurator(Pan(target: self.uiView)))
-        return self
+    func onPanMaker(_ panConfigurator: @escaping (Pan) -> Pan) -> Self {
+        self.onNotRendered {
+            panConfigurator(Pan(target: $0)).add()
+        }
     }
 
     func onPan(_ handler: @escaping (UIView) -> Void) -> Self {

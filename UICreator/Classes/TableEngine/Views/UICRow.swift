@@ -27,9 +27,17 @@ public class UICRow: ViewCreator {
 
     fileprivate(set) var trailingActions: (() -> [RowAction])? = nil
     fileprivate(set) var leadingActions: (() -> [RowAction])? = nil
+    fileprivate(set) var accessoryType: UITableViewCell.AccessoryType = .none
 
     public init(content: @escaping () -> ViewCreator) {
         self.content = content
+    }
+}
+
+public extension UICRow {
+    func accessoryType(_ type: UITableViewCell.AccessoryType) -> Self {
+        self.accessoryType = type
+        return self
     }
 }
 

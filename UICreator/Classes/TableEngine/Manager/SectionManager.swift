@@ -229,7 +229,7 @@ extension ListManager.SectionManager: ListContentDelegate {
             }
 
             return sum + [next]
-        }
+        } + updateRows
 
         self.listManager.content(updateSection: self.rows(rows))
     }
@@ -286,7 +286,7 @@ extension ListManager.SectionManager: SupportForEach {
     }
     
     func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
-        sequence.next { [compactCopy] contents in
+        sequence.sync { [compactCopy] contents in
             let sections = contents.compactMap {
                 ($0() as? UICSection)?.content
             }

@@ -40,15 +40,32 @@ public protocol UIGesture: Gesture {
     associatedtype Gesture: UIGestureRecognizer
 }
 
+public extension UIGesture {
+    func add() {
+        self.gesture.targetView?.addGestureRecognizer(self.releaseGesture())
+    }
+}
+
 private var kGesture: UInt = 0
+private var kTargetView: UInt = 0
 internal extension UIGestureRecognizer {
     var parent: Gesture? {
         get { objc_getAssociatedObject(self, &kGesture) as? Gesture }
-        set { objc_setAssociatedObject(self, &kGesture, newValue, .OBJC_ASSOCIATION_RETAIN) }
+        set { objc_setAssociatedObject(self, &kGesture, newValue, .OBJC_ASSOCIATION_ASSIGN) }
+    }
+
+    var targetView: UIView? {
+        get { (objc_getAssociatedObject(self, &kTargetView) as? UIView) ?? self.view }
+        set { objc_setAssociatedObject(self, &kTargetView, newValue, .OBJC_ASSOCIATION_ASSIGN) }
+    }
+
+    func releaseParent() {
+        objc_setAssociatedObject(self, &kGesture, self.parent, .OBJC_ASSOCIATION_RETAIN)
     }
 
     convenience init(target view: UIView!) {
         self.init(target: view, action: #selector(view.someGestureRecognized(_:)))
+        self.targetView = view
     }
 }
 
@@ -63,16 +80,12 @@ internal extension Gesture {
     func setGesture(_ uiGesture: UIGestureRecognizer, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN) {
         objc_setAssociatedObject(self, &kGestureRecognized, uiGesture, policity)
     }
-}
 
-internal extension UIView {
-    func addGesture(_ gesture: Gesture) {
-        guard let gestureRecognize = gesture.gesture else {
-            return
-        }
-
-        self.addGestureRecognizer(gestureRecognize)
-        gesture.setGesture(gestureRecognize, policity: .OBJC_ASSOCIATION_ASSIGN)
+    func releaseGesture() -> UIGestureRecognizer! {
+        let gesture: UIGestureRecognizer! = self.gesture
+        self.setGesture(gesture, policity: .OBJC_ASSOCIATION_ASSIGN)
+        gesture.releaseParent()
+        return gesture
     }
 }
 
@@ -170,8 +183,7 @@ public extension UIGesture {
         return self
     }
 
-    @available(tvOS 11.0, *)
-    @available(iOS 11, *)
+    @available(iOS 11, tvOS 11.0, *)
     func name(_ string: String?) -> Self {
         self.gesture.name = string
         return self
@@ -186,7 +198,7 @@ public extension UIGesture {
 public extension UIGesture {
     func onBegan(_ handler: @escaping (Gesture) -> Void) -> Self {
         let allBegan = self.began
-        self.began = .init {
+        self.began = .init { [allBegan] in
             guard let gesture = $0 as? Gesture else {
                 return
             }
@@ -199,7 +211,7 @@ public extension UIGesture {
 
     func onCancelled(_ handler: @escaping (Gesture) -> Void) -> Self {
         let allCancelled = self.cancelled
-        self.cancelled = .init {
+        self.cancelled = .init { [allCancelled] in
             guard let gesture = $0 as? Gesture else {
                 return
             }
@@ -212,7 +224,7 @@ public extension UIGesture {
 
     func onChanged(_ handler: @escaping (Gesture) -> Void) -> Self {
         let allChanged = self.changed
-        self.changed = .init {
+        self.changed = .init { [allChanged] in
             guard let gesture = $0 as? Gesture else {
                 return
             }
@@ -225,7 +237,7 @@ public extension UIGesture {
 
     func onFailed(_ handler: @escaping (Gesture) -> Void) -> Self {
         let allFailed = self.failed
-        self.failed = .init {
+        self.failed = .init { [allFailed] in
             guard let gesture = $0 as? Gesture else {
                 return
             }
@@ -238,7 +250,7 @@ public extension UIGesture {
 
     func onRecognized(_ handler: @escaping (Gesture) -> Void) -> Self {
         let allRecognized = self.recognized
-        self.recognized = .init {
+        self.recognized = .init { [allRecognized] in
             guard let gesture = $0 as? Gesture else {
                 return
             }
@@ -251,7 +263,7 @@ public extension UIGesture {
 
     func onPossible(_ handler: @escaping (Gesture) -> Void) -> Self {
         let allPossible = self.possible
-        self.possible = .init {
+        self.possible = .init { [allPossible] in
             guard let gesture = $0 as? Gesture else {
                 return
             }
@@ -264,7 +276,7 @@ public extension UIGesture {
 
     func onEnded(_ handler: @escaping (Gesture) -> Void) -> Self {
         let allEnded = self.ended
-        self.ended = .init {
+        self.ended = .init { [allEnded] in
             guard let gesture = $0 as? Gesture else {
                 return
             }
@@ -277,7 +289,7 @@ public extension UIGesture {
 
     func onAnyOther(_ handler: @escaping (Gesture) -> Void) -> Self {
         let allAnyOther = self.anyOther
-        self.anyOther = .init {
+        self.anyOther = .init { [allAnyOther] in
             guard let gesture = $0 as? Gesture else {
                 return
             }

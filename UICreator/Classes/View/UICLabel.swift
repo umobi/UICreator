@@ -24,24 +24,41 @@ import Foundation
 import UIKit
 
 public class _Label: UILabel {
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
+        }
+    }
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        self.commitInTheScene()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
@@ -49,23 +66,33 @@ public class UICLabel: UIViewCreator, TextElement {
     public typealias View = _Label
 
     required public init(_ text: String?) {
-        self.uiView = View.init(builder: self)
-        self.uiView.updateBuilder(self)
-        (self.uiView as? View)?.text = text
+        self.loadView { [unowned self] in
+            let view = View.init(builder: self)
+            view.text = text
+            return view
+        }
     }
 
     required public init(_ attributedText: NSAttributedString?) {
-        self.uiView = View.init(builder: self)
-        self.uiView.updateBuilder(self)
-        (self.uiView as? View)?.attributedText = attributedText
+        self.loadView { [unowned self] in
+            let view = View.init(builder: self)
+            view.attributedText = attributedText
+            return view
+        }
     }
+}
 
-    private var textRelay: Relay<String?>? = nil
-    public convenience init(_ textRelay: Relay<String?>) {
-        self.init(String?(nil))
+public extension UIViewCreator where View: UILabel, Self: TextElement {
+    init(_ text: Value<String?>) {
+        self.init(text.wrappedValue)
 
-        self.textRelay = textRelay
-        self.context.text.connect(to: textRelay)
+        let relay = text.asRelay
+        self.onInTheScene {
+            weak var view = $0 as? View
+            relay.sync {
+                view?.text = $0
+            }
+        }
     }
 }
 
@@ -126,17 +153,5 @@ public extension TextElement where View: UILabel {
         self.onNotRendered {
             ($0 as? View)?.adjustsFontSizeToFitWidth = flag
         }
-    }
-}
-
-extension UICLabel: UIViewContext {
-    public func bindContext(_ context: Context) {
-        context.text.sync { [weak self] in
-            (self?.uiView as? View)?.text = $0
-        }
-    }
-
-    public class Context: UICreator.Context {
-        let text: Value<String?> = .init(value: nil)
     }
 }

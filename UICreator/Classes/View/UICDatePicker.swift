@@ -25,24 +25,41 @@ import UIKit
 
 #if os(iOS)
 public class _DatePicker: UIDatePicker {
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
+        }
+    }
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        self.commitNotRendered()
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        self.commitRendered()
+        RenderManager(self)?.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        self.commitInTheScene()
+        RenderManager(self)?.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        self.commitLayout()
+        RenderManager(self)?.layoutSubviews()
     }
 }
 
@@ -50,8 +67,11 @@ public class UICDatePicker: UIViewCreator, Control {
     public typealias View = _DatePicker
 
     public init(calendar: Calendar? = nil) {
-        self.uiView = View.init(builder: self)
-        (self.uiView as? View)?.calendar = calendar ?? .current
+        self.loadView { [unowned self] in
+            let view = View.init(builder: self)
+            view.calendar = calendar ?? .current
+            return view
+        }
     }
 }
 
