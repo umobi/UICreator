@@ -255,7 +255,7 @@ extension UIView: ViewRender {
 
     @discardableResult
     public func onLayout(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.appendLayout(handler)
+        _ = self.appendLayout(handler)
 
         if self.frame.size != .zero {
             RenderManager(self)?.layoutSubviews()
