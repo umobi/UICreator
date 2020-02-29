@@ -222,10 +222,6 @@ public class UICPageContainer: UIView {
         }
     }
 
-    override var watchingViews: [UIView] {
-        return self.subviews
-    }
-
     public enum IndicatorViewPosition {
         case topRespectedToSafeArea
         case left

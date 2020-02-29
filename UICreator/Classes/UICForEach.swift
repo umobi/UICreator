@@ -22,25 +22,6 @@
 
 import Foundation
 
-protocol ForEachCreator: ViewCreator {
-    var viewType: ViewCreator.Type { get }
-    func load()
-    var isLoaded: Bool { get }
-//    func startObservation()
-}
-
-private var kManager: UInt = 0
-extension ForEachCreator {
-    weak var manager: SupportForEach? {
-        get { objc_getAssociatedObject(self, &kManager) as? SupportForEach }
-        set { objc_setAssociatedObject(self, &kManager, newValue, .OBJC_ASSOCIATION_ASSIGN) }
-    }
-}
-
-protocol SupportForEach: class {
-    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>)
-}
-
 public class PlaceholderView: UIView {
 
     override open var isHidden: Bool {

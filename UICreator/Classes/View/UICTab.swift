@@ -82,10 +82,6 @@ public class UICTabContainer: UIView {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
     }
-
-    override var watchingViews: [UIView] {
-        return self.subviews
-    }
 }
 
 public class UICTabCreator<TabController: UITabBarController>: UIViewCreator {

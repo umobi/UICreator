@@ -74,8 +74,4 @@ public class CollectionReusableView: UICollectionReusableView, ReusableView {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
     }
-
-    public override var watchingViews: [UIView] {
-        return self.contentView.subviews
-    }
 }

@@ -24,158 +24,6 @@ import Foundation
 import UIKit
 import UIContainer
 
-protocol RenderWillMoveToSuperviewState {
-    func render_willMoveToSuperview()
-}
-
-protocol RenderDidMoveToSuperviewState {
-    func render_didMoveToSuperview()
-}
-
-protocol RenderDidMoveToWindowState {
-    func render_didMoveToWindow()
-}
-
-protocol RenderLayoutSubviewsState {
-    func render_layoutSubviews()
-}
-
-struct RenderManager {
-    private(set) weak var manager: ViewCreator!
-
-    init?(_ view: UIView?) {
-        guard let manager = view?.viewCreator else {
-            return nil
-        }
-
-        self.manager = manager
-    }
-}
-
-extension UIView {
-    var superCreator: ViewCreator? {
-        guard let superview = self.superview else {
-            return nil
-        }
-
-        return sequence(first: superview, next: { $0.superview })
-            .first(where: { $0.viewCreator != nil })?
-            .viewCreator
-    }
-
-    var viewCreators: [ViewCreator] {
-        self.subviews.reduce([]) {
-            $0 + {
-                guard let creator = $0.viewCreator else {
-                    return $0.viewCreators
-                }
-
-                return [creator]
-            }($1)
-        }
-    }
-}
-
-extension RenderManager {
-    func willMove(toSuperview newSuperview: UIView?) {
-        if newSuperview == nil {
-            self.manager.tree.supertree?.remove(self.manager)
-            return
-        }
-
-        if self.manager.tree.supertree == nil {
-            self.manager.uiView.superCreator?.tree.append(self.manager)
-        }
-
-        if let override = self.manager.uiView as? RenderWillMoveToSuperviewState {
-            override.render_willMoveToSuperview()
-            return
-        }
-        
-        manager.render.commit(.notRendered)
-    }
-
-    func didMoveToSuperview() {
-        guard self.manager.uiView.superview != nil else {
-            return
-        }
-
-        if let override = self.manager.uiView as? RenderDidMoveToSuperviewState {
-            override.render_didMoveToSuperview()
-            return
-        }
-
-        manager.render.commit(.rendered)
-    }
-
-    func didMoveToWindow() {
-        guard self.manager.uiView.window != nil else {
-            if let root = self.manager.root {
-                root.tree.supertree?.remove(root)
-            }
-            manager.commitDisappear()
-            return
-        }
-
-        if self.manager.tree.supertree == nil {
-            self.manager.uiView.superCreator?.tree.append(self.manager)
-        }
-
-        if let override = self.manager.uiView as? RenderDidMoveToWindowState {
-            override.render_didMoveToWindow()
-            self.frame(manager.uiView.frame)
-            return
-        }
-
-        manager.render.commit(.inTheScene)
-        self.frame(manager.uiView.frame)
-    }
-
-    func layoutSubviews() {
-        if let override = self.manager.uiView as? RenderLayoutSubviewsState {
-            override.render_layoutSubviews()
-            self.frame(manager.uiView.frame)
-            return
-        }
-
-        manager.commitLayout()
-        self.frame(manager.uiView.frame)
-    }
-
-    func frame(_ rect: CGRect) {
-        guard manager.uiView.window != nil, !manager.uiView.isHidden else {
-            return
-        }
-
-        guard rect.size.height != .zero && rect.size.width != .zero else {
-            return
-        }
-
-        manager.commitAppear()
-    }
-
-    func isHidden(_ isHidden: Bool) {
-        guard isHidden else {
-            manager.commitDisappear()
-            return
-        }
-
-        self.frame(manager.uiView.frame)
-    }
-}
-
-extension RootView: RenderWillMoveToSuperviewState {
-    func render_willMoveToSuperview() {
-        self.willCommitNotRenderedHandler?()
-        self.willCommitNotRenderedHandler = nil
-
-        self.viewCreator?.render.commit(.notRendered)
-
-        self.didCommitNotRenderedHandler?()
-        self.didCommitNotRenderedHandler = nil
-    }
-}
-
 /// RootView is an internal view that is used to be the UIView of some view creator to support lazy loads.
 public class RootView: UIView {
     var willCommitNotRenderedHandler: (() -> Void)?
@@ -224,23 +72,17 @@ public class RootView: UIView {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
     }
-
-    override var watchingViews: [UIView] {
-        return self.subviews
-    }
 }
 
-private var kViewDidLoad: UInt = 0
-@objc extension Root {
+extension RootView: RenderWillMoveToSuperviewState {
+    func render_willMoveToSuperview() {
+        self.willCommitNotRenderedHandler?()
+        self.willCommitNotRenderedHandler = nil
 
-    private(set) var didViewLoad: Bool {
-        get { (objc_getAssociatedObject(self, &kViewDidLoad) as? Bool) ?? false }
-        set { (objc_setAssociatedObject(self, &kViewDidLoad, newValue, .OBJC_ASSOCIATION_RETAIN)) }
-    }
+        self.viewCreator?.render.commit(.notRendered)
 
-    /// The viewDidLoad function is a similar method used by UIKit for view controllers. This method means in UICreator that it is now allowed to directly access the subviews or manipulate data without having some errors thrown.
-    open func viewDidLoad() {
-        self.didViewLoad = true
+        self.didCommitNotRenderedHandler?()
+        self.didCommitNotRenderedHandler = nil
     }
 }
 
@@ -256,6 +98,20 @@ open class Root: ViewCreator {
         self.loadView { [unowned self] in
             View.init(builder: self)
         }
+    }
+}
+
+private var kViewDidLoad: UInt = 0
+@objc extension Root {
+
+    private(set) var didViewLoad: Bool {
+        get { (objc_getAssociatedObject(self, &kViewDidLoad) as? Bool) ?? false }
+        set { (objc_setAssociatedObject(self, &kViewDidLoad, newValue, .OBJC_ASSOCIATION_RETAIN)) }
+    }
+
+    /// The viewDidLoad function is a similar method used by UIKit for view controllers. This method means in UICreator that it is now allowed to directly access the subviews or manipulate data without having some errors thrown.
+    open func viewDidLoad() {
+        self.didViewLoad = true
     }
 }
 

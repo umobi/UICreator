@@ -22,48 +22,30 @@
 
 import Foundation
 
-public protocol UIViewMaker: ViewCreator {
-    var loadView: UIView { get }
-}
-
-public protocol UICViewRepresentable: UIViewCreator, UIViewMaker {
-    var uiView: View! { get }
-    func makeUIView() -> View
-    func updateView(_ view: View)
-}
-
-internal extension UIViewMaker {
-    func makeView() -> UIView {
-        if let view = self.uiView {
-            return view
-        }
-
-        self.loadView { [unowned self] in
-            let view = self.loadView
-            view.updateBuilder(self)
-            return view
-        }
-        
-        return Adaptor(self).releaseUIView()
-    }
-}
-
-public extension UICViewRepresentable {
-    var loadView: UIView {
-        return self.onInTheScene { [weak self] in
-            guard let view = ($0 as? View) else {
-                return
-            }
-
-            self?.updateView(view)
-        }.makeUIView()
+@propertyWrapper
+public struct UICOutlet<Value: AnyObject> {
+    private class Object {
+        weak var reference: Value!
     }
 
-    weak var uiView: View! {
-        return (self as ViewCreator).uiView as? View
+    private let object: Object
+
+    public var projectedValue: UICOutlet<Value> { return self }
+
+    public init(wrappedValue value: Value? = nil) {
+        self.object = .init()
+        self.object.reference = value
     }
 
-    weak var wrapper: UIView! {
-        return self.uiView.superview
+    public var wrappedValue: Value! {
+        self.object.reference
+    }
+
+    public func ref(_ value: Value?) {
+        self.object.reference = value
+    }
+
+    static var empty: UICOutlet<Value> {
+        .init()
     }
 }

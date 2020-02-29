@@ -70,20 +70,8 @@ public class TableView: UITableView {
     }
 }
 
-public class UICList: UIViewCreator, HasViewDelegate, HasViewDataSource {
+public class UICList: UIViewCreator {
     public typealias View = TableView
-
-    public func delegate(_ delegate: UITableViewDelegate?) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.delegate = delegate
-        }
-    }
-
-    public func dataSource(_ dataSource: UITableViewDataSource?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.dataSource = dataSource
-        }
-    }
 
     public init(style: UITableView.Style) {
         self.loadView { [unowned self] in

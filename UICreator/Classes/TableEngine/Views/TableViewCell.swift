@@ -73,10 +73,6 @@ internal class TableViewCell: UITableViewCell, ReusableView {
         RenderManager(self)?.layoutSubviews()
     }
 
-    public override var watchingViews: [UIView] {
-        return self.contentView.subviews
-    }
-
     func prepareCell(_ cell: UICCell) {
         self.reuseCell(cell)
 

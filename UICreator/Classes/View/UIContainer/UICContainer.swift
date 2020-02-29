@@ -33,10 +33,6 @@ public class _Container<View: UIViewController>: UIContainer.Container<View> {
         return spacerView
     }
 
-    override var watchingViews: [UIView] {
-        return []
-    }
-
     override open var isHidden: Bool {
         get { super.isHidden }
         set {

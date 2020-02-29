@@ -80,34 +80,6 @@ public extension ViewCreator {
     }
 }
 
-@propertyWrapper
-public struct UICOutlet<Value: AnyObject> {
-    private class Object {
-        weak var reference: Value!
-    }
-
-    private let object: Object
-
-    public var projectedValue: UICOutlet<Value> { return self }
-
-    public init(wrappedValue value: Value? = nil) {
-        self.object = .init()
-        self.object.reference = value
-    }
-
-    public var wrappedValue: Value! {
-        self.object.reference
-    }
-
-    public func ref(_ value: Value?) {
-        self.object.reference = value
-    }
-
-    static var empty: UICOutlet<Value> {
-        .init()
-    }
-}
-
 public extension ViewCreator {
     func shadow(radius: CGFloat) -> Self {
         return self.onNotRendered {

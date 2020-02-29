@@ -62,14 +62,8 @@ public class _TextField: UITextField {
     }
 }
 
-public class UICText: UIViewCreator, TextElement, TextKeyboard, Control, HasViewDelegate {
+public class UICText: UIViewCreator, TextElement, TextKeyboard, Control {
     public typealias View = _TextField
-    
-    public func delegate(_ delegate: UITextFieldDelegate?) -> Self {
-        self.onInTheScene { [weak delegate] in
-            ($0 as? View)?.delegate = delegate
-        }
-    }
 
     required public init(_ text: String?) {
         self.loadView { [unowned self] in

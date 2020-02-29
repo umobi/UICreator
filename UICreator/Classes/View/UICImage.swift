@@ -99,7 +99,7 @@ public class UICImage: UIViewCreator {
         }
     }
 
-    public convenience init(_ imageRelay: Relay<UIImage?>) {
+    public convenience init(_ imageRelay: Value<UIImage?>) {
         self.init(image: nil)
 
         _ = self.onInTheScene {

@@ -23,9 +23,10 @@
 import Foundation
 import UIKit
 
-protocol ViewRender: UIView {
-    /// Subviews that has commits that needs to be done.
-    var watchingViews: [UIView] { get }
+public protocol ViewRender: UIView {
+    func onAppear(_ handler: @escaping (UIView) -> Void) -> Self
+    func onDisappear(_ handler: @escaping (UIView) -> Void) -> Self
+    func onLayout(_ handler: @escaping (UIView) -> Void) -> Self
 }
 
 private var kViewBuilder: UInt = 0
@@ -46,13 +47,6 @@ internal extension ViewRender {
 
     func updateBuilder(_ builder: ViewCreator) {
         self.viewCreator = builder
-    }
-}
-
-extension UIView: ViewRender {
-    @objc
-    var watchingViews: [UIView] {
-        return self.subviews
     }
 }
 
@@ -235,10 +229,10 @@ extension ViewCreator {
     }
 }
 
-public extension UIView {
+extension UIView: ViewRender {
 
     @discardableResult
-    func onAppear(_ handler: @escaping (UIView) -> Void) -> Self {
+    public func onAppear(_ handler: @escaping (UIView) -> Void) -> Self {
         self.appendAppear(handler)
 
         if case .appeared = self.appearState {
@@ -249,7 +243,7 @@ public extension UIView {
     }
 
     @discardableResult
-    func onDisappear(_ handler: @escaping (UIView) -> Void) -> Self {
+    public func onDisappear(_ handler: @escaping (UIView) -> Void) -> Self {
         self.appendDisappear(handler)
 
         if case .disappeared = self.appearState {
@@ -258,12 +252,9 @@ public extension UIView {
 
         return self
     }
-}
-
-public extension UIView {
 
     @discardableResult
-    func onLayout(_ handler: @escaping (UIView) -> Void) -> Self {
+    public func onLayout(_ handler: @escaping (UIView) -> Void) -> Self {
         self.appendLayout(handler)
 
         if self.frame.size != .zero {
@@ -287,9 +278,6 @@ public extension ViewCreator {
         self.disappearUtil = self.disappearUtil.merge(.init(handler))
         return self
     }
-}
-
-public extension ViewCreator {
 
     @discardableResult
     func onLayout(_ handler: @escaping (UIView) -> Void) -> Self {

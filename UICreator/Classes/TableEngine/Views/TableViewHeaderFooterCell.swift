@@ -71,8 +71,4 @@ internal class TableViewHeaderFooterCell: UITableViewHeaderFooterView, ReusableV
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
     }
-
-    public override var watchingViews: [UIView] {
-        return self.contentView.subviews
-    }
 }
