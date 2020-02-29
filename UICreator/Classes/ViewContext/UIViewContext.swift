@@ -22,6 +22,8 @@
 
 import Foundation
 
+/// Don't use this protocol
+@available(*, deprecated)
 public protocol UIViewContext: ViewContext {
     associatedtype Context: UICreator.Context
     func bindContext(_ context: Context)

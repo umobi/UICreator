@@ -409,11 +409,9 @@ public class UICPage: UIViewCreator {
 }
 
 public extension UICPage {
-    func `as`<Controller: UIPageViewController>(_ ref: inout UIReference<Controller>!) -> Self {
-        let reference = UIReference<Controller>()
-        ref = reference
-        return self.onInTheScene { [weak self, weak reference] _ in
-            reference?.ref(self?.pageController as? Controller)
+    func `as`<Controller: UIPageViewController>(_ reference: UICOutlet<Controller>) -> Self {
+        return self.onInTheScene { [weak self, reference] _ in
+            reference.ref(self?.pageController as? Controller)
         }
     }
     

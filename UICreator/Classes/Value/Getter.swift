@@ -22,15 +22,19 @@
 
 import Foundation
 
-public protocol Getter: class {
+public protocol Getter {
     associatedtype Value
 
-    var value: Value { get }
+    var wrappedValue: Value { get }
+}
+
+protocol IDGetter {
+    var identifier: String { get }
 }
 
 public extension Getter {
     internal var identifier: String {
-        return "\(ObjectIdentifier(self))"
+        return (self as! IDGetter).identifier
     }
 
     func next(_ handler: @escaping (Value) -> Void) {
@@ -42,6 +46,6 @@ public extension Getter {
             syncHandler($0)
         }
 
-        syncHandler(self.value)
+        syncHandler(self.wrappedValue)
     }
 }

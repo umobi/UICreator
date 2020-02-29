@@ -73,28 +73,38 @@ public extension ViewCreator {
         }
     }
 
-    func `as`<UIElement: UIView>(_ reference: inout UIReference<UIElement>!) -> Self {
-        let ref = UIReference<UIElement>()
-        reference = ref
-        return self.onNotRendered { [weak ref] in
-            ref?.ref($0 as? UIElement)
+    func `as`<UIElement: UIView>(_ reference: UICOutlet<UIElement>) -> Self {
+        return self.onNotRendered { [reference] in
+            reference.ref($0 as? UIElement)
         }
     }
 }
 
-public class UIReference<UI: AnyObject> {
-    public private(set) weak var reference: UI!
-
-    init(_ ref: UI! = nil) {
-        self.reference = ref
+@propertyWrapper
+public struct UICOutlet<Value: AnyObject> {
+    private class Object {
+        weak var reference: Value!
     }
 
-    public func ref(_ ui: UI!) {
-        self.reference = ui
+    private let object: Object
+
+    public var projectedValue: UICOutlet<Value> { return self }
+
+    public init(wrappedValue value: Value? = nil) {
+        self.object = .init()
+        self.object.reference = value
     }
 
-    public static var empty: UIReference<UI> {
-        return .init()
+    public var wrappedValue: Value! {
+        self.object.reference
+    }
+
+    public func ref(_ value: Value?) {
+        self.object.reference = value
+    }
+
+    static var empty: UICOutlet<Value> {
+        .init()
     }
 }
 

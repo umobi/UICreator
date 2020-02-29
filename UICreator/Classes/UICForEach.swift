@@ -99,15 +99,15 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
     }
 
     public convenience init(_ value: UICreator.Value<[Value]>, content: @escaping (Value) -> View) {
-        self.init(value.asRelay, value: { [weak value] in value?.value }, content: content)
+        self.init(value.asRelay, content: content)
     }
 
     public convenience init(_ value: [Value], content: @escaping (Value) -> View) {
-        let value = UICreator.Value(value: value)
-        self.init(value.asRelay, value: { value.value }, content: content)
+        let value = UICreator.Value(wrappedValue: value)
+        self.init(value.asRelay, content: content)
     }
 
-    private init(_ relay: Relay<[Value]>, value: @escaping () -> [Value]?, content: @escaping (Value) -> View) {
+    private init(_ relay: Relay<[Value]>, content: @escaping (Value) -> View) {
         self.relay = relay
         self.content = content
         self.viewType = View.self

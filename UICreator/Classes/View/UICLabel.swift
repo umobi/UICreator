@@ -84,7 +84,7 @@ public class UICLabel: UIViewCreator, TextElement {
 
 public extension UIViewCreator where View: UILabel, Self: TextElement {
     init(_ text: Value<String?>) {
-        self.init(text.value)
+        self.init(text.wrappedValue)
 
         let relay = text.asRelay
         self.onInTheScene {

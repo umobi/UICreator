@@ -113,8 +113,8 @@ public class UICImage: UIViewCreator {
 
 public extension Value {
     func connect(to relay: Relay<Value>) {
-        relay.sync { [weak self] in
-            self?.value = $0
+        relay.sync {
+            self.wrappedValue = $0
         }
     }
 }
