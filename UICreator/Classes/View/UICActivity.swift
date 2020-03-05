@@ -67,9 +67,9 @@ public class UICActivity: UIViewCreator {
 
     public init(style: View.Style) {
         self.loadView { [unowned self] in
-            let view = View.init(builder: self)
-            view.style = style
-            return view
+            View.init(builder: self)
+        }.onNotRendered {
+            ($0 as? View)?.style = style
         }
     }
 }

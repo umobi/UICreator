@@ -38,10 +38,10 @@ class Tree {
             fatalError()
         }
 
-        guard !self.leafs.contains(where: {
+        if self.leafs.contains(where: {
             $0.leaf === leaf
-        }) else {
-            fatalError()
+        }) {
+            self.remove(leaf)
         }
 
         leaf.tree.supertree = self

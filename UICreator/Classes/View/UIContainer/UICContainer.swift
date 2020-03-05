@@ -74,12 +74,8 @@ public class UICContainer<ViewController: UIViewController>: UIViewCreator {
     public typealias View = _Container<ViewController>
 
     public required init(_ content: @escaping () -> ViewController) {
-        let content = content()
-
         self.onInTheScene {
-            ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: {
-                content
-            })
+            ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: content)
         }.loadView { [unowned self] in
             return View.init(builder: self)
         }

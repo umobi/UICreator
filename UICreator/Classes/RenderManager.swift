@@ -75,15 +75,25 @@ extension UIView {
 }
 
 extension RenderManager {
+    func checkSupercreator(_ superview: UIView? = nil) {
+        let superview = superview ?? self.manager.uiView.superview
+        guard let supercreator = superview?.viewCreator ?? superview?.superCreator else {
+            return
+        }
+
+        if supercreator !== self.manager.tree.supertree?.root {
+            self.manager.tree.supertree?.remove(self.manager)
+            supercreator.tree.append(self.manager)
+        }
+    }
+
     func willMove(toSuperview newSuperview: UIView?) {
         if newSuperview == nil {
             self.manager.tree.supertree?.remove(self.manager)
             return
         }
 
-        if self.manager.tree.supertree == nil {
-            self.manager.uiView.superCreator?.tree.append(self.manager)
-        }
+        self.checkSupercreator(newSuperview)
 
         if let override = self.manager.uiView as? RenderWillMoveToSuperviewState {
             override.render_willMoveToSuperview()
@@ -97,6 +107,8 @@ extension RenderManager {
         guard self.manager.uiView.superview != nil else {
             return
         }
+
+        self.checkSupercreator()
 
         if let override = self.manager.uiView as? RenderDidMoveToSuperviewState {
             override.render_didMoveToSuperview()
@@ -115,9 +127,7 @@ extension RenderManager {
             return
         }
 
-        if self.manager.tree.supertree == nil {
-            self.manager.uiView.superCreator?.tree.append(self.manager)
-        }
+        self.checkSupercreator()
 
         if let override = self.manager.uiView as? RenderDidMoveToWindowState {
             override.render_didMoveToWindow()

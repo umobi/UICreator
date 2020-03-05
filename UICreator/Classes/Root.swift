@@ -95,8 +95,21 @@ open class Root: ViewCreator {
     public typealias View = RootView
 
     public init() {
+        var body: ViewCreator?
+
+        if let templateView = self as? TemplateView {
+            let _body = templateView.body
+            self.tree.append(_body)
+            body = _body
+        }
+
         self.loadView { [unowned self] in
-            View.init(builder: self)
+            let view = View.init(builder: self)
+            if let body = body {
+                view.add(priority: .required, body.releaseUIView())
+            }
+
+            return view
         }
     }
 }
@@ -128,14 +141,6 @@ extension TemplateView where Self: Root {
         }
 
         self.didConfiguredView = true
-        let body = self.body
-        self.tree.append(body)
-
-        if self.uiView.subviews.isEmpty {
-            (self.uiView as? View)?.willCommitNotRenderedHandler = { [unowned self] in
-                self.uiView.add(priority: .required, body.releaseUIView())
-            }
-        }
 
         (self.uiView as? View)?.didCommitNotRenderedHandler = { [unowned self] in
             if !self.didViewLoad {

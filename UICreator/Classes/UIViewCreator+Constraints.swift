@@ -35,6 +35,71 @@ extension UIView {
     }
 }
 
+extension Anchor {
+    class ConstraintFinalize {
+        private var constraint: NSLayoutConstraint?
+        private var anchor: Anchor
+
+        init(original: Anchor, _ constraint: NSLayoutConstraint) {
+            self.constraint = constraint
+            self.anchor = original
+        }
+
+        init(_ anchor: Anchor) {
+            self.constraint = nil
+            self.anchor = anchor
+        }
+
+        private func activateIfNeeded() {
+            if let constraint = self.constraint {
+                if !constraint.isActive {
+                    NSLayoutConstraint.activate([constraint])
+                }
+            } else {
+                activate(anchor)
+            }
+        }
+
+        func constant(_ constant: CGFloat) -> Self {
+            self.constraint?.constant = constant
+            self.anchor = self.anchor.constant(constant)
+            return self
+        }
+
+        func multiplier(_ multiplier: CGFloat) -> Self {
+            NSLayoutConstraint.deactivate([self.constraint].compactMap { $0 })
+            self.constraint = nil
+            self.anchor = self.anchor.multiplier(multiplier)
+            return self
+        }
+
+        func priority(_ priority: UILayoutPriority) -> Self {
+            self.constraint?.priority = priority
+            self.anchor = self.anchor.priority(priority.rawValue)
+            return self
+        }
+
+        func priority(_ priority: Float) -> Self {
+            self.constraint?.priority = .init(priority)
+            self.anchor = self.anchor.priority(priority)
+            return self
+        }
+
+        deinit {
+            self.activateIfNeeded()
+        }
+    }
+
+    func orCreate() -> ConstraintFinalize {
+        if let constraint = self.findByContent().first {
+            let finalize = ConstraintFinalize(original: self, constraint)
+            return finalize
+        }
+
+        return .init(self)
+    }
+}
+
 public extension ViewCreator {
     func safeArea(topEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: UIView? = nil) -> Self {
         return self.onInTheScene {
@@ -43,23 +108,21 @@ public extension ViewCreator {
             }
 
             if #available(iOS 11, tvOS 11, *) {
-                activate(
-                    $0.anchor
-                        .top
-                        .equal.to(view.safeAreaLayoutGuide.anchor.topMargin)
-                        .constant(constant)
-                        .priority(priority.rawValue)
-                )
+                $0.anchor
+                    .top
+                    .equal.to(view.safeAreaLayoutGuide.anchor.topMargin)
+                    .orCreate()
+                    .constant(constant)
+                    .priority(priority)
                 return
             }
 
-            activate(
-                $0.anchor
-                    .top
-                    .equal.to(view.anchor.topMargin)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .top
+                .equal.to(view.anchor.topMargin)
+                .orCreate()
+                .constant(constant)
+                .priority(priority)
         }
     }
 
@@ -70,23 +133,21 @@ public extension ViewCreator {
             }
 
             if #available(iOS 11, tvOS 11, *) {
-                activate(
-                    $0.anchor
-                        .top
-                        .greaterThanOrEqual.to(view.safeAreaLayoutGuide.anchor.topMargin)
-                        .constant(constant)
-                        .priority(priority.rawValue)
-                )
+                $0.anchor
+                    .top
+                    .greaterThanOrEqual.to(view.safeAreaLayoutGuide.anchor.topMargin)
+                    .orCreate()
+                    .constant(constant)
+                    .priority(priority.rawValue)
                 return
             }
 
-            activate(
-                $0.anchor
-                    .top
-                    .greaterThanOrEqual.to(view.anchor.topMargin)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .top
+                .greaterThanOrEqual.to(view.anchor.topMargin)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -97,23 +158,21 @@ public extension ViewCreator {
             }
 
             if #available(iOS 11, tvOS 11, *) {
-                activate(
-                    $0.anchor
-                        .top
-                        .lessThanOrEqual.to(view.anchor.topMargin)
-                        .constant(constant)
-                        .priority(priority.rawValue)
-                )
-                return
-            }
-
-            activate(
                 $0.anchor
                     .top
                     .lessThanOrEqual.to(view.anchor.topMargin)
+                    .orCreate()
                     .constant(constant)
                     .priority(priority.rawValue)
-            )
+                return
+            }
+
+            $0.anchor
+                .top
+                .lessThanOrEqual.to(view.anchor.topMargin)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -124,23 +183,21 @@ public extension ViewCreator {
             }
 
             if #available(iOS 11, tvOS 11, *) {
-                activate(
-                    $0.anchor
-                        .bottom
-                        .equal.to(view.safeAreaLayoutGuide.anchor.bottomMargin)
-                        .constant(-constant)
-                        .priority(priority.rawValue)
-                )
+                $0.anchor
+                    .bottom
+                    .equal.to(view.safeAreaLayoutGuide.anchor.bottomMargin)
+                    .orCreate()
+                    .constant(-constant)
+                    .priority(priority.rawValue)
                 return
             }
 
-            activate(
-                $0.anchor
-                    .bottom
-                    .equal.to(view.anchor.bottomMargin)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .bottom
+                .equal.to(view.anchor.bottomMargin)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -151,23 +208,21 @@ public extension ViewCreator {
             }
 
             if #available(iOS 11, tvOS 11, *) {
-                activate(
-                    $0.anchor
-                        .bottom
-                        .greaterThanOrEqual.to(view.safeAreaLayoutGuide.anchor.bottomMargin)
-                        .constant(-constant)
-                        .priority(priority.rawValue)
-                )
+                $0.anchor
+                    .bottom
+                    .greaterThanOrEqual.to(view.safeAreaLayoutGuide.anchor.bottomMargin)
+                    .orCreate()
+                    .constant(-constant)
+                    .priority(priority.rawValue)
                 return
             }
 
-            activate(
-                $0.anchor
-                    .bottom
-                    .greaterThanOrEqual.to(view.anchor.bottomMargin)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .bottom
+                .greaterThanOrEqual.to(view.anchor.bottomMargin)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -178,23 +233,21 @@ public extension ViewCreator {
             }
 
             if #available(iOS 11, tvOS 11, *) {
-                activate(
-                    $0.anchor
-                        .bottom
-                        .lessThanOrEqual.to(view.safeAreaLayoutGuide.anchor.bottomMargin)
-                        .constant(-constant)
-                        .priority(priority.rawValue)
-                )
+                $0.anchor
+                    .bottom
+                    .lessThanOrEqual.to(view.safeAreaLayoutGuide.anchor.bottomMargin)
+                    .orCreate()
+                    .constant(-constant)
+                    .priority(priority.rawValue)
                 return
             }
 
-            activate(
-                $0.anchor
-                    .bottom
-                    .lessThanOrEqual.to(view.anchor.bottomMargin)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .bottom
+                .lessThanOrEqual.to(view.anchor.bottomMargin)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -205,23 +258,21 @@ public extension ViewCreator {
             }
 
             if #available(iOS 11, tvOS 11, *) {
-                activate(
-                    $0.anchor
-                        .leading
-                        .equal.to(view.safeAreaLayoutGuide.anchor.leadingMargin)
-                        .constant(constant)
-                        .priority(priority.rawValue)
-                )
+                $0.anchor
+                    .leading
+                    .equal.to(view.safeAreaLayoutGuide.anchor.leadingMargin)
+                    .orCreate()
+                    .constant(constant)
+                    .priority(priority.rawValue)
                 return
             }
 
-            activate(
-                $0.anchor
-                    .leading
-                    .equal.to(view.anchor.leadingMargin)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .leading
+                .equal.to(view.anchor.leadingMargin)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -232,23 +283,21 @@ public extension ViewCreator {
             }
 
             if #available(iOS 11, tvOS 11, *) {
-                activate(
-                    $0.anchor
-                        .leading
-                        .greaterThanOrEqual.to(view.safeAreaLayoutGuide.anchor.leadingMargin)
-                        .constant(constant)
-                        .priority(priority.rawValue)
-                )
+                $0.anchor
+                    .leading
+                    .greaterThanOrEqual.to(view.safeAreaLayoutGuide.anchor.leadingMargin)
+                    .orCreate()
+                    .constant(constant)
+                    .priority(priority.rawValue)
                 return
             }
 
-            activate(
-                $0.anchor
-                    .leading
-                    .greaterThanOrEqual.to(view.anchor.leadingMargin)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .leading
+                .greaterThanOrEqual.to(view.anchor.leadingMargin)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -259,23 +308,21 @@ public extension ViewCreator {
             }
 
             if #available(iOS 11, tvOS 11, *) {
-                activate(
-                    $0.anchor
-                        .leading
-                        .lessThanOrEqual.to(view.safeAreaLayoutGuide.anchor.leadingMargin)
-                        .constant(constant)
-                        .priority(priority.rawValue)
-                )
+                $0.anchor
+                    .leading
+                    .lessThanOrEqual.to(view.safeAreaLayoutGuide.anchor.leadingMargin)
+                    .orCreate()
+                    .constant(constant)
+                    .priority(priority.rawValue)
                 return
             }
 
-            activate(
-                $0.anchor
-                    .leading
-                    .lessThanOrEqual.to(view.anchor.leadingMargin)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .leading
+                .lessThanOrEqual.to(view.anchor.leadingMargin)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -286,23 +333,21 @@ public extension ViewCreator {
             }
 
             if #available(iOS 11, tvOS 11, *) {
-                activate(
-                    $0.anchor
-                        .trailing
-                        .equal.to(view.safeAreaLayoutGuide.anchor.trailingMargin)
-                        .constant(-constant)
-                        .priority(priority.rawValue)
-                )
+                $0.anchor
+                    .trailing
+                    .equal.to(view.safeAreaLayoutGuide.anchor.trailingMargin)
+                    .orCreate()
+                    .constant(-constant)
+                    .priority(priority.rawValue)
                 return
             }
 
-            activate(
-                $0.anchor
-                    .trailing
-                    .equal.to(view.anchor.trailingMargin)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .trailing
+                .equal.to(view.anchor.trailingMargin)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -313,23 +358,21 @@ public extension ViewCreator {
             }
 
             if #available(iOS 11, tvOS 11, *) {
-                activate(
-                    $0.anchor
-                        .trailing
-                        .greaterThanOrEqual.to(view.safeAreaLayoutGuide.anchor.trailingMargin)
-                        .constant(-constant)
-                        .priority(priority.rawValue)
-                )
+                $0.anchor
+                    .trailing
+                    .greaterThanOrEqual.to(view.safeAreaLayoutGuide.anchor.trailingMargin)
+                    .orCreate()
+                    .constant(-constant)
+                    .priority(priority.rawValue)
                 return
             }
 
-            activate(
-                $0.anchor
-                    .trailing
-                    .greaterThanOrEqual.to(view.anchor.trailingMargin)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .trailing
+                .greaterThanOrEqual.to(view.anchor.trailingMargin)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -340,23 +383,21 @@ public extension ViewCreator {
             }
 
             if #available(iOS 11, tvOS 11, *) {
-                activate(
-                    $0.anchor
-                        .trailing
-                        .lessThanOrEqual.to(view.safeAreaLayoutGuide.anchor.trailingMargin)
-                        .constant(-constant)
-                        .priority(priority.rawValue)
-                )
+                $0.anchor
+                    .trailing
+                    .lessThanOrEqual.to(view.safeAreaLayoutGuide.anchor.trailingMargin)
+                    .orCreate()
+                    .constant(-constant)
+                    .priority(priority.rawValue)
                 return
             }
 
-            activate(
-                $0.anchor
-                    .trailing
-                    .lessThanOrEqual.to(view.anchor.trailingMargin)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .trailing
+                .lessThanOrEqual.to(view.anchor.trailingMargin)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -373,13 +414,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .top
-                    .equal.to(view.anchor.top)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .top
+                .equal.to(view.anchor.top)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -389,13 +429,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .top
-                    .greaterThanOrEqual.to(view.anchor.top)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .top
+                .greaterThanOrEqual.to(view.anchor.top)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -405,13 +444,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .top
-                    .lessThanOrEqual.to(view.anchor.top)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .top
+                .lessThanOrEqual.to(view.anchor.top)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -421,13 +459,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .bottom
-                    .equal.to(view.anchor.bottom)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .bottom
+                .equal.to(view.anchor.bottom)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -437,13 +474,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .bottom
-                    .greaterThanOrEqual.to(view.anchor.bottom)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .bottom
+                .greaterThanOrEqual.to(view.anchor.bottom)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -453,13 +489,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .bottom
-                    .lessThanOrEqual.to(view.anchor.bottom)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .bottom
+                .lessThanOrEqual.to(view.anchor.bottom)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -469,13 +504,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .leading
-                    .equal.to(view.anchor.leading)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .leading
+                .equal.to(view.anchor.leading)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -485,13 +519,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .leading
-                    .greaterThanOrEqual.to(view.anchor.leading)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .leading
+                .greaterThanOrEqual.to(view.anchor.leading)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -501,13 +534,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .leading
-                    .lessThanOrEqual.to(view.anchor.leading)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .leading
+                .lessThanOrEqual.to(view.anchor.leading)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -517,13 +549,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .trailing
-                    .equal.to(view.anchor.trailing)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .trailing
+                .equal.to(view.anchor.trailing)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -533,13 +564,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .trailing
-                    .greaterThanOrEqual.to(view.anchor.trailing)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .trailing
+                .greaterThanOrEqual.to(view.anchor.trailing)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -549,13 +579,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .trailing
-                    .lessThanOrEqual.to(view.anchor.trailing)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .trailing
+                .lessThanOrEqual.to(view.anchor.trailing)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -565,13 +594,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .height
-                    .equal.to(view.anchor.height)
-                    .multiplier(multiplier)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .height
+                .equal.to(view.anchor.height)
+                .orCreate()
+                .multiplier(multiplier)
+                .priority(priority.rawValue)
         }
     }
 
@@ -581,13 +609,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .height
-                    .greaterThanOrEqual.to(view.anchor.height)
-                    .multiplier(multiplier)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .height
+                .greaterThanOrEqual.to(view.anchor.height)
+                .orCreate()
+                .multiplier(multiplier)
+                .priority(priority.rawValue)
         }
     }
 
@@ -597,13 +624,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .height
-                    .lessThanOrEqual.to(view.anchor.height)
-                    .multiplier(multiplier)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .height
+                .lessThanOrEqual.to(view.anchor.height)
+                .orCreate()
+                .multiplier(multiplier)
+                .priority(priority.rawValue)
         }
     }
 
@@ -613,13 +639,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .width
-                    .equal.to(view.anchor.width)
-                    .multiplier(multiplier)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .width
+                .equal.to(view.anchor.width)
+                .orCreate()
+                .multiplier(multiplier)
+                .priority(priority.rawValue)
         }
     }
 
@@ -629,13 +654,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .width
-                    .greaterThanOrEqual.to(view.anchor.width)
-                    .multiplier(multiplier)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .width
+                .greaterThanOrEqual.to(view.anchor.width)
+                .orCreate()
+                .multiplier(multiplier)
+                .priority(priority.rawValue)
         }
     }
 
@@ -645,13 +669,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .width
-                    .lessThanOrEqual.to(view.anchor.width)
-                    .multiplier(multiplier)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .width
+                .lessThanOrEqual.to(view.anchor.width)
+                .orCreate()
+                .multiplier(multiplier)
+                .priority(priority.rawValue)
         }
     }
 }
@@ -672,73 +695,67 @@ public extension ViewCreator {
 
     func aspectRatio(heightEqualTo multiplier: CGFloat, priority: UILayoutPriority = .required) -> Self {
         return self.onNotRendered { view in
-            activate(
-                view.anchor
-                    .height
-                    .equal.to(view.anchor.width)
-                    .multiplier(multiplier)
-                    .priority(priority.rawValue)
-            )
+            view.anchor
+                .height
+                .equal.to(view.anchor.width)
+                .orCreate()
+                .multiplier(multiplier)
+                .priority(priority.rawValue)
         }
     }
 
     func aspectRatio(heightGreaterThanOrEqualTo multiplier: CGFloat, priority: UILayoutPriority = .required) -> Self {
         return self.onNotRendered { view in
-            activate(
-                view.anchor
-                    .height
-                    .greaterThanOrEqual.to(view.anchor.width)
-                    .multiplier(multiplier)
-                    .priority(priority.rawValue)
-            )
+            view.anchor
+                .height
+                .greaterThanOrEqual.to(view.anchor.width)
+                .orCreate()
+                .multiplier(multiplier)
+                .priority(priority.rawValue)
         }
     }
 
     func aspectRatio(heightLessThanOrEqualTo multiplier: CGFloat, priority: UILayoutPriority = .required) -> Self {
         return self.onNotRendered { view in
-            activate(
-                view.anchor
-                    .height
-                    .lessThanOrEqual.to(view.anchor.width)
-                    .multiplier(multiplier)
-                    .priority(priority.rawValue)
-            )
+            view.anchor
+                .height
+                .lessThanOrEqual.to(view.anchor.width)
+                .orCreate()
+                .multiplier(multiplier)
+                .priority(priority.rawValue)
         }
     }
 
     func aspectRatio(widthEqualTo multiplier: CGFloat, priority: UILayoutPriority = .required) -> Self {
         return self.onNotRendered { view in
-            activate(
-                view.anchor
-                    .width
-                    .equal.to(view.anchor.height)
-                    .multiplier(multiplier)
-                    .priority(priority.rawValue)
-            )
+            view.anchor
+                .width
+                .equal.to(view.anchor.height)
+                .orCreate()
+                .multiplier(multiplier)
+                .priority(priority.rawValue)
         }
     }
 
     func aspectRatio(widthGreaterThanOrEqualTo multiplier: CGFloat, priority: UILayoutPriority = .required) -> Self {
         return self.onNotRendered { view in
-            activate(
-                view.anchor
-                    .width
-                    .greaterThanOrEqual.to(view.anchor.height)
-                    .multiplier(multiplier)
-                    .priority(priority.rawValue)
-            )
+            view.anchor
+                .width
+                .greaterThanOrEqual.to(view.anchor.height)
+                .orCreate()
+                .multiplier(multiplier)
+                .priority(priority.rawValue)
         }
     }
 
     func aspectRatio(widthLessThanOrEqualTo multiplier: CGFloat, priority: UILayoutPriority = .required) -> Self {
         return self.onNotRendered { view in
-            activate(
-                view.anchor
-                    .width
-                    .lessThanOrEqual.to(view.anchor.height)
-                    .multiplier(multiplier)
-                    .priority(priority.rawValue)
-            )
+            view.anchor
+                .width
+                .lessThanOrEqual.to(view.anchor.height)
+                .orCreate()
+                .multiplier(multiplier)
+                .priority(priority.rawValue)
         }
     }
 }
@@ -746,67 +763,61 @@ public extension ViewCreator {
 public extension ViewCreator {
     func height(equalTo constant: CGFloat, priority: UILayoutPriority = .required) -> Self {
         return self.onNotRendered {
-            activate(
-                $0.anchor
-                    .height
-                    .equal.to(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .height
+                .equal.to(constant)
+                .orCreate()
+                .priority(priority.rawValue)
         }
     }
 
     func height(greaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required) -> Self {
         return self.onNotRendered {
-            activate(
-                $0.anchor
-                    .height
-                    .greaterThanOrEqual.to(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .height
+                .greaterThanOrEqual.to(constant)
+                .orCreate()
+                .priority(priority.rawValue)
         }
     }
 
     func height(lessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required) -> Self {
         return self.onNotRendered {
-            activate(
-                $0.anchor
-                    .height
-                    .lessThanOrEqual.to(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .height
+                .lessThanOrEqual.to(constant)
+                .orCreate()
+                .priority(priority.rawValue)
         }
     }
 
     func width(equalTo constant: CGFloat, priority: UILayoutPriority = .required) -> Self {
         return self.onNotRendered {
-            activate(
-                $0.anchor
-                    .width
-                    .equal.to(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .width
+                .equal.to(constant)
+                .orCreate()
+                .priority(priority.rawValue)
         }
     }
 
     func width(greaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required) -> Self {
         return self.onNotRendered {
-            activate(
-                $0.anchor
-                    .width
-                    .greaterThanOrEqual.to(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .width
+                .greaterThanOrEqual.to(constant)
+                .orCreate()
+                .priority(priority.rawValue)
         }
     }
 
     func width(lessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required) -> Self {
         return self.onNotRendered {
-            activate(
-                $0.anchor
-                    .width
-                    .lessThanOrEqual.to(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .width
+                .lessThanOrEqual.to(constant)
+                .orCreate()
+                .priority(priority.rawValue)
         }
     }
 }
@@ -818,13 +829,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .center
-                    .equal.to(view.anchor.center)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .center
+                .equal.to(view.anchor.center)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -834,13 +844,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .center
-                    .greaterThanOrEqual.to(view.anchor.center)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .center
+                .greaterThanOrEqual.to(view.anchor.center)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -850,13 +859,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .center
-                    .lessThanOrEqual.to(view.anchor.center)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .center
+                .lessThanOrEqual.to(view.anchor.center)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -866,13 +874,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .centerX
-                    .equal.to(view.anchor.centerX)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .centerX
+                .equal.to(view.anchor.centerX)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -882,13 +889,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .centerX
-                    .greaterThanOrEqual.to(view.anchor.centerX)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .centerX
+                .greaterThanOrEqual.to(view.anchor.centerX)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -898,13 +904,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .centerX
-                    .lessThanOrEqual.to(view.anchor.centerX)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .centerX
+                .lessThanOrEqual.to(view.anchor.centerX)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -914,13 +919,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .centerY
-                    .equal.to(view.anchor.centerY)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .centerY
+                .equal.to(view.anchor.centerY)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -930,13 +934,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .centerY
-                    .greaterThanOrEqual.to(view.anchor.centerY)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .centerY
+                .greaterThanOrEqual.to(view.anchor.centerY)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -946,13 +949,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .centerY
-                    .lessThanOrEqual.to(view.anchor.centerY)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .centerY
+                .lessThanOrEqual.to(view.anchor.centerY)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 }
@@ -994,13 +996,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .top
-                    .equal.to(view.anchor.topMargin)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .top
+                .equal.to(view.anchor.topMargin)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -1010,13 +1011,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .top
-                    .greaterThanOrEqual.to(view.anchor.topMargin)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .top
+                .greaterThanOrEqual.to(view.anchor.topMargin)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -1026,13 +1026,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .top
-                    .lessThanOrEqual.to(view.anchor.topMargin)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .top
+                .lessThanOrEqual.to(view.anchor.topMargin)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -1042,13 +1041,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .bottom
-                    .equal.to(view.anchor.bottomMargin)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .bottom
+                .equal.to(view.anchor.bottomMargin)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -1058,13 +1056,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .bottom
-                    .greaterThanOrEqual.to(view.anchor.bottomMargin)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .bottom
+                .greaterThanOrEqual.to(view.anchor.bottomMargin)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -1074,13 +1071,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .bottom
-                    .lessThanOrEqual.to(view.anchor.bottomMargin)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .bottom
+                .lessThanOrEqual.to(view.anchor.bottomMargin)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -1090,13 +1086,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .leading
-                    .equal.to(view.anchor.leadingMargin)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .leading
+                .equal.to(view.anchor.leadingMargin)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -1106,13 +1101,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .leading
-                    .greaterThanOrEqual.to(view.anchor.leadingMargin)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .leading
+                .greaterThanOrEqual.to(view.anchor.leadingMargin)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -1122,13 +1116,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .leading
-                    .lessThanOrEqual.to(view.anchor.leadingMargin)
-                    .constant(constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .leading
+                .lessThanOrEqual.to(view.anchor.leadingMargin)
+                .orCreate()
+                .constant(constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -1138,13 +1131,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .trailing
-                    .equal.to(view.anchor.trailingMargin)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .trailing
+                .equal.to(view.anchor.trailingMargin)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -1154,13 +1146,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .trailing
-                    .greaterThanOrEqual.to(view.anchor.trailingMargin)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .trailing
+                .greaterThanOrEqual.to(view.anchor.trailingMargin)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 
@@ -1170,13 +1161,12 @@ public extension ViewCreator {
                 return
             }
 
-            activate(
-                $0.anchor
-                    .trailing
-                    .lessThanOrEqual.to(view.anchor.trailingMargin)
-                    .constant(-constant)
-                    .priority(priority.rawValue)
-            )
+            $0.anchor
+                .trailing
+                .lessThanOrEqual.to(view.anchor.trailingMargin)
+                .orCreate()
+                .constant(-constant)
+                .priority(priority.rawValue)
         }
     }
 }

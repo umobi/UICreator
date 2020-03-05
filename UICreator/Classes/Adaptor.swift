@@ -27,13 +27,15 @@ class ViewAdaptor: RootView {
 
     override open func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self.hosted)?.willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
+        RenderManager(self.hosted)?.willMove(toSuperview: self)
     }
 
     override open var isHidden: Bool {
         get { super.isHidden }
         set {
             super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
             RenderManager(self.hosted)?.isHidden(newValue)
         }
     }
@@ -42,22 +44,26 @@ class ViewAdaptor: RootView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self.hosted)?.frame(newValue)
+            RenderManager(self)?.frame(newValue)
+            RenderManager(self.hosted)?.frame(self.hosted.frame)
         }
     }
 
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
         RenderManager(self.hosted)?.didMoveToSuperview()
     }
 
     override open func didMoveToWindow() {
         super.didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
         RenderManager(self.hosted)?.didMoveToWindow()
     }
 
     override open func layoutSubviews() {
         super.layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
         RenderManager(self.hosted)?.layoutSubviews()
     }
 }
@@ -69,13 +75,19 @@ class Adaptor: ViewCreator {
         viewCreator.tree.supertree?.append(self)
         viewCreator.tree.supertree?.remove(viewCreator)
         self.tree.append(viewCreator)
+        let hostedView: UIView! = viewCreator.releaseUIView()
 
         self.loadView { [unowned self] in
-            let view = View.init(builder: self)
-            let hostedView: UIView! = viewCreator.releaseUIView()
-            view.hosted = hostedView
-            view.add(priority: .required, hostedView)
-            return view
+            View.init(builder: self)
+        }.onNotRendered {
+            ($0 as? View)?.hosted = hostedView
+            ($0 as? View)?.add(priority: .required, hostedView)
+        }
+    }
+
+    func removeSubviews() {
+        self.uiView?.subviews.forEach {
+            $0.removeFromSuperview()
         }
     }
 }

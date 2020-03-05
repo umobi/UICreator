@@ -31,27 +31,75 @@ protocol ReusableView: class {
     var cellLoaded: UICCell.Loaded! { get set }
 }
 
+struct ReusableObject {
+    weak var viewCreator: ViewCreator!
+    init(_ viewCreator: ViewCreator) {
+        self.viewCreator = viewCreator
+    }
+}
+
 private var kHostedView: UInt = 0
 extension ReusableView {
+    private var reusableObject: ReusableObject! {
+        get { objc_getAssociatedObject(self, &kHostedView) as? ReusableObject }
+        set { objc_setAssociatedObject(self, &kHostedView, newValue, .OBJC_ASSOCIATION_COPY) }
+    }
+    
     fileprivate(set) weak var hostedView: ViewCreator! {
-        get { objc_getAssociatedObject(self, &kHostedView) as? ViewCreator }
-        set { objc_setAssociatedObject(self, &kHostedView, newValue, .OBJC_ASSOCIATION_ASSIGN) }
+        get { self.reusableObject.viewCreator }
+        set { self.reusableObject = .init(newValue) }
     }
 }
 
 extension ReusableView {
-    func addView() {
-        guard let cellLoaded = self.cellLoaded else {
-            return
-        }
-
+    func newAddView(_ hosted: UICHost) {
         self.contentView.subviews.forEach {
             $0.removeFromSuperview()
         }
 
-        let host = UICHost(content: cellLoaded.cell.rowManager.payload.content)
-        self.hostedView = host
-        self.contentView.add(priority: .init(500), host.releaseUIView())
+        self.hostedView = hosted
+        self.contentView.add(priority: .init(500), hosted.releaseUIView())
+    }
+
+     func addView() {
+           guard let cellLoaded = self.cellLoaded else {
+               return
+           }
+
+           self.contentView.subviews.forEach {
+               $0.removeFromSuperview()
+           }
+
+           let host = UICHost(content: cellLoaded.cell.rowManager.payload.content)
+           self.hostedView = host
+           self.contentView.add(priority: .init(500), host.releaseUIView())
+    }
+
+    func newReusableCell(_ cell: UICCell) {
+        if self.cellLoaded == nil {
+            let cellLoaded = cell.load
+            let new = UICHost(content: cellLoaded.cell.rowManager.payload.content)
+            self.cellLoaded = cellLoaded
+            self.newAddView(new)
+            return
+        }
+
+        guard self.cellLoaded?.cell.rowManager !== cell.rowManager else {
+            return
+        }
+
+        let cellLoaded = cell.load
+        let new = UICHost(content: cellLoaded.cell.rowManager.payload.content)
+        let old = self.hostedView
+        self.cellLoaded = cellLoaded
+
+        if let old = old {
+            if !ReplacementTree(old).replace(with: new) {
+                self.newAddView(new)
+            }
+        } else {
+            self.newAddView(new)
+        }
     }
 
     func reuseCell(_ cell: UICCell) {
@@ -66,14 +114,7 @@ extension ReusableView {
         }
 
         self.cellLoaded = cell.load
-
-        OperationQueue.main.addOperation { [cell] in
-            guard self.cellLoaded?.cell.rowManager === cell.rowManager else {
-                return
-            }
-
-            self.addView()
-        }
+        self.addView()
     }
 
     func prepareCell(_ cell: UICCell) {
