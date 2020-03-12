@@ -29,6 +29,10 @@ public class UICTabContainer: UIView {
     private(set) weak var container: _Container<UITabBarController>!
     private var content: (() -> UITabBarController)? = nil
 
+    public var tabBarController: UITabBarController! {
+        self.container.view
+    }
+
     func setContent(content: @escaping () -> UITabBarController) {
         self.content = content
     }
@@ -108,7 +112,9 @@ public class UICTabCreator<TabController: UITabBarController>: UIViewCreator {
             self.tabController.viewControllers = contents().map { view in
                 let hosted = UICHost { view }
                 let controller = ContainerController(hosted)
-                controller.tabBarItem = view.uiView.tabBarItem
+                hosted.onNotRendered { [weak view, weak controller] _ in
+                    controller?.tabBarItem = view?.uiView.tabBarItem
+                }
                 return controller
             }
 
@@ -212,6 +218,12 @@ public extension UICTabCreator {
     func tabBar(unselectedItemTintColor color: UIColor?) -> Self {
         self.onRendered { [unowned self] _ in
             self.tabController.tabBar.unselectedItemTintColor = color
+        }
+    }
+
+    func tabBar(isHidden flag: Bool) -> Self {
+        self.onInTheScene { [unowned self] _ in
+            self.tabController.tabBar.isHidden = flag
         }
     }
 }
