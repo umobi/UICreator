@@ -173,7 +173,7 @@ private extension UIView {
             return
         }
 
-        guard self.appearState != .disappeared else {
+        guard self.appearState == .appeared else {
             return
         }
 

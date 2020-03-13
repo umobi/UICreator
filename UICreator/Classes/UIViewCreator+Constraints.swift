@@ -66,9 +66,13 @@ extension Anchor {
             return self
         }
 
-        func multiplier(_ multiplier: CGFloat) -> Self {
+        private func desactivate() {
             NSLayoutConstraint.deactivate([self.constraint].compactMap { $0 })
             self.constraint = nil
+        }
+
+        func multiplier(_ multiplier: CGFloat) -> Self {
+            self.desactivate()
             self.anchor = self.anchor.multiplier(multiplier)
             return self
         }
@@ -80,7 +84,11 @@ extension Anchor {
         }
 
         func priority(_ priority: Float) -> Self {
-            self.constraint?.priority = .init(priority)
+            if #available(iOS 13, tvOS 13, *) {
+                self.constraint?.priority = .init(priority)
+            } else {
+                self.desactivate()
+            }
             self.anchor = self.anchor.priority(priority)
             return self
         }
@@ -923,7 +931,7 @@ public extension ViewCreator {
                 .centerY
                 .equal.to(view.anchor.centerY)
                 .orCreate()
-                .constant(constant)
+                .constant(-constant)
                 .priority(priority.rawValue)
         }
     }
@@ -938,7 +946,7 @@ public extension ViewCreator {
                 .centerY
                 .greaterThanOrEqual.to(view.anchor.centerY)
                 .orCreate()
-                .constant(constant)
+                .constant(-constant)
                 .priority(priority.rawValue)
         }
     }
@@ -953,7 +961,7 @@ public extension ViewCreator {
                 .centerY
                 .lessThanOrEqual.to(view.anchor.centerY)
                 .orCreate()
-                .constant(constant)
+                .constant(-constant)
                 .priority(priority.rawValue)
         }
     }

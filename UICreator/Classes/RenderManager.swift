@@ -162,21 +162,7 @@ extension RenderManager {
         manager.commitAppear()
     }
 
-    private func recursiveHidden(_ isHidden: Bool) {
-        sequence(first: self.manager.uiView.subviews, next: {
-            $0.isEmpty ? nil : $0.reduce([]) { $0 + $1.subviews }
-        }).forEach {
-            $0.forEach {
-                if $0.isHidden != isHidden {
-                    $0.isHidden = isHidden
-                }
-            }
-        }
-    }
-
     func isHidden(_ isHidden: Bool) {
-        self.recursiveHidden(isHidden)
-
         if isHidden {
             manager.commitDisappear()
             return
