@@ -207,7 +207,19 @@ class ReplacementTree {
         self.swap(newManager)
 
         var toAppend = newManager.tree.leafs
-        
+
+//        guard (self.manager.tree.leafs.allSatisfy { old in
+//            if toAppend.contains(where: { type(of: $0.leaf) == type(of: old.leaf) }) {
+//                return true
+//            }
+//
+//            return false
+//        }) else {
+//            self.manager.root?.uiView.subviews.forEach {
+//                $0.removeFromSuperview()
+//            }
+//        }
+
         self.manager.tree.leafs.forEach { old in
             if let new = toAppend.enumerated().first(where: { type(of: $0.element.leaf) == type(of: old.leaf) }) {
                 if ReplacementTree(old.leaf).replace(with: new.element.leaf) {

@@ -71,9 +71,12 @@ public class UICSpacer: UIViewCreator {
         self.tree.append(content)
 
         self.loadView { [unowned self] in
-            let view = View.init(content.releaseUIView(), margin: margin)
+            let view = View(margin: margin)
             view.updateBuilder(self)
             return view
+        }
+        .onNotRendered {
+            ($0 as? View)?.addContent(content.releaseUIView())
         }
     }
 }
@@ -83,7 +86,7 @@ public class UICEmpty: ViewCreator {
 
     public init() {
         self.loadView { [unowned self] in
-            .init(builder: self)
+            View(builder: self)
         }
     }
 }

@@ -66,18 +66,20 @@ public class UICLabel: UIViewCreator, TextElement {
     public typealias View = _Label
 
     required public init(_ text: String?) {
-        self.loadView { [unowned self] in
-            let view = View.init(builder: self)
-            view.text = text
-            return view
+        self.loadView {
+            View(builder: self)
+        }
+        .onNotRendered {
+            ($0 as? View)?.text = text
         }
     }
 
     required public init(_ attributedText: NSAttributedString?) {
-        self.loadView { [unowned self] in
-            let view = View.init(builder: self)
-            view.attributedText = attributedText
-            return view
+        self.loadView {
+            View(builder: self)
+        }
+        .onNotRendered {
+            ($0 as? View)?.attributedText = attributedText
         }
     }
 }

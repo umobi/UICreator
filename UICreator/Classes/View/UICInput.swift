@@ -69,11 +69,11 @@ public class UICInput: UIViewCreator {
         let content = UICHost(content: content)
         self.tree.append(content)
 
-        self.loadView { [unowned self, content] in
-            let view = View.init(frame: .init(origin: .zero, size: size), inputViewStyle: style)
-            view.updateBuilder(self)
-            view.add(content.releaseUIView())
-            return view
+        self.loadView { [unowned self] in
+            return View.init(builder: self)
+        }
+        .onNotRendered {
+            $0.add(content.releaseUIView())
         }
     }
 }

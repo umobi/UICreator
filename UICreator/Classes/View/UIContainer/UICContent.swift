@@ -72,9 +72,14 @@ public class UICContent: UIViewCreator {
         self.tree.append(content)
 
         self.loadView { [unowned self] in
-            let view = View(content.releaseUIView(), contentMode: mode, priority: priority)
-            view.updateBuilder(self)
-            return view
+            View(builder: self)
+        }
+        .onNotRendered {
+            ($0 as? View)?.addContent(content.releaseUIView())
+         }
+        .onNotRendered {
+            ($0 as? View)?.layoutMode = mode
+            ($0 as? View)?.priority = priority
         }
     }
 }
@@ -119,13 +124,13 @@ public extension UIViewCreator where View: ContentView {
 
     func content(mode: UIView.ContentMode) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.apply(contentMode: mode)
+            ($0 as? View)?.layoutMode = mode
         }
     }
 
     func fitting(priority: UILayoutPriority) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.apply(priority: priority)
+            ($0 as? View)?.priority = priority
         }
     }
 }

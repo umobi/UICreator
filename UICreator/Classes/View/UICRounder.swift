@@ -71,9 +71,12 @@ public class UICRounder: UIViewCreator {
         self.tree.append(content)
 
         self.loadView { [unowned self] in
-            let view = View.init(content.releaseUIView(), radius: radius)
+            let view = View.init(radius: radius)
             view.updateBuilder(self)
             return view
+        }
+        .onNotRendered {
+            ($0 as? View)?.addContent(content.releaseUIView())
         }
     }
 }

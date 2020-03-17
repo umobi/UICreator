@@ -71,13 +71,15 @@ public class UICDashed: UIViewCreator {
         self.tree.append(content)
 
         self.loadView { [unowned self] in
-            let view = View.init(content.releaseUIView(), dash: pattern)
+            let view = View.init(dash: pattern)
             view.updateBuilder(self)
-            view.apply(strokeColor: color)
-                .apply(lineWidth: 1)
-                .refresh()
             return view
         }
+        .onNotRendered {
+            ($0 as? View)?.addContent(content.releaseUIView())
+        }
+        .dash(color: color)
+        .dash(lineWidth: 1)
     }
 }
 

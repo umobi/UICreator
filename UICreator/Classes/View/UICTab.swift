@@ -344,12 +344,13 @@ public class Controller: UIViewCreator {
         let content = UICHost(content: content)
         self.tree.append(content)
 
-        self.onInTheScene {
+        self.loadView { [unowned self] in
+            View.init(builder: self)
+        }
+        .onInTheScene {
             ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: {
                 return ContainerController(content)
             })
-        }.loadView { [unowned self] in
-            View.init(builder: self)
         }
     }
 }

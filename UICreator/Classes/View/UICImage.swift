@@ -74,28 +74,30 @@ public class UICImage: UIViewCreator {
 
     public init(mode: View.ContentMode = .scaleToFill) {
         self.loadView { [unowned self] in
-            let view = View.init(image: nil, highlightedImage: nil)
-            view.updateBuilder(self)
-            view.contentMode = mode
-            return view
+            return View.init(builder: self)
+        }
+        .onNotRendered {
+            ($0 as? View)?.contentMode = mode
         }
     }
 
     public init(image: UIImage?, highlightedImage: UIImage? = nil) {
         self.loadView { [unowned self] in
-            let view = View.init(image: image, highlightedImage: nil)
-            view.updateBuilder(self)
-            view.contentMode = .scaleToFill
-            return view
+            return View.init(builder: self)
+        }
+        .onNotRendered {
+            ($0 as? View)?.image = image
+            ($0 as? View)?.highlightedImage = highlightedImage
+            ($0 as? View)?.contentMode = .scaleToFill
         }
     }
 
     public init() {
         self.loadView { [unowned self] in
-            let view = View.init(image: nil, highlightedImage: nil)
-            view.updateBuilder(self)
-            view.contentMode = .scaleToFill
-            return view
+            return View.init(builder: self)
+        }
+        .onNotRendered {
+            ($0 as? View)?.contentMode = .scaleToFill
         }
     }
 

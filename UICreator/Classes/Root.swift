@@ -104,12 +104,12 @@ open class Root: ViewCreator {
         }
 
         self.loadView { [unowned self] in
-            let view = View.init(builder: self)
+            return View.init(builder: self)
+        }
+        .onNotRendered {
             if let body = body {
-                view.add(priority: .required, body.releaseUIView())
+                $0.add(priority: .required, body.releaseUIView())
             }
-
-            return view
         }
     }
 }

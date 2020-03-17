@@ -70,13 +70,13 @@ public class UICButton: UIViewCreator, Control {
             if let type = type {
                 let view = View.init(type: type)
                 view.updateBuilder(self)
-                view.setTitle(title, for: .normal)
                 return view
             }
 
-            let view = View.init(builder: self)
-            view.setTitle(title, for: .normal)
-            return view
+            return View.init(builder: self)
+        }
+        .onNotRendered {
+            ($0 as? View)?.setTitle(title, for: .normal)
         }
     }
 }

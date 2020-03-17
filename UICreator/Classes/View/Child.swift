@@ -74,12 +74,13 @@ public class Child: UIViewCreator {
             self.tree.append($0)
         }
 
-        self.onNotRendered { view in
+        self.loadView { [unowned self] in
+            View.init(builder: self)
+        }
+        .onNotRendered { view in
             contents.forEach {
                 view.add(priority: .init(UILayoutPriority.fittingSizeLevel.rawValue), $0.releaseUIView())
             }
-        }.loadView { [unowned self] in
-            View.init(builder: self)
         }
     }
 }

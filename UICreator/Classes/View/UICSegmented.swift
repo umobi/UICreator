@@ -143,11 +143,11 @@ public class UICSegmented: UIViewCreator, Control {
     public typealias View = _SegmentedControl
 
     public init(_ segments: @escaping () -> [Segment]) {
-        self.onNotRendered { [unowned self] _ in
+        self.loadView { [unowned self] in
+            View.init(builder: self)
+        }
+        .onNotRendered { [unowned self] _ in
             self.addSegments(segments())
-
-        }.loadView { [unowned self] in
-            return View.init(builder: self)
         }
     }
 

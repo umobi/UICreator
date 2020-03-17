@@ -22,6 +22,102 @@
 
 import Foundation
 
+public protocol DynamicValue {
+    associatedtype Value
+
+    func get(_ handler: @escaping (Value) -> Void)
+}
+
+@propertyWrapper
+public struct Relay2<Value>: DynamicValue {
+    let id: MutableGetter
+    let handler: ((@escaping  (Value) -> Void) -> Void)?
+    private var latestValue: Value?
+
+    init(_ id: IDGetter, handler: ((@escaping  (Value) -> Void) -> Void)? = nil) {
+        self.id = .init(id)
+        self.handler = handler
+    }
+
+    public var wrappedValue: Value {
+        get { latestValue! }
+        set { self.set(newValue) }
+    }
+
+    func assign(_ id: IDGetter) {
+        self.id.setListener(id)
+    }
+
+    class MutableGetter: IDGetter {
+        private(set) var identifier: String
+
+        init(_ id: IDGetter) {
+            self.identifier = id.identifier
+        }
+
+        init() {
+            self.identifier = ""
+        }
+
+        func setListener(_ id: IDGetter) {
+            guard self.identifier.isEmpty else {
+                fatalError()
+            }
+
+            self.identifier = id.identifier
+        }
+
+        func assert() {
+            guard self.identifier.isEmpty else {
+                fatalError()
+            }
+        }
+    }
+
+    public func get(_ handler: @escaping (Value) -> Void) {
+        if let selfHandler = self.handler {
+            selfHandler() {
+                handler($0)
+            }
+
+            return
+        }
+
+        self.id.assert()
+
+        ReactiveCenter.shared.valueDidChange(self.id.identifier) {
+            handler($0)
+        }
+
+        ReactiveCenter.shared.privateValueDidChange(self.id.identifier) {
+            handler($0)
+        }
+
+        ReactiveCenter.shared.privateLatestValue(self.id.identifier) {
+            handler($0)
+        }
+    }
+
+    public func map<Other>(_ handler: @escaping (Value) -> Other) -> Relay2<Other> {
+        self.id.assert()
+
+        return Relay2<Other>(self.id, handler: { callback in
+            self.get {
+                callback(handler($0))
+            }
+        })
+    }
+
+    private func set(_ newValue: Value) {
+        ReactiveCenter.shared.privateLatestValue(self.id.identifier, newValue: newValue)
+    }
+
+    internal func `post`(_ value: Value) {
+        ReactiveCenter.shared.privateValueDidChange(self.id.identifier, newValue: value)
+    }
+
+}
+
 public final class Relay<Value> {
     let id: IDGetter
 

@@ -71,9 +71,12 @@ public class UICScroll: UIViewCreator {
         self.tree.append(content)
 
         self.loadView { [unowned self] in
-            let view = View.init(content.releaseUIView(), axis: axis)
+            let view = View.init(axis: axis)
             view.updateBuilder(self)
             return view
+        }
+        .onNotRendered {
+            ($0 as? View)?.addContent(content.releaseUIView())
         }
     }
 }

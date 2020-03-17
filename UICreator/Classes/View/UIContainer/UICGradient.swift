@@ -68,11 +68,10 @@ public class UICGradient: UIViewCreator {
 
     public init(_ colors: [UIColor], direction: View.Direction = .right) {
         self.loadView { [unowned self] in
-            let view = View.init(builder: self)
-            view.colors = colors
-            view.direction = direction
-            return view
+            View.init(builder: self)
         }
+        .colors(colors)
+        .direction(direction)
     }
 
     public convenience init(_ colors: UIColor..., direction: View.Direction = .right) {

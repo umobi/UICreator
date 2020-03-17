@@ -69,8 +69,10 @@ public class UICSwitch: UIViewCreator, Control {
     public init(on: Bool) {
         self.loadView { [unowned self] in
             let view = View.init(builder: self)
-            view.isOn = on
             return view
+        }
+        .onNotRendered {
+            ($0 as? View)?.isOn = on
         }
     }
 }

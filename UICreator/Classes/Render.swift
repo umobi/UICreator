@@ -152,15 +152,15 @@ private extension Render {
     func recursive(commit state: UIView.RenderState){
         switch state {
         case .notRendered:
-            self.manager.notRendered.forEach {
+            self.manager.notRendered.reversed().forEach {
                 $0.render.pop(state)
             }
         case .rendered:
-            self.manager.rendered.forEach {
+            self.manager.rendered.reversed().forEach {
                 $0.render.pop(state)
             }
         case .inTheScene:
-            self.manager.inTheScene.forEach {
+            self.manager.inTheScene.reversed().forEach {
                 $0.render.pop(state)
             }
 

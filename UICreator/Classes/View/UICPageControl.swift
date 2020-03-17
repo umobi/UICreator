@@ -67,9 +67,10 @@ public class UICPageControl: UIViewCreator, Control {
 
     public init(numberOfPages: Int) {
         self.loadView { [unowned self] in
-            let view = View.init(builder: self)
-            view.numberOfPages = numberOfPages
-            return view
+            View.init(builder: self)
+        }
+        .onNotRendered {
+            ($0 as? View)?.numberOfPages = numberOfPages
         }
     }
 }

@@ -73,21 +73,20 @@ public class UICStack: UIViewCreator {
         }
 
         self.loadView { [unowned self, content] in
-            let view = View.init(builder: self)
-
+            View.init(builder: self)
+        }
+        .onNotRendered {
+            ($0 as? View)?.axis = axis
+            ($0 as? View)?.spacing = spacing
+        }
+        .onNotRendered { view in
             content.forEach {
                 if let forEachCreator = $0 as? ForEachCreator {
                     forEachCreator.manager = self
                 }
 
-                AddSubview(view).addArrangedSubview($0.releaseUIView())
+                AddSubview(view as? View)?.addArrangedSubview($0.releaseUIView())
             }
-
-            return view
-        }
-        .onNotRendered {
-            ($0 as? View)?.axis = axis
-            ($0 as? View)?.spacing = spacing
         }
     }
 

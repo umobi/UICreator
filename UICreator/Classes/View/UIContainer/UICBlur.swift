@@ -63,7 +63,7 @@ public class _BlurView: BlurView {
     }
 }
 
-public class UICBlur: ViewCreator {
+public class UICBlur: UIViewCreator {
     public typealias View = _BlurView
 
     public init(blur: UIBlurEffect.Style = .regular) {
@@ -72,6 +72,7 @@ public class UICBlur: ViewCreator {
             view.updateBuilder(self)
             return view
         }
+        .blur(style: blur)
     }
 }
 

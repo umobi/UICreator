@@ -68,9 +68,10 @@ public class UICDatePicker: UIViewCreator, Control {
 
     public init(calendar: Calendar? = nil) {
         self.loadView { [unowned self] in
-            let view = View.init(builder: self)
-            view.calendar = calendar ?? .current
-            return view
+            return View.init(builder: self)
+        }
+        .onNotRendered {
+            ($0 as? View)?.calendar = calendar ?? .current
         }
     }
 }
