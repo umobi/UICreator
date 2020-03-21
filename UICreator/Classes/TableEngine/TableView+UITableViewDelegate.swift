@@ -136,26 +136,26 @@ extension TableView {
 
 extension TableView {
     public func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
-        guard self.manager?.header(at: section) != nil else {
+        guard let header = self.manager?.header(at: section) else {
             return .zero
         }
 
-        return 1
+        return header.rowManager.payload.estimatedHeight ?? 1
     }
 
     public func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection section: Int) -> CGFloat {
-        guard self.manager?.footer(at: section) != nil else {
+        guard let footer = self.manager?.footer(at: section) else {
             return .zero
         }
 
-        return 1
+        return footer.rowManager.payload.estimatedHeight ?? 1
     }
 
     public func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard self.manager?.row(at: indexPath) != nil else {
+        guard let row = self.manager?.row(at: indexPath) else {
             return .zero
         }
 
-        return tableView.estimatedRowHeight
+        return row.rowManager.payload.estimatedHeight ?? tableView.estimatedRowHeight
     }
 }

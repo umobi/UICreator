@@ -88,6 +88,128 @@ public class UICTabContainer: UIView {
     }
 }
 
+public struct UICTabItem {
+
+    let title: String?
+    let image: UIImage?
+    let selectedImage: UIImage?
+    let tabSystem: UITabBarItem.SystemItem?
+    let tag: Int
+    let content: () -> ViewCreator
+
+    public init(content: @escaping () -> ViewCreator) {
+        self.title = nil
+        self.content = content
+        self.image = nil
+        self.selectedImage = nil
+        self.tabSystem = nil
+        self.tag = 0
+    }
+
+    public init(title: String, content: @escaping () -> ViewCreator) {
+        self.title = title
+        self.content = content
+        self.image = nil
+        self.selectedImage = nil
+        self.tabSystem = nil
+        self.tag = 0
+    }
+
+    public init(image: UIImage, content: @escaping () -> ViewCreator) {
+        self.title = nil
+        self.content = content
+        self.image = image
+        self.selectedImage = nil
+        self.tabSystem = nil
+        self.tag = 0
+    }
+
+    public func title(_ title: String?) -> Self {
+        self.edit {
+            $0.title = title
+        }
+    }
+
+    public func image(_ image: UIImage?) -> Self {
+        self.edit {
+            $0.image = image
+        }
+    }
+
+    public func tag(_ tag: Int) -> Self {
+        self.edit {
+            $0.tag = tag
+        }
+    }
+
+    public func selectedImage(_ image: UIImage) -> Self {
+        self.edit {
+            $0.selectedImage = image
+        }
+    }
+
+    public func systemItem(_ systemItem: UITabBarItem.SystemItem) -> Self {
+        self.edit {
+            $0.tabSystem = systemItem
+        }
+    }
+
+    private init(_ original: UICTabItem, editable: Editable) {
+        self.title = editable.title
+        self.image = editable.image
+        self.selectedImage = editable.selectedImage
+        self.tabSystem = editable.tabSystem
+        self.tag = editable.tag
+        self.content = original.content
+    }
+
+    private func edit(_ edit: @escaping (Editable) -> Void) -> Self {
+        let editable = Editable(self)
+        edit(editable)
+        return .init(self, editable: editable)
+    }
+
+    private class Editable {
+        var title: String?
+        var image: UIImage?
+        var selectedImage: UIImage?
+        var tabSystem: UITabBarItem.SystemItem?
+        var tag: Int
+
+        init(_ tabItem: UICTabItem) {
+            self.title = tabItem.title
+            self.image = tabItem.image
+            self.selectedImage = tabItem.selectedImage
+            self.tabSystem = tabItem.tabSystem
+            self.tag = tabItem.tag
+        }
+    }
+
+    var tabItem: UITabBarItem {
+        if let tabSystem = self.tabSystem {
+            let tabItem = UITabBarItem(tabBarSystemItem: tabSystem, tag: self.tag)
+            tabItem.selectedImage = self.selectedImage
+            tabItem.title = self.title
+            tabItem.image = self.image
+            return tabItem
+        }
+
+        let tabItem = UITabBarItem()
+        tabItem.title = self.title
+        tabItem.image = self.image
+        tabItem.tag = self.tag
+        tabItem.selectedImage = self.selectedImage
+        return tabItem
+    }
+
+    func load() -> (ViewCreator, UITabBarItem) {
+        let tabItem = self.tabItem
+        return (self.content().onNotRendered {
+            $0.tabBarItem = tabItem
+        }, tabItem)
+    }
+}
+
 public class UICTabCreator<TabController: UITabBarController>: UIViewCreator {
     public typealias View = UICTabContainer
 
@@ -105,16 +227,15 @@ public class UICTabCreator<TabController: UITabBarController>: UIViewCreator {
         return self._tabBarController ?? self.tabBarController
     }
 
-    public init(_ contents: @escaping () -> [ViewCreator]) {
+    public init(_ contents: @escaping () -> [UICTabItem]) {
         self.loadView { [unowned self] in
             let view = View.init(builder: self)
 
-            self.tabController.viewControllers = contents().map { view in
+            self.tabController.viewControllers = contents().map { item in
+                let (view, tabItem) = item.load()
                 let hosted = UICHost { view }
                 let controller = ContainerController(hosted)
-                hosted.onNotRendered { [weak view, weak controller] _ in
-                    controller?.tabBarItem = view?.uiView.tabBarItem
-                }
+                controller.tabBarItem = tabItem
                 return controller
             }
 
@@ -131,8 +252,8 @@ public class UICTabCreator<TabController: UITabBarController>: UIViewCreator {
 
 public typealias UICTab = UICTabCreator<UITabBarController>
 
-extension UICTab {
-    typealias Other<TabController: UITabBarController> = UICTabCreator<UITabBarController>
+public extension UICTab {
+    typealias Other<TabController: UITabBarController> = UICTabCreator<TabController>
 }
 
 public extension UICTabCreator {

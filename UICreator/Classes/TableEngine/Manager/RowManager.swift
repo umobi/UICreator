@@ -116,12 +116,14 @@ extension ListManager.RowManager {
         let trailingActions: (() -> [RowAction])?
         let leadingActions: (() -> [RowAction])?
         let accessoryType: UITableViewCell.AccessoryType
+        let estimatedHeight: CGFloat?
 
         init(header: UICHeader) {
             self.content = header.content
             self.trailingActions = nil
             self.leadingActions = nil
             self.accessoryType = .none
+            self.estimatedHeight = header.height
         }
 
         init(footer: UICFooter) {
@@ -129,6 +131,7 @@ extension ListManager.RowManager {
             self.trailingActions = nil
             self.leadingActions = nil
             self.accessoryType = .none
+            self.estimatedHeight = nil
         }
 
         init(row: UICRow) {
@@ -136,6 +139,7 @@ extension ListManager.RowManager {
             self.trailingActions = row.trailingActions
             self.leadingActions = row.leadingActions
             self.accessoryType = row.accessoryType
+            self.estimatedHeight = nil
         }
 
         var asRowManager: ListManager.RowManager {

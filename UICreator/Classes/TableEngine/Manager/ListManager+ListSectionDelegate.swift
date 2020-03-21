@@ -84,6 +84,13 @@ extension ListManager: ListSectionDelegate {
     func content(_ section: ListManager.SectionManager.Copy, updateSections: [ListManager.SectionManager]) {
         var updateSections = updateSections
 
+        if self.sections.isEmpty {
+            self.update(sections: updateSections.enumerated().map {
+                $0.element.index($0.offset)
+            })
+            return
+        }
+
         self.update(sections: self.sections.reduce([]) { sum, next in
             if next.identifier == section.identifier {
                 let toAppend = updateSections

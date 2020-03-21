@@ -24,8 +24,26 @@ import Foundation
 
 public class UICHeader: ViewCreator {
     let content: () -> ViewCreator
+    fileprivate(set) var height: CGFloat? = nil
 
     public init(content: @escaping () -> ViewCreator) {
         self.content = content
+    }
+}
+
+public extension UICHeader {
+    func estimatedHeight(_ height: CGFloat) -> Self {
+        self.height = height
+        return self
+    }
+}
+
+public extension UICHeader {
+    static var empty: UICHeader {
+        return UICHeader(content: {
+            UICEmpty()
+        })
+        .height(equalTo: 0)
+        .estimatedHeight(0)
     }
 }
