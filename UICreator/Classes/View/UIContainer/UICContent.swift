@@ -75,11 +75,11 @@ public class UICContent: UIViewCreator {
             View(builder: self)
         }
         .onNotRendered {
-            ($0 as? View)?.addContent(content.releaseUIView())
-         }
-        .onNotRendered {
             ($0 as? View)?.layoutMode = mode
             ($0 as? View)?.priority = priority
+        }
+        .onNotRendered {
+            ($0 as? View)?.addContent(content.releaseUIView())
         }
     }
 }
