@@ -24,6 +24,7 @@ import Foundation
 
 public protocol UIViewMaker: ViewCreator {
     var loadView: UIView { get }
+    var wrapper: UIView! { get }
 }
 
 public protocol UICViewRepresentable: UIViewCreator, UIViewMaker {

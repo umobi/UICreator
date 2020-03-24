@@ -29,6 +29,14 @@ public class UIViewWrapper {
         self.wrap = wrap
     }
 
+    public convenience init?(_ view: UIView) {
+        guard let creator = view.viewCreator else {
+            return nil
+        }
+
+        self.init(creator)
+    }
+
     /// This will retain view on viewCreator
     public weak var uiView: UIView! {
         return self.wrap.uiView
@@ -37,5 +45,13 @@ public class UIViewWrapper {
     /// This changes the keeper reference to UIView
     public func releaseUIView() -> UIView! {
         return self.wrap.releaseUIView()
+    }
+
+    public var safe: UIView! {
+        if let maker = self.wrap as? UIViewMaker {
+            return maker.wrapper
+        }
+
+        return self.wrap.uiView
     }
 }
