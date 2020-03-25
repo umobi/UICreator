@@ -60,7 +60,6 @@ public class RootView: UIView {
 
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
-        print(self)
         RenderManager(self)?.didMoveToSuperview()
     }
 
@@ -72,10 +71,6 @@ public class RootView: UIView {
     override open func layoutSubviews() {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
-    }
-
-    deinit {
-        fatalError()
     }
 }
 
@@ -159,7 +154,11 @@ extension TemplateView where Self: Root {
 
         self.didConfiguredView = true
 
-        (self.uiView as? View)?.didCommitNotRenderedHandler = { [unowned self] in
+        (self.uiView as? View)?.didCommitNotRenderedHandler = { [weak self] in
+            guard let self = self else {
+                fatalError()
+            }
+            
             if !self.didViewLoad {
                 self.viewDidLoad()
             }

@@ -52,7 +52,7 @@ internal extension UIGestureRecognizer {
 
     var parent: Gesture? {
         get {
-            self.mutable.gestureObject as? Gesture
+            self.mutable.gestureObject.value.object as? Gesture
         }
         set {
             guard let newValue = newValue else {

@@ -95,7 +95,7 @@ internal extension ViewRender {
     }
 
     func setCreator(_ newValue: ViewCreator?, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_ASSIGN) {
-        print("setter: \(ObjectIdentifier(self)) \(newValue)")
+        
         guard let newValue = newValue else {
             self.payload.viewCreator.value = .nil
             return

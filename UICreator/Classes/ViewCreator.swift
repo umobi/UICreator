@@ -240,7 +240,6 @@ extension ViewCreator {
 
         let loadView: UIView! = {
             if let loadHandler = self.loadViewHandler {
-                print("[ViewCreator] setter:loadView \(ObjectIdentifier(self))")
                 let view = loadHandler()
                 self.loadViewHandler = nil
                 return view
@@ -262,9 +261,7 @@ extension ViewCreator {
 
     @discardableResult
     func loadView(_ handler: @escaping () -> UIView) -> Self {
-        print("[ViewCreator] setter:loadView \(ObjectIdentifier(self))")
         self.loadViewHandler = handler
-        print(self.loadViewHandler)
         return self
     }
 
