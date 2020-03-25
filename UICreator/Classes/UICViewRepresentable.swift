@@ -60,11 +60,11 @@ public extension UICViewRepresentable {
         }.makeUIView()
     }
 
-    weak var uiView: View! {
+    var uiView: View! {
         return (self as ViewCreator).uiView as? View
     }
 
-    weak var wrapper: UIView! {
+    var wrapper: UIView! {
         return self.uiView.superview
     }
 }

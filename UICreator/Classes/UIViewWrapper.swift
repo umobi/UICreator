@@ -38,7 +38,7 @@ public class UIViewWrapper {
     }
 
     /// This will retain view on viewCreator
-    public weak var uiView: UIView! {
+    public var uiView: UIView! {
         return self.wrap.uiView
     }
 

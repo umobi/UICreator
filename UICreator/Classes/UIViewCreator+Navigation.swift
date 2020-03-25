@@ -23,19 +23,19 @@
 import Foundation
 
 public extension UIView {
-    weak var viewController: UIViewController! {
+    var viewController: UIViewController! {
         return sequence(first: self as UIResponder, next: { $0.next }).first(where: {
             $0 is UIViewController
         }) as? UIViewController
     }
 
-    weak var navigationController: UINavigationController? {
+    var navigationController: UINavigationController? {
         return self.viewController.navigationController
     }
 }
 
 internal extension ViewCreator {
-    weak var viewController: UIViewController! {
+    var viewController: UIViewController! {
         return self.uiView.viewController
     }
 }

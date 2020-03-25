@@ -41,7 +41,7 @@ Definitions of UIView as ViewBuild:
     - **leaf** are views that is the last view in the hierarchy of builders views, so it may manage it self content. This core has `Stack` as `UIStackView`, `Child` as `UIView`, `Table` as `UITableView`. If the view is to much complex and there is no way to keep the right hierarchy of ViewBuilder's methods, you can use the `UICHost` view in the middle of subviews that will keep the integrity of the hierarchy by calling the commits methods for its subviews.
 */
 
-public protocol ViewCreator: class {
+public protocol ViewCreator: UICOpaqueClass {
     /// It is executed in `willMove(toSubview:)` and depends of superview to call the `commitNotRendered()`.
     @discardableResult
     func onNotRendered(_ handler: @escaping (UIView) -> Void) -> Self
@@ -64,11 +64,56 @@ public protocol ViewCreator: class {
     func onDisappear(_ handler: @escaping (UIView) -> Void) -> Self
 }
 
-struct DynamicWeakObject<Object> where Object: AnyObject {
+protocol WeakMemoryStored {
+    associatedtype Object
+
+    var object: Object! { get }
+}
+
+public protocol UICOpaqueClass: class {
+
+}
+
+struct OpaqueClassStored: WeakMemoryStored {
+    private weak var __weak_creator: UICOpaqueClass!
+    private var __strong_creator: UICOpaqueClass!
+
+    var object: UICOpaqueClass! {
+        self.__strong_creator ?? self.__weak_creator
+    }
+
+    private init(weak object: UICOpaqueClass!) {
+        self.__weak_creator = object
+        self.__strong_creator = nil
+    }
+
+    private init(strong object: UICOpaqueClass!) {
+        self.__weak_creator = nil
+        self.__strong_creator = object
+    }
+
+    static func `weak`(_ object: UICOpaqueClass) -> Self {
+        .init(weak: object)
+    }
+
+    static func strong(_ object: UICOpaqueClass) -> Self {
+        .init(strong: object)
+    }
+
+    static var `nil`: Self {
+        .init(weak: nil)
+    }
+
+    var isWeaked: Bool {
+        self.__weak_creator != nil
+    }
+}
+
+struct DynamicWeakObject<Object>: WeakMemoryStored where Object: AnyObject {
     private weak var __weak_uiView: Object!
     private var __strong_uiView: Object!
 
-    weak var object: Object! {
+    var object: Object! {
         self.__strong_uiView ?? self.__weak_uiView
     }
 
@@ -163,7 +208,7 @@ private extension ViewCreator {
 }
 
 internal extension ViewCreator {
-    weak var uiView: UIView! {
+    var uiView: UIView! {
         self.viewObject.object
     }
 

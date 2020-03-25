@@ -51,7 +51,7 @@ extension ReusableView {
         set { self.mutableReusableObject.value = newValue }
     }
     
-    fileprivate(set) weak var hostedView: ViewCreator! {
+    fileprivate(set) var hostedView: ViewCreator! {
         get { self.reusableObject.viewCreator }
         set { self.reusableObject = .init(newValue) }
     }

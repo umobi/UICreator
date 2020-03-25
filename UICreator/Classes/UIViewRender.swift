@@ -27,7 +27,7 @@ struct ViewPayload {
     typealias AppearState = UIView.AppearState
     typealias Handler = UIView.Handler
 
-    let viewCreator: Mutable<DynamicWeakObject<AnyObject>> = .init(value: .nil)
+    let viewCreator: Mutable<OpaqueClassStored> = .init(value: .nil)
     let appearState: Mutable<AppearState> = .init(value: .unset)
 
     let appearMethods: Mutable<AppearsMethods> = .init(value: .init())
@@ -87,7 +87,10 @@ public protocol ViewRender: UIView {
 
 internal extension ViewRender {
     private(set) var viewCreator: ViewCreator? {
-        get { self.payload.viewCreator.value.object as? ViewCreator }
+        get {
+            let viewCreator = self.payload.viewCreator
+            return viewCreator.value.object as? ViewCreator
+        }
         set { self.setCreator(newValue, policity: self.superview == nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
     }
 
@@ -98,16 +101,12 @@ internal extension ViewRender {
             return
         }
 
-        guard let object = newValue as? AnyObject else {
-            fatalError()
-        }
-
         if case .OBJC_ASSOCIATION_ASSIGN = policity {
-            self.payload.viewCreator.value = .weak(object)
+            self.payload.viewCreator.value = .weak(newValue)
             return
         }
 
-        self.payload.viewCreator.value = .strong(object)
+        self.payload.viewCreator.value = .strong(newValue)
     }
 
     init(builder: ViewCreator) {

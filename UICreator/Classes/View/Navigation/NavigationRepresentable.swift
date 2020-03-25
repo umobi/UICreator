@@ -65,10 +65,10 @@ private extension UIView {
     }
 }
 
-func OBJCSet<Object>(_ object: Any, _ key: UnsafeRawPointer, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN, orLoad: @escaping () -> Object) -> Object {
-    guard let object = objc_getAssociatedObject(object, key) as? Object else {
+func OBJCSet<Object>(_ index: Any, _ key: UnsafeRawPointer, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN, orLoad: @escaping () -> Object) -> Object {
+    guard let object = objc_getAssociatedObject(index, key) as? Object else {
         let object = orLoad()
-        objc_setAssociatedObject(object, key, object, policity)
+        objc_setAssociatedObject(index, key, object, policity)
         return object
     }
 
@@ -77,7 +77,7 @@ func OBJCSet<Object>(_ object: Any, _ key: UnsafeRawPointer, policity: objc_Asso
 
 private var kContentHandler: UInt = 0
 public extension NavigationRepresentable {
-    internal weak var navigationController: UINavigationController! {
+    internal var navigationController: UINavigationController! {
         return self.uiView.lowerNavigationController
     }
 

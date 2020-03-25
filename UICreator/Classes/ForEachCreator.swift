@@ -22,7 +22,7 @@
 
 import Foundation
 
-protocol SupportForEach: class {
+protocol SupportForEach: UICOpaqueClass {
     func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>)
 }
 
@@ -34,17 +34,18 @@ protocol ForEachCreator: ViewCreator {
 
 private var kManager: UInt = 0
 extension ForEachCreator {
-    private var managerMutable: Mutable<DynamicWeakObject<AnyObject>> {
+    private var managerMutable: Mutable<OpaqueClassStored> {
         OBJCSet(self, &kManager) {
             .init(value: .nil)
         }
     }
 
-    weak var manager: SupportForEach? {
+    var manager: SupportForEach? {
         get { self.managerMutable.value.object as? SupportForEach }
         set {
-            guard let newValue = newValue as? AnyObject else {
-                fatalError()
+            guard let newValue = newValue else {
+                self.managerMutable.value = .nil
+                return
             }
 
             self.managerMutable.value = .weak(newValue)

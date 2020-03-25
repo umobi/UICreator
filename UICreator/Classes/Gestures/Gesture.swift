@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public protocol Gesture: class {
+public protocol Gesture: UICOpaqueClass {
     init(target view: UIView!)
 }
 
@@ -38,7 +38,7 @@ public extension UIGesture {
 }
 
 struct UIGesturePayload {
-    let gestureObject: Mutable<DynamicWeakObject<AnyObject>> = .init(value: .nil)
+    let gestureObject: Mutable<OpaqueClassStored> = .init(value: .nil)
     let targetViewObject: Mutable<DynamicWeakObject<UIView>> = .init(value: .nil)
 }
 
