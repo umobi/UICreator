@@ -97,16 +97,10 @@ extension Tree {
     }
 }
 
-private var kTree: UInt = 0
 extension ViewCreator {
-    var treeMutable: Mutable<Tree> {
-        OBJCSet(self, &kTree) {
-            .init(value: .init(self))
-        }
-    }
     var tree: Tree {
-        get { self.treeMutable.value }
-        set { self.treeMutable.value = newValue }
+        get { self.mem_objects.tree.value }
+        set { self.mem_objects.tree.value = newValue }
     }
 }
 

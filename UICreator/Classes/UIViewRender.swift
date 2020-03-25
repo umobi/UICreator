@@ -377,42 +377,20 @@ struct AppearsUtilCreator {
     }
 }
 
-private var kAppearsUtilCreator: UInt = 0
-extension ViewCreator {
-    var appearsUtilCreator: AppearsUtilCreator {
-        OBJCSet(self, &kAppearsUtilCreator, policity: .OBJC_ASSOCIATION_COPY) {
-            let appearUtils = AppearsUtilCreator()
-            self.onNotRendered { [unowned self] in
-                $0.onAppear {
-                    self.appearUtil.action($0)
-                }
-
-                $0.onDisappear {
-                    self.disappearUtil.action($0)
-                }
-
-                $0.onLayout {
-                    self.layoutUtil.action($0)
-                }
-            }
-            return appearUtils
-        }
-    }
-}
 extension ViewCreator {
     var appearUtil: AppearUtil {
-        get { self.appearsUtilCreator.appearUtil.value }
-        set { self.appearsUtilCreator.appearUtil.value = newValue }
+        get { self.mem_objects.appearsManager.appearUtil.value }
+        set { self.mem_objects.appearsManager.appearUtil.value = newValue }
     }
 
     var disappearUtil: AppearUtil {
-        get { self.appearsUtilCreator.disappearUtil.value }
-        set { self.appearsUtilCreator.disappearUtil.value = newValue }
+        get { self.mem_objects.appearsManager.disappearUtil.value }
+        set { self.mem_objects.appearsManager.disappearUtil.value = newValue }
     }
 
     var layoutUtil: AppearUtil {
-        get { self.appearsUtilCreator.layoutUtil.value }
-        set { self.appearsUtilCreator.layoutUtil.value = newValue }
+        get { self.mem_objects.appearsManager.layoutUtil.value }
+        set { self.mem_objects.appearsManager.layoutUtil.value = newValue }
     }
 }
 

@@ -100,21 +100,47 @@ struct DynamicWeakObject<Object> where Object: AnyObject {
 }
 
 struct ViewCreatorLoadManager {
-    let viewObjectMutable: Mutable<DynamicWeakObject<UIView>> = .init(value: .nil)
-    let loadViewHandlerMutable: Mutable<(() -> UIView)?> = .init(value: nil)
+    let viewObject: Mutable<DynamicWeakObject<UIView>> = .init(value: .nil)
+    let loadViewHandler: Mutable<(() -> UIView)?> = .init(value: nil)
+    let tree: Mutable<Tree>
+    let render: Mutable<Render>
+    let appearsManager: AppearsUtilCreator
+
+    init(_ manager: ViewCreator) {
+        self.tree = .init(value: .init(manager))
+        self.render = .init(value: .create(manager))
+        self.appearsManager = AppearsUtilCreator()
+
+        self.render.value.onNotRendered { [unowned manager] in
+            $0.onAppear {
+                manager.appearUtil.action($0)
+            }
+
+            $0.onDisappear {
+                manager.disappearUtil.action($0)
+            }
+
+            $0.onLayout {
+                manager.layoutUtil.action($0)
+            }
+        }
+    }
 }
 
 private var kViewLoadManager: UInt = 0
-private extension ViewCreator {
-    var viewLoadManager: ViewCreatorLoadManager {
+extension ViewCreator {
+    var mem_objects: ViewCreatorLoadManager {
         OBJCSet(self, &kViewLoadManager, policity: .OBJC_ASSOCIATION_COPY) {
-            .init()
+            .init(self)
         }
     }
+}
+
+private extension ViewCreator {
 
     private(set) var viewObject: DynamicWeakObject<UIView> {
-        get { self.viewLoadManager.viewObjectMutable.value }
-        set { self.viewLoadManager.viewObjectMutable.value = newValue }
+        get { self.mem_objects.viewObject.value }
+        set { self.mem_objects.viewObject.value = newValue }
     }
 
     var isViewWeaked: Bool {
@@ -154,8 +180,8 @@ internal extension ViewCreator {
 
 extension ViewCreator {
     private(set) var loadViewHandler: (() -> UIView)? {
-        get { self.viewLoadManager.loadViewHandlerMutable.value }
-        set { self.viewLoadManager.loadViewHandlerMutable.value = newValue}
+        get { self.mem_objects.loadViewHandler.value }
+        set { self.mem_objects.loadViewHandler.value = newValue }
     }
 
     var isViewLoaded: Bool {
@@ -167,8 +193,21 @@ extension ViewCreator {
             return self.uiView
         }
 
-        let loadView: UIView! = self.loadViewHandler?() ?? (self as? UIViewMaker)?.makeView()
-        self.loadViewHandler = nil
+        let loadView: UIView! = {
+            if let loadHandler = self.loadViewHandler {
+                print("[ViewCreator] setter:loadView \(ObjectIdentifier(self))")
+                let view = loadHandler()
+                self.loadViewHandler = nil
+                return view
+            }
+
+            if let viewMaker = self as? UIViewMaker {
+                return viewMaker.makeView()
+            }
+
+            fatalError()
+        }()
+
         if loadView.viewCreator === self {
             self.setView(loadView, asWeak: true)
         }
@@ -178,7 +217,9 @@ extension ViewCreator {
 
     @discardableResult
     func loadView(_ handler: @escaping () -> UIView) -> Self {
+        print("[ViewCreator] setter:loadView \(ObjectIdentifier(self))")
         self.loadViewHandler = handler
+        print(self.loadViewHandler)
         return self
     }
 

@@ -33,9 +33,7 @@ class Render {
     }
 
     static func create(_ manager: ViewCreator) -> Render {
-        let render = Render(manager)
-        manager.render = render
-        return render
+        return Render(manager)
     }
 
     private var isRunningOutsideCicle: Bool = false
@@ -214,16 +212,8 @@ private extension ViewCreator {
     }
 }
 
-private var kRender: UInt = 0
 extension ViewCreator {
-    var renderMutable: Mutable<Render> {
-        OBJCSet(self, &kRender) {
-            .init(value: .create(self))
-        }
-    }
-    
     var render: Render {
-        get { self.renderMutable.value }
-        set { self.renderMutable.value = newValue }
+        self.mem_objects.render.value
     }
 }
