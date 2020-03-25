@@ -40,9 +40,15 @@ struct ReusableObject {
 
 private var kHostedView: UInt = 0
 extension ReusableView {
+    private var mutableReusableObject: Mutable<ReusableObject?> {
+        OBJCSet(self, &kHostedView) {
+            .init(value: nil)
+        }
+    }
+
     private var reusableObject: ReusableObject! {
-        get { objc_getAssociatedObject(self, &kHostedView) as? ReusableObject }
-        set { objc_setAssociatedObject(self, &kHostedView, newValue, .OBJC_ASSOCIATION_COPY) }
+        get { self.mutableReusableObject.value }
+        set { self.mutableReusableObject.value = newValue }
     }
     
     fileprivate(set) weak var hostedView: ViewCreator! {

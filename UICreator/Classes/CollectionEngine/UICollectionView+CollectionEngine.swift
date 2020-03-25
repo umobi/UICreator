@@ -23,17 +23,26 @@
 import Foundation
 import UIKit
 
-private var kCollectionListManager: UInt = 0
-private var kCollectionLayoutManager: UInt = 0
+struct MEMCollectionPayload {
+    let manager: Mutable<ListCollectionManager?> = .init(value: nil)
+    let layoutManager: Mutable<UICCollectionLayoutManager?> = .init(value: nil)
+}
 
+private var kMEMCollectionPayload: UInt = 0
 extension UICollectionView {
+    private var collectionPayload: MEMCollectionPayload {
+        OBJCSet(self, &kMEMCollectionPayload, policity: .OBJC_ASSOCIATION_COPY) {
+            .init()
+        }
+    }
+
     var manager: ListCollectionManager? {
-        get { objc_getAssociatedObject(self, &kCollectionListManager) as? ListCollectionManager }
-        set { objc_setAssociatedObject(self, &kCollectionListManager, newValue, .OBJC_ASSOCIATION_RETAIN) }
+        get { self.collectionPayload.manager.value }
+        set { self.collectionPayload.manager.value = newValue }
     }
 
     var layoutManager: UICCollectionLayoutManager? {
-        get { objc_getAssociatedObject(self, &kCollectionLayoutManager) as? UICCollectionLayoutManager }
-        set { objc_setAssociatedObject(self, &kCollectionLayoutManager, newValue, .OBJC_ASSOCIATION_RETAIN) }
+        get { self.collectionPayload.layoutManager.value }
+        set { self.collectionPayload.layoutManager.value = newValue }
     }
 }

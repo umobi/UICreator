@@ -349,14 +349,11 @@ public extension UICTabCreator {
     }
 }
 
-private var kTabBarItem: UInt = 0
 public extension UIView {
     var tabBarItem: UITabBarItem? {
-        get { objc_getAssociatedObject(self, &kTabBarItem) as? UITabBarItem }
+        get { self.payload.tabBarItem.value }
 
-        set {
-            objc_setAssociatedObject(self, &kTabBarItem, newValue, .OBJC_ASSOCIATION_RETAIN)
-        }
+        set { self.payload.tabBarItem.value = newValue }
     }
 }
 

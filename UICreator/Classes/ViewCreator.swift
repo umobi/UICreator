@@ -64,30 +64,30 @@ public protocol ViewCreator: class {
     func onDisappear(_ handler: @escaping (UIView) -> Void) -> Self
 }
 
-private struct UIViewObject {
-    private weak var __weak_uiView: UIView!
-    private var __strong_uiView: UIView!
+struct DynamicWeakObject<Object> where Object: AnyObject {
+    private weak var __weak_uiView: Object!
+    private var __strong_uiView: Object!
 
-    weak var uiView: UIView! {
+    weak var object: Object! {
         self.__strong_uiView ?? self.__weak_uiView
     }
 
-    private init(weak view: UIView!) {
-        self.__weak_uiView = view
+    private init(weak object: Object!) {
+        self.__weak_uiView = object
         self.__strong_uiView = nil
     }
 
-    private init(strong view: UIView!) {
+    private init(strong object: Object!) {
         self.__weak_uiView = nil
-        self.__strong_uiView = view
+        self.__strong_uiView = object
     }
 
-    static func `weak`(_ view: UIView) -> Self {
-        .init(weak: view)
+    static func `weak`(_ object: Object) -> Self {
+        .init(weak: object)
     }
 
-    static func strong(_ view: UIView) -> Self {
-        .init(strong: view)
+    static func strong(_ object: Object) -> Self {
+        .init(strong: object)
     }
 
     static var `nil`: Self {
@@ -99,17 +99,22 @@ private struct UIViewObject {
     }
 }
 
-private var kUIView: UInt = 0
+struct ViewCreatorLoadManager {
+    let viewObjectMutable: Mutable<DynamicWeakObject<UIView>> = .init(value: .nil)
+    let loadViewHandlerMutable: Mutable<(() -> UIView)?> = .init(value: nil)
+}
+
+private var kViewLoadManager: UInt = 0
 private extension ViewCreator {
-    private(set) var viewObject: UIViewObject {
-        get {
-            objc_getAssociatedObject(self, &kUIView) as? UIViewObject ?? {
-                let object = UIViewObject.nil
-                self.viewObject = object
-                return object
-            }()
+    var viewLoadManager: ViewCreatorLoadManager {
+        OBJCSet(self, &kViewLoadManager, policity: .OBJC_ASSOCIATION_COPY) {
+            .init()
         }
-        set { objc_setAssociatedObject(self, &kUIView, newValue, .OBJC_ASSOCIATION_COPY_NONATOMIC) }
+    }
+
+    private(set) var viewObject: DynamicWeakObject<UIView> {
+        get { self.viewLoadManager.viewObjectMutable.value }
+        set { self.viewLoadManager.viewObjectMutable.value = newValue }
     }
 
     var isViewWeaked: Bool {
@@ -133,7 +138,7 @@ private extension ViewCreator {
 
 internal extension ViewCreator {
     weak var uiView: UIView! {
-        self.viewObject.uiView
+        self.viewObject.object
     }
 
     func releaseUIView() -> UIView! {
@@ -147,11 +152,10 @@ internal extension ViewCreator {
     }
 }
 
-private var kLoadView: UInt = 0
 extension ViewCreator {
     private(set) var loadViewHandler: (() -> UIView)? {
-        get { objc_getAssociatedObject(self, &kLoadView) as? (() -> UIView) }
-        set { objc_setAssociatedObject(self, &kLoadView, newValue, .OBJC_ASSOCIATION_RETAIN)}
+        get { self.viewLoadManager.loadViewHandlerMutable.value }
+        set { self.viewLoadManager.loadViewHandlerMutable.value = newValue}
     }
 
     var isViewLoaded: Bool {

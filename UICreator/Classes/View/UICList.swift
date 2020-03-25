@@ -268,11 +268,10 @@ public extension UIViewCreator where View: UITableView {
     }
 }
 
-private var kTableViewCellHandler: UInt = 0
 extension UITableView {
     private var tableViewCellHandler: ((UITableViewCell) -> Void)? {
-        get { objc_getAssociatedObject(self, &kTableViewCellHandler) as? (UITableViewCell) -> Void }
-        set { objc_setAssociatedObject(self, &kTableViewCellHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
+        get { self.loadManager.cellHandler.value }
+        set { self.loadManager.cellHandler.value = newValue }
     }
 
     @discardableResult

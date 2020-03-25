@@ -33,10 +33,21 @@ protocol ForEachCreator: ViewCreator {
 }
 
 private var kManager: UInt = 0
-
 extension ForEachCreator {
+    private var managerMutable: Mutable<DynamicWeakObject<AnyObject>> {
+        OBJCSet(self, &kManager) {
+            .init(value: .nil)
+        }
+    }
+
     weak var manager: SupportForEach? {
-        get { objc_getAssociatedObject(self, &kManager) as? SupportForEach }
-        set { objc_setAssociatedObject(self, &kManager, newValue, .OBJC_ASSOCIATION_ASSIGN) }
+        get { self.managerMutable.value.object as? SupportForEach }
+        set {
+            guard let newValue = newValue as? AnyObject else {
+                fatalError()
+            }
+
+            self.managerMutable.value = .weak(newValue)
+        }
     }
 }

@@ -99,15 +99,14 @@ extension Tree {
 
 private var kTree: UInt = 0
 extension ViewCreator {
-    var tree: Tree {
-        get {
-            (objc_getAssociatedObject(self, &kTree) as? Tree) ?? {
-                let tree = Tree(self)
-                self.tree = tree
-                return tree
-            }()
+    var treeMutable: Mutable<Tree> {
+        OBJCSet(self, &kTree) {
+            .init(value: .init(self))
         }
-        set { objc_setAssociatedObject(self, &kTree, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    }
+    var tree: Tree {
+        get { self.treeMutable.value }
+        set { self.treeMutable.value = newValue }
     }
 }
 

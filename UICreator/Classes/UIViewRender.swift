@@ -23,21 +23,91 @@
 import Foundation
 import UIKit
 
+struct ViewPayload {
+    typealias AppearState = UIView.AppearState
+    typealias Handler = UIView.Handler
+
+    let viewCreator: Mutable<DynamicWeakObject<AnyObject>> = .init(value: .nil)
+    let appearState: Mutable<AppearState> = .init(value: .unset)
+
+    let appearMethods: Mutable<AppearsMethods> = .init(value: .init())
+    let tabBarItem: Mutable<UITabBarItem?> = .init(value: nil)
+
+    struct AppearsMethods: MutableEditable {
+        let appearHandler: Handler?
+        let disappearHandler: Handler?
+        let layoutHandler: Handler?
+
+        init() {
+            self.appearHandler = nil
+            self.disappearHandler = nil
+            self.layoutHandler = nil
+        }
+
+        init(_ original: AppearsMethods, editable: Editable) {
+            self.appearHandler = editable.appearHandler
+            self.disappearHandler = editable.disappearHandler
+            self.layoutHandler = editable.layoutHandler
+        }
+
+        func edit(_ edit: @escaping (Editable) -> Void) -> ViewPayload.AppearsMethods {
+            let editable = Editable(self)
+            edit(editable)
+            return .init(self, editable: editable)
+        }
+
+        class Editable {
+            var appearHandler: Handler?
+            var disappearHandler: Handler?
+            var layoutHandler: Handler?
+
+            init(_ methods: AppearsMethods) {
+                self.appearHandler = methods.appearHandler
+                self.disappearHandler = methods.disappearHandler
+                self.layoutHandler = methods.layoutHandler
+            }
+        }
+    }
+}
+
+private var kViewPayload: UInt = 0
+extension UIView {
+    var payload: ViewPayload {
+        OBJCSet(self, &kViewPayload, policity: .OBJC_ASSOCIATION_COPY) {
+            .init()
+        }
+    }
+}
+
 public protocol ViewRender: UIView {
     func onAppear(_ handler: @escaping (UIView) -> Void) -> Self
     func onDisappear(_ handler: @escaping (UIView) -> Void) -> Self
     func onLayout(_ handler: @escaping (UIView) -> Void) -> Self
 }
 
-private var kViewBuilder: UInt = 0
 internal extension ViewRender {
     private(set) var viewCreator: ViewCreator? {
-        get { objc_getAssociatedObject(self, &kViewBuilder) as? ViewCreator }
+        get { self.payload.viewCreator.value.object as? ViewCreator }
         set { self.setCreator(newValue, policity: self.superview == nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
     }
 
     func setCreator(_ newValue: ViewCreator?, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_ASSIGN) {
-        objc_setAssociatedObject(self, &kViewBuilder, newValue, policity)
+        print("setter: \(ObjectIdentifier(self)) \(newValue)")
+        guard let newValue = newValue else {
+            self.payload.viewCreator.value = .nil
+            return
+        }
+
+        guard let object = newValue as? AnyObject else {
+            fatalError()
+        }
+
+        if case .OBJC_ASSOCIATION_ASSIGN = policity {
+            self.payload.viewCreator.value = .weak(object)
+            return
+        }
+
+        self.payload.viewCreator.value = .strong(object)
     }
 
     init(builder: ViewCreator) {
@@ -50,11 +120,6 @@ internal extension ViewRender {
     }
 }
 
-private var kAppearState: UInt = 0
-private var kOnAppearHandler: UInt = 0
-private var kOnDisappearHandler: UInt = 0
-private var kOnLayoutHandler: UInt = 0
-
 extension UIView {
     enum AppearState {
         case appeared
@@ -63,8 +128,8 @@ extension UIView {
     }
 
     var appearState: AppearState {
-        get { (objc_getAssociatedObject(self, &kAppearState) as? AppearState) ?? .unset }
-        set { objc_setAssociatedObject(self, &kAppearState, newValue, .OBJC_ASSOCIATION_RETAIN) }
+        get { self.payload.appearState.value }
+        set { self.payload.appearState.value = newValue }
     }
 }
 
@@ -116,21 +181,30 @@ private extension UIView {
 private extension UIView {
 
     var appearHandler: UIView.Handler? {
-        get { objc_getAssociatedObject(self, &kOnAppearHandler) as? UIView.Handler }
-        set { objc_setAssociatedObject(self, &kOnAppearHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
+        get { self.payload.appearMethods.value.appearHandler }
+        set {
+            self.payload.appearMethods.update {
+                $0.appearHandler = newValue
+            }
+        }
     }
 
     var disappearHandler: UIView.Handler? {
-        get { objc_getAssociatedObject(self, &kOnDisappearHandler) as? UIView.Handler }
-        set { objc_setAssociatedObject(self, &kOnDisappearHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
+        get { self.payload.appearMethods.value.disappearHandler }
+        set {
+            self.payload.appearMethods.update {
+                $0.disappearHandler = newValue
+            }
+        }
     }
-}
-
-private extension UIView {
 
     var layoutHandler: UIView.Handler? {
-        get { objc_getAssociatedObject(self, &kOnLayoutHandler) as? UIView.Handler }
-        set { objc_setAssociatedObject(self, &kOnLayoutHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
+        get { self.payload.appearMethods.value.layoutHandler }
+        set {
+            self.payload.appearMethods.update {
+                $0.layoutHandler = newValue
+            }
+        }
     }
 }
 
@@ -291,53 +365,54 @@ public extension ViewCreator {
     }
 }
 
-private var kAppearUtil: UInt = 0
-private var kDisappearUtil: UInt = 0
-private var kLayoutUtil: UInt = 0
+struct AppearsUtilCreator {
+    let appearUtil: Mutable<AppearUtil>
+    let disappearUtil: Mutable<AppearUtil>
+    let layoutUtil: Mutable<AppearUtil>
+
+    init() {
+        self.appearUtil = .init(value: .init { _ in })
+        self.disappearUtil = .init(value: .init { _ in })
+        self.layoutUtil = .init(value: .init { _ in })
+    }
+}
+
+private var kAppearsUtilCreator: UInt = 0
 extension ViewCreator {
-    var appearUtil: AppearUtil {
-        get { objc_getAssociatedObject(self, &kAppearUtil) as? AppearUtil ?? {
-            let appearUtil = AppearUtil { _ in }
-            self.appearUtil = appearUtil
+    var appearsUtilCreator: AppearsUtilCreator {
+        OBJCSet(self, &kAppearsUtilCreator, policity: .OBJC_ASSOCIATION_COPY) {
+            let appearUtils = AppearsUtilCreator()
             self.onNotRendered { [unowned self] in
                 $0.onAppear {
                     self.appearUtil.action($0)
                 }
-            }
-            return appearUtil
-        }()}
 
-        set { objc_setAssociatedObject(self, &kAppearUtil, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    var disappearUtil: AppearUtil {
-        get { objc_getAssociatedObject(self, &kDisappearUtil) as? AppearUtil ?? {
-            let disappearUtil = AppearUtil { _ in }
-            self.disappearUtil = disappearUtil
-            self.onNotRendered { [unowned self] in
                 $0.onDisappear {
                     self.disappearUtil.action($0)
                 }
-            }
-            return disappearUtil
-        }()}
 
-        set { objc_setAssociatedObject(self, &kDisappearUtil, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    var layoutUtil: AppearUtil {
-        get { objc_getAssociatedObject(self, &kLayoutUtil) as? AppearUtil ?? {
-            let layoutUtil = AppearUtil { _ in }
-            self.layoutUtil = layoutUtil
-            self.onNotRendered { [unowned self] in
                 $0.onLayout {
                     self.layoutUtil.action($0)
                 }
             }
-            return layoutUtil
-        }()}
+            return appearUtils
+        }
+    }
+}
+extension ViewCreator {
+    var appearUtil: AppearUtil {
+        get { self.appearsUtilCreator.appearUtil.value }
+        set { self.appearsUtilCreator.appearUtil.value = newValue }
+    }
 
-        set { objc_setAssociatedObject(self, &kLayoutUtil, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    var disappearUtil: AppearUtil {
+        get { self.appearsUtilCreator.disappearUtil.value }
+        set { self.appearsUtilCreator.disappearUtil.value = newValue }
+    }
+
+    var layoutUtil: AppearUtil {
+        get { self.appearsUtilCreator.layoutUtil.value }
+        set { self.appearsUtilCreator.layoutUtil.value = newValue }
     }
 }
 

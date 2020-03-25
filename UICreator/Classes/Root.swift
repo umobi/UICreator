@@ -60,6 +60,7 @@ public class RootView: UIView {
 
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
+        print(self)
         RenderManager(self)?.didMoveToSuperview()
     }
 
@@ -71,6 +72,10 @@ public class RootView: UIView {
     override open func layoutSubviews() {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
+    }
+
+    deinit {
+        fatalError()
     }
 }
 
@@ -115,11 +120,18 @@ open class Root: ViewCreator {
 }
 
 private var kViewDidLoad: UInt = 0
-@objc extension Root {
+private extension Root {
+    var didViewLoadMutable: Mutable<Bool> {
+        OBJCSet(self, &kViewDidLoad) {
+            .init(value: false)
+        }
+    }
+}
 
+@objc extension Root {
     private(set) var didViewLoad: Bool {
-        get { (objc_getAssociatedObject(self, &kViewDidLoad) as? Bool) ?? false }
-        set { (objc_setAssociatedObject(self, &kViewDidLoad, newValue, .OBJC_ASSOCIATION_RETAIN)) }
+        get { self.didViewLoadMutable.value }
+        set { self.didViewLoadMutable.value = newValue }
     }
 
     /// The viewDidLoad function is a similar method used by UIKit for view controllers. This method means in UICreator that it is now allowed to directly access the subviews or manipulate data without having some errors thrown.
@@ -130,9 +142,14 @@ private var kViewDidLoad: UInt = 0
 
 private var kTemplateViewDidConfiguredView: UInt = 0
 extension TemplateView where Self: Root {
+    private var didConfiguredViewMutable: Mutable<Bool> {
+        OBJCSet(self, &kTemplateViewDidConfiguredView) {
+            .init(value: false)
+        }
+    }
     private var didConfiguredView: Bool {
-        get { (objc_getAssociatedObject(self, &kTemplateViewDidConfiguredView) as? Bool) ?? false }
-        set { objc_setAssociatedObject(self, &kTemplateViewDidConfiguredView, newValue, .OBJC_ASSOCIATION_RETAIN) }
+        get { self.didConfiguredViewMutable.value }
+        set { self.didConfiguredViewMutable.value = newValue }
     }
 
     internal func viewDidChanged() {

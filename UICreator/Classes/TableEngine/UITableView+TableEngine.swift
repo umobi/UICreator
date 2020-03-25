@@ -22,11 +22,58 @@
 
 import Foundation
 
-private var kTableManager: UInt = 0
+extension UITableView {
+    struct WeakCell {
+        private(set) weak var view: ReusableView!
+        init(_ view: ReusableView) {
+            self.view = view
+        }
+    }
+}
+
+struct TableLoadManager {
+    let reusableCells: Mutable<[UITableView.WeakCell]> = .init(value: [])
+    let manager: Mutable<ListCollectionManager?> = .init(value: nil)
+    let cellHandler: Mutable<((UITableViewCell) -> Void)?> = .init(value: nil)
+}
+
+private var kTableLoadManager: UInt = 0
+
+extension UITableView {
+    var loadManager: TableLoadManager {
+        OBJCSet(self, &kTableLoadManager, policity: .OBJC_ASSOCIATION_COPY) {
+            .init()
+        }
+    }
+}
 
 extension UITableView {
     var manager: ListCollectionManager? {
-        get { objc_getAssociatedObject(self, &kTableManager) as? ListCollectionManager }
-        set { objc_setAssociatedObject(self, &kTableManager, newValue, .OBJC_ASSOCIATION_RETAIN) }
+        get { self.loadManager.manager.value }
+        set { self.loadManager.manager.value = newValue }
+    }
+}
+
+extension UITableView {
+    private var reusableCells: [WeakCell] {
+        get { self.loadManager.reusableCells.value }
+        set { self.loadManager.reusableCells.value = newValue }
+    }
+
+    func appendReusable(cell: ReusableView) {
+        guard !self.reusableCells.contains(where: { $0.view === cell }) else {
+            return
+        }
+
+        self.reusableCells.append(.init(cell))
+        self.reusableCells = self.reusableCells.filter {
+            $0.view != nil
+        }
+    }
+
+    func reusableView(at indexPath: IndexPath) -> ReusableView? {
+        self.reusableCells.first(where: {
+            $0.view?.cellLoaded.cell.rowManager.indexPath == indexPath
+        })?.view
     }
 }

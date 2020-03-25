@@ -46,7 +46,7 @@ public protocol NavigationRepresentable: TemplateView {
     func popTo(view: ViewCreator, animated: Bool) -> Self
 }
 
-class ContentHandler {
+struct ContentHandler {
     let content: () -> ViewCreator
     init(_ content: @escaping () -> ViewCreator) {
         self.content = content
@@ -65,8 +65,17 @@ private extension UIView {
     }
 }
 
+func OBJCSet<Object>(_ object: Any, _ key: UnsafeRawPointer, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN, orLoad: @escaping () -> Object) -> Object {
+    guard let object = objc_getAssociatedObject(object, key) as? Object else {
+        let object = orLoad()
+        objc_setAssociatedObject(object, key, object, policity)
+        return object
+    }
+
+    return object
+}
+
 private var kContentHandler: UInt = 0
-private var kNavigationController: UInt = 0
 public extension NavigationRepresentable {
     internal weak var navigationController: UINavigationController! {
         return self.uiView.lowerNavigationController
@@ -76,9 +85,15 @@ public extension NavigationRepresentable {
         return self.navigationController.navigationBar
     }
 
+    private var contentMutable: Mutable<ContentHandler?> {
+        OBJCSet(self, &kContentHandler) {
+            .init(value: nil)
+        }
+    }
+
     internal var content: ContentHandler? {
-        get { objc_getAssociatedObject(self, &kContentHandler) as? ContentHandler }
-        set { objc_setAssociatedObject(self, &kContentHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
+        get { self.contentMutable.value }
+        set { self.contentMutable.value = newValue }
     }
 
     var body: ViewCreator {

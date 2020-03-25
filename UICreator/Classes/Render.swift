@@ -26,7 +26,7 @@ class Render {
     weak var manager: ViewCreator!
     var state: UIView.RenderState = .unset
 
-    private var needs: Set<UIView.RenderState> = []
+    private var needs: Set<UIView.RenderState> = .init()
 
     private init(_ manager: ViewCreator) {
         self.manager = manager
@@ -216,8 +216,14 @@ private extension ViewCreator {
 
 private var kRender: UInt = 0
 extension ViewCreator {
+    var renderMutable: Mutable<Render> {
+        OBJCSet(self, &kRender) {
+            .init(value: .create(self))
+        }
+    }
+    
     var render: Render {
-        get { (objc_getAssociatedObject(self, &kRender) as? Render) ?? .create(self) }
-        set { objc_setAssociatedObject(self, &kRender, newValue, .OBJC_ASSOCIATION_RETAIN) }
+        get { self.renderMutable.value }
+        set { self.renderMutable.value = newValue }
     }
 }
