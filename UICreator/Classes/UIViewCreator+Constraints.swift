@@ -99,7 +99,7 @@ extension Anchor {
     }
 
     func orCreate() -> ConstraintFinalize {
-        if let constraint = self.findByContent().first {
+        if let constraint = self.find().first {
             let finalize = ConstraintFinalize(original: self, constraint)
             return finalize
         }
