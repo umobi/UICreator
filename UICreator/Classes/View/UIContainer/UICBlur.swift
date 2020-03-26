@@ -67,12 +67,12 @@ public class UICBlur: UIViewCreator {
     public typealias View = _BlurView
 
     public init(blur: UIBlurEffect.Style = .regular) {
-        self.loadView { [unowned self] in
-            let view = View.init(blur: blur)
-            view.updateBuilder(self)
-            return view
-        }
-        .blur(style: blur)
+        self.blur(style: blur)
+            .loadView { [unowned self] in
+                let view = View.init(blur: blur)
+                view.updateBuilder(self)
+                return view
+            }
     }
 }
 

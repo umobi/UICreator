@@ -22,28 +22,28 @@
 
 import Foundation
 
-/// `TextElement` may be removed from this project. It turns some shared methods needed in some view creators. The problem that makes TextElement unnecessary is that it always will need to extend it when creating text elements like Label using `UICViewRepresentable`.
-public protocol TextElement: UIViewCreator {
-    func text(_ string: String?) -> Self
-    func text(_ attributedText: NSAttributedString?) -> Self
+public extension UIView {
+    struct CreatorKeyframe {
+        let startTime: TimeInterval
+        let duration: TimeInterval
+        let animations: (UIView) -> Void
 
-    func text(color: UIColor?) -> Self
-    func font(_ font: UIFont, isDynamicTextSize: Bool) -> Self
+        private init(startAt startTime: TimeInterval, duration: TimeInterval, animations: @escaping (UIView) -> Void) {
+            self.startTime = startTime
+            self.duration = duration
+            self.animations = animations
+        }
 
-    func text(scale: CGFloat) -> Self
-    func text(alignment: NSTextAlignment) -> Self
+        public static func keyframe(startAt startTime: TimeInterval, duration: TimeInterval, animations: @escaping (UIView) -> Void) -> CreatorKeyframe{
+            return .init(startAt: startTime, duration: duration, animations: animations)
+        }
+    }
 
-    init(_ text: String?)
-    init(_ attributedText: NSAttributedString?)
+    struct CreatorKeyframeSequence {
+        let sequence: [CreatorKeyframe]
 
-    func adjustsFont(forContentSizeCategory flag: Bool) -> Self
-}
-
-public extension TextElement {
-    func text(scale: CGFloat) -> Self {
-        Fatal.Builder("text(scale:) not implemented")
-            .warning()
-        
-        return self
+        public init(_ sequence: CreatorKeyframe...) {
+            self.sequence = sequence
+        }
     }
 }

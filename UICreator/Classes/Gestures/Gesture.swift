@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public protocol Gesture: UICOpaqueClass {
+public protocol Gesture: Opaque {
     init(target view: UIView!)
 }
 
@@ -38,8 +38,8 @@ public extension UIGesture {
 }
 
 struct UIGesturePayload {
-    let gestureObject: Mutable<OpaqueClassStored> = .init(value: .nil)
-    let targetViewObject: Mutable<DynamicWeakObject<UIView>> = .init(value: .nil)
+    let gestureObject: Mutable<MEMOpaque> = .init(value: .nil)
+    let targetViewObject: Mutable<MEMWeak<UIView>> = .init(value: .nil)
 }
 
 private var kUIGesturePayload: UInt = 0
@@ -92,7 +92,7 @@ internal extension UIGestureRecognizer {
 
 private var kGestureMutable: UInt = 0
 internal extension Gesture {
-    private var gestureMutable: Mutable<DynamicWeakObject<UIGestureRecognizer>> {
+    private var gestureMutable: Mutable<MEMWeak<UIGestureRecognizer>> {
         OBJCSet(self, &kGestureMutable) {
             .init(value: .nil)
         }

@@ -21,29 +21,30 @@
 //
 
 import Foundation
+import UIKit
 
-struct Fatal {
-    static func die(_ type: FatalType) {
-        fatalError(type.error)
+/// `struct Handler` is a wrap for callbacks used by Core to execute some of the style configurations and other callbacks.
+/// It always return the `self` view as a parameter, so you will not need to create memory dependency in callbacks.
+/// As a tip, you may just cast like `$0 as? View`, that may work.
+struct UIHandler<Object> {
+    private let handler: ((Object) -> Void)?
+
+    init(_ handler: @escaping (Object) -> Void) {
+        self.handler = handler
     }
 
-    static func warning(_ type: FatalType) {
-        print("[WARNING] \(type.error)")
-    }
-}
-
-protocol FatalType {
-    var error: String { get }
-    func die()
-    func warning()
-}
-
-extension FatalType {
-    func die() {
-        Fatal.die(self)
+    init() {
+        self.handler = nil
     }
 
-    func warning() {
-        Fatal.warning(self)
+    func commit(in object: Object) {
+        self.handler?(object)
+    }
+
+    func merge(_ other: UIHandler<Object>) -> Self {
+        .init {
+            self.handler?($0)
+            other.handler?($0)
+        }
     }
 }

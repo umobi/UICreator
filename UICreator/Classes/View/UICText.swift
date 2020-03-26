@@ -66,35 +66,32 @@ public class UICText: UIViewCreator, TextElement, TextKeyboard, Control {
     public typealias View = _TextField
 
     required public init(_ text: String?) {
-        self.loadView { [unowned self] in
-            View.init(builder: self)
-        }
-        .onNotRendered {
-            ($0 as? View)?.text = text
-        }
+        self.text(text)
+            .loadView { [unowned self] in
+                View.init(builder: self)
+            }
     }
 
     required public init(_ attributedText: NSAttributedString?) {
-        self.loadView { [unowned self] in
-            View.init(builder: self)
-        }
-        .onNotRendered {
-            ($0 as? View)?.attributedText = attributedText
-        }
+        self.text(attributedText)
+            .loadView { [unowned self] in
+                View.init(builder: self)
+            }
+
     }
 
     required public init(placeholder text: String?) {
-        self.loadView { [unowned self] in
-            View.init(builder: self)
-        }
-        .placeholder(text)
+        self.placeholder(text)
+            .loadView { [unowned self] in
+                View.init(builder: self)
+            }
     }
 
     required public init(placeholder attributed: NSAttributedString?) {
-        self.loadView { [unowned self] in
-            View.init(builder: self)
-        }
-        .placeholder(attributed)
+        self.placeholder(attributed)
+            .loadView { [unowned self] in
+                View.init(builder: self)
+            }
     }
 }
 

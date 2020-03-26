@@ -70,16 +70,16 @@ public class UICDashed: UIViewCreator {
         let content = content()
         self.tree.append(content)
 
-        self.loadView { [unowned self] in
-            let view = View.init(dash: pattern)
-            view.updateBuilder(self)
-            return view
-        }
-        .onNotRendered {
+        self.onNotRendered {
             ($0 as? View)?.addContent(content.releaseUIView())
         }
         .dash(color: color)
         .dash(lineWidth: 1)
+        .loadView { [unowned self] in
+            let view = View.init(dash: pattern)
+            view.updateBuilder(self)
+            return view
+        }
     }
 }
 

@@ -22,46 +22,33 @@
 
 import Foundation
 
-/// Don't use this protocol
-@available(*, deprecated)
-public protocol UIViewContext: ViewContext {
-    associatedtype Context: UICreator.Context
-    func bindContext(_ context: Context)
+protocol SupportForEach: Opaque {
+    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>)
 }
 
-extension UIViewContext {
-    private static func createContext<Context: UICreator.Context>(for uiView: UIView!) -> Context {
-        let context = Context.init()
-        guard let _self = uiView.viewCreator as? Self else {
-            fatalError()
+protocol ForEachCreator: ViewCreator {
+    var viewType: ViewCreator.Type { get }
+    func load()
+    var isLoaded: Bool { get }
+}
+
+private var kManager: UInt = 0
+extension ForEachCreator {
+    private var managerMutable: Mutable<MEMOpaque> {
+        OBJCSet(self, &kManager) {
+            .init(value: .nil)
         }
-
-        context.onContextChange { uiView in
-            if uiView.superview == nil {
-                _ = uiView.viewCreator?.onRendered {
-                    guard let _self = $0.viewCreator as? Self else {
-                        return
-                    }
-
-                    _self.bindContext(_self.context)
-                }
-
-                return
-            }
-
-            guard let _self = uiView.viewCreator as? Self else {
-                return
-            }
-            _self.bindContext(_self.context)
-        }
-
-        _self.update(context: context)
-        return context
     }
 
-    public var context: Context {
-        get { (self as ViewContext).context as? Context ?? {
-            return Self.createContext(for: self.uiView)
-        }() }
+    var manager: SupportForEach? {
+        get { self.managerMutable.value.object as? SupportForEach }
+        set {
+            guard let newValue = newValue else {
+                self.managerMutable.value = .nil
+                return
+            }
+
+            self.managerMutable.value = .weak(newValue)
+        }
     }
 }

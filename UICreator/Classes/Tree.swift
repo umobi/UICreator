@@ -35,7 +35,8 @@ class Tree {
 
     func appendAssert(_ leaf: ViewCreator) {
         guard self.root !== leaf else {
-            fatalError()
+            Fatal.rootCycle.die()
+            return
         }
 
         if self.leafs.contains(where: {
@@ -68,7 +69,8 @@ class Tree {
         guard self.leafs.contains(where: {
             $0.leaf === leaf
         }) else {
-            fatalError()
+            Fatal.viewOutOfTree.die()
+            return
         }
 
         self.leafs = self.leafs.filter {
@@ -98,13 +100,6 @@ extension Tree {
 }
 
 extension ViewCreator {
-    var tree: Tree {
-        get { self.mem_objects.tree.value }
-        set { self.mem_objects.tree.value = newValue }
-    }
-}
-
-extension ViewCreator {
     var root: ViewCreator? {
         sequence(first: self as ViewCreator, next: { $0.tree.supertree?.root })
             .reversed()
@@ -122,5 +117,12 @@ public extension UIView {
         self.viewCreators.forEach {
             $0.tree.printTrace()
         }
+    }
+}
+
+extension Tree {
+    enum Fatal: String, FatalType {
+        case rootCycle = "Appeding a leaf that is equal to root of the tree is not allowed. This bug cause a root cycle."
+        case viewOutOfTree = "Removing a leaf that is not in the tree is not allowed."
     }
 }

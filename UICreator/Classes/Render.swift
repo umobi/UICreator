@@ -211,9 +211,3 @@ private extension ViewCreator {
         }
     }
 }
-
-extension ViewCreator {
-    var render: Render {
-        self.mem_objects.render.value
-    }
-}

@@ -21,24 +21,23 @@
 //
 
 import Foundation
+import UIKit
+import EasyAnchor
+import UIContainer
 
-public protocol ViewContext: ViewCreator {
+internal extension UIView {
 
-}
+    /// The `add(_:)` function is used internally to add views inside view and constraint with required priority in all edges.
+    func add(priority: UILayoutPriority? = nil,_ view: UIView) {
+        AddSubview(self).addSubview(view)
 
-private var kContext: UInt = 0
-internal extension ViewContext {
-    private(set) var context: Context? {
-        get { objc_getAssociatedObject(self, &kContext) as? Context }
-        set { objc_setAssociatedObject(self, &kContext, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
+        let priority: UILayoutPriority = priority ?? ((self as UIView) is RootView && view is RootView ? .required :
+        .init(751))
 
-    func update(context: Context?) {
-        guard let context = context else {
-            return
-        }
-
-        self.context = context
-        self.context?.notifyContextChange(self.uiView)
+        activate(
+            view.anchor
+                .edges
+                .priority(priority.rawValue)
+        )
     }
 }

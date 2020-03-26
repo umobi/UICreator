@@ -21,63 +21,6 @@
 //
 
 import Foundation
-import UIKit
-
-struct ViewPayload {
-    typealias AppearState = UIView.AppearState
-    typealias Handler = UIView.Handler
-
-    let viewCreator: Mutable<OpaqueClassStored> = .init(value: .nil)
-    let appearState: Mutable<AppearState> = .init(value: .unset)
-
-    let appearMethods: Mutable<AppearsMethods> = .init(value: .init())
-    let tabBarItem: Mutable<UITabBarItem?> = .init(value: nil)
-
-    struct AppearsMethods: MutableEditable {
-        let appearHandler: Handler?
-        let disappearHandler: Handler?
-        let layoutHandler: Handler?
-
-        init() {
-            self.appearHandler = nil
-            self.disappearHandler = nil
-            self.layoutHandler = nil
-        }
-
-        init(_ original: AppearsMethods, editable: Editable) {
-            self.appearHandler = editable.appearHandler
-            self.disappearHandler = editable.disappearHandler
-            self.layoutHandler = editable.layoutHandler
-        }
-
-        func edit(_ edit: @escaping (Editable) -> Void) -> ViewPayload.AppearsMethods {
-            let editable = Editable(self)
-            edit(editable)
-            return .init(self, editable: editable)
-        }
-
-        class Editable {
-            var appearHandler: Handler?
-            var disappearHandler: Handler?
-            var layoutHandler: Handler?
-
-            init(_ methods: AppearsMethods) {
-                self.appearHandler = methods.appearHandler
-                self.disappearHandler = methods.disappearHandler
-                self.layoutHandler = methods.layoutHandler
-            }
-        }
-    }
-}
-
-private var kViewPayload: UInt = 0
-extension UIView {
-    var payload: ViewPayload {
-        OBJCSet(self, &kViewPayload, policity: .OBJC_ASSOCIATION_COPY) {
-            .init()
-        }
-    }
-}
 
 public protocol ViewRender: UIView {
     func onAppear(_ handler: @escaping (UIView) -> Void) -> Self
@@ -87,26 +30,23 @@ public protocol ViewRender: UIView {
 
 internal extension ViewRender {
     private(set) var viewCreator: ViewCreator? {
-        get {
-            let viewCreator = self.payload.viewCreator
-            return viewCreator.value.object as? ViewCreator
-        }
+        get { self.opaqueViewCreator.object as? ViewCreator }
         set { self.setCreator(newValue, policity: self.superview == nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
     }
 
     func setCreator(_ newValue: ViewCreator?, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_ASSIGN) {
         
         guard let newValue = newValue else {
-            self.payload.viewCreator.value = .nil
+            self.opaqueViewCreator = .nil
             return
         }
 
         if case .OBJC_ASSOCIATION_ASSIGN = policity {
-            self.payload.viewCreator.value = .weak(newValue)
+            self.opaqueViewCreator = .weak(newValue)
             return
         }
 
-        self.payload.viewCreator.value = .strong(newValue)
+        self.opaqueViewCreator = .strong(newValue)
     }
 
     init(builder: ViewCreator) {
@@ -124,11 +64,6 @@ extension UIView {
         case appeared
         case disappeared
         case unset
-    }
-
-    var appearState: AppearState {
-        get { self.payload.appearState.value }
-        set { self.payload.appearState.value = newValue }
     }
 }
 
@@ -173,36 +108,6 @@ private extension UIView {
         return self.layout {
             handler($0)
             allLayout?.commit(in: $0)
-        }
-    }
-}
-
-private extension UIView {
-
-    var appearHandler: UIView.Handler? {
-        get { self.payload.appearMethods.value.appearHandler }
-        set {
-            self.payload.appearMethods.update {
-                $0.appearHandler = newValue
-            }
-        }
-    }
-
-    var disappearHandler: UIView.Handler? {
-        get { self.payload.appearMethods.value.disappearHandler }
-        set {
-            self.payload.appearMethods.update {
-                $0.disappearHandler = newValue
-            }
-        }
-    }
-
-    var layoutHandler: UIView.Handler? {
-        get { self.payload.appearMethods.value.layoutHandler }
-        set {
-            self.payload.appearMethods.update {
-                $0.layoutHandler = newValue
-            }
         }
     }
 }
@@ -342,13 +247,13 @@ public extension ViewCreator {
 
     @discardableResult
     func onAppear(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.appearUtil = self.appearUtil.merge(.init(handler))
+        self.appear = self.appear.merge(.init(handler))
         return self
     }
 
     @discardableResult
     func onDisappear(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.disappearUtil = self.disappearUtil.merge(.init(handler))
+        self.disappear = self.disappear.merge(.init(handler))
         return self
     }
 
@@ -359,51 +264,7 @@ public extension ViewCreator {
             return self
         }
         
-        self.layoutUtil = self.layoutUtil.merge(.init(handler))
+        self.layout = self.layout.merge(.init(handler))
         return self
-    }
-}
-
-struct AppearsUtilCreator {
-    let appearUtil: Mutable<AppearUtil>
-    let disappearUtil: Mutable<AppearUtil>
-    let layoutUtil: Mutable<AppearUtil>
-
-    init() {
-        self.appearUtil = .init(value: .init { _ in })
-        self.disappearUtil = .init(value: .init { _ in })
-        self.layoutUtil = .init(value: .init { _ in })
-    }
-}
-
-extension ViewCreator {
-    var appearUtil: AppearUtil {
-        get { self.mem_objects.appearsManager.appearUtil.value }
-        set { self.mem_objects.appearsManager.appearUtil.value = newValue }
-    }
-
-    var disappearUtil: AppearUtil {
-        get { self.mem_objects.appearsManager.disappearUtil.value }
-        set { self.mem_objects.appearsManager.disappearUtil.value = newValue }
-    }
-
-    var layoutUtil: AppearUtil {
-        get { self.mem_objects.appearsManager.layoutUtil.value }
-        set { self.mem_objects.appearsManager.layoutUtil.value = newValue }
-    }
-}
-
-struct AppearUtil {
-    let action: (UIView) -> Void
-
-    init(_ action: @escaping (UIView) -> Void) {
-        self.action = action
-    }
-
-    func merge(_ other: AppearUtil) -> Self {
-        .init {
-            self.action($0)
-            other.action($0)
-        }
     }
 }

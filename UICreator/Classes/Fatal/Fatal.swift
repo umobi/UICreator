@@ -21,17 +21,45 @@
 //
 
 import Foundation
-import UIKit
 
-open class Context {
-    required public init() {}
-
-    private var onContextChangeHandler: ((UIView) -> Void)? = nil
-    internal func onContextChange(_ handler: @escaping (UIView) -> Void) {
-        self.onContextChangeHandler = handler
+struct Fatal {
+    static func die(_ type: FatalType) {
+        fatalError(type.error)
     }
 
-    internal func notifyContextChange(_ uiView: UIView) {
-        self.onContextChangeHandler?(uiView)
+    static func warning(_ type: FatalType) {
+        print("[WARNING] \(type.error)")
+    }
+}
+
+protocol FatalType {
+    var error: String { get }
+    func die()
+    func warning()
+}
+
+extension FatalType where Self: RawRepresentable, RawValue == String {
+    var error: String {
+        return self.rawValue
+    }
+}
+
+extension FatalType {
+    func die() {
+        Fatal.die(self)
+    }
+
+    func warning() {
+        Fatal.warning(self)
+    }
+}
+
+extension Fatal {
+    struct Builder: FatalType {
+        let error: String
+        
+        init(_ string: String) {
+            self.error = string
+        }
     }
 }

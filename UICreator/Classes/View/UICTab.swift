@@ -349,14 +349,6 @@ public extension UICTabCreator {
     }
 }
 
-public extension UIView {
-    var tabBarItem: UITabBarItem? {
-        get { self.payload.tabBarItem.value }
-
-        set { self.payload.tabBarItem.value = newValue }
-    }
-}
-
 public extension ViewCreator {
     func tabBarItem(title: String?) -> Self {
         self.onNotRendered {

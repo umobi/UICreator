@@ -67,11 +67,11 @@ public class UICGradient: UIViewCreator {
     public typealias View = _GradientView
 
     public init(_ colors: [UIColor], direction: View.Direction = .right) {
-        self.loadView { [unowned self] in
-            View.init(builder: self)
-        }
-        .colors(colors)
-        .direction(direction)
+        self.colors(colors)
+            .direction(direction)
+            .loadView { [unowned self] in
+                View.init(builder: self)
+            }
     }
 
     public convenience init(_ colors: UIColor..., direction: View.Direction = .right) {

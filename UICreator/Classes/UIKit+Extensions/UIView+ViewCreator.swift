@@ -336,32 +336,6 @@ public extension ViewCreator {
     }
 }
 
-public extension UIView {
-    struct CreatorKeyframe {
-        let startTime: TimeInterval
-        let duration: TimeInterval
-        let animations: (UIView) -> Void
-
-        private init(startAt startTime: TimeInterval, duration: TimeInterval, animations: @escaping (UIView) -> Void) {
-            self.startTime = startTime
-            self.duration = duration
-            self.animations = animations
-        }
-
-        public static func keyframe(startAt startTime: TimeInterval, duration: TimeInterval, animations: @escaping (UIView) -> Void) -> CreatorKeyframe{
-            return .init(startAt: startTime, duration: duration, animations: animations)
-        }
-    }
-
-    struct CreatorKeyframeSequence {
-        let sequence: [CreatorKeyframe]
-
-        public init(_ sequence: CreatorKeyframe...) {
-            self.sequence = sequence
-        }
-    }
-}
-
 public extension ViewCreator {
     func addLayer(_ handler: @escaping (UIView) -> CALayer) -> Self {
         self.onNotRendered {

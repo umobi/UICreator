@@ -22,28 +22,37 @@
 
 import Foundation
 
-/// `TextElement` may be removed from this project. It turns some shared methods needed in some view creators. The problem that makes TextElement unnecessary is that it always will need to extend it when creating text elements like Label using `UICViewRepresentable`.
-public protocol TextElement: UIViewCreator {
-    func text(_ string: String?) -> Self
-    func text(_ attributedText: NSAttributedString?) -> Self
+struct MEMWeak<Object>: Memory where Object: AnyObject {
+    private weak var __weak_uiView: Object!
+    private var __strong_uiView: Object!
 
-    func text(color: UIColor?) -> Self
-    func font(_ font: UIFont, isDynamicTextSize: Bool) -> Self
+    var object: Object! {
+        self.__strong_uiView ?? self.__weak_uiView
+    }
 
-    func text(scale: CGFloat) -> Self
-    func text(alignment: NSTextAlignment) -> Self
+    private init(weak object: Object!) {
+        self.__weak_uiView = object
+        self.__strong_uiView = nil
+    }
 
-    init(_ text: String?)
-    init(_ attributedText: NSAttributedString?)
+    private init(strong object: Object!) {
+        self.__weak_uiView = nil
+        self.__strong_uiView = object
+    }
 
-    func adjustsFont(forContentSizeCategory flag: Bool) -> Self
-}
+    static func `weak`(_ object: Object) -> Self {
+        .init(weak: object)
+    }
 
-public extension TextElement {
-    func text(scale: CGFloat) -> Self {
-        Fatal.Builder("text(scale:) not implemented")
-            .warning()
-        
-        return self
+    static func strong(_ object: Object) -> Self {
+        .init(strong: object)
+    }
+
+    static var `nil`: Self {
+        .init(weak: nil)
+    }
+
+    var isWeaked: Bool {
+        self.__weak_uiView != nil
     }
 }

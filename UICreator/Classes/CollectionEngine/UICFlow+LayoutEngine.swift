@@ -170,7 +170,7 @@ class UICCollectionLayoutManager {
 
     private init(_ contents: [UICCollectionLayoutSectionElement]) {
         if contents.contains(where: { $0 is UICCollectionLayoutSection }) {
-            if !contents.allSatisfy { $0 is UICCollectionLayoutSection } {
+            if !contents.allSatisfy({ $0 is UICCollectionLayoutSection }) {
                 fatalError()
             }
 

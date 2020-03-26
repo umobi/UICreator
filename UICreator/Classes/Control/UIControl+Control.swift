@@ -41,28 +41,27 @@ extension Mutable where Value: MutableEditable {
 }
 
 struct ControlPayload: MutableEditable {
-    typealias Handler = UIView.Handler
 
-    let touchDown: Handler?
-    let touchDownRepeat: Handler?
-    let touchDragInside: Handler?
-    let touchDragOutside: Handler?
-    let touchDragEnter: Handler?
-    let touchDragExit: Handler?
-    let touchUpInside: Handler?
-    let touchUpOutside: Handler?
-    let touchCancel: Handler?
-    let editingDidBegin: Handler?
-    let valueChanged: Handler?
-    let primaryActionTriggered: Handler?
-    let editingChanged: Handler?
-    let editingDidEnd: Handler?
-    let editingDidEndOnExit: Handler?
-    let allTouchEvents: Handler?
-    let allEditingEvents: Handler?
-    let applicationReserved: Handler?
-    let systemReserved: Handler?
-    let allEvents: Handler?
+    let touchDown: UIHandler<UIView>?
+    let touchDownRepeat: UIHandler<UIView>?
+    let touchDragInside: UIHandler<UIView>?
+    let touchDragOutside: UIHandler<UIView>?
+    let touchDragEnter: UIHandler<UIView>?
+    let touchDragExit: UIHandler<UIView>?
+    let touchUpInside: UIHandler<UIView>?
+    let touchUpOutside: UIHandler<UIView>?
+    let touchCancel: UIHandler<UIView>?
+    let editingDidBegin: UIHandler<UIView>?
+    let valueChanged: UIHandler<UIView>?
+    let primaryActionTriggered: UIHandler<UIView>?
+    let editingChanged: UIHandler<UIView>?
+    let editingDidEnd: UIHandler<UIView>?
+    let editingDidEndOnExit: UIHandler<UIView>?
+    let allTouchEvents: UIHandler<UIView>?
+    let allEditingEvents: UIHandler<UIView>?
+    let applicationReserved: UIHandler<UIView>?
+    let systemReserved: UIHandler<UIView>?
+    let allEvents: UIHandler<UIView>?
 
     init() {
         self.touchDown = nil
@@ -119,28 +118,27 @@ struct ControlPayload: MutableEditable {
 
 extension ControlPayload {
     class Editable {
-        typealias Handler = UIView.Handler
 
-        var touchDown: Handler?
-        var touchDownRepeat: Handler?
-        var touchDragInside: Handler?
-        var touchDragOutside: Handler?
-        var touchDragEnter: Handler?
-        var touchDragExit: Handler?
-        var touchUpInside: Handler?
-        var touchUpOutside: Handler?
-        var touchCancel: Handler?
-        var editingDidBegin: Handler?
-        var valueChanged: Handler?
-        var primaryActionTriggered: Handler?
-        var editingChanged: Handler?
-        var editingDidEnd: Handler?
-        var editingDidEndOnExit: Handler?
-        var allTouchEvents: Handler?
-        var allEditingEvents: Handler?
-        var applicationReserved: Handler?
-        var systemReserved: Handler?
-        var allEvents: Handler?
+        var touchDown: UIHandler<UIView>?
+        var touchDownRepeat: UIHandler<UIView>?
+        var touchDragInside: UIHandler<UIView>?
+        var touchDragOutside: UIHandler<UIView>?
+        var touchDragEnter: UIHandler<UIView>?
+        var touchDragExit: UIHandler<UIView>?
+        var touchUpInside: UIHandler<UIView>?
+        var touchUpOutside: UIHandler<UIView>?
+        var touchCancel: UIHandler<UIView>?
+        var editingDidBegin: UIHandler<UIView>?
+        var valueChanged: UIHandler<UIView>?
+        var primaryActionTriggered: UIHandler<UIView>?
+        var editingChanged: UIHandler<UIView>?
+        var editingDidEnd: UIHandler<UIView>?
+        var editingDidEndOnExit: UIHandler<UIView>?
+        var allTouchEvents: UIHandler<UIView>?
+        var allEditingEvents: UIHandler<UIView>?
+        var applicationReserved: UIHandler<UIView>?
+        var systemReserved: UIHandler<UIView>?
+        var allEvents: UIHandler<UIView>?
 
         init(_ payload: ControlPayload) {
             self.touchDown = payload.touchDown

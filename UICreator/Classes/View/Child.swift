@@ -25,7 +25,7 @@ import UIKit
 import EasyAnchor
 import UIContainer
 
-public class ChildView: UIView {
+public class ZStackView: UIView {
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -65,8 +65,8 @@ public class ChildView: UIView {
 }
 
 /// `class Child` is a view that holds more than one **subview**.
-public class Child: UIViewCreator {
-    public typealias View = ChildView
+public class UICZStack: UIViewCreator {
+    public typealias View = ZStackView
 
     public init(_ contents: @escaping () -> [ViewCreator]) {
         let contents = contents()

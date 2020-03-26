@@ -72,7 +72,7 @@ public class UICStack: UIViewCreator {
             self.tree.append($0)
         }
 
-        self.loadView { [unowned self, content] in
+        self.loadView { [unowned self] in
             View.init(builder: self)
         }
         .onNotRendered {
