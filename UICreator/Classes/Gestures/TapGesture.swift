@@ -32,7 +32,7 @@ public class Tap: UIGesture {
     }
 }
 
-extension UIGesture where Gesture: UITapGestureRecognizer {
+public extension UIGesture where Gesture: UITapGestureRecognizer {
     func number(ofTapsRequired number: Int) -> Self {
         (self.gesture as? Gesture)?.numberOfTapsRequired = number
         return self

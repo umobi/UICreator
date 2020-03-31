@@ -193,17 +193,26 @@ extension GesturePayload {
 }
 
 private var kGestureWrapper: UInt = 0
+private var kGestureDelegate: UInt = 0
 internal extension Gesture {
     var gestureWrapper: Mutable<GesturePayload> {
         OBJCSet(self, &kGestureWrapper) {
             .init(value: .init())
         }
     }
+
+    var gestureDelegate: GestureDelegate {
+        OBJCSet(self, &kGestureDelegate, policity: .OBJC_ASSOCIATION_RETAIN) {
+            let delegate = GestureDelegate()
+            self.gesture.delegate = delegate
+            return delegate
+        }
+    }
 }
 
 public extension UIGesture {
-    func `as`<UIGesture: UIGestureRecognizer>(_ reference: inout UIGesture!) -> Self {
-        reference = self.gesture as? UIGesture
+    func `as`<UIGesture: UIGestureRecognizer>(_ outlet: UICOutlet<UIGesture>) -> Self {
+        outlet.ref(self.gesture as? UIGesture)
         return self
     }
 
@@ -390,5 +399,161 @@ internal extension Gesture {
         @unknown default:
             payload.anyOther?.handler(sender)
         }
+    }
+}
+
+public extension Gesture {
+    func onShouldBegin(_ handler: @escaping (UIView) -> Bool) -> Self {
+        self.gestureDelegate.onShouldBegin(handler)
+        return self
+    }
+
+    func onShouldRecognizeSimultaneouslyOtherGesture(_ handler: @escaping (UIView, UIGestureRecognizer) -> Bool) -> Self {
+        self.gestureDelegate.onShouldRecognizeSimultaneouslyOtherGesture(handler)
+        return self
+    }
+
+    func onShouldRequireFailureOfOtherGesture(_ handler: @escaping (UIView, UIGestureRecognizer) -> Bool) -> Self {
+        self.gestureDelegate.onShouldRequireFailureOfOtherGesture(handler)
+        return self
+    }
+
+    func onShouldBeRequiredToFailByOtherGesture(_ handler: @escaping (UIView, UIGestureRecognizer) -> Bool) -> Self {
+        self.gestureDelegate.onShouldBeRequiredToFailByOtherGesture(handler)
+        return self
+    }
+
+    func onShouldReceiveTouch(_ handler: @escaping (UIView, UITouch) -> Bool) -> Self {
+        self.gestureDelegate.onShouldReceiveTouch(handler)
+        return self
+    }
+
+    func onShouldReceivePress(_ handler: @escaping (UIView, UIPress) -> Bool) -> Self {
+        self.gestureDelegate.onShouldReceivePress(handler)
+        return self
+    }
+
+    func onShouldReceiveEvent(_ handler: @escaping (UIView, UIEvent) -> Bool) -> Self {
+        self.gestureDelegate.onShouldReceiveEvent(handler)
+        return self
+    }
+}
+
+public class GestureDelegate: NSObject, UIGestureRecognizerDelegate {
+
+    private var shouldBeginHandler: ((UIView) -> Bool)? = nil
+    func onShouldBegin(_ handler: @escaping (UIView) -> Bool) {
+        let old = self.shouldBeginHandler
+        self.shouldBeginHandler = {
+            if old?($0) ?? false {
+                return true
+            }
+
+            return handler($0)
+        }
+    }
+
+    private var shouldRecognizeSimultaneouslyOtherGestureHandler: ((UIView, UIGestureRecognizer) -> Bool)? = nil
+    func onShouldRecognizeSimultaneouslyOtherGesture(_ handler: @escaping (UIView, UIGestureRecognizer) -> Bool) {
+        let old = self.shouldRecognizeSimultaneouslyOtherGestureHandler
+        self.shouldRecognizeSimultaneouslyOtherGestureHandler = {
+            if old?($0, $1) ?? false {
+                return true
+            }
+
+            return handler($0, $1)
+        }
+    }
+
+    private var shouldRequireFailureOfOtherGestureHandler: ((UIView, UIGestureRecognizer) -> Bool)? = nil
+    func onShouldRequireFailureOfOtherGesture(_ handler: @escaping (UIView, UIGestureRecognizer) -> Bool) {
+        let old = self.shouldRequireFailureOfOtherGestureHandler
+        self.shouldRequireFailureOfOtherGestureHandler = {
+            if old?($0, $1) ?? false {
+                return true
+            }
+
+            return handler($0, $1)
+        }
+    }
+
+    private var shouldBeRequiredToFailByOtherGesture: ((UIView, UIGestureRecognizer) -> Bool)? = nil
+    func onShouldBeRequiredToFailByOtherGesture(_ handler: @escaping (UIView, UIGestureRecognizer) -> Bool) {
+        let old = self.shouldBeRequiredToFailByOtherGesture
+        self.shouldBeRequiredToFailByOtherGesture = {
+            if old?($0, $1) ?? false {
+                return true
+            }
+
+            return handler($0, $1)
+        }
+    }
+
+    private var shouldReceiveTouchHandler: ((UIView, UITouch) -> Bool)? = nil
+    func onShouldReceiveTouch(_ handler: @escaping (UIView, UITouch) -> Bool) {
+        let old = self.shouldReceiveTouchHandler
+        self.shouldReceiveTouchHandler = {
+            if old?($0, $1) ?? false {
+                return true
+            }
+
+            return handler($0, $1)
+        }
+    }
+
+    private var shouldReceivePressHandler: ((UIView, UIPress) -> Bool)? = nil
+    func onShouldReceivePress(_ handler: @escaping (UIView, UIPress) -> Bool) {
+        let old = self.shouldReceivePressHandler
+        self.shouldReceivePressHandler = {
+            if old?($0, $1) ?? false {
+                return true
+            }
+
+            return handler($0, $1)
+        }
+    }
+
+    private var shouldReceiveEventHandler: ((UIView, UIEvent) -> Bool)? = nil
+    func onShouldReceiveEvent(_ handler: @escaping (UIView, UIEvent) -> Bool) {
+        let old = self.shouldReceiveEventHandler
+        self.shouldReceiveEventHandler = {
+            if old?($0, $1) ?? false {
+                return true
+            }
+
+            return handler($0, $1)
+        }
+    }
+
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        self.shouldBeginHandler?(gestureRecognizer.view!) ?? true
+    }
+
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        self.shouldRecognizeSimultaneouslyOtherGestureHandler?(gestureRecognizer.view!, otherGestureRecognizer) ?? false
+    }
+
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        self.shouldRecognizeSimultaneouslyOtherGestureHandler?(gestureRecognizer.view!, otherGestureRecognizer) ?? gestureRecognizer.shouldRequireFailure(of: otherGestureRecognizer)
+    }
+
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        self.shouldRequireFailureOfOtherGestureHandler?(gestureRecognizer.view!, otherGestureRecognizer) ?? gestureRecognizer.shouldBeRequiredToFail(by: otherGestureRecognizer)
+    }
+
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        self.shouldReceiveTouchHandler?(gestureRecognizer.view!, touch) ?? true
+    }
+
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive press: UIPress) -> Bool {
+        self.shouldReceivePressHandler?(gestureRecognizer.view!, press) ?? true
+    }
+
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive event: UIEvent) -> Bool {
+        if #available(iOS 13.4, tvOS 13.4, *) {
+            return self.shouldReceiveEventHandler?(gestureRecognizer.view!, event) ?? gestureRecognizer.shouldReceive(event)
+        }
+
+        return self.shouldReceiveEventHandler?(gestureRecognizer.view!, event) ?? true
     }
 }

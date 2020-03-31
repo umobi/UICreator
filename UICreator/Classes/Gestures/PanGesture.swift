@@ -33,7 +33,7 @@ public class Pan: UIGesture {
 }
 
 #if os(iOS)
-extension UIGesture where Gesture: UIPanGestureRecognizer {
+public extension UIGesture where Gesture: UIPanGestureRecognizer {
     func maximumNumber(ofTouches number: Int) -> Self {
         (self.gesture as? Gesture)?.maximumNumberOfTouches = number
         return self
