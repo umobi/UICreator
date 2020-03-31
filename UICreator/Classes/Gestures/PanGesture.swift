@@ -52,7 +52,7 @@ internal extension UIView {
     }
 }
 
-public extension UIViewCreator {
+public extension ViewCreator {
 
     func onPanMaker(_ panConfigurator: @escaping (Pan) -> Pan) -> Self {
         self.onNotRendered {

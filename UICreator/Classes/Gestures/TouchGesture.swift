@@ -103,7 +103,7 @@ public extension UIGesture where Gesture: TouchGesture {
     #endif
 }
 
-public extension UIViewCreator {
+public extension ViewCreator {
     func onTouchMaker(_ touchConfigurator: @escaping (Touch) -> Touch) -> Self {
         self.onNotRendered {
             touchConfigurator(Touch(target: $0)).add()

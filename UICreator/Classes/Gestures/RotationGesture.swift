@@ -33,7 +33,7 @@ public class Rotation: UIGesture {
     }
 }
 
-public extension UIViewCreator {
+public extension ViewCreator {
 
     func onRotationMaker(_ rotationConfigurator: @escaping (Rotation) -> Rotation) -> Self {
         self.onNotRendered {

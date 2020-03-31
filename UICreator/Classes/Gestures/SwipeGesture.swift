@@ -32,7 +32,7 @@ public class Swipe: UIGesture {
     }
 }
 
-public extension UIViewCreator {
+public extension ViewCreator {
 
     func onSwipeMaker(_ swipeConfigurator: @escaping (Swipe) -> Swipe) -> Self {
         self.onNotRendered {

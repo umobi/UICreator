@@ -33,7 +33,7 @@ public class ScreenEdgePan: UIGesture {
     }
 }
 
-public extension UIViewCreator {
+public extension ViewCreator {
     func onScreenEdgePanMaker(_ screenEdgePanConfigurator: @escaping (ScreenEdgePan) -> ScreenEdgePan) -> Self {
         self.onNotRendered {
             screenEdgePanConfigurator(ScreenEdgePan(target: $0)).add()

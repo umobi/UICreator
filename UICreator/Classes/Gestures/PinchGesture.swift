@@ -34,7 +34,7 @@ public class Pinch: UIGesture {
     }
 }
 
-public extension UIViewCreator {
+public extension ViewCreator {
 
     func onPinchMaker(_ pinchConfigurator: @escaping (Pinch) -> Pinch) -> Self {
         self.onNotRendered {

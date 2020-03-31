@@ -35,7 +35,7 @@ public class Hover: UIGesture {
     }
 }
 
-public extension UIViewCreator {
+public extension ViewCreator {
 
     @available(iOS 13.0, *)
     func onHoverMaker(_ hoverConfigurator: @escaping (Hover) -> Hover) -> Self {
