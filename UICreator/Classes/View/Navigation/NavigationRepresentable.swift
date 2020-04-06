@@ -75,6 +75,18 @@ func OBJCSet<Object>(_ index: Any, _ key: UnsafeRawPointer, policity: objc_Assoc
     return object
 }
 
+public struct NavigationModifier {
+    private weak var navigationRepresentable: NavigationRepresentable!
+
+    public init(_ navigationRepresentable: NavigationRepresentable) {
+        self.navigationRepresentable = navigationRepresentable
+    }
+
+    public var navigationController: UINavigationController! {
+        return self.navigationRepresentable.navigationController
+    }
+}
+
 private var kContentHandler: UInt = 0
 public extension NavigationRepresentable {
     internal var navigationController: UINavigationController! {
