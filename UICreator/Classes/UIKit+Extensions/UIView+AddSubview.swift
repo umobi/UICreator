@@ -22,7 +22,7 @@
 
 import Foundation
 import UIKit
-import EasyAnchor
+import ConstraintBuilder
 import UIContainer
 
 internal extension UIView {
@@ -34,10 +34,10 @@ internal extension UIView {
         let priority: UILayoutPriority = priority ?? ((self as UIView) is RootView && view is RootView ? .required :
         .init(751))
 
-        activate(
-            view.anchor
+        Constraintable.activate(
+            view.cbuild
                 .edges
-                .priority(priority.rawValue)
+                .priority(priority)
         )
     }
 }

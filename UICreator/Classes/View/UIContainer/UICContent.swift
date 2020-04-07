@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 import UIContainer
-import EasyAnchor
+import ConstraintBuilder
 
 public class _ContentView: ContentView {
 

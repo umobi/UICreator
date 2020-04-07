@@ -22,7 +22,7 @@
 
 import Foundation
 import UIContainer
-import EasyAnchor
+import ConstraintBuilder
 
 public struct UICWeakResized {
     weak var superview: UIView!
@@ -112,22 +112,22 @@ public extension UICWeakResized {
 
         if let muttable = muttable {
             if let width = self.width {
-                activate(
-                    muttable.subview.anchor
+                Constraintable.activate(
+                    muttable.subview.cbuild
                         .width
-                        .equal.to(resizableView.anchor.width)
-                        .priority(width.rawValue)
+                        .equalTo(resizableView.cbuild.width)
+                        .priority(width)
                 )
 
                 muttable.superview.autoresizingMask.insert(.flexibleWidth)
             }
 
             if let height = self.height {
-                activate(
-                    muttable.subview.anchor
+                Constraintable.activate(
+                    muttable.subview.cbuild
                         .height
-                        .equal.to(resizableView.anchor.height)
-                        .priority(height.rawValue)
+                        .equalTo(resizableView.cbuild.height)
+                        .priority(height)
                 )
 
                 muttable.superview.autoresizingMask.insert(.flexibleHeight)

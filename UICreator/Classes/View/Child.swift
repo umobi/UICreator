@@ -22,7 +22,7 @@
 
 import Foundation
 import UIKit
-import EasyAnchor
+import ConstraintBuilder
 import UIContainer
 
 public class ZStackView: UIView {
@@ -79,7 +79,7 @@ public class UICZStack: UIViewCreator {
         }
         .onNotRendered { view in
             contents.forEach {
-                view.add(priority: .init(UILayoutPriority.fittingSizeLevel.rawValue), $0.releaseUIView())
+                view.add(priority: .fittingSizeLevel, $0.releaseUIView())
             }
         }
     }

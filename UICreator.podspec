@@ -36,7 +36,7 @@ UICreator is a replacement for storyboard and xib files. It directly communicate
   s.source_files = 'UICreator/Classes/**/*'
 
   s.dependency 'UIContainer', '~> 1.2.0-beta.5'
-  s.dependency 'EasyAnchor', '~> 3.0.0'
+  s.dependency 'ConstraintBuilder'
   # s.resource_bundles = {
   #   'UICreator' => ['UICreator/Assets/*.png']
   # }

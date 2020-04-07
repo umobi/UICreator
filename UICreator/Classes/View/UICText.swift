@@ -22,7 +22,7 @@
 
 import Foundation
 import UIKit
-import EasyAnchor
+import ConstraintBuilder
 
 public class _TextField: UITextField {
     override public func willMove(toSuperview newSuperview: UIView?) {
@@ -263,12 +263,12 @@ public extension UIViewCreator where View: UITextField {
                     return
                 }
 
-                activate(
-                    $0.anchor
+                Constraintable.activate(
+                    $0.cbuild
                         .centerY
-                        .equal.to(view.anchor.centerY),
+                        .equalTo(view.cbuild.centerY),
 
-                    $0.anchor
+                    $0.cbuild
                         .leading
                 )
 
@@ -295,12 +295,12 @@ public extension UIViewCreator where View: UITextField {
                     return
                 }
 
-                activate(
-                    $0.anchor
+                Constraintable.activate(
+                    $0.cbuild
                         .centerY
-                        .equal.to(view.anchor.centerY),
+                        .equalTo(view.cbuild.centerY),
 
-                    $0.anchor
+                    $0.cbuild
                         .trailing
                 )
 

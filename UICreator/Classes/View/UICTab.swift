@@ -22,7 +22,7 @@
 
 import Foundation
 import UIKit
-import EasyAnchor
+import ConstraintBuilder
 import UIContainer
 
 public class UICTabContainer: UIView {
@@ -73,8 +73,8 @@ public class UICTabContainer: UIView {
             })
 
             AddSubview(self).addSubview(container)
-            activate(
-                container.anchor
+            Constraintable.activate(
+                container.cbuild
                     .edges
             )
             return container

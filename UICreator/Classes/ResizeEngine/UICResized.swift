@@ -22,7 +22,7 @@
 
 import Foundation
 import UIContainer
-import EasyAnchor
+import ConstraintBuilder
 
 public struct UICResized {
 
@@ -67,10 +67,10 @@ public struct UICResized {
         self.superview.translatesAutoresizingMaskIntoConstraints = true
         self.superview.autoresizingMask = [.flexibleHeight, .flexibleWidth]
 
-        activate(
-            subview.anchor
+        Constraintable.activate(
+            subview.cbuild
                 .center
-                .equal.to(self.superview.anchor.center)
+                .equalTo(self.superview.cbuild.center)
         )
 
         self.addHandler?(self.superview)

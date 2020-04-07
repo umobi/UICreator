@@ -22,81 +22,81 @@
 
 import Foundation
 import UIKit
-import EasyAnchor
+import ConstraintBuilder
 
-extension Anchor {
-    class ConstraintFinalize {
-        private var constraint: NSLayoutConstraint?
-        private var anchor: Anchor
-
-        init(original: Anchor, _ constraint: NSLayoutConstraint) {
-            self.constraint = constraint
-            self.anchor = original
-        }
-
-        init(_ anchor: Anchor) {
-            self.constraint = nil
-            self.anchor = anchor
-        }
-
-        private func activateIfNeeded() {
-            if let constraint = self.constraint {
-                if !constraint.isActive {
-                    NSLayoutConstraint.activate([constraint])
-                }
-            } else {
-                activate(anchor)
-            }
-        }
-
-        @discardableResult
-        func constant(_ constant: CGFloat) -> Self {
-            self.constraint?.constant = constant
-            self.anchor = self.anchor.constant(constant)
-            return self
-        }
-
-        private func desactivate() {
-            NSLayoutConstraint.deactivate([self.constraint].compactMap { $0 })
-            self.constraint = nil
-        }
-
-        @discardableResult
-        func multiplier(_ multiplier: CGFloat) -> Self {
-            self.desactivate()
-            self.anchor = self.anchor.multiplier(multiplier)
-            return self
-        }
-
-        @discardableResult
-        func priority(_ priority: UILayoutPriority) -> Self {
-            self.constraint?.priority = priority
-            self.anchor = self.anchor.priority(priority.rawValue)
-            return self
-        }
-
-        @discardableResult
-        func priority(_ priority: Float) -> Self {
-            if #available(iOS 13, tvOS 13, *) {
-                self.constraint?.priority = .init(priority)
-            } else {
-                self.desactivate()
-            }
-            self.anchor = self.anchor.priority(priority)
-            return self
-        }
-
-        deinit {
-            self.activateIfNeeded()
-        }
-    }
-
-    func orCreate() -> ConstraintFinalize {
-        if let constraint = self.find().first {
-            let finalize = ConstraintFinalize(original: self, constraint)
-            return finalize
-        }
-
-        return .init(self)
-    }
-}
+//extension Anchor {
+//    class ConstraintFinalize {
+//        private var constraint: NSLayoutConstraint?
+//        private var anchor: Anchor
+//
+//        init(original: Anchor, _ constraint: NSLayoutConstraint) {
+//            self.constraint = constraint
+//            self.cbuild = original
+//        }
+//
+//        init(_ anchor: Anchor) {
+//            self.constraint = nil
+//            self.cbuild = anchor
+//        }
+//
+//        private func activateIfNeeded() {
+//            if let constraint = self.constraint {
+//                if !constraint.isActive {
+//                    NSLayoutConstraint.activate([constraint])
+//                }
+//            } else {
+//                activate(anchor)
+//            }
+//        }
+//
+//        @discardableResult
+//        func constant(_ constant: CGFloat) -> Self {
+//            self.constraint?.constant = constant
+//            self.cbuild = self.cbuild.constant(constant)
+//            return self
+//        }
+//
+//        private func desactivate() {
+//            NSLayoutConstraint.deactivate([self.constraint].compactMap { $0 })
+//            self.constraint = nil
+//        }
+//
+//        @discardableResult
+//        func multiplier(_ multiplier: CGFloat) -> Self {
+//            self.desactivate()
+//            self.cbuild = self.cbuild.multiplier(multiplier)
+//            return self
+//        }
+//
+//        @discardableResult
+//        func priority(_ priority: UILayoutPriority) -> Self {
+//            self.constraint?.priority = priority
+//            self.cbuild = self.cbuild.priority(priority)
+//            return self
+//        }
+//
+//        @discardableResult
+//        func priority(_ priority: Float) -> Self {
+//            if #available(iOS 13, tvOS 13, *) {
+//                self.constraint?.priority = .init(priority)
+//            } else {
+//                self.desactivate()
+//            }
+//            self.cbuild = self.cbuild.priority(priority)
+//            return self
+//        }
+//
+//        deinit {
+//            self.activateIfNeeded()
+//        }
+//    }
+//
+//    func orCreate() -> ConstraintFinalize {
+//        if let constraint = self.find().first {
+//            let finalize = ConstraintFinalize(original: self, constraint)
+//            return finalize
+//        }
+//
+//        return .init(self)
+//    }
+//}

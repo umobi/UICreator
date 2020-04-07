@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 import UIContainer
-import EasyAnchor
+import ConstraintBuilder
 
 public class UICPageViewController: UIPageViewController {
     private var queuedViewControllers: [UIViewController]!
@@ -186,7 +186,7 @@ public class UICPageContainer: UIView {
             })
 
             AddSubview(self).addSubview(container)
-            activate(container.anchor.edges)
+            Constraintable.activate(container.cbuild.edges)
             return container
         }()
         RenderManager(self)?.didMoveToWindow()
@@ -236,108 +236,116 @@ public class UICPageContainer: UIView {
         case .topRespectedToSafeArea:
             stackView.axis = .vertical
 
-            activate(
-                stackView.anchor
+            Constraintable.activate(
+                stackView.cbuild
                     .leading
                     .trailing,
 
-                stackView.anchor
+                stackView.cbuild
                     .bottom
-                    .greaterThanOrEqual
+                    .greaterThanOrEqualTo(0)
             )
 
             if #available(iOS 11.0, tvOS 11, *) {
-                activate(
-                    stackView.anchor
+                Constraintable.activate(
+                    stackView.cbuild
                         .top
-                        .equal.to(self.safeAreaLayoutGuide.anchor.topMargin)
+                        .equalTo(self.safeAreaLayoutGuide.cbuild.topMargin)
                 )
             } else {
-                activate(
-                    stackView.anchor
+                Constraintable.activate(
+                    stackView.cbuild
                         .top
-                        .equal.to(self.anchor.topMargin)
+                        .equalTo(self.cbuild.topMargin)
                 )
             }
         case .bottomRespectedToSafeArea:
             stackView.axis = .vertical
 
-            activate(
-                stackView.anchor
+            Constraintable.activate(
+                stackView.cbuild
                     .leading
                     .trailing,
 
-                stackView.anchor
+                stackView.cbuild
                     .top
-                    .greaterThanOrEqual
+                    .greaterThanOrEqualTo(0)
             )
 
             if #available(iOS 11.0, tvOS 11, *) {
-                activate(
-                    stackView.anchor
+                Constraintable.activate(
+                    stackView.cbuild
                         .bottom
-                        .equal.to(self.safeAreaLayoutGuide.anchor.bottomMargin)
+                        .equalTo(self.safeAreaLayoutGuide.cbuild.bottomMargin)
                 )
             } else {
-                activate(
-                    stackView.anchor
+                Constraintable.activate(
+                    stackView.cbuild
                         .bottom
-                        .equal.to(self.anchor.bottomMargin)
+                        .equalTo(self.cbuild.bottomMargin)
                 )
             }
 
         case .left:
             stackView.axis = .horizontal
 
-            activate(
-                stackView.anchor
+            Constraintable.activate(
+                stackView.cbuild
                     .bottom
-                    .leading
                     .top,
 
-                stackView.anchor
+                stackView.cbuild
+                    .leading,
+
+                stackView.cbuild
                     .trailing
-                    .greaterThanOrEqual
+                    .greaterThanOrEqualTo(0)
             )
         case .right:
             stackView.axis = .horizontal
 
-            activate(
-                stackView.anchor
+            Constraintable.activate(
+                stackView.cbuild
                     .bottom
-                    .trailing
                     .top,
 
-                stackView.anchor
+                stackView.cbuild
+                    .trailing,
+
+                stackView.cbuild
                     .leading
-                    .greaterThanOrEqual
+                    .greaterThanOrEqualTo(0)
             )
         case .top:
             stackView.axis = .vertical
 
-            activate(
-                stackView.anchor
-                    .leading
-                    .trailing
+            Constraintable.activate(
+                stackView.cbuild
+                    .bottom
                     .top,
 
-                stackView.anchor
+                stackView.cbuild
+                    .trailing,
+
+                stackView.cbuild
                     .bottom
-                    .greaterThanOrEqual
+                    .greaterThanOrEqualTo(0)
             )
 
         case .bottom:
             stackView.axis = .vertical
 
-            activate(
-                stackView.anchor
-                    .leading
-                    .trailing
+            Constraintable.activate(
+                stackView.cbuild
                     .bottom,
 
-                stackView.anchor
+                stackView.cbuild
+                    .leading
+                    .trailing,
+
+                stackView.cbuild
                     .top
-                    .greaterThanOrEqual
+                    .greaterThanOrEqualTo(0)
             )
         }
     }

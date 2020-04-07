@@ -22,15 +22,15 @@
 
 import Foundation
 import UIContainer
-import EasyAnchor
+import ConstraintBuilder
 
 public extension ViewControllerType where Self: ViewCreator {
     var content: ViewControllerMaker {
         return .dynamic { [unowned self] in
             AddSubview($0.view)?.addSubview(self.releaseUIView())
 
-            activate(
-                self.uiView.anchor
+            Constraintable.activate(
+                self.uiView.cbuild
                     .edges
             )
 
