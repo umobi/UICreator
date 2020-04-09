@@ -25,7 +25,7 @@ import UIKit
 
 extension _CollectionView: UICollectionViewDelegate {
     var size: CGSize {
-        return .init(width: self.frame.size.width - (self.contentInset.top + self.contentInset.bottom), height: self.frame.height - (self.contentInset.left + self.contentInset.right))
+        return .init(width: self.frame.size.width - (self.contentInset.left + self.contentInset.right), height: self.frame.height - (self.contentInset.top + self.contentInset.bottom))
     }
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
