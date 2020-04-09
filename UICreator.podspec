@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'UICreator'
-  s.version          = '1.0.0-alpha.8'
+  s.version          = '1.0.0-alpha.9'
   s.summary          = 'Create UI using declarative components'
 
 # This description is used to generate tags and improve search results.
@@ -35,8 +35,8 @@ UICreator is a replacement for storyboard and xib files. It directly communicate
 
   s.source_files = 'UICreator/Classes/**/*'
 
-  s.dependency 'UIContainer', '~> 1.2.0-beta.5'
-  s.dependency 'ConstraintBuilder'
+  s.dependency 'UIContainer', '~> 1.2.0-beta.6'
+  s.dependency 'ConstraintBuilder', '1.0.0'
   # s.resource_bundles = {
   #   'UICreator' => ['UICreator/Assets/*.png']
   # }
