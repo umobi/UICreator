@@ -29,6 +29,7 @@
 
 /* Begin PBXFileReference section */
 		07B7921DE8D0484472AEF39D /* Pods-UICreator_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UICreator_Example.debug.xcconfig"; path = "Target Support Files/Pods-UICreator_Example/Pods-UICreator_Example.debug.xcconfig"; sourceTree = "<group>"; };
+		0CA9F0AE2440AF69006F6902 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Package.swift; path = ../Package.swift; sourceTree = "<group>"; };
 		0EF045A7673A3832B20A1C47 /* Pods-UICreator_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UICreator_Tests.release.xcconfig"; path = "Target Support Files/Pods-UICreator_Tests/Pods-UICreator_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		2E708FA524FD0E3F98B683B8 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		3BE4193A87455EB1A9079457 /* Pods-UICreator_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UICreator_Example.release.xcconfig"; path = "Target Support Files/Pods-UICreator_Example/Pods-UICreator_Example.release.xcconfig"; sourceTree = "<group>"; };
@@ -72,6 +73,7 @@
 		607FACC71AFB9204008FA782 = {
 			isa = PBXGroup;
 			children = (
+				0CA9F0AE2440AF69006F6902 /* Package.swift */,
 				607FACF51AFB993E008FA782 /* Podspec Metadata */,
 				607FACD21AFB9204008FA782 /* Example for UICreator */,
 				607FACE81AFB9204008FA782 /* Tests */,

@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'UICreator'
   s.version          = '1.0.0-alpha.9'
-  s.summary          = 'Create UI using declarative components'
+  s.summary          = 'UICreator use declarative programming to create view interface using UIKit by Apple'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -33,10 +33,10 @@ UICreator is a replacement for storyboard and xib files. It directly communicate
   s.tvos.deployment_target = '10.0'
   s.swift_version = '5.1'
 
-  s.source_files = 'UICreator/Classes/**/*'
+  s.source_files = 'Sources/UICreator/Classes/**/*'
 
-  s.dependency 'UIContainer', '~> 1.2.0-beta.6'
-  s.dependency 'ConstraintBuilder', '1.0.0'
+  s.dependency 'UIContainer', '~> 1.2.0-beta.9'
+  s.dependency 'ConstraintBuilder', '1.0.2'
   # s.resource_bundles = {
   #   'UICreator' => ['UICreator/Assets/*.png']
   # }
