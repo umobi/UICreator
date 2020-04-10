@@ -21,6 +21,7 @@
 //
 
 import Foundation
+import UIKit
 
 public class _ImageView: UIImageView {
 
