@@ -27,6 +27,7 @@ public protocol ViewRender: UIView {
     func onAppear(_ handler: @escaping (UIView) -> Void) -> Self
     func onDisappear(_ handler: @escaping (UIView) -> Void) -> Self
     func onLayout(_ handler: @escaping (UIView) -> Void) -> Self
+    func onTrait(_ handler: @escaping (UIView) -> Void) -> Self
 }
 
 internal extension ViewRender {
@@ -83,8 +84,8 @@ private extension UIView {
     func appendAppear(_ handler: @escaping (UIView) -> Void) -> Self {
         let allAppear = self.appearHandler
         return self.appear {
-            handler($0)
             allAppear?.commit(in: $0)
+            handler($0)
         }
     }
 
@@ -92,8 +93,8 @@ private extension UIView {
     func appendDisappear(_ handler: @escaping (UIView) -> Void) -> Self {
         let allDisappear = self.disappearHandler
         return self.disappear {
-            handler($0)
             allDisappear?.commit(in: $0)
+            handler($0)
         }
     }
 }
@@ -107,8 +108,23 @@ private extension UIView {
     func appendLayout(_ handler: @escaping (UIView) -> Void) -> Self {
         let allLayout = self.layoutHandler
         return self.layout {
-            handler($0)
             allLayout?.commit(in: $0)
+            handler($0)
+        }
+    }
+}
+
+private extension UIView {
+    private func trait(_ handler: @escaping (UIView) -> Void) -> Self {
+        self.traitHandler = .init(handler)
+        return self
+    }
+
+    func appendTrait(_ handler: @escaping (UIView) -> Void) -> Self {
+        let allTrait = self.traitHandler
+        return self.trait {
+            allTrait?.commit(in: $0)
+            handler($0)
         }
     }
 }
@@ -116,6 +132,37 @@ private extension UIView {
 extension UIView {
     func commitLayout() {
         self.layoutHandler?.commit(in: self)
+    }
+
+    func commitTrait() {
+        self.traitHandler?.commit(in: self)
+    }
+}
+
+private extension UIView {
+    private static func _recursiveToBottom(in view: UIView, visitedRoot: Bool = false, guard guardCheckHandler: @escaping (UIView) -> Bool, do doHandler: @escaping (UIView) -> Void) {
+        guard !visitedRoot || view.viewCreator == nil else {
+            return
+        }
+
+        guard guardCheckHandler(view) else {
+            return
+        }
+
+        let visitedRoot = !visitedRoot || view.viewCreator != nil
+        view.subviews.forEach {
+            self._recursiveToBottom(in: $0, visitedRoot: visitedRoot, guard: guardCheckHandler, do: doHandler)
+        }
+
+        doHandler(view)
+    }
+
+    static func recursiveToBottom(in view: UIView, guard guardCheckHandler: @escaping (UIView) -> Bool, do doHandler: @escaping (UIView) -> Void) {
+        self._recursiveToBottom(in: view, guard: guardCheckHandler, do: doHandler)
+    }
+
+    static func recursiveToBottom(in view: UIView, do doHandler: @escaping (UIView) -> Void) {
+        self._recursiveToBottom(in: view, guard: { _ in true }, do: doHandler)
     }
 }
 
@@ -129,81 +176,84 @@ private extension UIView {
         self.disappearHandler?.commit(in: self)
     }
 
-    func _recursiveAppear(_ visitedRoot: Bool = false) {
-        guard !visitedRoot || self.viewCreator == nil else {
-            return
-        }
-
-        guard self.appearState != .appeared else {
-            return
-        }
-
-        let visitedRoot = !visitedRoot || self.viewCreator != nil
-        self.subviews.forEach {
-            $0._recursiveAppear(visitedRoot)
-        }
-
-        self.appearState = .appeared
-        self.commitAppear()
+    func notifyAppearedState() {
+        UIView.recursiveToBottom(
+            in: self,
+            guard: {
+                $0.appearState != .appeared
+            }, do: {
+                $0.appearState = .appeared
+                $0.commitAppear()
+            })
     }
 
-    func _recursiveDisappear(_ visitedRoot: Bool = false) {
-        guard !visitedRoot || self.viewCreator == nil else {
+    func notifyDisappearedState() {
+        UIView.recursiveToBottom(
+            in: self,
+            guard: {
+                $0.appearState == .appeared
+            }, do: {
+                $0.appearState = .disappeared
+                $0.commitAppear()
+            })
+    }
+}
+
+private extension UIView {
+    func notifyLayout() {
+        UIView.recursiveToBottom(
+            in: self,
+            do: {
+                $0.commitLayout()
+            })
+    }
+
+    func notifyTrait() {
+        UIView.recursiveToBottom(
+            in: self,
+            do: {
+                $0.commitTrait()
+            })
+    }
+}
+
+extension ViewCreator {
+    func setNeedsCommit(commit handler: @escaping (UIView) -> Void) {
+        if let uiView = self.uiView {
+            handler(uiView)
             return
         }
 
-        guard self.appearState == .appeared else {
-            return
+        self.onInTheScene {
+            handler($0)
         }
-
-        let visitedRoot = !visitedRoot || self.viewCreator != nil
-        self.subviews.forEach {
-            $0._recursiveDisappear(visitedRoot)
-        }
-
-        self.appearState = .disappeared
-        self.commitDisappear()
     }
 }
 
 extension ViewCreator {
     func commitAppear() {
-        self.onInTheScene {
-            $0._recursiveAppear()
+        self.setNeedsCommit {
+            $0.notifyAppearedState()
         }
     }
 
     func commitDisappear() {
-        self.onInTheScene {
-            $0._recursiveDisappear()
+        self.setNeedsCommit {
+            $0.notifyDisappearedState()
         }
     }
 }
 
-private extension UIView {
-    func _recursiveLayout(_ visitedRoot: Bool = false) {
-        guard !visitedRoot || self.viewCreator == nil else {
-            return
-        }
-
-        let visitedRoot = !visitedRoot || self.viewCreator != nil
-
-        self.subviews.forEach {
-            $0._recursiveLayout(visitedRoot)
-        }
-
-        self.commitLayout()
-    }
-}
 extension ViewCreator {
     func commitLayout() {
-        if let uiView = self.uiView {
-            uiView._recursiveLayout()
-            return
+        self.setNeedsCommit {
+            $0.notifyLayout()
         }
-        
-        self.onInTheScene {
-            $0._recursiveLayout()
+    }
+
+    func commitTrait() {
+        self.setNeedsCommit {
+            $0.notifyTrait()
         }
     }
 }
@@ -241,6 +291,11 @@ extension UIView: ViewRender {
         }
 
         return self
+    }
+
+    @discardableResult
+    public func onTrait(_ handler: @escaping (UIView) -> Void) -> Self {
+        return self.appendTrait(handler)
     }
 }
 

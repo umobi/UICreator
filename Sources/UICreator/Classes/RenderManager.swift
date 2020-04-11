@@ -151,6 +151,10 @@ extension RenderManager {
         self.frame(manager.uiView.frame)
     }
 
+    func traitDidChange() {
+        self.manager.commitTrait()
+    }
+
     func frame(_ rect: CGRect) {
         guard manager.uiView.window != nil, !manager.uiView.isHidden else {
             return

@@ -60,6 +60,11 @@ public class UICActivityIndicatorView: UIActivityIndicatorView {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
     }
+
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
+    }
 }
 
 public class UICActivity: UIViewCreator {
@@ -85,6 +90,37 @@ public extension UIViewCreator where View: UIActivityIndicatorView {
     func hidesWhenStopped(_ flag: Bool) -> Self {
         self.onNotRendered {
             ($0 as? View)?.hidesWhenStopped = flag
+        }
+    }
+}
+
+public extension UIViewCreator where View: UIActivityIndicatorView {
+    func isLoading(_ isLoading: Value<Bool>) -> Self {
+        let relay = isLoading.asRelay
+
+        return self.onNotRendered { [relay] view in
+            weak var view = view
+            relay.sync {
+                if $0 {
+                    (view as? View)?.startAnimating()
+                    return
+                }
+
+                (view as? View)?.stopAnimating()
+            }
+        }
+    }
+}
+
+public extension UIViewCreator where View: UIActivityIndicatorView {
+    func color(_ value: Value<UIColor>) -> Self {
+        let relay = value.asRelay
+
+        return self.onNotRendered { [relay] view in
+            weak var view = view
+            relay.sync {
+                (view as? View)?.color = $0
+            }
         }
     }
 }

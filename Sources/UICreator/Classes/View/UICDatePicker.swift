@@ -61,6 +61,11 @@ public class _DatePicker: UIDatePicker {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
     }
+
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
+    }
 }
 
 public class UICDatePicker: UIViewCreator, Control {
@@ -130,6 +135,76 @@ public extension UIViewCreator where View: UIDatePicker {
 public extension UIViewCreator where Self: Control, View: UIDatePicker {
     func onValueChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         return self.onEvent(.valueChanged, handler)
+    }
+}
+
+public extension UIViewCreator where Self: Control, View: UIDatePicker {
+    func selectedDate(_ value: Value<Date>) -> Self {
+        self.onValueChanged {
+            guard let date = ($0 as? View)?.date else {
+                return
+            }
+
+            value.wrappedValue = date
+        }.onInTheScene {
+            weak var datePicker = $0 as? View
+
+            value.sync {
+                datePicker?.setDate($0, animated: true)
+            }
+        }
+    }
+
+    func selectedTime(_ value: Value<TimeInterval>) -> Self {
+        self.onValueChanged {
+            guard let time = ($0 as? View)?.countDownDuration else {
+                return
+            }
+
+            value.wrappedValue = time
+        }.onInTheScene {
+            weak var datePicker = $0 as? View
+
+            value.sync {
+                datePicker?.countDownDuration = $0
+            }
+        }
+    }
+
+    func maximumDate(_ value: Value<Date?>) -> Self {
+        self.onInTheScene {
+            weak var view = $0 as? View
+            value.sync {
+                view?.maximumDate = $0
+            }
+        }
+    }
+
+    func minimumDate(_ value: Value<Date?>) -> Self {
+        self.onInTheScene {
+            weak var view = $0 as? View
+            value.sync {
+                view?.minimumDate = $0
+            }
+        }
+    }
+
+    func maximumDate(_ value: Value<Date>) -> Self {
+        self.onInTheScene {
+            weak var view = $0 as? View
+            value.sync {
+                view?.maximumDate = $0
+            }
+        }
+    }
+
+    func minimumDate(_ value: Value<Date>) -> Self {
+        self.onInTheScene {
+            weak var view = $0 as? View
+            value.sync {
+                view?.minimumDate = $0
+            }
+        }
     }
 }
 

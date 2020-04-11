@@ -60,6 +60,11 @@ public class _Label: UILabel {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
     }
+
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
+    }
 }
 
 public class UICLabel: UIViewCreator, TextElement {
@@ -111,7 +116,7 @@ public extension TextElement where View: UILabel {
         }
     }
 
-    func text(color: UIColor?) -> Self {
+    func textColor(_ color: UIColor?) -> Self {
         self.onNotRendered {
             ($0 as? View)?.textColor = color
         }
@@ -124,20 +129,20 @@ public extension TextElement where View: UILabel {
         }
     }
 
-    func text(scale: CGFloat) -> Self {
+    func textScale(_ scale: CGFloat) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.minimumScaleFactor = scale
             ($0 as? View)?.adjustsFontSizeToFitWidth = scale != 1
         }
     }
 
-    func text(alignment: NSTextAlignment) -> Self {
+    func textAlignment(_ alignment: NSTextAlignment) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.textAlignment = alignment
         }
     }
 
-    func number(ofLines number: Int) -> Self {
+    func numberOfLines(_ number: Int) -> Self {
         self.onNotRendered {
             ($0 as? View)?.numberOfLines = number
         }
@@ -145,15 +150,33 @@ public extension TextElement where View: UILabel {
 }
 
 public extension TextElement where View: UILabel {
-    func adjustsFont(forContentSizeCategory flag: Bool) -> Self {
+    func adjustsFontForContentSizeCategory(_ flag: Bool) -> Self {
         self.onNotRendered {
             ($0 as? View)?.adjustsFontForContentSizeCategory = flag
         }
     }
 
-    func adjustsFontSize(toFitWidth flag: Bool) -> Self {
+    func adjustsFontSizeToFitWidth(_ flag: Bool) -> Self {
         self.onNotRendered {
             ($0 as? View)?.adjustsFontSizeToFitWidth = flag
+        }
+    }
+}
+
+public extension UIViewCreator where View: UILabel, Self: TextElement {
+    init(_ attributed: Value<NSAttributedString?>) {
+        self.init(NSAttributedString?(nil))
+
+        attributed.sync { [weak self] in
+            _ = self?.text($0)
+        }
+    }
+}
+
+public extension UIViewCreator where View: UILabel {
+    func lineBreakMode(_ mode: NSLineBreakMode) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.lineBreakMode = mode
         }
     }
 }

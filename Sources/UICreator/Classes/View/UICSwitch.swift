@@ -61,6 +61,11 @@ public class _Switch: UISwitch {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
     }
+
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
+    }
 }
 
 public class UICSwitch: UIViewCreator, Control {
@@ -117,3 +122,34 @@ public extension UIViewCreator where Self: Control, View: UISwitch {
 }
 #endif
 
+public extension UICSwitch {
+    convenience init(_ value: Value<Bool>) {
+        self.init(on: value.wrappedValue)
+
+        let relay = value.asRelay
+        var isLocked = false
+
+        _ = self.onNotRendered { [relay] in
+            weak var view = $0 as? View
+
+            relay.sync {
+                guard !isLocked else {
+                    return
+                }
+
+                isLocked = true
+                view?.setOn($0, animated: true)
+                isLocked = false
+            }
+        }
+        .onValueChanged {
+            guard !isLocked else {
+                return
+            }
+
+            isLocked = true
+            value.wrappedValue = ($0 as? View)?.isOn ?? false
+            isLocked = false
+        }
+    }
+}

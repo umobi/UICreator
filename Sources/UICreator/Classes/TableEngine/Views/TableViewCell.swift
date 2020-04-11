@@ -73,6 +73,11 @@ internal class TableViewCell: UITableViewCell, ReusableView {
         RenderManager(self)?.layoutSubviews()
     }
 
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
+    }
+
     func prepareCell(_ cell: UICCell) {
         self.reuseCell(cell)
 

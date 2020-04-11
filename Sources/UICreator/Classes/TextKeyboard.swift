@@ -25,28 +25,28 @@ import UIKit
 
 /// `TextKeyboard` has the same problem as *TextElement* and may be removed in the next released versions.
 public protocol TextKeyboard: UIViewCreator {
-    func autocapitalization(type: UITextAutocapitalizationType) -> Self
-    func autocorrection(type: UITextAutocorrectionType) -> Self
+    func autocapitalizationType(_ type: UITextAutocapitalizationType) -> Self
+    func autocorrectionType(_ type: UITextAutocorrectionType) -> Self
 
-    func keyboard(type: UIKeyboardType) -> Self
-    func keyboard(appearance: UIKeyboardAppearance) -> Self
-    func returnKey(type: UIReturnKeyType) -> Self
+    func keyboardType(_ type: UIKeyboardType) -> Self
+    func keyboardAppearance(_ appearance: UIKeyboardAppearance) -> Self
+    func returnKeyType(_ type: UIReturnKeyType) -> Self
 
-    func secureText(_ flag: Bool) -> Self
+    func isSecureTextEntry(_ flag: Bool) -> Self
     @available(iOS 12, tvOS 12, *)
     func passwordRules(_ passwordRules: UITextInputPasswordRules?) -> Self
 
     @available(iOS 11, tvOS 11, *)
-    func smartDashes(type: UITextSmartDashesType) -> Self
+    func smartDashesType(_ type: UITextSmartDashesType) -> Self
     @available(iOS 11, tvOS 11, *)
-    func smartQuotes(type: UITextSmartQuotesType) -> Self
+    func smartQuotesType(_ type: UITextSmartQuotesType) -> Self
     @available(iOS 11, tvOS 11, *)
-    func smartInsertDelete(type: UITextSmartInsertDeleteType) -> Self
+    func smartInsertDeleteType(_ type: UITextSmartInsertDeleteType) -> Self
 
-    func textContent(type: UITextContentType) -> Self
+    func textContentType(_ type: UITextContentType) -> Self
     func inputAccessoryView(content: @escaping () -> ViewCreator) -> Self
     func inputView(content: @escaping () -> ViewCreator) -> Self
-    func input(delegate: UITextInputDelegate) -> Self
+    func inputDelegate(_ delegate: UITextInputDelegate) -> Self
 
-    func typing(attributes: [NSAttributedString.Key : Any]?) -> Self
+    func typingAttributes(_ attributes: [NSAttributedString.Key : Any]?) -> Self
 }

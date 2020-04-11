@@ -29,28 +29,31 @@ private struct UIViewPayload {
     let viewCreator: Mutable<MEMOpaque> = .init(value: .nil)
     let appearState: Mutable<AppearState> = .init(value: .unset)
 
-    let appearMethods: Mutable<UIViewAppearHandler> = .init(value: .init())
+    let viewMethods: Mutable<UIViewMethods> = .init(value: .init())
     let tabBarItem: Mutable<UITabBarItem?> = .init(value: nil)
 }
 
-struct UIViewAppearHandler: MutableEditable {
+struct UIViewMethods: MutableEditable {
     let appearHandler: UIHandler<UIView>?
     let disappearHandler: UIHandler<UIView>?
     let layoutHandler: UIHandler<UIView>?
+    let traitHandler: UIHandler<UIView>?
 
     init() {
         self.appearHandler = nil
         self.disappearHandler = nil
         self.layoutHandler = nil
+        self.traitHandler = nil
     }
 
-    private init(_ original: UIViewAppearHandler, editable: Editable) {
+    private init(_ original: UIViewMethods, editable: Editable) {
         self.appearHandler = editable.appearHandler
         self.disappearHandler = editable.disappearHandler
         self.layoutHandler = editable.layoutHandler
+        self.traitHandler = editable.traitHandler
     }
 
-    func edit(_ edit: @escaping (Editable) -> Void) -> UIViewAppearHandler {
+    func edit(_ edit: @escaping (Editable) -> Void) -> Self {
         let editable = Editable(self)
         edit(editable)
         return .init(self, editable: editable)
@@ -60,11 +63,13 @@ struct UIViewAppearHandler: MutableEditable {
         var appearHandler: UIHandler<UIView>?
         var disappearHandler: UIHandler<UIView>?
         var layoutHandler: UIHandler<UIView>?
+        var traitHandler: UIHandler<UIView>?
 
-        init(_ methods: UIViewAppearHandler) {
+        init(_ methods: UIViewMethods) {
             self.appearHandler = methods.appearHandler
             self.disappearHandler = methods.disappearHandler
             self.layoutHandler = methods.layoutHandler
+            self.traitHandler = methods.traitHandler
         }
     }
 }
@@ -77,8 +82,8 @@ extension UIView {
         }
     }
 
-    private var appearMethods: Mutable<UIViewAppearHandler> {
-        self.payload.appearMethods
+    private var viewMethods: Mutable<UIViewMethods> {
+        self.payload.viewMethods
     }
 
     var opaqueViewCreator: MEMOpaque {
@@ -97,28 +102,37 @@ extension UIView {
     }
 
     var appearHandler: UIHandler<UIView>? {
-        get { self.appearMethods.value.appearHandler }
+        get { self.viewMethods.value.appearHandler }
         set {
-            self.appearMethods.update {
+            self.viewMethods.update {
                 $0.appearHandler = newValue
             }
         }
     }
 
     var disappearHandler: UIHandler<UIView>? {
-        get { self.appearMethods.value.disappearHandler }
+        get { self.viewMethods.value.disappearHandler }
         set {
-            self.appearMethods.update {
+            self.viewMethods.update {
                 $0.disappearHandler = newValue
             }
         }
     }
 
     var layoutHandler: UIHandler<UIView>? {
-        get { self.appearMethods.value.layoutHandler }
+        get { self.viewMethods.value.layoutHandler }
         set {
-            self.appearMethods.update {
+            self.viewMethods.update {
                 $0.layoutHandler = newValue
+            }
+        }
+    }
+
+    var traitHandler: UIHandler<UIView>? {
+        get { self.viewMethods.value.traitHandler }
+        set {
+            self.viewMethods.update {
+                $0.traitHandler = newValue
             }
         }
     }

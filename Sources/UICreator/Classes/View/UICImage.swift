@@ -61,6 +61,11 @@ public class _ImageView: UIImageView {
         RenderManager(self)?.layoutSubviews()
     }
 
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
+    }
+
     override public func removeConstraint(_ constraint: NSLayoutConstraint) {
         super.removeConstraint(constraint)
     }
@@ -167,3 +172,17 @@ public extension UIViewCreator where View: UIImageView {
     }
 }
 #endif
+
+public extension UICImage {
+    convenience init(image: Value<UIImage?>, placeholder: UIImage? = nil) {
+        self.init(image: nil)
+
+        let relay = image.asRelay
+        self.onNotRendered { [relay] view in
+            weak var view = view as? View
+            relay.sync {
+                view?.image = $0 ?? placeholder
+            }
+        }
+    }
+}

@@ -61,6 +61,11 @@ public class _RounderView: RounderView {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
     }
+
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
+    }
 }
 
 public class UICRounder: UIViewCreator {

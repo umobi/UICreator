@@ -28,20 +28,20 @@ public protocol TextElement: UIViewCreator {
     func text(_ string: String?) -> Self
     func text(_ attributedText: NSAttributedString?) -> Self
 
-    func text(color: UIColor?) -> Self
+    func textColor(_ color: UIColor?) -> Self
     func font(_ font: UIFont, isDynamicTextSize: Bool) -> Self
 
-    func text(scale: CGFloat) -> Self
-    func text(alignment: NSTextAlignment) -> Self
+    func textScale(_ scale: CGFloat) -> Self
+    func textAlignment(_ alignment: NSTextAlignment) -> Self
 
     init(_ text: String?)
     init(_ attributedText: NSAttributedString?)
 
-    func adjustsFont(forContentSizeCategory flag: Bool) -> Self
+    func adjustsFontForContentSizeCategory(_ flag: Bool) -> Self
 }
 
 public extension TextElement {
-    func text(scale: CGFloat) -> Self {
+    func textScale(_ scale: CGFloat) -> Self {
         Fatal.Builder("text(scale:) not implemented")
             .warning()
         

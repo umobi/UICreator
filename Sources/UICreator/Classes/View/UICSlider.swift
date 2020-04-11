@@ -61,6 +61,11 @@ public class _Slider: UISlider {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
     }
+
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
+    }
 }
 
 public class UICSlider: UIViewCreator, Control {
@@ -153,3 +158,16 @@ public extension UIViewCreator where Self: Control, View: UISlider {
     }
 }
 #endif
+
+public extension UIViewCreator where View: UISlider, Self: Control {
+    func value(_ value: Value<Float>) -> Self {
+        self.onValueChanged {
+            value.wrappedValue = ($0 as? View)?.value ?? 0.0
+        }.onInTheScene {
+            weak var view = $0 as? View
+            value.sync {
+                view?.setValue($0, animated: true)
+            }
+        }
+    }
+}

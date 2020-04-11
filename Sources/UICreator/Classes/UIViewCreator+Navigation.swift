@@ -297,3 +297,13 @@ public extension ViewCreator {
     }
 }
 #endif
+
+public extension ViewCreator {
+    func navigation(title value: Value<String?>) -> Self {
+        value.sync { [weak self] in
+            _ = self?.navigation(title: $0)
+        }
+
+        return self
+    }
+}

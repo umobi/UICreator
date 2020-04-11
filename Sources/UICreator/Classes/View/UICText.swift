@@ -60,6 +60,11 @@ public class _TextField: UITextField {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
     }
+
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
+    }
 }
 
 public class UICText: UIViewCreator, TextElement, TextKeyboard, Control {
@@ -108,7 +113,7 @@ public extension TextElement where View: UITextField {
         }
     }
 
-    func text(color: UIColor?) -> Self {
+    func textColor(_ color: UIColor?) -> Self {
         self.onNotRendered {
             ($0 as? View)?.textColor = color
         }
@@ -157,7 +162,7 @@ public extension TextElement where View: UITextField {
         }
     }
 
-    func text(alignment: NSTextAlignment) -> Self {
+    func textAlignment(_ alignment: NSTextAlignment) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.textAlignment = alignment
         }
@@ -165,19 +170,19 @@ public extension TextElement where View: UITextField {
 }
 
 public extension UIViewCreator where View: UITextField {
-    func adjustsFont(forContentSizeCategory flag: Bool) -> Self {
+    func adjustsFontForContentSizeCategory(_ flag: Bool) -> Self {
         self.onNotRendered {
             ($0 as? View)?.adjustsFontForContentSizeCategory = flag
         }
     }
 
-    func adjustsFontSize(toFitWidth flag: Bool) -> Self {
+    func adjustsFontSizeToFitWidth(_ flag: Bool) -> Self {
         self.onNotRendered {
             ($0 as? View)?.adjustsFontSizeToFitWidth = flag
         }
     }
 
-    func allowsEditing(textAttributes flag: Bool) -> Self {
+    func allowsEditingTextAttributes(_ flag: Bool) -> Self {
         self.onNotRendered {
             ($0 as? View)?.allowsEditingTextAttributes = flag
         }
@@ -198,7 +203,7 @@ public extension UIViewCreator where View: UITextField {
         }
     }
 
-    func border(style: UITextField.BorderStyle) -> Self {
+    func borderStyle(_ style: UITextField.BorderStyle) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.borderStyle = style
         }
@@ -207,19 +212,19 @@ public extension UIViewCreator where View: UITextField {
 
 public extension UIViewCreator where View: UITextField {
 
-    func clearButton(mode: UITextField.ViewMode) -> Self {
+    func clearButtonMode(_ mode: UITextField.ViewMode) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.clearButtonMode = mode
         }
     }
 
-    func clears(onBegin flag: Bool) -> Self {
+    func clearsOnBegin(_ flag: Bool) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.clearsOnBeginEditing = flag
         }
     }
 
-    func clears(onInsertion flag: Bool) -> Self {
+    func clearsOnInsertion(_ flag: Bool) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.clearsOnInsertion = flag
         }
@@ -315,25 +320,25 @@ public extension UIViewCreator where View: UITextField {
 }
 
 public extension TextKeyboard where View: UITextField {
-    func autocapitalization(type: UITextAutocapitalizationType) -> Self {
+    func autocapitalizationType(_ type: UITextAutocapitalizationType) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.autocapitalizationType = type
         }
     }
 
-    func autocorrection(type: UITextAutocorrectionType) -> Self {
+    func autocorrectionType(_ type: UITextAutocorrectionType) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.autocorrectionType = type
         }
     }
 
-    func keyboard(type: UIKeyboardType) -> Self {
+    func keyboardType(_ type: UIKeyboardType) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.keyboardType = type
         }
     }
 
-    func keyboard(appearance: UIKeyboardAppearance) -> Self {
+    func keyboardAppearance(_ appearance: UIKeyboardAppearance) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.keyboardAppearance = appearance
         }
@@ -342,13 +347,13 @@ public extension TextKeyboard where View: UITextField {
 
 public extension TextKeyboard where View: UITextField {
 
-    func returnKey(type: UIReturnKeyType) -> Self {
+    func returnKeyType(_ type: UIReturnKeyType) -> Self {
         self.onNotRendered {
             ($0 as? View)?.returnKeyType = type
         }
     }
 
-    func secureText(_ flag: Bool = true) -> Self {
+    func isSecureTextEntry(_ flag: Bool = true) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.isSecureTextEntry = flag
         }
@@ -365,19 +370,19 @@ public extension TextKeyboard where View: UITextField {
 @available(iOS 11, tvOS 11, *)
 public extension TextKeyboard where View: UITextField {
 
-    func smartDashes(type: UITextSmartDashesType) -> Self {
+    func smartDashesType(_ type: UITextSmartDashesType) -> Self {
         self.onNotRendered {
             ($0 as? View)?.smartDashesType = type
         }
     }
 
-    func smartQuotes(type: UITextSmartQuotesType) -> Self {
+    func smartQuotesType(_ type: UITextSmartQuotesType) -> Self {
         self.onNotRendered {
             ($0 as? View)?.smartQuotesType = type
         }
     }
 
-    func smartInsertDelete(type: UITextSmartInsertDeleteType) -> Self {
+    func smartInsertDeleteType(_ type: UITextSmartInsertDeleteType) -> Self {
         self.onNotRendered {
             ($0 as? View)?.smartInsertDeleteType = type
         }
@@ -385,7 +390,7 @@ public extension TextKeyboard where View: UITextField {
 }
 
 public extension TextKeyboard where View: UITextField {
-    func textContent(type: UITextContentType) -> Self {
+    func textContentType(_ type: UITextContentType) -> Self {
         self.onNotRendered {
             ($0 as? View)?.textContentType = type
         }
@@ -409,15 +414,76 @@ public extension TextKeyboard where View: UITextField {
         }
     }
 
-    func input(delegate: UITextInputDelegate) -> Self {
+    func inputDelegate(_ delegate: UITextInputDelegate) -> Self {
         self.onInTheScene {
             ($0 as? View)?.inputDelegate = delegate
         }
     }
 
-    func typing(attributes: [NSAttributedString.Key : Any]?) -> Self {
+    func typingAttributes(_ attributes: [NSAttributedString.Key : Any]?) -> Self {
        self.onNotRendered {
            ($0 as? View)?.typingAttributes = attributes
        }
    }
+}
+
+public extension UIViewCreator where Self: Control & TextElement, View: UITextField {
+    init(_ value: Value<String?>) {
+        self.init(value.wrappedValue)
+
+        _ = self.onInTheScene { [weak self] in
+            weak var view = $0 as? View
+            var isLocked = false
+
+            _ = self?.onEvent(.editingChanged) { _ in
+                guard !isLocked else {
+                    return
+                }
+
+                isLocked = true
+                value.wrappedValue = view?.text
+                isLocked = false
+            }
+
+            value.sync {
+                guard !isLocked else {
+                    return
+                }
+
+                isLocked = true
+                view?.text = $0
+                isLocked = false
+            }
+        }
+    }
+}
+
+public extension UIViewCreator where Self: TextElement & Control, View: UITextField {
+    func text(_ value: Value<String?>) -> Self {
+        self.onNotRendered { view in
+            weak var view = view
+            var isLocked: Bool = false
+
+            _ = self.onEditingChanged {
+                guard !isLocked else {
+                    return
+                }
+
+                isLocked = true
+                value.wrappedValue = ($0 as? View)?.text
+                isLocked = false
+            }
+
+            value.sync {
+                guard !isLocked else {
+                    return
+                }
+
+
+                isLocked = true
+                (view as? View)?.text = $0
+                isLocked = false
+            }
+        }
+    }
 }

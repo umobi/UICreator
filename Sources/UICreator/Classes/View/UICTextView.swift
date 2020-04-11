@@ -60,6 +60,11 @@ public class _TextView: UITextView {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
     }
+
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
+    }
 }
 
 public class UICTextView: UIViewCreator, TextElement, TextKeyboard {
@@ -114,7 +119,7 @@ public extension TextElement where View: UITextView {
         }
     }
 
-    func text(color: UIColor?) -> Self {
+    func textColor(_ color: UIColor?) -> Self {
         self.onNotRendered {
             ($0 as? View)?.textColor = color
         }
@@ -127,13 +132,13 @@ public extension TextElement where View: UITextView {
         }
     }
 
-    func text(alignment: NSTextAlignment) -> Self {
+    func textAlignment(_ alignment: NSTextAlignment) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.textAlignment = alignment
         }
     }
 
-    func textContainer(insets: UIEdgeInsets) -> Self {
+    func textContainerInsets(_ insets: UIEdgeInsets) -> Self {
         self.onNotRendered {
             ($0 as? View)?.textContainerInset = insets
         }
@@ -141,7 +146,7 @@ public extension TextElement where View: UITextView {
 }
 
 public extension TextElement where View: UITextView {
-    func adjustsFont(forContentSizeCategory flag: Bool) -> Self {
+    func adjustsFontForContentSizeCategory(_ flag: Bool) -> Self {
         self.onNotRendered {
             ($0 as? View)?.adjustsFontForContentSizeCategory = flag
         }
@@ -149,26 +154,26 @@ public extension TextElement where View: UITextView {
 }
 
 public extension TextKeyboard where View: UITextView {
-    func autocapitalization(type: UITextAutocapitalizationType) -> Self {
+    func autocapitalizationType(_ type: UITextAutocapitalizationType) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.autocapitalizationType = type
         }
     }
 
-    func autocorrection(type: UITextAutocorrectionType) -> Self {
+    func autocorrectionType(_ type: UITextAutocorrectionType) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.autocorrectionType = type
         }
     }
 
 
-    func keyboard(type: UIKeyboardType) -> Self {
+    func keyboardType(_ type: UIKeyboardType) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.keyboardType = type
         }
     }
 
-    func keyboard(appearance: UIKeyboardAppearance) -> Self {
+    func keyboardAppearance(_ appearance: UIKeyboardAppearance) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.keyboardAppearance = appearance
         }
@@ -177,13 +182,13 @@ public extension TextKeyboard where View: UITextView {
 
 public extension TextKeyboard where View: UITextView {
 
-    func returnKey(type: UIReturnKeyType) -> Self {
+    func returnKeyType(_ type: UIReturnKeyType) -> Self {
         self.onNotRendered {
             ($0 as? View)?.returnKeyType = type
         }
     }
 
-    func secureText(_ flag: Bool = true) -> Self {
+    func isSecureTextEntry(_ flag: Bool = true) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.isSecureTextEntry = flag
         }
@@ -200,19 +205,19 @@ public extension TextKeyboard where View: UITextView {
 @available(iOS 11, tvOS 11, *)
 public extension TextKeyboard where View: UITextView {
 
-    func smartDashes(type: UITextSmartDashesType) -> Self {
+    func smartDashesType(_ type: UITextSmartDashesType) -> Self {
         self.onNotRendered {
             ($0 as? View)?.smartDashesType = type
         }
     }
 
-    func smartQuotes(type: UITextSmartQuotesType) -> Self {
+    func smartQuotesType(_ type: UITextSmartQuotesType) -> Self {
         self.onNotRendered {
             ($0 as? View)?.smartQuotesType = type
         }
     }
 
-    func smartInsertDelete(type: UITextSmartInsertDeleteType) -> Self {
+    func smartInsertDeleteType(_ type: UITextSmartInsertDeleteType) -> Self {
         self.onNotRendered {
             ($0 as? View)?.smartInsertDeleteType = type
         }
@@ -220,7 +225,7 @@ public extension TextKeyboard where View: UITextView {
 }
 
 public extension TextKeyboard where View: UITextView {
-    func textContent(type: UITextContentType) -> Self {
+    func textContentType(_ type: UITextContentType) -> Self {
         self.onNotRendered {
             ($0 as? View)?.textContentType = type
         }
@@ -244,13 +249,13 @@ public extension TextKeyboard where View: UITextView {
         }
     }
 
-    func input(delegate: UITextInputDelegate) -> Self {
+    func inputDelegate(_ delegate: UITextInputDelegate) -> Self {
         self.onInTheScene {
             ($0 as? View)?.inputDelegate = delegate
         }
     }
 
-    func typing(attributes: [NSAttributedString.Key : Any]?) -> Self {
+    func typingAttributes(_ attributes: [NSAttributedString.Key : Any]?) -> Self {
        self.onNotRendered {
             ($0 as? View)?.typingAttributes = attributes ?? [:]
        }

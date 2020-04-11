@@ -25,7 +25,7 @@ import UIKit
 import UIContainer
 
 public extension ViewCreator {
-    func background(color: UIColor?) -> Self {
+    func backgroundColor(_ color: UIColor?) -> Self {
         return self.onNotRendered {
             $0.backgroundColor = color
         }
@@ -49,19 +49,19 @@ public extension ViewCreator {
         }
     }
 
-    func border(color: UIColor?) -> Self {
+    func borderColor(_ color: UIColor?) -> Self {
         return self.onNotRendered {
             $0.layer.borderColor = color?.cgColor
         }
     }
 
-    func border(width: CGFloat) -> Self {
+    func borderWidth(_ width: CGFloat) -> Self {
         return self.onNotRendered {
             $0.layer.borderWidth = width
         }
     }
 
-    func corner(radius: CGFloat) -> Self {
+    func cornerRadius(_ radius: CGFloat) -> Self {
         return self.onNotRendered {
             $0.layer.cornerRadius = radius
         }
@@ -81,31 +81,49 @@ public extension ViewCreator {
 }
 
 public extension ViewCreator {
-    func shadow(radius: CGFloat) -> Self {
+    func shadowRadius(_ radius: CGFloat) -> Self {
         return self.onNotRendered {
             $0.layer.shadowRadius = radius
         }
     }
 
-    func shadow(offset: CGSize) -> Self {
+    func shadowOffset(_ offset: CGSize) -> Self {
         return self.onNotRendered {
             $0.layer.shadowOffset = offset
         }
     }
 
-    func shadow(ocupacity alpha: CGFloat) -> Self {
+    func shadowOffset(x: CGFloat) -> Self {
+        return self.onNotRendered {
+            $0.layer.shadowOffset = .init(width: x, height: 0)
+        }
+    }
+
+    func shadowOffset(y: CGFloat) -> Self {
+        return self.onNotRendered {
+            $0.layer.shadowOffset = .init(width: 0, height: y)
+        }
+    }
+
+    func shadowOffset(x: CGFloat, y: CGFloat) -> Self {
+        return self.onNotRendered {
+            $0.layer.shadowOffset = .init(width: x, height: y)
+        }
+    }
+
+    func shadowOcupacity(_ alpha: CGFloat) -> Self {
         return self.onNotRendered {
             $0.layer.shadowOpacity = Float(alpha)
         }
     }
 
-    func shadow(color: UIColor?) -> Self {
+    func shadowColor(_ color: UIColor?) -> Self {
         return self.onNotRendered {
             $0.layer.shadowColor = color?.cgColor
         }
     }
 
-    func clips(toBounds flag: Bool) -> Self {
+    func clipsToBounds(_ flag: Bool) -> Self {
         return self.onInTheScene {
             $0.clipsToBounds = flag
         }
@@ -340,6 +358,66 @@ public extension ViewCreator {
     func addLayer(_ handler: @escaping (UIView) -> CALayer) -> Self {
         self.onNotRendered {
             $0.layer.addSublayer(handler($0))
+        }
+    }
+}
+
+public extension ViewCreator {
+    func backgroundColor(_ color: Value<UIColor>) -> Self {
+        let relay = color.asRelay
+
+        return self.onNotRendered { [relay] view in
+            weak var view = view
+            relay.sync {
+                view?.backgroundColor = $0
+            }
+        }
+    }
+}
+
+public extension ViewCreator {
+    func isUserInteractionEnabled(_ value: Value<Bool>) -> Self {
+        self.onInTheScene {
+            weak var view = $0
+            value.sync {
+                view?.isUserInteractionEnabled = $0
+            }
+        }
+    }
+}
+
+public extension ViewCreator {
+    func isHidden(_ value: Value<Bool>) -> Self {
+        let relay = value.asRelay
+
+        return self.onNotRendered { [relay] view in
+            weak var weakView = view
+            relay.sync {
+                weakView?.isHidden = $0
+            }
+        }
+    }
+
+    func tintColor(_ value: Value<UIColor>) -> Self {
+        let relay = value.asRelay
+
+        return self.onNotRendered { [relay] view in
+            weak var weakView = view
+            relay.sync {
+                weakView?.tintColor = $0
+            }
+        }
+    }
+}
+
+public extension UICViewRepresentable {
+    func isHidden(_ value: Value<Bool>) -> Self {
+        let relay = value.asRelay
+
+        return self.onRendered { [weak self, relay] _ in
+            relay.sync {
+                self?.wrapper?.isHidden = $0
+            }
         }
     }
 }
