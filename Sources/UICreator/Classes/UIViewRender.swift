@@ -323,4 +323,10 @@ public extension ViewCreator {
         self.layout = self.layout.merge(.init(handler))
         return self
     }
+
+    @discardableResult
+    func onTrait(_ handler: @escaping (UIView) -> Void) -> Self {
+        self.trait = self.trait.merge(.init(handler))
+        return self
+    }
 }

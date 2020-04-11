@@ -28,12 +28,12 @@ private struct MEMViewCreator {
     let loadViewHandler: Mutable<(() -> UIView)?> = .init(value: nil)
     let tree: Mutable<Tree>
     let render: Render
-    let appearUtil: AppearUtil
+    let viewMethods: ViewMethods
 
     init(_ manager: ViewCreator) {
         self.tree = .init(value: .init(manager))
         self.render = .create(manager)
-        self.appearUtil = AppearUtil()
+        self.viewMethods = ViewMethods()
 
         self.render.onNotRendered { [unowned manager] in
             $0.onAppear {
@@ -47,15 +47,20 @@ private struct MEMViewCreator {
             $0.onLayout {
                 manager.layout.commit(in: $0)
             }
+
+            $0.onTrait {
+                manager.trait.commit(in: $0)
+            }
         }
     }
 }
 
 extension MEMViewCreator {
-    struct AppearUtil {
+    struct ViewMethods {
         let appear: Mutable<UIHandler<UIView>> = .init(value: .init())
         let disappear: Mutable<UIHandler<UIView>> = .init(value: .init())
         let layout: Mutable<UIHandler<UIView>> = .init(value: .init())
+        let trait: Mutable<UIHandler<UIView>> = .init(value: .init())
     }
 }
 
@@ -73,18 +78,23 @@ extension ViewCreator {
     }
 
     var appear: UIHandler<UIView> {
-        get { self.storedMemory.appearUtil.appear.value }
-        set { self.storedMemory.appearUtil.appear.value = newValue }
+        get { self.storedMemory.viewMethods.appear.value }
+        set { self.storedMemory.viewMethods.appear.value = newValue }
     }
 
     var disappear: UIHandler<UIView> {
-        get { self.storedMemory.appearUtil.disappear.value }
-        set { self.storedMemory.appearUtil.disappear.value = newValue }
+        get { self.storedMemory.viewMethods.disappear.value }
+        set { self.storedMemory.viewMethods.disappear.value = newValue }
     }
 
     var layout: UIHandler<UIView> {
-        get { self.storedMemory.appearUtil.layout.value }
-        set { self.storedMemory.appearUtil.layout.value = newValue }
+        get { self.storedMemory.viewMethods.layout.value }
+        set { self.storedMemory.viewMethods.layout.value = newValue }
+    }
+
+    var trait: UIHandler<UIView> {
+        get { self.storedMemory.viewMethods.trait.value }
+        set { self.storedMemory.viewMethods.trait.value = newValue }
     }
 
     fileprivate(set) var loadViewHandler: (() -> UIView)? {
