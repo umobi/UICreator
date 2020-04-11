@@ -1,0 +1,188 @@
+//
+// Copyright (c) 2019-Present Umobi - https://github.com/umobi
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+import Foundation
+import UIKit
+
+public class _ImageView: UIImageView {
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
+        }
+    }
+
+    override public func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
+    }
+
+    override public func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
+    }
+
+    override public func didMoveToWindow() {
+        super.didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
+    }
+
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
+    }
+
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
+    }
+
+    override public func removeConstraint(_ constraint: NSLayoutConstraint) {
+        super.removeConstraint(constraint)
+    }
+
+    override public func removeConstraints(_ constraints: [NSLayoutConstraint]) {
+        super.removeConstraints(constraints)
+    }
+}
+
+public class UICImage: UIViewCreator {
+    public typealias View = _ImageView
+
+    public init(mode: View.ContentMode = .scaleToFill) {
+        self.loadView { [unowned self] in
+            return View.init(builder: self)
+        }
+        .onNotRendered {
+            ($0 as? View)?.contentMode = mode
+        }
+    }
+
+    public init(image: UIImage?, highlightedImage: UIImage? = nil) {
+        self.loadView { [unowned self] in
+            return View.init(builder: self)
+        }
+        .onNotRendered {
+            ($0 as? View)?.image = image
+            ($0 as? View)?.highlightedImage = highlightedImage
+            ($0 as? View)?.contentMode = .scaleToFill
+        }
+    }
+
+    public init() {
+        self.loadView { [unowned self] in
+            return View.init(builder: self)
+        }
+        .onNotRendered {
+            ($0 as? View)?.contentMode = .scaleToFill
+        }
+    }
+
+    public convenience init(_ imageRelay: Value<UIImage?>) {
+        self.init(image: nil)
+
+        _ = self.onInTheScene {
+            weak var view = $0 as? View
+            imageRelay.sync {
+                view?.image = $0
+            }
+        }
+    }
+}
+
+public extension Value {
+    func connect(to relay: Relay<Value>) {
+        relay.sync {
+            self.wrappedValue = $0
+        }
+    }
+}
+
+public extension UIViewCreator where View: UIImageView {
+
+    @available(iOS 13, tvOS 13.0, *)
+    func applySymbolConfiguration(_ configuration: UIImage.SymbolConfiguration) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.image = ($0 as? View)?.image?.applyingSymbolConfiguration(configuration)
+        }
+    }
+
+    @available(iOS 13, tvOS 13.0, *)
+    func preferredSymbolConfiguration(_ configuration: UIImage.SymbolConfiguration) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.preferredSymbolConfiguration = configuration
+        }
+    }
+
+    func content(mode: View.ContentMode) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.contentMode = mode
+        }
+    }
+
+    func image(_ image: UIImage?) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.image = image
+        }
+    }
+
+    func rendering(mode: UIImage.RenderingMode) -> Self {
+        return self.onRendered {
+            ($0 as? View)?.image = ($0 as? View)?.image?.withRenderingMode(mode)
+        }
+    }
+}
+
+#if os(tvOS)
+public extension UIViewCreator where View: UIImageView {
+    @available(tvOS 13, *)
+    func adjustsImageWhenAncestorFocused(_ flag: Bool) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.adjustsImageWhenAncestorFocused = flag
+        }
+    }
+}
+#endif
+
+public extension UICImage {
+    convenience init(image: Value<UIImage?>, placeholder: UIImage? = nil) {
+        self.init(image: nil)
+
+        let relay = image.asRelay
+        self.onNotRendered { [relay] view in
+            weak var view = view as? View
+            relay.sync {
+                view?.image = $0 ?? placeholder
+            }
+        }
+    }
+}
