@@ -67,6 +67,11 @@ class ViewAdaptor: RootView {
         RenderManager(self)?.layoutSubviews()
         RenderManager(self.hosted)?.layoutSubviews()
     }
+
+    override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
+    }
 }
 
 class Adaptor: ViewCreator {

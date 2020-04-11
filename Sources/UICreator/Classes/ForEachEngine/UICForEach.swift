@@ -60,6 +60,11 @@ public class PlaceholderView: UIView {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
     }
+
+    override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
+    }
 }
 
 public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {

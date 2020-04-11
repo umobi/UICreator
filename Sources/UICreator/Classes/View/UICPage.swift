@@ -222,6 +222,11 @@ public class UICPageContainer: UIView {
         }
     }
 
+    override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
+    }
+
     public enum IndicatorViewPosition {
         case topRespectedToSafeArea
         case left

@@ -86,6 +86,11 @@ public class UICTabContainer: UIView {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
     }
+
+    override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
+    }
 }
 
 public struct UICTabItem {

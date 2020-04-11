@@ -72,6 +72,11 @@ public class RootView: UIView {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
     }
+
+    override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
+    }
 }
 
 extension RootView: RenderWillMoveToSuperviewState {
