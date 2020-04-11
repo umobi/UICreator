@@ -52,6 +52,9 @@ public extension ViewCreator {
     func borderColor(_ color: UIColor?) -> Self {
         return self.onNotRendered {
             $0.layer.borderColor = color?.cgColor
+            $0.onTrait {
+                $0.layer.borderColor = color?.cgColor
+            }
         }
     }
 
@@ -120,6 +123,9 @@ public extension ViewCreator {
     func shadowColor(_ color: UIColor?) -> Self {
         return self.onNotRendered {
             $0.layer.shadowColor = color?.cgColor
+            $0.onTrait {
+                $0.layer.shadowColor = color?.cgColor
+            }
         }
     }
 
