@@ -157,7 +157,6 @@ public extension UIViewCreator where Self: Control, View: UISlider {
         self.onEvent(.valueChanged, handler)
     }
 }
-#endif
 
 public extension UIViewCreator where View: UISlider, Self: Control {
     func value(_ value: Value<Float>) -> Self {
@@ -171,3 +170,4 @@ public extension UIViewCreator where View: UISlider, Self: Control {
         }
     }
 }
+#endif

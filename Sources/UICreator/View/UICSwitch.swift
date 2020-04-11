@@ -120,7 +120,6 @@ public extension UIViewCreator where Self: Control, View: UISwitch {
         return self.onEvent(.valueChanged, handler)
     }
 }
-#endif
 
 public extension UICSwitch {
     convenience init(_ value: Value<Bool>) {
@@ -153,3 +152,5 @@ public extension UICSwitch {
         }
     }
 }
+
+#endif

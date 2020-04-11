@@ -1,6 +1,0 @@
-framework module UICreator {
-  umbrella header "UICreator-umbrella.h"
-
-  export *
-  module * { export * }
-}
