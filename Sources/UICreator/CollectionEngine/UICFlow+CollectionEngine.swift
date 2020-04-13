@@ -27,13 +27,13 @@ extension _CollectionView: ListSupport {
 
 }
 
-public extension UICFlow {
-    convenience init(_ contents: @escaping () -> [ViewCreator]) {
-        self.init(ListManager(contents: contents()))
+public extension UICCollection {
+    convenience init(layout: UICollectionViewLayout,_ contents: @escaping () -> [ViewCreator]) {
+        self.init(layout: layout, ListManager(contents: contents()))
     }
     
-    private convenience init(_ manager: ListManager) {
-        self.init()
+    private convenience init(layout: UICollectionViewLayout, _ manager: ListManager) {
+        self.init(layout: layout)
 
         self.onNotRendered { [manager] in
             let collectionView: View! = $0 as? View

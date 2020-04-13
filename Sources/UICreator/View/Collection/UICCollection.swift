@@ -23,9 +23,14 @@
 import Foundation
 import UIKit
 
-public protocol CollectionLayout {
+public protocol CollectionLayout: UIViewCreator where View: UICollectionView {
     associatedtype Layout: UICollectionViewLayout
-    var dynamicCollectionViewLayout: Layout { get }
+}
+
+public extension CollectionLayout {
+    var dynamicCollectionViewLayout: Layout {
+        (self.uiView as? View)?.collectionViewLayout as! Layout
+    }
 }
 
 public class _CollectionView: UICollectionView {
@@ -70,13 +75,19 @@ public class _CollectionView: UICollectionView {
         super.traitCollectionDidChange(previousTraitCollection)
         RenderManager(self)?.traitDidChange()
     }
+
+    override open func reloadData() {
+        super.reloadData()
+        self.invalidateLayoutMaker()
+    }
 }
 
-public class UICCollection: UIViewCreator {
+open class UICCollection: UIViewCreator {
     public typealias View = _CollectionView
-    init(layout: @escaping () -> UICollectionViewLayout) {
+
+    public init(layout: UICollectionViewLayout) {
         self.loadView { [unowned self] in
-            let view = View(frame: .zero, collectionViewLayout: layout())
+            let view = View(frame: .zero, collectionViewLayout: layout)
             view.updateBuilder(self)
             return view
         }
