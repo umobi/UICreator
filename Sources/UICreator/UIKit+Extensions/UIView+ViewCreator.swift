@@ -426,4 +426,10 @@ public extension UICViewRepresentable {
             }
         }
     }
+
+    func isHidden(_ flag: Bool) -> Self {
+        self.onRendered { [weak self] _ in
+            self?.wrapper.isHidden = flag
+        }
+    }
 }

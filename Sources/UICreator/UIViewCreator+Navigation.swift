@@ -145,7 +145,7 @@ public extension ViewCreator {
 
     func navigation(titleView content: @escaping () -> ViewCreator) -> Self {
         return self.onInTheScene {
-            $0.navigationItem.titleView = content().releaseUIView()
+            $0.navigationItem.titleView = UICHost(content: content).releaseUIView()
         }
     }
 

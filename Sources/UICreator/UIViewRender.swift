@@ -194,7 +194,7 @@ private extension UIView {
                 $0.appearState == .appeared
             }, do: {
                 $0.appearState = .disappeared
-                $0.commitAppear()
+                $0.commitDisappear()
             })
     }
 }
