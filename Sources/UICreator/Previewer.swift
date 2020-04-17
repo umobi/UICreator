@@ -22,7 +22,7 @@
 
 import Foundation
 
-#if DEBUG && canImport(SwiftUI) && targetEnvironment(simulator)
+#if UICREATOR_SUIPREVIEWS && DEBUG && canImport(SwiftUI)
 import SwiftUI
 
 @available(iOS 13, tvOS 13, *)
