@@ -379,6 +379,31 @@ public extension ViewCreator {
             }
         }
     }
+
+    func borderColor(_ color: Value<UIColor>) -> Self {
+
+        return self.onNotRendered { view in
+            weak var view = view
+            color.sync {
+                view?.layer.borderColor = $0.cgColor
+            }
+
+            view?.onTrait {
+                $0.layer.borderColor = color.wrappedValue.cgColor
+            }
+        }
+    }
+
+    func borderWidth(_ constant: Value<CGFloat>) -> Self {
+        let relay = constant.asRelay
+
+        return self.onNotRendered { [relay] view in
+            weak var view = view
+            relay.sync {
+                view?.layer.borderWidth = $0
+            }
+        }
+    }
 }
 
 public extension ViewCreator {
