@@ -158,15 +158,8 @@ public extension ViewCreator {
     }
 
     @discardableResult
-    func present<View: ViewCreator>(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> View) -> Self {
+    func present(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> ViewCreator) -> Self {
         let controller = ContainerController(UICHost(content: content))
-        self.presentable?.present(controller, animated: animated, completion: onCompletion)
-        return self
-    }
-
-    @discardableResult
-    func present<View: ViewControllerType>(animated: Bool, onCompletion: (() -> Void)? = nil,_ content: View) -> Self {
-        let controller = ContainerController(content)
         self.presentable?.present(controller, animated: animated, completion: onCompletion)
         return self
     }
@@ -182,16 +175,8 @@ public extension ViewCreator {
     }
 
     @discardableResult
-    func presentModal<View: ViewCreator>(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> View) -> Self {
+    func presentModal(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> ViewCreator) -> Self {
         let controller = ContainerController(UICHost(content: content))
-        controller.modalPresentationStyle = .overFullScreen
-        self.presentable?.present(controller, animated: animated, completion: onCompletion)
-        return self
-    }
-
-    @discardableResult
-    func presentModal<View: ViewControllerType>(animated: Bool, onCompletion: (() -> Void)? = nil,_ content: View) -> Self {
-        let controller = ContainerController(content)
         controller.modalPresentationStyle = .overFullScreen
         self.presentable?.present(controller, animated: animated, completion: onCompletion)
         return self
