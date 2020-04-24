@@ -96,7 +96,7 @@ extension UIView {
         set { self.payload.appearState.value = newValue }
     }
 
-    var tabBarItem: UITabBarItem? {
+    public var tabBarItem: UITabBarItem? {
         get { self.payload.tabBarItem.value }
         set { self.payload.tabBarItem.value = newValue }
     }

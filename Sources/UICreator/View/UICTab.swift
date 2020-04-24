@@ -238,8 +238,9 @@ public class UICTabCreator<TabController: UITabBarController>: UIViewCreator {
 
             self.tabController.viewControllers = contents().map { item in
                 let (view, tabItem) = item.load()
-                let hosted = UICHost { view }
-                let controller = ContainerController(hosted)
+                let controller = UICHostingView {
+                    view
+                }
                 controller.tabBarItem = tabItem
                 return controller
             }
@@ -453,18 +454,18 @@ public extension ViewCreator {
 }
 
 public class Controller: UIViewCreator {
-    public typealias View = _Container<ContainerController<UICHost>>
+    public typealias View = _Container<UICHostingView>
 
     public init(content: @escaping () -> ViewCreator) {
-        let content = UICHost(content: content)
-        self.tree.append(content)
+        let hostedController = UICHostingView(content: content)
+        self.tree.append(hostedController.hostedView)
 
         self.loadView { [unowned self] in
             View.init(builder: self)
         }
         .onInTheScene {
             ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: {
-                return ContainerController(content)
+                return hostedController
             })
         }
     }

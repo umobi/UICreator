@@ -22,9 +22,8 @@
 
 import Foundation
 import UIKit
-import UIContainer
 
-public class UICHost: Root, ViewControllerType, UIViewCreator {
+public class UICHost: Root, UIViewCreator {
     public init(size: CGSize = .zero, content: @escaping () -> ViewCreator) {
         super.init()
 

@@ -115,13 +115,13 @@ public extension NavigationRepresentable {
             }
 
             self.content = nil
-            return self.navigationLoader(ContainerController(UICHost(content: content)))
+            return self.navigationLoader(UICHostingView(content: content))
         }
     }
 
     @discardableResult
     func push(animated: Bool, content: @escaping () -> ViewCreator) -> Self {
-        self.navigationController.pushViewController(ContainerController(UICHost(content: content)), animated: animated)
+        self.navigationController.pushViewController(UICHostingView(content: content), animated: animated)
         return self
     }
 

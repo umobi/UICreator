@@ -85,9 +85,9 @@ public struct UICPresent {
     }
 
     func present() {
-        let viewController = ContainerController(UICHost {
+        let viewController = UICHostingView {
             self.toView!
-        })
+        }
 
         viewController.modalPresentationStyle = self.presentingStyle
         viewController.modalTransitionStyle = self.transitionStyle
@@ -159,7 +159,7 @@ public extension ViewCreator {
 
     @discardableResult
     func present(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> ViewCreator) -> Self {
-        let controller = ContainerController(UICHost(content: content))
+        let controller = UICHostingView(content: content)
         self.presentable?.present(controller, animated: animated, completion: onCompletion)
         return self
     }
@@ -176,7 +176,7 @@ public extension ViewCreator {
 
     @discardableResult
     func presentModal(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> ViewCreator) -> Self {
-        let controller = ContainerController(UICHost(content: content))
+        let controller = UICHostingView(content: content)
         controller.modalPresentationStyle = .overFullScreen
         self.presentable?.present(controller, animated: animated, completion: onCompletion)
         return self

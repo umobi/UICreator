@@ -426,17 +426,15 @@ public extension UICPage {
     
     func pages(direction: UIPageViewController.NavigationDirection,_ contents: @escaping () -> [ViewCreator]) -> Self {
         let contents = contents().map { content in
-            UICHost(content: { content })
+            UICHostingView(content: { content })
         }
 
         contents.forEach {
-            self.tree.append($0)
+            self.tree.append($0.hostedView)
         }
 
         return self.onInTheScene { [unowned self] _ in
-            self.pageController.updateViewControllers(contents.map { content in
-                ContainerController(content)
-            }, direction: direction, animated: false, completion: nil)
+            self.pageController.updateViewControllers(contents, direction: direction, animated: false, completion: nil)
         }
     }
 
