@@ -89,6 +89,8 @@ public class UICHostingView: UIViewController {
         let contentView: UIView! = hostView.releaseUIView()
         AddSubview(self.view).addSubview(contentView)
 
+        (contentView as? RootView)?.hostingView = self
+
         Constraintable.activate(
             contentView.cbuild.edges
         )
