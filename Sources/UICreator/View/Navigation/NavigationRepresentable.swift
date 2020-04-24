@@ -156,18 +156,6 @@ public extension NavigationRepresentable {
     }
 }
 
-//extension UIView {
-//    func contains(view: UIView) -> Bool {
-//        if self === view {
-//            return true
-//        }
-//
-//        return self.subviews.first(where: {
-//            $0.contains(view: view)
-//        }) != nil
-//    }
-//}
-
 public extension UIView {
     func contains(_ viewCreator: ViewCreator) -> Bool {
         return self.contains(where: {

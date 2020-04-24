@@ -25,6 +25,21 @@ import UIKit
 import ConstraintBuilder
 import UIContainer
 
+public extension UITabBarController {
+    func selectedIndex(_ index: Int) {
+        guard let view = self.viewControllers?[index] else {
+            return
+        }
+
+        guard self.delegate?.tabBarController?(self, shouldSelect: view) ?? true else {
+            return
+        }
+
+        self.selectedViewController = view
+        self.delegate?.tabBarController?(self, didSelect: view)
+    }
+}
+
 public class UICTabContainer: UIView {
     private(set) weak var container: _Container<UITabBarController>!
     private var content: (() -> UITabBarController)? = nil
@@ -467,6 +482,28 @@ public class Controller: UIViewCreator {
             ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: {
                 return hostedController
             })
+        }
+    }
+}
+
+public extension UICTabCreator {
+    func selectedItem(_ selected: Value<Int>) -> Self {
+        self.onInTheScene {
+            weak var view = $0 as? View
+
+            selected.sync {
+                view?.tabBarController.selectedIndex($0)
+            }
+        }
+    }
+
+    func selectedItem<Enum: RawRepresentable>(_ selected: Value<Enum>) -> Self where Enum.RawValue == Int {
+        self.onInTheScene {
+            weak var view = $0 as? View
+
+            selected.sync {
+                view?.tabBarController.selectedIndex($0.rawValue)
+            }
         }
     }
 }
