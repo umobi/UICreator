@@ -27,6 +27,10 @@ import UIContainer
 
 public extension UITabBarController {
     func selectedIndex(_ index: Int) {
+        guard index != self.selectedIndex else {
+            return
+        }
+        
         guard let view = self.viewControllers?[index] else {
             return
         }
