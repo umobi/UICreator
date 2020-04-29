@@ -225,13 +225,6 @@ public struct UICTabItem {
         tabItem.selectedImage = self.selectedImage
         return tabItem
     }
-
-    func load() -> (ViewCreator, UITabBarItem) {
-        let tabItem = self.tabItem
-        return (self.content().onNotRendered {
-            $0.tabBarItem = tabItem
-        }, tabItem)
-    }
 }
 
 public class UICTabCreator<TabController: UITabBarController>: UIViewCreator {
@@ -256,11 +249,8 @@ public class UICTabCreator<TabController: UITabBarController>: UIViewCreator {
             let view = View.init(builder: self)
 
             self.tabController.viewControllers = contents().map { item in
-                let (view, tabItem) = item.load()
-                let controller = UICHostingView {
-                    view
-                }
-                controller.tabBarItem = tabItem
+                let controller = UICHostingView(content: item.content)
+                controller.tabBarItem = item.tabItem
                 return controller
             }
 
@@ -374,9 +364,23 @@ public extension UICTabCreator {
     }
 }
 
+public extension UIView {
+    var tabBarItem: UITabBarItem? {
+        get { self.viewController.tabBarItem }
+        set { self.viewController.tabBarItem = newValue }
+    }
+}
+
+public extension ViewCreator {
+    var tabBarItem: UITabBarItem? {
+        get { self.uiView.tabBarItem }
+        set { self.uiView.viewController.tabBarItem = newValue }
+    }
+}
+
 public extension ViewCreator {
     func tabBarItem(title: String?) -> Self {
-        self.onNotRendered {
+        self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
             tabItem.title = title
             $0.tabBarItem = tabItem
@@ -384,7 +388,7 @@ public extension ViewCreator {
     }
 
     func tabBarItem(image: UIImage?) -> Self {
-        self.onNotRendered {
+        self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
             tabItem.image = image
             $0.tabBarItem = tabItem
@@ -392,7 +396,7 @@ public extension ViewCreator {
     }
 
     func tabBarItem(tag: Int) -> Self {
-        self.onNotRendered {
+        self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
             tabItem.tag = tag
             $0.tabBarItem = tabItem
@@ -400,7 +404,7 @@ public extension ViewCreator {
     }
 
     func tabBarItem(selectedImage image: UIImage?) -> Self {
-        self.onNotRendered {
+        self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
             tabItem.selectedImage = image
             $0.tabBarItem = tabItem
@@ -408,7 +412,7 @@ public extension ViewCreator {
     }
 
     func tabBarItem(titlePositionAdjustment position: UIOffset) -> Self {
-        self.onNotRendered {
+        self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
             tabItem.titlePositionAdjustment = position
             $0.tabBarItem = tabItem
@@ -416,7 +420,7 @@ public extension ViewCreator {
     }
 
     func tabBarItem(imageInsets insets: UIEdgeInsets) -> Self {
-        self.onNotRendered {
+        self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
             tabItem.imageInsets = insets
             $0.tabBarItem = tabItem
@@ -425,7 +429,7 @@ public extension ViewCreator {
 
     @available(iOS 13.0, tvOS 13, *)
     func tabBarItem(standardAppearance: UITabBarAppearance?) -> Self {
-        self.onNotRendered {
+        self.onInTheScene {
             let tabItem = $0.viewController.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
             tabItem.standardAppearance = standardAppearance
             $0.tabBarItem = tabItem
@@ -436,7 +440,7 @@ public extension ViewCreator {
 public extension ViewCreator {
 
     func tabBarItem(badgeColor color: UIColor?) -> Self {
-        self.onNotRendered {
+        self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
             tabItem.badgeColor = color
             $0.tabBarItem = tabItem
@@ -444,7 +448,7 @@ public extension ViewCreator {
     }
 
     func tabBarItem(badgeTextAttributes attributes: [NSAttributedString.Key : Any]?, for state: UIControl.State) -> Self {
-        self.onNotRendered {
+        self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
             tabItem.setBadgeTextAttributes(attributes, for: state)
             $0.tabBarItem = tabItem
@@ -452,7 +456,7 @@ public extension ViewCreator {
     }
 
     func tabBarItem(badgeFont font: UIFont, for state: UIControl.State = .normal) -> Self {
-        self.onNotRendered {
+        self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
             tabItem.setBadgeTextAttributes(tabItem.badgeTextAttributes(for: state)?.merging([.font: font], uniquingKeysWith: {
                 $1
@@ -462,7 +466,7 @@ public extension ViewCreator {
     }
 
     func tabBarItem(badgeFontColor color: UIFont, for state: UIControl.State = .normal) -> Self {
-        self.onNotRendered {
+        self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
             tabItem.setBadgeTextAttributes(tabItem.badgeTextAttributes(for: state)?.merging([.foregroundColor: color], uniquingKeysWith: {
                 $1

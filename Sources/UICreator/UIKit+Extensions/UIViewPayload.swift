@@ -30,7 +30,6 @@ private struct UIViewPayload {
     let appearState: Mutable<AppearState> = .init(value: .unset)
 
     let viewMethods: Mutable<UIViewMethods> = .init(value: .init())
-    let tabBarItem: Mutable<UITabBarItem?> = .init(value: nil)
 }
 
 struct UIViewMethods: MutableEditable {
@@ -94,11 +93,6 @@ extension UIView {
     var appearState: AppearState {
         get { self.payload.appearState.value }
         set { self.payload.appearState.value = newValue }
-    }
-
-    public var tabBarItem: UITabBarItem? {
-        get { self.payload.tabBarItem.value }
-        set { self.payload.tabBarItem.value = newValue }
     }
 
     var appearHandler: UIHandler<UIView>? {

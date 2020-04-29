@@ -117,8 +117,9 @@ open class Root: ViewCreator {
             return View.init(builder: self)
         }
         .onNotRendered {
-            if let body = body {
-                $0.add(priority: .required, body.releaseUIView())
+            if let finalBody = body {
+                $0.add(priority: .required, finalBody.releaseUIView())
+                body = nil
             }
         }
     }
