@@ -22,9 +22,86 @@
 
 import Foundation
 import UIKit
-import UIContainer
+import ConstraintBuilder
 
-public class _DashedView: DashedView {
+public class UICDashedView: UIView, UICManagerContentView {
+
+    weak var view: UIView?
+    private(set) var strokeColor: UIColor = .clear
+    private(set) var lineWidth: CGFloat = 1
+    private(set) var dashPattern: [NSNumber]
+
+    private var shape: CAShapeLayer!
+
+    public required init(_ view: UIView, dash pattern: [NSNumber]) {
+        self.dashPattern = pattern
+        super.init(frame: .zero)
+        self.addContent(view)
+    }
+
+    public required init(dash pattern: [NSNumber]) {
+        self.dashPattern = pattern
+        super.init(frame: .zero)
+    }
+
+    public func addContent(_ view: UIView) {
+        CBSubview(self).addSubview(view)
+
+        Constraintable.activate(
+            view.cbuild
+                .edges
+        )
+
+        self.view = view
+    }
+
+    public func reloadContentLayout() {
+        self.shape = self.shape ?? self.createShape()
+
+        self.shape.strokeColor = strokeColor.cgColor
+        self.shape.lineWidth = self.lineWidth
+        self.shape.lineDashPattern = self.dashPattern
+    }
+
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func createShape() -> CAShapeLayer {
+        guard let view = self.view else {
+            return CAShapeLayer()
+        }
+
+        let shapeLayer: CAShapeLayer = CAShapeLayer()
+        let frameSize = self.frame.size
+        let shapeRect = CGRect(x: 0, y: 0, width: frameSize.width, height: frameSize.height)
+
+        shapeLayer.bounds = shapeRect
+        shapeLayer.position = CGPoint(x: frameSize.width/2, y: frameSize.height/2)
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        shapeLayer.strokeColor = strokeColor.cgColor
+        shapeLayer.lineWidth = self.lineWidth
+        shapeLayer.lineJoin = CAShapeLayerLineJoin.round
+        shapeLayer.lineDashPattern = self.dashPattern
+        shapeLayer.path = UIBezierPath(roundedRect: shapeRect, cornerRadius: view.layer.cornerRadius).cgPath
+
+        self.layer.addSublayer(shapeLayer)
+
+        return shapeLayer
+    }
+
+    func refreshView() {
+        guard let view = self.view else {
+            return
+        }
+
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+
+        self.shape.path = UIBezierPath(roundedRect: self.bounds, cornerRadius: view.layer.cornerRadius).cgPath
+        self.shape.frame = self.bounds
+        self.shape.cornerRadius = self.subviews.first!.layer.cornerRadius
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -59,17 +136,41 @@ public class _DashedView: DashedView {
 
     override public func layoutSubviews() {
         super.layoutSubviews()
+        self.refreshView()
         RenderManager(self)?.layoutSubviews()
     }
 
     override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
+        self.reloadContentLayout()
         RenderManager(self)?.traitDidChange()
     }
 }
 
+public extension UICDashedView {
+
+    func apply(strokeColor: UIColor) -> Self {
+        self.strokeColor = strokeColor
+        return self
+    }
+
+    func apply(lineWidth: CGFloat) -> Self {
+        self.lineWidth = lineWidth
+        return self
+    }
+
+    func apply(dashPattern: [NSNumber]) -> Self {
+        self.dashPattern = dashPattern
+        return self
+    }
+
+    func refresh() {
+        self.reloadContentLayout()
+    }
+}
+
 public class UICDashed: UIViewCreator {
-    public typealias View = _DashedView
+    public typealias View = UICDashedView
 
     public init(color: UIColor, pattern: [NSNumber] = [2, 3], content: @escaping () -> ViewCreator) {
         let content = content()
@@ -88,7 +189,7 @@ public class UICDashed: UIViewCreator {
     }
 }
 
-extension UIViewCreator where View: DashedView {
+extension UIViewCreator where View: UICDashedView {
 
     public func dash(color: UIColor) -> Self {
         self.onNotRendered {

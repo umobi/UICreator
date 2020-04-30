@@ -22,7 +22,6 @@
 
 import Foundation
 import UIKit
-import UIContainer
 
 public extension ViewCreator {
     func backgroundColor(_ color: UIColor?) -> Self {
@@ -166,7 +165,7 @@ public extension ViewCreator {
     #if os(iOS)
     func statusBar(_ appearanceStyle: UIStatusBarStyle) -> Self {
         self.onInTheScene {
-            ($0.viewController as? StatusBarAppearanceManager)?.statusBarStyle = appearanceStyle
+            ($0.viewController as? UICHostingView)?.statusBarStyle = appearanceStyle
         }
     }
     #endif

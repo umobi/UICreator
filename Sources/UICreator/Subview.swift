@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 
 /// Wrapper class for collection of Subviews
-public struct Subview {
+public struct CBSubview {
     public let views: [ViewCreator]
 
     public init(_ views: ViewCreator...) {

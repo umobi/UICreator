@@ -22,15 +22,28 @@
 
 import Foundation
 import UIKit
-import UIContainer
+import ConstraintBuilder
 
-public class _Container<View: UIViewController>: UIContainer.Container<View> {
-    weak var spacerView: SpacerView!
+public class UICControllerContainerView<View: UIViewController>: UIView {
+    weak var view: View!
 
-    public func spacer<T>(_ view: T) -> SpacerView where T : UIView {
-        let spacerView = SpacerView(view, spacing: 0)
-        self.spacerView = spacerView
-        return spacerView
+    public func contain(viewController: View, parentView: UIViewController? = nil) {
+        guard let parentView = parentView ?? self.viewController else {
+            fatalError()
+        }
+
+        self.view?.view.removeFromSuperview()
+
+        self.view = viewController
+        parentView.addChild(viewController)
+        CBSubview(self).addSubview(viewController.view)
+
+        Constraintable.activate(
+            viewController.view.cbuild
+                .edges
+        )
+
+        viewController.didMove(toParent: parentView)
     }
 
     override open var isHidden: Bool {
@@ -76,14 +89,14 @@ public class _Container<View: UIViewController>: UIContainer.Container<View> {
 }
 
 public class UICContainer<ViewController: UIViewController>: UIViewCreator {
-    public typealias View = _Container<ViewController>
+    public typealias View = UICControllerContainerView<ViewController>
 
     public required init(_ content: @escaping () -> ViewController) {
         self.loadView { [unowned self] in
             return View.init(builder: self)
         }
         .onInTheScene {
-            ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: content)
+            ($0 as? View)?.contain(viewController: content())
         }
     }
 }

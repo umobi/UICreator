@@ -22,7 +22,6 @@
 
 import Foundation
 import UIKit
-import UIContainer
 
 public struct UICPresent {
     let presentingStyle: UIModalPresentationStyle

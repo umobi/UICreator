@@ -26,7 +26,6 @@ Pod::Spec.new do |s|
 
   s.source_files = 'Sources/UICreator/**/*'
 
-  s.dependency 'UIContainer', '~> 1.2.0-beta.10'
-  s.dependency 'ConstraintBuilder', '1.0.2'
+  s.dependency 'ConstraintBuilder', '>= 1.0.5', "< 2.0.0"
 
 end

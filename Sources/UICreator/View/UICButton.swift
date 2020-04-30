@@ -110,7 +110,7 @@ public extension UIViewCreator where View: UIButton {
     func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> Self {
         return self.onRendered {
             ($0 as? View)?.titleLabel?.font = font
-            ($0 as? View)?.titleLabel?.isDynamicTextSize = isDynamicTextSize
+            ($0 as? View)?.titleLabel?.adjustsFontForContentSizeCategory = isDynamicTextSize
         }
     }
 }

@@ -7,7 +7,6 @@
 
 import Foundation
 import UIKit
-import UIContainer
 import ConstraintBuilder
 
 public class UICHostingView: UIViewController {
@@ -47,7 +46,7 @@ public class UICHostingView: UIViewController {
 
         self.strongContentView = nil
 
-        AddSubview(self.view).addSubview(strongView)
+        UIView.CBSubview(self.view).addSubview(strongView)
 
         Constraintable.activate(
             strongView.cbuild.edges
@@ -87,7 +86,7 @@ public class UICHostingView: UIViewController {
         self.contentView = hostView
 
         let contentView: UIView! = hostView.releaseUIView()
-        AddSubview(self.view).addSubview(contentView)
+        UIView.CBSubview(self.view).addSubview(contentView)
 
         (contentView as? RootView)?.hostingView = self
 

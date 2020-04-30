@@ -23,7 +23,6 @@
 import Foundation
 import UIKit
 import ConstraintBuilder
-import UIContainer
 
 public extension UITabBarController {
     func selectedIndex(_ index: Int) {
@@ -45,7 +44,7 @@ public extension UITabBarController {
 }
 
 public class UICTabContainer: UIView {
-    private(set) weak var container: _Container<UITabBarController>!
+    private(set) weak var container: UICControllerContainerView<UITabBarController>!
     private var content: (() -> UITabBarController)? = nil
 
     public var tabBarController: UITabBarController! {
@@ -85,13 +84,17 @@ public class UICTabContainer: UIView {
     override open func didMoveToWindow() {
         super.didMoveToWindow()
         self.container = self.container ?? {
-            let container = _Container<UITabBarController>(in: self.viewController, loadHandler: { [unowned self] in
-                let viewController = self.content?()
-                self.content = nil
-                return viewController
-            })
+            let container = UICControllerContainerView<UITabBarController>()
+            container.contain(
+                viewController: {
+                    let viewController = self.content?()
+                    self.content = nil
+                    return viewController!
+                }(),
+                parentView: self.viewController
+            )
 
-            AddSubview(self).addSubview(container)
+            CBSubview(self).addSubview(container)
             Constraintable.activate(
                 container.cbuild
                     .edges
@@ -477,7 +480,7 @@ public extension ViewCreator {
 }
 
 public class Controller: UIViewCreator {
-    public typealias View = _Container<UICHostingView>
+    public typealias View = UICControllerContainerView<UICHostingView>
 
     public init(content: @escaping () -> ViewCreator) {
         let hostedController = UICHostingView(content: content)
@@ -487,9 +490,7 @@ public class Controller: UIViewCreator {
             View.init(builder: self)
         }
         .onInTheScene {
-            ($0 as? View)?.prepareContainer(inside: $0.viewController, loadHandler: {
-                return hostedController
-            })
+            ($0 as? View)?.contain(viewController: hostedController)
         }
     }
 }

@@ -22,7 +22,6 @@
 
 import Foundation
 import UIKit
-import UIContainer
 
 /// RootView is an internal view that is used to be the UIView of some view creator to support lazy loads.
 public class RootView: UIView {

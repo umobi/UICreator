@@ -23,13 +23,12 @@
 import Foundation
 import UIKit
 import ConstraintBuilder
-import UIContainer
 
 internal extension UIView {
 
     /// The `add(_:)` function is used internally to add views inside view and constraint with required priority in all edges.
     func add(priority: UILayoutPriority? = nil,_ view: UIView) {
-        AddSubview(self).addSubview(view)
+        CBSubview(self).addSubview(view)
 
         let priority: UILayoutPriority = priority ?? ((self as UIView) is RootView && view is RootView ? .required :
         .init(751))

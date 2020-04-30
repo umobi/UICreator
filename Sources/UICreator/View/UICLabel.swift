@@ -125,7 +125,7 @@ public extension TextElement where View: UILabel {
     func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.font = font
-            ($0 as? View)?.isDynamicTextSize = isDynamicTextSize
+            ($0 as? View)?.adjustsFontForContentSizeCategory = isDynamicTextSize
         }
     }
 

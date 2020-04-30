@@ -22,7 +22,6 @@
 
 import Foundation
 import UIKit
-import UIContainer
 
 public class StackView: UIStackView {
 
@@ -90,7 +89,7 @@ public class UICStack: UIViewCreator {
                     forEachCreator.manager = self
                 }
 
-                AddSubview(view as? View)?.addArrangedSubview($0.releaseUIView())
+                UIView.CBSubview(view as? View)?.addArrangedSubview($0.releaseUIView())
             }
         }
     }
@@ -162,13 +161,13 @@ extension UICStack: SupportForEach {
 
                 views.enumerated().forEach { newView in
                     guard newView.offset <= endIndex - startIndex, let viewCreator = view?.arrangedSubviews[startIndex..<(view?.arrangedSubviews ?? []).count].enumerated().first(where: { $0.offset == newView.offset })?.element.viewCreator else {
-                        AddSubview(view)?.insertArrangedSubview(newView.element.releaseUIView(), at: startIndex + newView.offset)
+                        UIView.CBSubview(view)?.insertArrangedSubview(newView.element.releaseUIView(), at: startIndex + newView.offset)
                         return
                     }
 
                     if !ReplacementTree(viewCreator).replace(with: newView.element) {
                         (view?.arrangedSubviews ?? [])[startIndex + newView.offset].removeFromSuperview()
-                        AddSubview(view)?.insertArrangedSubview(newView.element.releaseUIView(), at: startIndex + newView.offset)
+                        UIView.CBSubview(view)?.insertArrangedSubview(newView.element.releaseUIView(), at: startIndex + newView.offset)
                     }
                 }
 
@@ -201,7 +200,7 @@ extension UICStack: SupportForEach {
                 }
 
                 views.enumerated().forEach {
-                    AddSubview(view)?.insertArrangedSubview($0.element.releaseUIView(), at: startIndex + $0.offset)
+                    UIView.CBSubview(view)?.insertArrangedSubview($0.element.releaseUIView(), at: startIndex + $0.offset)
                 }
 
                 firstView = views.first?.uiView
