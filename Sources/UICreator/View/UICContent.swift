@@ -63,7 +63,9 @@ public class UICContentView: UIView, UICManagerContentView {
     }
 
     override public init(frame: CGRect) {
-        fatalError("init(frame:) has not been implemented")
+        self.priority = .required
+        self.layoutMode = .center
+        super.init(frame: frame)
     }
 
     required init?(coder: NSCoder) {
