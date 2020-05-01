@@ -678,8 +678,9 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .height
-                    .equalTo(constant)
+                    .equal
                     .update()
+                    .constant(constant)
                     .priority(priority)
             )
         }
@@ -690,8 +691,9 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .height
-                    .greaterThanOrEqualTo(constant)
+                    .greaterThanOrEqual
                     .update()
+                    .constant(constant)
                     .priority(priority)
             )
         }
@@ -702,8 +704,9 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .height
-                    .lessThanOrEqualTo(constant)
+                    .lessThanOrEqual
                     .update()
+                    .constant(constant)
                     .priority(priority)
             )
         }
@@ -714,8 +717,9 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .width
-                    .equalTo(constant)
+                    .equal
                     .update()
+                    .constant(constant)
                     .priority(priority)
             )
         }
@@ -726,8 +730,9 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .width
-                    .greaterThanOrEqualTo(constant)
+                    .greaterThanOrEqual
                     .update()
+                    .constant(constant)
                     .priority(priority)
             )
         }
@@ -738,8 +743,9 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .width
-                    .lessThanOrEqualTo(constant)
+                    .lessThanOrEqual
                     .update()
+                    .constant(constant)
                     .priority(priority)
             )
         }
