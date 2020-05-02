@@ -27,5 +27,4 @@ jobs:
         
     - name: cocoapods lint
       run: |
-        brew install cocoapods
-        pod lib lint --allow-warnings
+          pod lib lint --allow-warnings
