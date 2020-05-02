@@ -1,6 +1,6 @@
 # UICreator
 
-[![CI Status](https://img.shields.io/travis/brennobemoura/UICreator.svg?style=flat)](https://travis-ci.org/brennobemoura/UICreator)
+[![Swift](https://github.com/umobi/UICreator/workflows/Swift/badge.svg)](https://cocoapods.org/pods/UICreator)
 [![Version](https://img.shields.io/cocoapods/v/UICreator.svg?style=flat)](https://cocoapods.org/pods/UICreator)
 [![License](https://img.shields.io/cocoapods/l/UICreator.svg?style=flat)](https://cocoapods.org/pods/UICreator)
 [![Platform](https://img.shields.io/cocoapods/p/UICreator.svg?style=flat)](https://cocoapods.org/pods/UICreator)
