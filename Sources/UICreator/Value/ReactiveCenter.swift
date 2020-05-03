@@ -22,7 +22,7 @@
 
 import Foundation
 
-class ReactiveToken: CustomStringConvertible, Equatable {
+private class ReactiveToken: CustomStringConvertible, Equatable {
     var description: String {
         "\(ObjectIdentifier(self))"
     }
@@ -33,35 +33,39 @@ class ReactiveToken: CustomStringConvertible, Equatable {
 }
 
 private let _reactive = ReactiveCenter()
-final class ReactiveCenter: NotificationCenter {
+private final class ReactiveCenter: NotificationCenter {
     static var shared: ReactiveCenter {
         return _reactive
     }
 }
 
-extension ReactiveCenter {
-    struct ReferenceCenter {
-        fileprivate let reactiveCenter: ReactiveCenter
-        fileprivate let reference: ReactiveItemReference
+struct ReactiveReferenceCenter {
+    fileprivate let reactiveCenter: ReactiveCenter
+    fileprivate let reference: ReactiveItemReference
 
-        fileprivate init(reference: ReactiveItemReference,_ center: ReactiveCenter) {
-            self.reactiveCenter = center
-            self.reference = reference
-        }
+    fileprivate init(reference: ReactiveItemReference,_ center: ReactiveCenter) {
+        self.reactiveCenter = center
+        self.reference = reference
     }
 
-    fileprivate func referenceCenter(_ reference: ReactiveItemReference) -> ReferenceCenter {
+    func unregister(_ observable: NSObjectProtocol) {
+        self.reactiveCenter.removeObserver(observable)
+    }
+}
+
+extension ReactiveCenter {
+    fileprivate func referenceCenter(_ reference: ReactiveItemReference) -> ReactiveReferenceCenter {
         .init(reference: reference, self)
     }
 }
 
 extension ReactiveItemReference {
-    var reactive: ReactiveCenter.ReferenceCenter {
+    var reactive: ReactiveReferenceCenter {
         ReactiveCenter.shared.referenceCenter(self)
     }
 }
 
-private extension ReactiveCenter.ReferenceCenter {
+private extension ReactiveReferenceCenter {
     static let kNotificationNewValue = "kNotificationNewValue"
     static let kNotificationToken = "kNotificationToken"
 
@@ -78,15 +82,11 @@ private extension ReactiveCenter.ReferenceCenter {
     }
 
     var valueSetterNotification: Notification.Name {
-        .init("\(self.reference).setter.value")
-    }
-
-    var requestValueSetterNotification: Notification.Name {
         .init("\(self.reference).request.setter.value")
     }
 }
 
-extension ReactiveCenter.ReferenceCenter {
+extension ReactiveReferenceCenter {
 
     func valueDidChange<Value>(_ newValue: Value) {
         self.reactiveCenter.post(
@@ -112,10 +112,10 @@ extension ReactiveCenter.ReferenceCenter {
     }
 }
 
-extension ReactiveCenter.ReferenceCenter {
+extension ReactiveReferenceCenter {
     func requestValueSetter<Value>(_ newValue: Value) {
         self.reactiveCenter.post(
-            name: self.requestValueSetterNotification,
+            name: self.valueSetterNotification,
             object: nil,
             userInfo: [
                 Self.kNotificationNewValue: newValue
@@ -137,7 +137,7 @@ extension ReactiveCenter.ReferenceCenter {
     }
 }
 
-extension ReactiveCenter.ReferenceCenter {
+extension ReactiveReferenceCenter {
     func valueGetter<Value>(handler: @escaping () -> Value) {
         self.reference.append(self.reactiveCenter.addObserver(
             forName: self.requestValueGetterNotification,

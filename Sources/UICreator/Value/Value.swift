@@ -23,7 +23,15 @@
 import Foundation
 
 class ReactiveItemReference: CustomStringConvertible {
-    private var observables: [NSObjectProtocol] = []
+    struct NSWeakObjectProtocol {
+        weak var observable: NSObjectProtocol!
+
+        init(_ observable: NSObjectProtocol) {
+            self.observable = observable
+        }
+    }
+
+    private var observables: [NSWeakObjectProtocol] = []
 
     private var identifier: String {
         "\(ObjectIdentifier(self))"
@@ -34,12 +42,12 @@ class ReactiveItemReference: CustomStringConvertible {
     }
 
     func append(_ observable: NSObjectProtocol) {
-        self.observables.append(observable)
+        self.observables.append(.init(observable))
     }
 
     deinit {
         self.observables.forEach {
-            ReactiveCenter.shared.removeObserver($0)
+            self.reactive.unregister($0.observable)
         }
     }
 }
