@@ -126,17 +126,12 @@ extension ViewCreator {
     }
 
     func setView(_ uiView: UIView, asWeak: Bool = false) {
-        self.viewObject = {
-            if asWeak {
-                return .weak(uiView)
-            }
-
-            return .strong(uiView)
-        }()
-
-        if let root = self as? (Root & TemplateView) {
-            root.viewDidChanged()
+        if asWeak {
+            self.viewObject = .weak(uiView)
+            return
         }
+        
+        self.viewObject = .strong(uiView)
     }
 
     private func loadViewIfNeeded() -> UIView! {
@@ -153,6 +148,10 @@ extension ViewCreator {
 
             if let viewMaker = self as? UIViewMaker {
                 return viewMaker.makeView()
+            }
+
+            if let uicView = self as? UICView {
+                return uicView.makeView()
             }
 
             fatalError()

@@ -37,7 +37,6 @@ internal extension ViewRender {
     }
 
     func setCreator(_ newValue: ViewCreator?, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_ASSIGN) {
-        
         guard let newValue = newValue else {
             self.opaqueViewCreator = .nil
             return

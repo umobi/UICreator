@@ -208,7 +208,11 @@ extension ListManager.RowManager: SupportForEach {
             compactCopy.listManager
                 .section(at: compactCopy.indexPath.section)
                 .content(compactCopy, updatedWith: $0.map { content in
-                    compactCopy.restore(.init(row: content() as! UICRow))
+                    guard let row = content() as? UICRow else {
+                        fatalError()
+                    }
+
+                    return compactCopy.restore(.init(row: row))
                 })
         }
     }

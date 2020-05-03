@@ -70,32 +70,21 @@ public class PlaceholderView: UIView {
 public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
     let viewType: ViewCreator.Type
 
-    let relay: Relay<[Value]>
+    let observable: Observable
     let content: (Value) -> ViewCreator
     private var syncLoad: ((UIView) -> Void)? = nil
 
     private func startObservation() {
         let content = self.content
-        self.manager?.viewsDidChange(placeholderView: self.uiView, relay.map {
-            $0.map { item in
-                {
-                    content(item)
-                }
+        self.manager?.viewsDidChange(placeholderView: self.uiView, self.observable.map { element in
+            {
+                content(element)
             }
         })
     }
 
-    public convenience init(_ value: UICreator.Value<[Value]>, content: @escaping (Value) -> View) {
-        self.init(value.asRelay, content: content)
-    }
-
-    public convenience init(_ value: [Value], content: @escaping (Value) -> View) {
-        let value = UICreator.Value(wrappedValue: value)
-        self.init(value.asRelay, content: content)
-    }
-
-    private init(_ relay: Relay<[Value]>, content: @escaping (Value) -> View) {
-        self.relay = relay
+    private init(_ observable: Observable, content: @escaping (Value) -> View) {
+        self.observable = observable
         self.content = content
         self.viewType = View.self
         self.loadView {
@@ -113,6 +102,14 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
             }
     }
 
+    public convenience init(_ value: [Value], content: @escaping (Value) -> View) {
+        self.init(.frozed(.init(wrappedValue: value)), content: content)
+    }
+
+    public convenience init(_ relay: Relay<[Value]>, content: @escaping (Value) -> View) {
+        self.init(.dynamic(relay), content: content)
+    }
+
     func load() {
         let syncLoad = self.syncLoad
         self.syncLoad = nil
@@ -121,5 +118,29 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
 
     var isLoaded: Bool {
         return self.syncLoad == nil
+    }
+}
+
+extension UICForEach {
+    enum Observable {
+        case frozed(UICreator.Value<[Value]>)
+        case dynamic(Relay<[Value]>)
+
+        func map<OtherValue>(_ handler: @escaping (Value) -> OtherValue) -> Relay<[OtherValue]> {
+            let relay: Relay<[Value]> = {
+                switch self {
+                case .frozed(let value):
+                    return value.projectedValue
+                case .dynamic(let relay):
+                    return relay
+                }
+            }()
+
+            return relay.map {
+                $0.map {
+                    handler($0)
+                }
+            }
+        }
     }
 }

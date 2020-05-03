@@ -117,7 +117,7 @@ public struct UICPresent {
     }
 }
 
-public class UICNavigation: Root, NavigationRepresentable {
+public class UICNavigation: NavigationRepresentable {
 
     public var navigationLoader: (UIViewController) -> UINavigationController {
         {
@@ -126,7 +126,6 @@ public class UICNavigation: Root, NavigationRepresentable {
     }
 
     public init(_ content: @escaping () -> ViewCreator) {
-        super.init()
         self.content = .init(content)
     }
 }

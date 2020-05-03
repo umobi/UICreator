@@ -122,16 +122,15 @@ public extension UIViewCreator where Self: Control, View: UISwitch {
 }
 
 public extension UICSwitch {
-    convenience init(_ value: Value<Bool>) {
-        self.init(on: value.wrappedValue)
+    convenience init(_ isOn: Relay<Bool>) {
+        self.init(on: isOn.wrappedValue)
 
-        let relay = value.asRelay
         var isLocked = false
 
-        _ = self.onNotRendered { [relay] in
+        _ = self.onNotRendered {
             weak var view = $0 as? View
 
-            relay.sync {
+            isOn.sync {
                 guard !isLocked else {
                     return
                 }
@@ -147,7 +146,7 @@ public extension UICSwitch {
             }
 
             isLocked = true
-            value.wrappedValue = ($0 as? View)?.isOn ?? false
+            isOn.wrappedValue = ($0 as? View)?.isOn ?? false
             isLocked = false
         }
     }

@@ -22,84 +22,65 @@
 
 import Foundation
 
+class ReactiveItemReference: CustomStringConvertible {
+    private var observables: [NSObjectProtocol] = []
+
+    private var identifier: String {
+        "\(ObjectIdentifier(self))"
+    }
+
+    var description: String {
+        self.identifier
+    }
+
+    func append(_ observable: NSObjectProtocol) {
+        self.observables.append(observable)
+    }
+
+    deinit {
+        self.observables.forEach {
+            ReactiveCenter.shared.removeObserver($0)
+        }
+    }
+}
+
 @propertyWrapper
-public struct Value<Value>: Getter, IDGetter {
-    private class ID: IDGetter {
-        var identifier: String {
-            "\(ObjectIdentifier(self))"
-        }
+public struct Value<Value> {
+    let mutableBox: Box
 
-        var value: Value {
-            didSet {
-                ReactiveCenter.shared.valueDidChange(self.identifier, newValue: self.value)
-            }
-        }
-
-        init(_ value: Value) {
-            self.value = value
-
-            ReactiveCenter.shared.start(self.identifier)
-            ReactiveCenter.shared.valueDidChange(self.identifier, newValue: value)
-
-            ReactiveCenter.shared.privateResquestLatestValue(self.identifier) { [weak self] in
-                guard let self = self else {
-                    return
-                }
-
-                ReactiveCenter.shared.privateLatestValue(self.identifier, newValue: self.value)
-            }
-        }
-
-        deinit {
-            ReactiveCenter.shared.remove(self.identifier)
-        }
-    }
-
-    private let id: ID
-    var identifier: String {
-        self.id.identifier
-    }
-
-    public var projectedValue: UICreator.Value<Value> { return self }
+    public var projectedValue: Relay<Value> { return .init(self.mutableBox.reference) }
 
     public var wrappedValue: Value {
-        get { self.id.value }
+        get { self.mutableBox.value }
         nonmutating
-        set { self.id.value = newValue }
+        set { self.mutableBox.value = newValue }
     }
 
     public init(wrappedValue value: Value) {
-        self.id = .init(value)
-    }
-
-}
-
-public extension Value {
-    var asRelay: Relay<Value> {
-        return .init(self.id)
+        self.mutableBox = .init(value: value)
     }
 }
 
-public extension Value {
-    func bind<Object, ObjectValue>(_ keyPath: KeyPath<Object, ObjectValue>) -> Relay<ObjectValue?> where Value == Optional<Object> {
-        return self.asRelay.map {
-            guard let object = $0 else {
-                return nil
+extension Value {
+    class Box: Mutable<Value> {
+        let reference = ReactiveItemReference()
+
+        override var value: Value {
+            didSet {
+                self.reference.reactive.valueDidChange(self.value)
+            }
+        }
+
+        override init(value: Value) {
+            super.init(value: value)
+
+            self.reference.reactive.valueSetter { [weak self] in
+                self?.value = $0
             }
 
-            return object[keyPath: keyPath]
-        }
-    }
-
-    func bind<ObjectValue>(_ keyPath: KeyPath<Value, ObjectValue>) -> Relay<ObjectValue?> {
-        return self.asRelay.map {
-            $0[keyPath: keyPath]
-        }
-    }
-
-    func bind<ObjectValue>(_ keyPath: KeyPath<Value, ObjectValue>) -> Relay<ObjectValue> {
-        return self.asRelay.map {
-            $0[keyPath: keyPath]
+            self.reference.reactive.valueGetter { [weak self] in
+                self?.value
+            }
         }
     }
 }

@@ -22,51 +22,13 @@
 
 import Foundation
 
-class Destructor {
-    var identifiers: [String] = []
-
-    weak static var shared: Destructor!
-
-    static func remove(_ id: String) {
-        if let shared = Self.shared {
-            shared.append(id)
-            return
-        }
-
-        let destructor = Destructor()
-        Self.shared = destructor
-        destructor.append(id)
+class ReactiveToken: CustomStringConvertible, Equatable {
+    var description: String {
+        "\(ObjectIdentifier(self))"
     }
 
-    private var queue: DispatchQueue? = nil
-    func run() {
-        guard queue == nil else {
-            return
-        }
-
-        self.queue = DispatchQueue.main
-        self.queue?.async {
-            while let id = self.identifiers.first {
-                self.identifiers.removeFirst()
-
-                ReactiveCenter.shared.privateDeinit(id)
-                ReactiveCenter.shared.unregister(id)
-            }
-
-            self.queue = nil
-            Self.shared = nil
-        }
-    }
-
-    func append(_ id: String) {
-        self.identifiers.append(id)
-        self.run()
-    }
-
-    deinit {
-        if !self.identifiers.isEmpty {
-            fatalError()
-        }
+    static func ==(_ left: ReactiveToken,_ right: ReactiveToken) -> Bool {
+        ObjectIdentifier(left) == ObjectIdentifier(right)
     }
 }
 
@@ -75,112 +37,157 @@ final class ReactiveCenter: NotificationCenter {
     static var shared: ReactiveCenter {
         return _reactive
     }
+}
 
-    private var activeObservables: [String: [NSObjectProtocol]] = [:]
+extension ReactiveCenter {
+    struct ReferenceCenter {
+        fileprivate let reactiveCenter: ReactiveCenter
+        fileprivate let reference: ReactiveItemReference
 
-    func start(_ identifier: String) {
-        self.unregister(identifier)
-
-        self.activeObservables[identifier] = []
-    }
-
-    func unregister(_ identifier: String) {
-        self.activeObservables[identifier]?.forEach {
-            ReactiveCenter.shared.removeObserver($0)
-        }
-
-        self.activeObservables[identifier] = nil
-    }
-
-    private func isWatching(_ id: String) -> Bool {
-        self.activeObservables[id] != nil
-    }
-
-    private func isRegisteredOrDie(_ identifier: String) {
-        guard self.isWatching(identifier) else {
-            Fatal.ReactiveCenter.unregistered.die()
-            return
+        fileprivate init(reference: ReactiveItemReference,_ center: ReactiveCenter) {
+            self.reactiveCenter = center
+            self.reference = reference
         }
     }
 
-    private func track(_ identifier: String,_ observable: NSObjectProtocol) {
-        self.activeObservables[identifier]?.append(observable)
+    fileprivate func referenceCenter(_ reference: ReactiveItemReference) -> ReferenceCenter {
+        .init(reference: reference, self)
+    }
+}
+
+extension ReactiveItemReference {
+    var reactive: ReactiveCenter.ReferenceCenter {
+        ReactiveCenter.shared.referenceCenter(self)
+    }
+}
+
+private extension ReactiveCenter.ReferenceCenter {
+    static let kNotificationNewValue = "kNotificationNewValue"
+    static let kNotificationToken = "kNotificationToken"
+
+    var valueChangedNotification: Notification.Name {
+        .init(rawValue: "\(self.reference).valueChanged")
     }
 
-    private static let kNotificationNewValue = "kNotificationNewValue"
-    func valueDidChange<Value>(_ identifier: String, newValue: Value) {
-        self.isRegisteredOrDie(identifier)
-        self.post(name: .init(rawValue: "\(identifier).valueChanged"), object: nil, userInfo: [Self.kNotificationNewValue: newValue])
+    var valueGetterNotification: Notification.Name {
+        .init("\(self.reference).getter.value")
     }
 
-    func valueDidChange<Value>(_ identifier: String, handler: @escaping (Value) -> Void) {
-        self.isRegisteredOrDie(identifier)
+    var requestValueGetterNotification: Notification.Name {
+        .init("\(self.reference).request.getter.value")
+    }
 
-        self.track(identifier, self.addObserver(forName: .init(rawValue: "\(identifier).valueChanged"), object: nil, queue: nil) { notification in
-            handler(notification.userInfo?[Self.kNotificationNewValue] as! Value)
+    var valueSetterNotification: Notification.Name {
+        .init("\(self.reference).setter.value")
+    }
+
+    var requestValueSetterNotification: Notification.Name {
+        .init("\(self.reference).request.setter.value")
+    }
+}
+
+extension ReactiveCenter.ReferenceCenter {
+
+    func valueDidChange<Value>(_ newValue: Value) {
+        self.reactiveCenter.post(
+            name: self.valueChangedNotification,
+            object: nil,
+            userInfo: [
+                Self.kNotificationNewValue: newValue
+            ])
+    }
+
+    func valueDidChange<Value>(handler: @escaping (Value) -> Void) {
+        self.reference.append(self.reactiveCenter.addObserver(
+            forName: self.valueChangedNotification,
+            object: nil,
+            queue: nil,
+            using: { notification in
+                guard let value = notification.userInfo?[Self.kNotificationNewValue] as? Value else {
+                    fatalError()
+                }
+
+                handler(value)
+            }))
+    }
+}
+
+extension ReactiveCenter.ReferenceCenter {
+    func requestValueSetter<Value>(_ newValue: Value) {
+        self.reactiveCenter.post(
+            name: self.requestValueSetterNotification,
+            object: nil,
+            userInfo: [
+                Self.kNotificationNewValue: newValue
+            ])
+    }
+
+    func valueSetter<Value>(_ handler: @escaping (Value) -> Void) {
+        self.reference.append(self.reactiveCenter.addObserver(
+            forName: self.valueSetterNotification,
+            object: nil,
+            queue: nil,
+            using: {
+                guard let value = $0.userInfo?[Self.kNotificationNewValue] as? Value else {
+                    fatalError()
+                }
+
+                handler(value)
+            }))
+    }
+}
+
+extension ReactiveCenter.ReferenceCenter {
+    func valueGetter<Value>(handler: @escaping () -> Value) {
+        self.reference.append(self.reactiveCenter.addObserver(
+            forName: self.requestValueGetterNotification,
+            object: nil,
+            queue: nil,
+            using: { [weak reactiveCenter, valueGetterNotification] in
+                guard let token = $0.userInfo?[Self.kNotificationToken] as? ReactiveToken else {
+                    return
+                }
+
+                reactiveCenter?.post(
+                    name: valueGetterNotification,
+                    object: nil,
+                    userInfo: [
+                        Self.kNotificationNewValue: handler(),
+                        Self.kNotificationToken: token
+                    ]
+                )
+            }))
+    }
+
+    func requestValueGetter<Value>(handler: @escaping (Value) -> Void) {
+        let token = ReactiveToken()
+        let observable: NSObjectProtocol = self.reactiveCenter.addObserver(
+            forName: self.valueGetterNotification,
+            object: nil,
+            queue: nil,
+            using: {
+                guard
+                    let notificationToken = $0.userInfo?[Self.kNotificationToken] as? ReactiveToken,
+                    notificationToken == token
+                    else {
+                        return
+                    }
+
+                guard let value = $0.userInfo?[Self.kNotificationNewValue] as? Value else {
+                    fatalError()
+                }
+
+                handler(value)
         })
-    }
 
-    func privateValueDidChange<Value>(_ identifier: String, newValue: Value) {
-        self.isRegisteredOrDie(identifier)
+        self.reactiveCenter.post(
+            name: self.requestValueGetterNotification,
+            object: nil,
+            userInfo: [
+                Self.kNotificationToken: token
+            ])
 
-        self.post(name: .init(rawValue: "\(identifier).private.valueChanged"), object: nil, userInfo: [Self.kNotificationNewValue: newValue])
-    }
-
-    func privateValueDidChange<Value>(_ identifier: String, handler: @escaping (Value) -> Void) {
-        self.isRegisteredOrDie(identifier)
-
-        self.track(identifier, self.addObserver(forName: .init(rawValue: "\(identifier).private.valueChanged"), object: nil, queue: nil) { notification in
-            handler(notification.userInfo?[Self.kNotificationNewValue] as! Value)
-        })
-    }
-
-    func privateDeinit(_ identifier: String) {
-        guard self.isWatching(identifier) else {
-            return
-        }
-
-        self.post(name: .init(rawValue: "\(identifier).private.deinit"), object: nil)
-    }
-
-    func privateDeinit(_ identifier: String, handler: @escaping () -> Void) {
-        self.isRegisteredOrDie(identifier)
-
-        self.track(identifier, self.addObserver(forName: .init(rawValue: "\(identifier).private.deinit"), object: nil, queue: nil) { _ in
-            handler()
-        })
-    }
-
-    func privateLatestValue<Value>(_ identifier: String, newValue: Value) {
-        self.isRegisteredOrDie(identifier)
-
-        self.post(name: .init(rawValue: "\(identifier).private.latestValue"), object: nil, userInfo: [Self.kNotificationNewValue: newValue])
-    }
-
-    func privateLatestValue<Value>(_ identifier: String, handler: @escaping (Value) -> Void) {
-        self.isRegisteredOrDie(identifier)
-
-        self.track(identifier, self.addObserver(forName: .init(rawValue: "\(identifier).private.latestValue"), object: nil, queue: nil) { notification in
-            handler(notification.userInfo?[Self.kNotificationNewValue] as! Value)
-        })
-    }
-
-    func privateResquestLatestValue(_ identifier: String) {
-        self.isRegisteredOrDie(identifier)
-
-        self.post(name: .init(rawValue: "\(identifier).private.request.latestValue"), object: nil)
-    }
-
-    func privateResquestLatestValue(_ identifier: String, handler: @escaping () -> Void) {
-        self.isRegisteredOrDie(identifier)
-
-        self.track(identifier, self.addObserver(forName: .init(rawValue: "\(identifier).private.request.latestValue"), object: nil, queue: nil) { _ in
-            handler()
-        })
-    }
-
-    func remove(_ id: String) {
-        Destructor.remove(id)
+        self.reactiveCenter.removeObserver(observable)
     }
 }
 

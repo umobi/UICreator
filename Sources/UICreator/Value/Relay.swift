@@ -22,72 +22,225 @@
 
 import Foundation
 
-public final class Relay<Value> {
-    let id: IDGetter
+@propertyWrapper
+//@dynamicMemberLookup
+public struct Relay<Value> {
+    private weak var reference: ReactiveItemReference!
 
-    init(_ id: IDGetter) {
-        self.id = id
-        self.handler = nil
+    init(_ reference: ReactiveItemReference) {
+        self.reference = reference
     }
 
-    public func next(_ handler: @escaping (Value) -> Void) {
-        Self.collapse(self)() { value in
-            handler(value)
+    public var wrappedValue: Value {
+        get {
+            let dispatchGroup = DispatchGroup()
+            dispatchGroup.enter()
+
+            var value: Value!
+
+            self.reference.reactive.requestValueGetter(handler: { (requestedValue: Value) in
+                value = requestedValue
+                dispatchGroup.leave()
+            })
+
+            dispatchGroup.wait()
+            return value
         }
+        nonmutating
+        set { self.reference.reactive.requestValueSetter(newValue) }
+    }
+
+//    public subscript<T>(dynamicMember keyPath: KeyPath<Value, T>) -> Relay<T> {
+//        return self.map {
+//            $0[keyPath: keyPath]
+//        }
+//    }
+
+    public func next(_ handler: @escaping (Value) -> Void) {
+        self.reference.reactive.valueDidChange(handler: handler)
     }
 
     public func sync(_ handler: @escaping (Value) -> Void) {
-        Self.collapse(self)() { value in
-            handler(value)
-        }
-        
-        ReactiveCenter.shared.privateResquestLatestValue(self.id.identifier)
+        self.next(handler)
+
+        self.reference.reactive.requestValueGetter(handler: handler)
     }
 
-    private static func collapse<Value>(_ relay: Relay<Value>) -> ((@escaping (Value) -> Void) -> Void) {
-        let id = relay.id
-        let handler = relay.handler
+    public func map<Other>(_ handler: @escaping (Value) -> Other) -> Relay<Other> {
+        let value = UICreator.Value<Other>(wrappedValue: handler(self.wrappedValue))
+        self.next {
+            value.wrappedValue = handler($0)
+        }
 
-        return  { externalHandler in
-            if let selfHandler = handler {
-                selfHandler() {
-                    externalHandler($0)
-                }
+        return value.projectedValue
+    }
+}
 
-                return
-            }
+//extension Relay where Value: OptionalType {
+//    public subscript<T>(dynamicMember keyPath: KeyPath<Value.Wrapped, Optional<T>>) -> Relay<Optional<T>> {
+//        return self.map {
+//            $0.value?[keyPath: keyPath]
+//        }
+//    }
+//}
 
-            ReactiveCenter.shared.valueDidChange(id.identifier) {
-                externalHandler($0)
-            }
-
-            ReactiveCenter.shared.privateValueDidChange(id.identifier) {
-                externalHandler($0)
-            }
-
-            ReactiveCenter.shared.privateLatestValue(id.identifier) {
-                externalHandler($0)
-            }
+public extension Relay {
+    @available(*, deprecated, message: "no substitute")
+    func connect(to relay: Relay<Value>) {
+        relay.sync {
+            self.wrappedValue = $0
         }
     }
+}
 
-    let handler: ((@escaping  (Value) -> Void) -> Void)?
-    init(_ id: IDGetter, handler: @escaping ((@escaping (Value) -> Void) -> Void)) {
-        self.id = id
-        self.handler = handler
-    }
-
-    public func map<Other>(_ handler: @escaping  (Value) -> Other) -> Relay<Other> {
-        let callbase = Self.collapse(self)
-        return Relay<Other>.init(self.id, handler: { function in
-            return callbase() {
-                function(handler($0))
+public extension Relay {
+    @available(*, deprecated, message: "no substitute")
+    func bind<Object, ObjectValue>(_ keyPath: KeyPath<Object, ObjectValue>) -> Relay<ObjectValue?> where Value == Optional<Object> {
+        return self.map {
+            guard let object = $0 else {
+                return nil
             }
-        })
+
+            return object[keyPath: keyPath]
+        }
     }
 
-    func `post`(_ value: Value) {
-        ReactiveCenter.shared.privateValueDidChange(self.id.identifier, newValue: value)
+    @available(*, deprecated, message: "no substitute")
+    func bind<ObjectValue>(_ keyPath: KeyPath<Value, ObjectValue>) -> Relay<ObjectValue?> {
+        return self.map {
+            $0[keyPath: keyPath]
+        }
     }
 
+    @available(*, deprecated, message: "no substitute")
+    func bind<ObjectValue>(_ keyPath: KeyPath<Value, ObjectValue>) -> Relay<ObjectValue> {
+        return self.map {
+            $0[keyPath: keyPath]
+        }
+    }
+}
+
+public protocol OptionalType {
+    associatedtype Wrapped
+    var value: Wrapped? { get }
+}
+
+extension Optional: OptionalType {
+    /// Cast `Optional<Wrapped>` to `Wrapped?`
+    public var value: Wrapped? {
+        return self
+    }
+}
+
+public extension Relay where Value: OptionalType {
+    func bind(to relay: Relay<Value>) {
+        self.next {
+            relay.wrappedValue = $0
+        }
+    }
+}
+
+public extension Relay {
+    func bind(to relay: Relay<Value>) {
+        self.next {
+            relay.wrappedValue = $0
+        }
+    }
+
+    func bind(to relay: Relay<Value?>) {
+        self.next {
+            relay.wrappedValue = $0
+        }
+    }
+}
+
+/// Sync from left
+infix operator <->
+/// Sync from left
+public func <-><T>(left: Relay<T>, right: Relay<T>) {
+    var isLocked = false
+
+    left.sync {
+        guard !isLocked else {
+            return
+        }
+
+        isLocked = true
+        right.wrappedValue = $0
+        isLocked = false
+    }
+
+    right.next {
+        guard !isLocked else {
+            return
+        }
+
+        isLocked = true
+        left.wrappedValue = $0
+        isLocked = false
+    }
+}
+
+/// Sync from left
+public func <-><T>(left: Relay<T>?, right: Relay<T>) {
+    guard let left = left else {
+        return
+    }
+
+    left <-> right
+}
+
+/// Sync from left
+public func <-><T>(left: Relay<T>?, right: Relay<T>?) {
+    guard let left = left, let right = right else {
+        return
+    }
+
+    left <-> right
+}
+
+/// Lazy operator
+infix operator <~>
+
+/// Lazy operator
+public func <~><T>(left: Relay<T>, right: Relay<T>) {
+    var isLocked = false
+
+    left.next {
+        guard !isLocked else {
+            return
+        }
+
+        isLocked = true
+        right.wrappedValue = $0
+        isLocked = false
+    }
+
+    right.next {
+        guard !isLocked else {
+            return
+        }
+
+        isLocked = true
+        left.wrappedValue = $0
+        isLocked = false
+    }
+}
+
+/// Lazy operator
+public func <~><T>(left: Relay<T>?, right: Relay<T>) {
+    guard let left = left else {
+        return
+    }
+
+    left <~> right
+}
+
+/// Lazy operator
+public func <~><T>(left: Relay<T>?, right: Relay<T>?) {
+    guard let left = left, let right = right else {
+        return
+    }
+
+    left <~> right
 }

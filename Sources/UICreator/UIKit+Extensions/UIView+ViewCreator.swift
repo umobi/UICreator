@@ -368,18 +368,16 @@ public extension ViewCreator {
 }
 
 public extension ViewCreator {
-    func backgroundColor(_ color: Value<UIColor>) -> Self {
-        let relay = color.asRelay
-
-        return self.onNotRendered { [relay] view in
+    func backgroundColor(_ color: Relay<UIColor>) -> Self {
+        self.onNotRendered { view in
             weak var view = view
-            relay.sync {
+            color.sync {
                 view?.backgroundColor = $0
             }
         }
     }
 
-    func borderColor(_ color: Value<UIColor>) -> Self {
+    func borderColor(_ color: Relay<UIColor>) -> Self {
 
         return self.onNotRendered { view in
             weak var view = view
@@ -393,12 +391,10 @@ public extension ViewCreator {
         }
     }
 
-    func borderWidth(_ constant: Value<CGFloat>) -> Self {
-        let relay = constant.asRelay
-
-        return self.onNotRendered { [relay] view in
+    func borderWidth(_ constant: Relay<CGFloat>) -> Self {
+        self.onNotRendered { view in
             weak var view = view
-            relay.sync {
+            constant.sync {
                 view?.layer.borderWidth = $0
             }
         }
@@ -406,7 +402,7 @@ public extension ViewCreator {
 }
 
 public extension ViewCreator {
-    func isUserInteractionEnabled(_ value: Value<Bool>) -> Self {
+    func isUserInteractionEnabled(_ value: Relay<Bool>) -> Self {
         self.onInTheScene {
             weak var view = $0
             value.sync {
@@ -417,23 +413,19 @@ public extension ViewCreator {
 }
 
 public extension ViewCreator {
-    func isHidden(_ value: Value<Bool>) -> Self {
-        let relay = value.asRelay
-
-        return self.onNotRendered { [relay] view in
+    func isHidden(_ isHidden: Relay<Bool>) -> Self {
+        self.onNotRendered { view in
             weak var weakView = view
-            relay.sync {
+            isHidden.sync {
                 weakView?.isHidden = $0
             }
         }
     }
 
-    func tintColor(_ value: Value<UIColor>) -> Self {
-        let relay = value.asRelay
-
-        return self.onNotRendered { [relay] view in
+    func tintColor(_ tintColor: Relay<UIColor>) -> Self {
+        self.onNotRendered { view in
             weak var weakView = view
-            relay.sync {
+            tintColor.sync {
                 weakView?.tintColor = $0
             }
         }
@@ -441,11 +433,9 @@ public extension ViewCreator {
 }
 
 public extension UICViewRepresentable {
-    func isHidden(_ value: Value<Bool>) -> Self {
-        let relay = value.asRelay
-
-        return self.onRendered { [weak self, relay] _ in
-            relay.sync {
+    func isHidden(_ isHidden: Relay<Bool>) -> Self {
+        self.onRendered { [weak self] _ in
+            isHidden.sync {
                 self?.wrapper?.isHidden = $0
             }
         }

@@ -496,7 +496,7 @@ public class Controller: UIViewCreator {
 }
 
 public extension UICTabCreator {
-    func selectedItem(_ selected: Value<Int>) -> Self {
+    func selectedItem(_ selected: Relay<Int>) -> Self {
         self.onInTheScene {
             weak var view = $0 as? View
 
@@ -506,7 +506,7 @@ public extension UICTabCreator {
         }
     }
 
-    func selectedItem<Enum: RawRepresentable>(_ selected: Value<Enum>) -> Self where Enum.RawValue == Int {
+    func selectedItem<Enum: RawRepresentable>(_ selected: Relay<Enum>) -> Self where Enum.RawValue == Int {
         self.onInTheScene {
             weak var view = $0 as? View
 

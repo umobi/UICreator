@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public protocol NavigationRepresentable: TemplateView {
+public protocol NavigationRepresentable: UICView {
     var navigationLoader: (UIViewController) -> UINavigationController { get }
     var navigationBar: UINavigationBar { get }
 

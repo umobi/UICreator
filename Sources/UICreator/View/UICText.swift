@@ -428,7 +428,7 @@ public extension TextKeyboard where View: UITextField {
 }
 
 public extension UIViewCreator where Self: Control & TextElement, View: UITextField {
-    init(_ value: Value<String?>) {
+    init(_ value: Relay<String?>) {
         self.init(value.wrappedValue)
 
         _ = self.onInTheScene { [weak self] in
@@ -459,7 +459,7 @@ public extension UIViewCreator where Self: Control & TextElement, View: UITextFi
 }
 
 public extension UIViewCreator where Self: TextElement & Control, View: UITextField {
-    func text(_ value: Value<String?>) -> Self {
+    func text(_ value: Relay<String?>) -> Self {
         self.onNotRendered { view in
             weak var view = view
             var isLocked: Bool = false

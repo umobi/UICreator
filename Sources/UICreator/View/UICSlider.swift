@@ -159,7 +159,7 @@ public extension UIViewCreator where Self: Control, View: UISlider {
 }
 
 public extension UIViewCreator where View: UISlider, Self: Control {
-    func value(_ value: Value<Float>) -> Self {
+    func value(_ value: Relay<Float>) -> Self {
         self.onValueChanged {
             value.wrappedValue = ($0 as? View)?.value ?? 0.0
         }.onInTheScene {

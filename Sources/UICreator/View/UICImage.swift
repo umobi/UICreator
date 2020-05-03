@@ -107,7 +107,7 @@ public class UICImage: UIViewCreator {
         }
     }
 
-    public convenience init(_ imageRelay: Value<UIImage?>) {
+    public convenience init(_ imageRelay: Relay<UIImage?>) {
         self.init(image: nil)
 
         _ = self.onInTheScene {
@@ -115,14 +115,6 @@ public class UICImage: UIViewCreator {
             imageRelay.sync {
                 view?.image = $0
             }
-        }
-    }
-}
-
-public extension Value {
-    func connect(to relay: Relay<Value>) {
-        relay.sync {
-            self.wrappedValue = $0
         }
     }
 }
@@ -174,13 +166,12 @@ public extension UIViewCreator where View: UIImageView {
 #endif
 
 public extension UICImage {
-    convenience init(image: Value<UIImage?>, placeholder: UIImage? = nil) {
+    convenience init(image: Relay<UIImage?>, placeholder: UIImage? = nil) {
         self.init(image: nil)
 
-        let relay = image.asRelay
-        self.onNotRendered { [relay] view in
+        self.onNotRendered { view in
             weak var view = view as? View
-            relay.sync {
+            image.sync {
                 view?.image = $0 ?? placeholder
             }
         }
