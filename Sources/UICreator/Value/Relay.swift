@@ -50,6 +50,8 @@ public struct Relay<Value> {
         set { self.reference.reactive.requestValueSetter(newValue) }
     }
 
+    public var projectedValue: Relay<Value> { self }
+
 //    public subscript<T>(dynamicMember keyPath: KeyPath<Value, T>) -> Relay<T> {
 //        return self.map {
 //            $0[keyPath: keyPath]
