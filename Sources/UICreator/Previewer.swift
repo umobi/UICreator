@@ -33,14 +33,12 @@ public struct LivePreview: SwiftUI.View {
 
     /// The init supports directly constructor of view creator or it can be used the callback constructor. Since view creator doesn’t have a default constructor, it is needed to be created outside of LivePreview.
     public init(_ initClass: ViewCreator) {
-        self.view = UICCenter {
-            initClass
-        }
+        self.view = initClass
     }
 
     /// Create LivePreview with content callback
     public init(content: @escaping () -> ViewCreator) {
-        self.view = UICCenter(content: content)
+        self.view = content()
     }
 
     public var body: some SwiftUI.View {
@@ -63,7 +61,9 @@ public struct Previewer: UIViewRepresentable {
     public func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<Previewer>) {}
 
     public func makeUIView(context: UIViewRepresentableContext<Previewer>) -> UIView {
-        return self.view.releaseUIView()
+        return self.view
+            .insets()
+            .releaseUIView()
     }
 }
 
