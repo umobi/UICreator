@@ -33,21 +33,21 @@ public protocol ViewRender: UIView {
 internal extension ViewRender {
     private(set) var viewCreator: ViewCreator? {
         get { self.opaqueViewCreator.object as? ViewCreator }
-        set { self.setCreator(newValue, policity: self.superview == nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
+        set { self.setCreator(newValue, storeType: self.superview == nil ? .weak : .strong) }
     }
 
-    func setCreator(_ newValue: ViewCreator?, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_ASSIGN) {
+    func setCreator(_ newValue: ViewCreator?, storeType: MemoryStoreType = .weak) {
         guard let newValue = newValue else {
             self.opaqueViewCreator = .nil
             return
         }
 
-        if case .OBJC_ASSOCIATION_ASSIGN = policity {
+        switch storeType {
+        case .weak:
             self.opaqueViewCreator = .weak(newValue)
-            return
+        case .strong:
+            self.opaqueViewCreator = .strong(newValue)
         }
-
-        self.opaqueViewCreator = .strong(newValue)
     }
 
     init(builder: ViewCreator) {

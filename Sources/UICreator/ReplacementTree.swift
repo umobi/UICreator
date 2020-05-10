@@ -32,7 +32,7 @@ class ReplacementTree {
 
     func swap(_ newManager: ViewCreator) {
         newManager.setView(self.manager.uiView, asWeak: self.manager.isViewWeaked)
-        self.manager.uiView.setCreator(newManager, policity: self.manager.isViewWeaked ? .OBJC_ASSOCIATION_RETAIN : .OBJC_ASSOCIATION_ASSIGN)
+        self.manager.uiView.setCreator(newManager, storeType: self.manager.isViewWeaked ? .strong : .weak)
 
         self.manager.tree.supertree?.append(newManager)
         self.manager.tree.supertree?.remove(self.manager)

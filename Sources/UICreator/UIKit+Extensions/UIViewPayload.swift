@@ -23,10 +23,12 @@
 import Foundation
 import UIKit
 
+extension NSObject: Opaque {}
+
 private struct UIViewPayload {
     typealias AppearState = UIView.AppearState
 
-    let viewCreator: Mutable<MEMOpaque> = .init(value: .nil)
+    let viewCreator: Mutable<MemorySwitch> = .init(value: .nil)
     let appearState: Mutable<AppearState> = .init(value: .unset)
 
     let viewMethods: Mutable<UIViewMethods> = .init(value: .init())
@@ -85,7 +87,7 @@ extension UIView {
         self.payload.viewMethods
     }
 
-    var opaqueViewCreator: MEMOpaque {
+    var opaqueViewCreator: MemorySwitch {
         get { self.payload.viewCreator.value }
         set { self.payload.viewCreator.value = newValue }
     }

@@ -22,37 +22,68 @@
 
 import Foundation
 
-struct MEMWeak<Object>: Memory where Object: AnyObject {
-    private weak var __weak_uiView: Object!
-    private var __strong_uiView: Object!
+struct WeakOpaque {
+    fileprivate weak var object: Opaque?
 
+    fileprivate init(_ object: Opaque?) {
+        self.object = object
+    }
+}
+
+struct StrongOpaque {
+    fileprivate var object: Opaque?
+
+    fileprivate init(_ object: Opaque?) {
+        self.object = object
+    }
+}
+
+enum MemorySwitch: Memory {
+    typealias Object = Opaque
+
+    case weak(WeakOpaque)
+    case strong(StrongOpaque)
+    case `nil`
+
+    static func weak(_ object: Opaque?) -> Self {
+        return .weak(WeakOpaque(object))
+    }
+
+    static func strong(_ object: Opaque?) -> Self {
+        return .strong(StrongOpaque(object))
+    }
+}
+
+extension MemorySwitch {
+    var isWeak: Bool {
+        if case .weak = self {
+            return true
+        }
+
+        return false
+    }
+}
+
+extension MemorySwitch {
     var object: Object! {
-        self.__strong_uiView ?? self.__weak_uiView
+        switch self {
+        case .weak(let opaque):
+            return opaque.object
+        case .strong(let opaque):
+            return opaque.object
+        case .nil:
+            return nil
+        }
     }
+}
 
-    private init(weak object: Object!) {
-        self.__weak_uiView = object
-        self.__strong_uiView = nil
+extension MemorySwitch {
+    func castedObject<T>() -> T? {
+        return self.object as? T
     }
+}
 
-    private init(strong object: Object!) {
-        self.__weak_uiView = nil
-        self.__strong_uiView = object
-    }
-
-    static func `weak`(_ object: Object) -> Self {
-        .init(weak: object)
-    }
-
-    static func strong(_ object: Object) -> Self {
-        .init(strong: object)
-    }
-
-    static var `nil`: Self {
-        .init(weak: nil)
-    }
-
-    var isWeaked: Bool {
-        self.__weak_uiView != nil
-    }
+enum MemoryStoreType {
+    case weak
+    case strong
 }
