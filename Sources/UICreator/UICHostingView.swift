@@ -37,32 +37,6 @@ public class UICHostingView: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override public func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-
-        guard let strongView = self.strongContentView, strongView.superview == nil else {
-            return
-        }
-
-        self.strongContentView = nil
-
-        UIView.CBSubview(self.view).addSubview(strongView)
-
-        Constraintable.activate(
-            strongView.cbuild.edges
-        )
-    }
-
-    override public func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        guard let view = self.hostedView.uiView else {
-            return
-        }
-
-        self.strongContentView = view
-        view.removeFromSuperview()
-    }
-
     #if os(iOS)
     public var statusBarStyle: UIStatusBarStyle? = nil {
         didSet {
@@ -75,24 +49,15 @@ public class UICHostingView: UIViewController {
     }
     #endif
 
-    override public func viewDidLoad() {
-        super.viewDidLoad()
-
+    public override func loadView() {
         guard let contentBuilder = self.contentBuilder else {
             fatalError()
         }
 
-        let hostView = UICHost(content: { contentBuilder })
-        self.contentView = hostView
+        self.contentView = contentBuilder
 
-        let contentView: UIView! = hostView.releaseUIView()
-        UIView.CBSubview(self.view).addSubview(contentView)
-
-        (contentView as? RootView)?.hostingView = self
-
-        Constraintable.activate(
-            contentView.cbuild.edges
-        )
+        let contentView: UIView! = contentBuilder.releaseUIView()
+        self.view = contentView
     }
 
     @available(iOS 11.0, tvOS 11, *)

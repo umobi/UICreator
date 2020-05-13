@@ -32,11 +32,6 @@ public class RootView: UIView {
         super.init(frame: .zero)
     }
 
-    weak var hostingView: UICHostingView? = nil
-    override public var next: UIResponder? {
-        super.next ?? (self.hostingView?.view)
-    }
-
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
