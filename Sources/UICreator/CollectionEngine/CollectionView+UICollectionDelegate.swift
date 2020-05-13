@@ -24,31 +24,55 @@ import Foundation
 import UIKit
 
 extension _CollectionView: UICollectionViewDelegate {
-    var size: CGSize {
-        return .init(width: self.frame.size.width - (self.contentInset.left + self.contentInset.right), height: self.frame.height - (self.contentInset.top + self.contentInset.bottom))
-    }
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        guard let section = self.layoutManager?.section(at: indexPath.section) else {
-            return .zero
-        }
-
-        return section.size(inside: self.size, at: indexPath)
+        return self.sizeForItem(at: indexPath)
     }
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        guard let header = self.layoutManager?.header(at: section) else {
-            return .zero
-        }
-
-        return header.size(self.size, at: section)
+        return self.sizeForHeader(at: section) ?? .zero
     }
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
-        guard let footer = self.layoutManager?.footer(at: section) else {
-            return .zero
+        return self.sizeForFooter(at: section) ?? .zero
+    }
+}
+
+public extension UICollectionView {
+    fileprivate var size: CGSize {
+        return .init(width: self.frame.size.width - (self.contentInset.left + self.contentInset.right), height: self.frame.height - (self.contentInset.top + self.contentInset.bottom))
+    }
+
+    /// ViewCreator
+    func sizeForItem(at indexPath: IndexPath) -> CGSize {
+        guard let layoutManager = self.layoutManager else {
+            fatalError()
         }
 
-        return footer.size(self.size, at: section)
+        return layoutManager
+            .section(at: indexPath.section)
+            .size(inside: self.size, at: indexPath)
+    }
+
+    /// ViewCreator
+    func sizeForHeader(at section: Int) -> CGSize? {
+        guard let layoutManager = self.layoutManager else {
+            fatalError()
+        }
+
+        return layoutManager
+            .header(at: section)?
+            .size(self.size, at: section)
+    }
+
+    /// ViewCreator
+    func sizeForFooter(at section: Int) -> CGSize? {
+        guard let layoutManager = self.layoutManager else {
+            fatalError()
+        }
+
+        return layoutManager
+            .footer(at: section)?
+            .size(self.size, at: section)
     }
 }

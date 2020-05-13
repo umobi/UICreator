@@ -95,12 +95,10 @@ public extension UIViewCreator where View: UIActivityIndicatorView {
 }
 
 public extension UIViewCreator where View: UIActivityIndicatorView {
-    func isLoading(_ isLoading: Value<Bool>) -> Self {
-        let relay = isLoading.asRelay
-
-        return self.onNotRendered { [relay] view in
+    func isLoading(_ isLoading: Relay<Bool>) -> Self {
+        self.onNotRendered { view in
             weak var view = view
-            relay.sync {
+            isLoading.sync {
                 if $0 {
                     (view as? View)?.startAnimating()
                     return
@@ -113,12 +111,10 @@ public extension UIViewCreator where View: UIActivityIndicatorView {
 }
 
 public extension UIViewCreator where View: UIActivityIndicatorView {
-    func color(_ value: Value<UIColor>) -> Self {
-        let relay = value.asRelay
-
-        return self.onNotRendered { [relay] view in
+    func color(_ color: Relay<UIColor>) -> Self {
+        self.onNotRendered { view in
             weak var view = view
-            relay.sync {
+            color.sync {
                 (view as? View)?.color = $0
             }
         }

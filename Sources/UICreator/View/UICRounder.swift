@@ -22,9 +22,38 @@
 
 import Foundation
 import UIKit
-import UIContainer
+import ConstraintBuilder
 
-public class _RounderView: RounderView {
+public protocol UICManagerContentView {
+    func addContent(_ view: UIView)
+    func reloadContentLayout()
+}
+
+public class UICRounderView: UIView, UICManagerContentView {
+    public var radius: CGFloat {
+        didSet {
+            self.reloadContentLayout()
+        }
+    }
+
+    public required init(radius: CGFloat) {
+        self.radius = radius
+        super.init(frame: .zero)
+    }
+
+    public required init(_ view: UIView, radius: CGFloat) {
+        self.radius = radius
+        super.init(frame: .zero)
+        self.addContent(view)
+    }
+
+    public override init(frame: CGRect) {
+        fatalError("init(frame:) not implemented")
+    }
+
+    required public init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) not implemented")
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -59,6 +88,7 @@ public class _RounderView: RounderView {
 
     override public func layoutSubviews() {
         super.layoutSubviews()
+        self.reloadContentLayout()
         RenderManager(self)?.layoutSubviews()
     }
 
@@ -68,8 +98,52 @@ public class _RounderView: RounderView {
     }
 }
 
+public extension UICRounderView {
+
+    func addContent(_ view: UIView) {
+        CBSubview(self).addSubview(view)
+
+        Constraintable.activate(
+            view.cbuild
+                .edges
+        )
+        self.clipsToBounds = true
+        self.reloadContentLayout()
+    }
+
+    func reloadContentLayout() {
+        if self.radius < 1 {
+            self.layer.cornerRadius = self.frame.height * self.radius
+        } else {
+            self.layer.cornerRadius = self.radius
+        }
+    }
+
+    func border(width: CGFloat, color: UIColor?) {
+        self.layer.borderWidth = width
+        self.layer.borderColor = color?.cgColor
+    }
+
+    @discardableResult
+    func border(width: CGFloat) -> Self {
+        guard let color = self.layer.borderColor else {
+            self.border(width: width, color: UIColor.clear)
+            return self
+        }
+
+        self.border(width: width, color: UIColor(cgColor: color))
+        return self
+    }
+
+    @discardableResult
+    func border(color: UIColor?) -> Self {
+        self.border(width: self.layer.borderWidth, color: color)
+        return self
+    }
+}
+
 public class UICRounder: UIViewCreator {
-    public typealias View = _RounderView
+    public typealias View = UICRounderView
 
     public init(radius: CGFloat, content: @escaping () -> ViewCreator) {
         let content = content()

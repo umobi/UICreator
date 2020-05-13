@@ -22,7 +22,6 @@
 
 import Foundation
 import UIKit
-import UIContainer
 
 /// RootView is an internal view that is used to be the UIView of some view creator to support lazy loads.
 public class RootView: UIView {
@@ -31,6 +30,11 @@ public class RootView: UIView {
 
     init() {
         super.init(frame: .zero)
+    }
+
+    weak var hostingView: UICHostingView? = nil
+    override public var next: UIResponder? {
+        super.next ?? (self.hostingView?.view)
     }
 
     required init?(coder: NSCoder) {
@@ -100,73 +104,8 @@ open class Root: ViewCreator {
     public typealias View = RootView
 
     public init() {
-        var body: ViewCreator?
-
-        if let templateView = self as? TemplateView {
-            let _body = templateView.body
-            self.tree.append(_body)
-            body = _body
-        }
-
         self.loadView { [unowned self] in
             return View.init(builder: self)
-        }
-        .onNotRendered {
-            if let body = body {
-                $0.add(priority: .required, body.releaseUIView())
-            }
-        }
-    }
-}
-
-private var kViewDidLoad: UInt = 0
-private extension Root {
-    var didViewLoadMutable: Mutable<Bool> {
-        OBJCSet(self, &kViewDidLoad) {
-            .init(value: false)
-        }
-    }
-}
-
-@objc extension Root {
-    private(set) var didViewLoad: Bool {
-        get { self.didViewLoadMutable.value }
-        set { self.didViewLoadMutable.value = newValue }
-    }
-
-    /// The viewDidLoad function is a similar method used by UIKit for view controllers. This method means in UICreator that it is now allowed to directly access the subviews or manipulate data without having some errors thrown.
-    open func viewDidLoad() {
-        self.didViewLoad = true
-    }
-}
-
-private var kTemplateViewDidConfiguredView: UInt = 0
-extension TemplateView where Self: Root {
-    private var didConfiguredViewMutable: Mutable<Bool> {
-        OBJCSet(self, &kTemplateViewDidConfiguredView) {
-            .init(value: false)
-        }
-    }
-    private var didConfiguredView: Bool {
-        get { self.didConfiguredViewMutable.value }
-        set { self.didConfiguredViewMutable.value = newValue }
-    }
-
-    internal func viewDidChanged() {
-        guard !self.didConfiguredView else {
-            return
-        }
-
-        self.didConfiguredView = true
-
-        (self.uiView as? View)?.didCommitNotRenderedHandler = { [weak self] in
-            guard let self = self else {
-                fatalError()
-            }
-            
-            if !self.didViewLoad {
-                self.viewDidLoad()
-            }
         }
     }
 }

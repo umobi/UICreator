@@ -78,6 +78,18 @@ public class UICPageControl: UIViewCreator, Control {
             ($0 as? View)?.numberOfPages = numberOfPages
         }
     }
+
+    public init(numberOfPages: Relay<Int>) {
+        self.loadView { [unowned self] in
+            View.init(builder: self)
+        }
+        .onNotRendered {
+            weak var view = $0 as? View
+            numberOfPages.sync {
+                view?.numberOfPages = $0
+            }
+        }
+    }
 }
 
 public extension UIViewCreator where View: UIPageControl {
@@ -116,10 +128,32 @@ public extension UIViewCreator where View: UIPageControl {
             ($0 as? View)?.pageIndicatorTintColor = indicatorTintColor
         }
     }
+
+    func currentPage(_ value: Relay<Int>) -> Self {
+        self.onNotRendered {
+            weak var view = $0 as? View
+            value.sync {
+                view?.currentPage = $0
+            }
+        }
+    }
 }
 
 public extension UIViewCreator where Self: Control, View: UIPageControl {
     func onPageChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onEvent(.valueChanged, handler)
+    }
+
+    func currentPage(_ value: Relay<Int>) -> Self {
+        self.onNotRendered { [weak self] in
+            weak var view = $0 as? View
+            _ = self?.onPageChanged { _ in
+                value.wrappedValue = view?.currentPage ?? .zero
+            }
+
+            value.sync {
+                view?.currentPage = $0
+            }
+        }
     }
 }

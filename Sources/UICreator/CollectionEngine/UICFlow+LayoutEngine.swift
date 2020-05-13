@@ -247,12 +247,3 @@ internal extension CollectionLayoutConstraintable {
          return value
      }
 }
-
-public extension UICFlow {
-    func layoutMaker(content: @escaping () -> [UICCollectionLayoutSectionElement]) -> Self {
-        return self.onInTheScene {
-            ($0 as? View)?.layoutManager = UICCollectionLayoutManager(contents: content())
-            ($0 as? View)?.collectionViewLayout.invalidateLayout()
-        }
-    }
-}

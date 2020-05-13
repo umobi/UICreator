@@ -35,7 +35,11 @@ class Tree {
     }
 
     func appendAssert(_ leaf: ViewCreator) {
-        guard self.root !== leaf else {
+        guard
+            !sequence(first: self.root, next: {
+                $0?.tree.supertree?.root
+            }).contains(where: { $0 === leaf })
+        else {
             Fatal.rootCycle.die()
             return
         }

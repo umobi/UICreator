@@ -145,7 +145,7 @@ public extension ViewCreator {
 
     func navigation(titleView content: @escaping () -> ViewCreator) -> Self {
         return self.onInTheScene {
-            $0.navigationItem.titleView = content().releaseUIView()
+            $0.navigationItem.titleView = UICHost(content: content).releaseUIView()
         }
     }
 
@@ -299,7 +299,7 @@ public extension ViewCreator {
 #endif
 
 public extension ViewCreator {
-    func navigation(title value: Value<String?>) -> Self {
+    func navigation(title value: Relay<String?>) -> Self {
         value.sync { [weak self] in
             _ = self?.navigation(title: $0)
         }

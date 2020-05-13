@@ -22,9 +22,72 @@
 
 import Foundation
 import UIKit
-import UIContainer
+import ConstraintBuilder
 
-public class _GradientView: GradientView {
+public class UICGradientView: UIView {
+    fileprivate let gradientLayer = CAGradientLayer()
+
+    public enum Direction {
+        case top
+        case bottom
+        case left
+        case right
+        case other(CGPoint, CGPoint)
+
+        var points: (CGPoint, CGPoint) {
+            switch self {
+            case .top:
+                return (CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1.0))
+            case .bottom:
+                return (CGPoint(x: 0, y: 1.0), CGPoint(x: 0, y: 0))
+            case .left:
+                return (CGPoint(x: 1.0, y: 0), CGPoint(x: 0, y: 0))
+            case .right:
+                return (CGPoint(x: 0.0, y: 0), CGPoint(x: 1.0, y: 0))
+            case .other(let from, let to):
+                return (from, to)
+            }
+        }
+    }
+
+    public var direction: Direction = .right {
+        didSet {
+            self.setupGradientLayer()
+        }
+    }
+
+    public var colors: [UIColor] = [] {
+        didSet {
+            self.setupGradientLayer()
+        }
+    }
+
+    var locations: [NSNumber] {
+        guard self.colors.count > 1 else {
+            return [0]
+        }
+
+        let lastIndex = self.colors.count - 1
+
+        let points = self.direction.points
+        let distance = points.0.distance(to: points.1)
+
+        return self.colors.enumerated().map { color in
+            return NSNumber(value: {
+                let r = Double(color.offset) / Double(lastIndex)
+                return r * Double(distance)
+            }() as Double)
+        }
+    }
+
+    private func setupGradientLayer() {
+        gradientLayer.frame = bounds
+
+        gradientLayer.locations = self.locations
+        gradientLayer.colors = self.colors.map { $0.cgColor }
+        gradientLayer.startPoint = self.direction.points.0
+        gradientLayer.endPoint = self.direction.points.1
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -59,17 +122,38 @@ public class _GradientView: GradientView {
 
     override public func layoutSubviews() {
         super.layoutSubviews()
+        gradientLayer.frame = self.bounds
         RenderManager(self)?.layoutSubviews()
     }
 
     override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
+        self.setupGradientLayer()
         RenderManager(self)?.traitDidChange()
     }
 }
 
+public extension UICGradientView {
+    static func Linear(colors: [UIColor], direction: Direction) -> UICGradientView {
+        let gradient = UICGradientView()
+        gradient.colors = colors
+        gradient.direction = direction
+        return gradient
+    }
+
+    func animates(animator handler: (CAGradientLayer) -> Void) {
+        handler(self.gradientLayer)
+    }
+}
+
+extension CGPoint {
+    func distance(to point: CGPoint) -> CGFloat {
+        return sqrt(pow(x - point.x, 2) + pow(y - point.y, 2))
+    }
+}
+
 public class UICGradient: UIViewCreator {
-    public typealias View = _GradientView
+    public typealias View = UICGradientView
 
     public init(_ colors: [UIColor], direction: View.Direction = .right) {
         self.colors(colors)
@@ -84,7 +168,7 @@ public class UICGradient: UIViewCreator {
     }
 }
 
-public extension UIViewCreator where View: GradientView {
+public extension UIViewCreator where View: UICGradientView {
 
     func colors(_ colors: UIColor...) -> Self {
         self.onNotRendered {

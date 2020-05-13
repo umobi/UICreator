@@ -22,9 +22,8 @@
 
 import Foundation
 import UIKit
-import UIContainer
 
-public protocol NavigationRepresentable: TemplateView {
+public protocol NavigationRepresentable: UICView {
     var navigationLoader: (UIViewController) -> UINavigationController { get }
     var navigationBar: UINavigationBar { get }
 
@@ -115,13 +114,13 @@ public extension NavigationRepresentable {
             }
 
             self.content = nil
-            return self.navigationLoader(ContainerController(UICHost(content: content)))
+            return self.navigationLoader(UICHostingView(content: content))
         }
     }
 
     @discardableResult
     func push(animated: Bool, content: @escaping () -> ViewCreator) -> Self {
-        self.navigationController.pushViewController(ContainerController(UICHost(content: content)), animated: animated)
+        self.navigationController.pushViewController(UICHostingView(content: content), animated: animated)
         return self
     }
 
@@ -146,7 +145,7 @@ public extension NavigationRepresentable {
     @discardableResult
     func popTo(view: ViewCreator, animated: Bool) -> Self {
         guard let viewController = self.navigationController.viewControllers.first(where: {
-            $0.view.contains(view: view.uiView)
+            $0.view.contains(view)
         }) else {
             fatalError("\(type(of: view)) is not on first hierarchy")
         }
@@ -154,67 +153,26 @@ public extension NavigationRepresentable {
         self.navigationController.popToViewController(viewController, animated: animated)
         return self
     }
-
-
-//    /// Check if ViewCreator is inside the first view of navigation
-//    func isFirst(_ viewCreator: ViewCreator) -> Bool {
-//        self.navigationController.viewControllers.first?.view.contains(view: viewCreator.uiView) ?? false
-//    }
-//
-//    /// Check if ViewCreator is inside the last view of navigation
-//    func isLast(_ viewCreator: ViewCreator) -> Bool {
-//        self.navigationController.viewControllers.last?.view.contains(view: viewCreator.uiView) ?? false
-//    }
 }
 
-//extension UIView {
-//    var viewCreators: [ViewCreator] {
-//        self.subviews.compactMap {
-//            $0.viewCreator
-//        }
-//    }
-//
-//    var lowViewCreator: ViewCreator? {
-//        return lowRootView(self)
-//    }
-//
-//    private func lowViewCreator(_ ignores: UIView) -> ViewCreator? {
-//        if self !== ignores {
-//            if let root = self.viewCreator as? ViewCreator {
-//                return root
-//            }
-//        }
-//
-//        return self.subviews.first(where: {
-//            $0.lowViewCreator(ignores) != nil
-//        })?.viewCreator as? ViewCreator
-//    }
-//
-//    var lowRootView: UICView? {
-//        self.lowRootView(self)
-//    }
-//
-//    private func lowRootView(_ ignores: UIView) -> UICView? {
-//        if self !== ignores {
-//            if let root = self.viewCreator as? UICView {
-//                return root
-//            }
-//        }
-//
-//        return self.subviews.first(where: {
-//            $0.lowRootView(ignores) != nil
-//        })?.viewCreator as? UICView
-//    }
-//}
-//
-extension UIView {
-    func contains(view: UIView) -> Bool {
-        if self === view {
+public extension UIView {
+    func contains(_ viewCreator: ViewCreator) -> Bool {
+        return self.contains(where: {
+            $0 === viewCreator
+        })
+    }
+
+    func contains(where handler: @escaping (ViewCreator) -> Bool) -> Bool {
+        if let viewCreator = self.viewCreator, handler(viewCreator) {
             return true
         }
 
-        return self.subviews.first(where: {
-            $0.contains(view: view)
-        }) != nil
+        if let hostingView = self.next as? UICHostingView {
+            return hostingView.hostedView.uiView.contains(where: handler)
+        }
+
+        return self.subviews.contains(where: {
+            $0.contains(where: handler)
+        })
     }
 }

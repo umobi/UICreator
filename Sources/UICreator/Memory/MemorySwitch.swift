@@ -21,21 +21,69 @@
 //
 
 import Foundation
-import UIContainer
-import ConstraintBuilder
-import UIKit
 
-public extension ViewControllerType where Self: ViewCreator {
-    var content: ViewControllerMaker {
-        return .dynamic { [unowned self] in
-            AddSubview($0.view)?.addSubview(self.releaseUIView())
+struct WeakOpaque {
+    fileprivate weak var object: Opaque?
 
-            Constraintable.activate(
-                self.uiView.cbuild
-                    .edges
-            )
+    fileprivate init(_ object: Opaque?) {
+        self.object = object
+    }
+}
 
-            $0.view.backgroundColor = .clear
+struct StrongOpaque {
+    fileprivate var object: Opaque?
+
+    fileprivate init(_ object: Opaque?) {
+        self.object = object
+    }
+}
+
+enum MemorySwitch: Memory {
+    typealias Object = Opaque
+
+    case weak(WeakOpaque)
+    case strong(StrongOpaque)
+    case `nil`
+
+    static func weak(_ object: Opaque?) -> Self {
+        return .weak(WeakOpaque(object))
+    }
+
+    static func strong(_ object: Opaque?) -> Self {
+        return .strong(StrongOpaque(object))
+    }
+}
+
+extension MemorySwitch {
+    var isWeak: Bool {
+        if case .weak = self {
+            return true
+        }
+
+        return false
+    }
+}
+
+extension MemorySwitch {
+    var object: Object! {
+        switch self {
+        case .weak(let opaque):
+            return opaque.object
+        case .strong(let opaque):
+            return opaque.object
+        case .nil:
+            return nil
         }
     }
+}
+
+extension MemorySwitch {
+    func castedObject<T>() -> T? {
+        return self.object as? T
+    }
+}
+
+enum MemoryStoreType {
+    case weak
+    case strong
 }

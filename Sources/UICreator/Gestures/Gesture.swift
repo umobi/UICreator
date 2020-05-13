@@ -38,8 +38,8 @@ public extension UIGesture {
 }
 
 struct UIGesturePayload {
-    let gestureObject: Mutable<MEMOpaque> = .init(value: .nil)
-    let targetViewObject: Mutable<MEMWeak<UIView>> = .init(value: .nil)
+    let gestureObject: Mutable<MemorySwitch> = .init(value: .nil)
+    let targetViewObject: Mutable<MemorySwitch> = .init(value: .nil)
 }
 
 private var kUIGesturePayload: UInt = 0
@@ -65,7 +65,7 @@ internal extension UIGestureRecognizer {
     }
 
     var targetView: UIView? {
-        get { self.mutable.targetViewObject.value.object ?? self.view }
+        get { self.mutable.targetViewObject.value.castedObject() ?? self.view }
         set {
             if let newValue = newValue {
                 self.mutable.targetViewObject.value = .weak(newValue)
@@ -92,29 +92,29 @@ internal extension UIGestureRecognizer {
 
 private var kGestureMutable: UInt = 0
 internal extension Gesture {
-    private var gestureMutable: Mutable<MEMWeak<UIGestureRecognizer>> {
+    private var gestureMutable: Mutable<MemorySwitch> {
         OBJCSet(self, &kGestureMutable) {
             .init(value: .nil)
         }
     }
 
     var gesture: UIGestureRecognizer! {
-        get { self.gestureMutable.value.object }
-        set { setGesture(newValue, policity: newValue?.view?.superview != nil ? .OBJC_ASSOCIATION_ASSIGN : .OBJC_ASSOCIATION_RETAIN) }
+        get { self.gestureMutable.value.castedObject() }
+        set { setGesture(newValue, storeType: newValue?.view?.superview != nil ? .weak : .strong) }
     }
 
-    func setGesture(_ uiGesture: UIGestureRecognizer, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN) {
-        if case .OBJC_ASSOCIATION_ASSIGN = policity {
+    func setGesture(_ uiGesture: UIGestureRecognizer, storeType: MemoryStoreType = .strong) {
+        switch storeType {
+        case .weak:
             self.gestureMutable.value = .weak(uiGesture)
-            return
+        case .strong:
+            self.gestureMutable.value = .strong(uiGesture)
         }
-
-        self.gestureMutable.value = .strong(uiGesture)
     }
 
     func releaseGesture() -> UIGestureRecognizer! {
         let gesture: UIGestureRecognizer! = self.gesture
-        self.setGesture(gesture, policity: .OBJC_ASSOCIATION_ASSIGN)
+        self.setGesture(gesture, storeType: .weak)
         gesture.releaseParent()
         return gesture
     }

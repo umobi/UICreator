@@ -139,7 +139,7 @@ public extension UIViewCreator where Self: Control, View: UIDatePicker {
 }
 
 public extension UIViewCreator where Self: Control, View: UIDatePicker {
-    func selectedDate(_ value: Value<Date>) -> Self {
+    func selectedDate(_ value: Relay<Date>) -> Self {
         self.onValueChanged {
             guard let date = ($0 as? View)?.date else {
                 return
@@ -155,7 +155,7 @@ public extension UIViewCreator where Self: Control, View: UIDatePicker {
         }
     }
 
-    func selectedTime(_ value: Value<TimeInterval>) -> Self {
+    func selectedTime(_ value: Relay<TimeInterval>) -> Self {
         self.onValueChanged {
             guard let time = ($0 as? View)?.countDownDuration else {
                 return
@@ -171,7 +171,7 @@ public extension UIViewCreator where Self: Control, View: UIDatePicker {
         }
     }
 
-    func maximumDate(_ value: Value<Date?>) -> Self {
+    func maximumDate(_ value: Relay<Date?>) -> Self {
         self.onInTheScene {
             weak var view = $0 as? View
             value.sync {
@@ -180,7 +180,7 @@ public extension UIViewCreator where Self: Control, View: UIDatePicker {
         }
     }
 
-    func minimumDate(_ value: Value<Date?>) -> Self {
+    func minimumDate(_ value: Relay<Date?>) -> Self {
         self.onInTheScene {
             weak var view = $0 as? View
             value.sync {
@@ -189,7 +189,7 @@ public extension UIViewCreator where Self: Control, View: UIDatePicker {
         }
     }
 
-    func maximumDate(_ value: Value<Date>) -> Self {
+    func maximumDate(_ value: Relay<Date>) -> Self {
         self.onInTheScene {
             weak var view = $0 as? View
             value.sync {
@@ -198,7 +198,7 @@ public extension UIViewCreator where Self: Control, View: UIDatePicker {
         }
     }
 
-    func minimumDate(_ value: Value<Date>) -> Self {
+    func minimumDate(_ value: Relay<Date>) -> Self {
         self.onInTheScene {
             weak var view = $0 as? View
             value.sync {

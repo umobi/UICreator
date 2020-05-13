@@ -29,7 +29,6 @@ public protocol UIViewMaker: ViewCreator {
 }
 
 public protocol UICViewRepresentable: UIViewCreator, UIViewMaker {
-    var uiView: View! { get }
     func makeUIView() -> View
     func updateView(_ view: View)
 }

@@ -22,7 +22,6 @@
 
 import Foundation
 import UIKit
-import UIContainer
 
 public struct UICPresent {
     let presentingStyle: UIModalPresentationStyle
@@ -85,9 +84,9 @@ public struct UICPresent {
     }
 
     func present() {
-        let viewController = ContainerController(UICHost {
+        let viewController = UICHostingView {
             self.toView!
-        })
+        }
 
         viewController.modalPresentationStyle = self.presentingStyle
         viewController.modalTransitionStyle = self.transitionStyle
@@ -118,7 +117,7 @@ public struct UICPresent {
     }
 }
 
-public class UICNavigation: Root, NavigationRepresentable {
+public class UICNavigation: NavigationRepresentable {
 
     public var navigationLoader: (UIViewController) -> UINavigationController {
         {
@@ -127,7 +126,6 @@ public class UICNavigation: Root, NavigationRepresentable {
     }
 
     public init(_ content: @escaping () -> ViewCreator) {
-        super.init()
         self.content = .init(content)
     }
 }
@@ -158,15 +156,8 @@ public extension ViewCreator {
     }
 
     @discardableResult
-    func present<View: ViewCreator>(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> View) -> Self {
-        let controller = ContainerController(UICHost(content: content))
-        self.presentable?.present(controller, animated: animated, completion: onCompletion)
-        return self
-    }
-
-    @discardableResult
-    func present<View: ViewControllerType>(animated: Bool, onCompletion: (() -> Void)? = nil,_ content: View) -> Self {
-        let controller = ContainerController(content)
+    func present(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> ViewCreator) -> Self {
+        let controller = UICHostingView(content: content)
         self.presentable?.present(controller, animated: animated, completion: onCompletion)
         return self
     }
@@ -182,16 +173,8 @@ public extension ViewCreator {
     }
 
     @discardableResult
-    func presentModal<View: ViewCreator>(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> View) -> Self {
-        let controller = ContainerController(UICHost(content: content))
-        controller.modalPresentationStyle = .overFullScreen
-        self.presentable?.present(controller, animated: animated, completion: onCompletion)
-        return self
-    }
-
-    @discardableResult
-    func presentModal<View: ViewControllerType>(animated: Bool, onCompletion: (() -> Void)? = nil,_ content: View) -> Self {
-        let controller = ContainerController(content)
+    func presentModal(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> ViewCreator) -> Self {
+        let controller = UICHostingView(content: content)
         controller.modalPresentationStyle = .overFullScreen
         self.presentable?.present(controller, animated: animated, completion: onCompletion)
         return self

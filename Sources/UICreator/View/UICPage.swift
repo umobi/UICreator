@@ -22,7 +22,6 @@
 
 import Foundation
 import UIKit
-import UIContainer
 import ConstraintBuilder
 
 public class UICPageViewController: UIPageViewController {
@@ -136,7 +135,7 @@ extension UICPageViewController: UIPageViewControllerDataSource {
 }
 
 public class UICPageContainer: UIView {
-    private(set) weak var container: _Container<UICPageViewController>!
+    private(set) weak var container: UICControllerContainerView<UICPageViewController>!
     private var content: (() -> UICPageViewController)? = nil
 
     private weak var stackView: UIStackView!
@@ -179,13 +178,16 @@ public class UICPageContainer: UIView {
     override open func didMoveToWindow() {
         super.didMoveToWindow()
         self.container = self.container ?? {
-            let container = _Container<UICPageViewController>(in: self.viewController, loadHandler: { [unowned self] in
-                let viewController = self.content?()
-                self.content = nil
-                return viewController
-            })
+            let container = UICControllerContainerView<UICPageViewController>()
+            container.contain(
+                viewController: {
+                    let viewController = self.content?()
+                    self.content = nil
+                    return viewController!
+                }(),
+                parentView: self.viewController)
 
-            AddSubview(self).addSubview(container)
+            CBSubview(self).addSubview(container)
             Constraintable.activate(container.cbuild.edges)
             return container
         }()
@@ -363,10 +365,10 @@ public class UICPageContainer: UIView {
         }
 
         let stackView = UIStackView()
-        AddSubview(self).addSubview(stackView)
+        CBSubview(self).addSubview(stackView)
         self.positionSV(stackView, orientedBy: location)
         views.forEach {
-            AddSubview(stackView).addArrangedSubview($0)
+            CBSubview(stackView).addArrangedSubview($0)
         }
 
         self.stackView = stackView
@@ -426,17 +428,15 @@ public extension UICPage {
     
     func pages(direction: UIPageViewController.NavigationDirection,_ contents: @escaping () -> [ViewCreator]) -> Self {
         let contents = contents().map { content in
-            UICHost(content: { content })
+            UICHostingView(content: { content })
         }
 
         contents.forEach {
-            self.tree.append($0)
+            self.tree.append($0.hostedView)
         }
 
         return self.onInTheScene { [unowned self] _ in
-            self.pageController.updateViewControllers(contents.map { content in
-                ContainerController(content)
-            }, direction: direction, animated: false, completion: nil)
+            self.pageController.updateViewControllers(contents, direction: direction, animated: false, completion: nil)
         }
     }
 

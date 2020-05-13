@@ -88,13 +88,13 @@ struct UICCollectionLayoutModifiedItem: CollectionLayoutConstraintable {
 
         if case .equalTo(let constant)? = self.vertical {
             if case .equalTo(let newConstant)? = copy.vertical {
-                didChangedSize = didChangedSize && constant != newConstant
+                didChangedSize = didChangedSize || constant != newConstant
             }
         }
 
         if case .equalTo(let constant)? = self.horizontal {
             if case .equalTo(let newConstant)? = copy.horizontal {
-                didChangedSize = didChangedSize && constant != newConstant
+                didChangedSize = didChangedSize || constant != newConstant
             }
         }
 

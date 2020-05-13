@@ -22,9 +22,31 @@
 
 import Foundation
 import UIKit
-import UIContainer
+import ConstraintBuilder
 
-public class _SpacerView: SpacerView {
+public class UICSpacerView: UIView, UICManagerContentView {
+    private weak var view: UIView?
+    let margin: Edges
+
+    public required init(_ view: UIView!, margin: Edges) {
+        self.margin = margin
+        super.init(frame: .zero)
+
+        self.addContent(view)
+    }
+
+    public required init(margin: Edges) {
+        self.margin = margin
+        super.init(frame: .zero)
+    }
+
+    public override init(frame: CGRect) {
+        fatalError("init(frame:) has not been implemented")
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -41,7 +63,7 @@ public class _SpacerView: SpacerView {
             RenderManager(self)?.frame(newValue)
         }
     }
-    
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         RenderManager(self)?.willMove(toSuperview: newSuperview)
@@ -66,12 +88,83 @@ public class _SpacerView: SpacerView {
         super.traitCollectionDidChange(previousTraitCollection)
         RenderManager(self)?.traitDidChange()
     }
+
+    private func layout() {
+        guard let view = self.view else {
+            return
+        }
+
+        Constraintable.update(
+            view.cbuild
+                .top
+                .equalTo(self)
+                .update()
+                .constant(self.margin.top),
+
+            view.cbuild
+                .bottom
+                .equalTo(self)
+                .update()
+                .constant(self.margin.bottom),
+
+            view.cbuild
+                .trailing
+                .equalTo(self)
+                .update()
+                .constant(self.margin.trailing),
+
+            view.cbuild
+                .leading
+                .equalTo(self)
+                .update()
+                .constant(self.margin.leading)
+        )
+    }
+
+    public func addContent(_ view: UIView) {
+        self.view = view
+        CBSubview(self).addSubview(view)
+        self.layout()
+    }
+
+    public func reloadContentLayout() {
+        guard self.view != nil else {
+            return
+        }
+
+        self.layout()
+    }
+}
+
+public extension UICSpacerView {
+    struct Edges {
+        public let top, bottom, leading, trailing: CGFloat
+
+        public init(top: CGFloat, bottom: CGFloat, leading: CGFloat, trailing: CGFloat) {
+            self.top = top
+            self.bottom = bottom
+            self.leading = leading
+            self.trailing = trailing
+        }
+
+        public init(vertical: CGFloat, horizontal: CGFloat) {
+            self.init(top: vertical, bottom: vertical, leading: horizontal, trailing: horizontal)
+        }
+
+        public init(spacing: CGFloat) {
+            self.init(top: spacing, bottom: spacing, leading: spacing, trailing: spacing)
+        }
+
+        public static var zero: Edges {
+            return .init(top: 0, bottom: 0, leading: 0, trailing: 0)
+        }
+    }
 }
 
 public class UICSpacer: UIViewCreator {
-    public typealias View = _SpacerView
+    public typealias View = UICSpacerView
 
-    public required init(margin: View.Margin, content: @escaping () -> ViewCreator) {
+    public required init(margin: View.Edges, content: @escaping () -> ViewCreator) {
         let content = content()
         self.tree.append(content)
 

@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 
 private struct MEMViewCreator {
-    let viewObject: Mutable<MEMWeak<UIView>> = .init(value: .nil)
+    let viewObject: Mutable<MemorySwitch> = .init(value: .nil)
     let loadViewHandler: Mutable<(() -> UIView)?> = .init(value: nil)
     let tree: Mutable<Tree>
     let render: Render
@@ -72,7 +72,7 @@ extension ViewCreator {
         }
     }
 
-    fileprivate(set) var viewObject: MEMWeak<UIView> {
+    fileprivate(set) var viewObject: MemorySwitch {
         get { self.storedMemory.viewObject.value }
         set { self.storedMemory.viewObject.value = newValue }
     }
@@ -114,11 +114,11 @@ extension ViewCreator {
 
 extension ViewCreator {
     var uiView: UIView! {
-        self.viewObject.object
+        self.viewObject.castedObject()
     }
 
     var isViewWeaked: Bool {
-        self.viewObject.isWeaked
+        self.viewObject.isWeak
     }
 
     var isViewLoaded: Bool {
@@ -126,17 +126,12 @@ extension ViewCreator {
     }
 
     func setView(_ uiView: UIView, asWeak: Bool = false) {
-        self.viewObject = {
-            if asWeak {
-                return .weak(uiView)
-            }
-
-            return .strong(uiView)
-        }()
-
-        if let root = self as? (Root & TemplateView) {
-            root.viewDidChanged()
+        if asWeak {
+            self.viewObject = .weak(uiView)
+            return
         }
+        
+        self.viewObject = .strong(uiView)
     }
 
     private func loadViewIfNeeded() -> UIView! {
@@ -155,6 +150,10 @@ extension ViewCreator {
                 return viewMaker.makeView()
             }
 
+            if let uicView = self as? UICView {
+                return uicView.makeView()
+            }
+
             fatalError()
         }()
 
@@ -170,7 +169,7 @@ extension ViewCreator {
         guard uiView.viewCreator === self else {
             return uiView
         }
-        uiView.setCreator(self, policity: .OBJC_ASSOCIATION_RETAIN)
+        uiView.setCreator(self, storeType: .strong)
         self.setView(uiView, asWeak: true)
         return uiView
     }

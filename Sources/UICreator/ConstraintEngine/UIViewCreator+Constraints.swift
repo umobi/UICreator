@@ -36,6 +36,16 @@ extension UIView {
     }
 }
 
+extension UIView {
+    var safeAreaCompatibleGuide: UILayoutGuide {
+        if #available(iOS 11, tvOS 11, *) {
+            return self.safeAreaLayoutGuide
+        }
+
+        return self.layoutMarginsGuide
+    }
+}
+
 public extension ViewCreator {
     func safeArea(topEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
         return self.onInTheScene {
@@ -43,22 +53,10 @@ public extension ViewCreator {
                 return
             }
 
-            if #available(iOS 11, tvOS 11, *) {
-                Constraintable.update(
-                    (UIViewWrapper($0)?.safe ?? $0).cbuild
-                        .top
-                        .equalTo(view.safeAreaLayoutGuide.cbuild.topMargin)
-                        .update()
-                        .constant(constant)
-                        .priority(priority)
-                )
-                return
-            }
-
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .top
-                    .equalTo(view.cbuild.topMargin)
+                    .equalTo(view.safeAreaCompatibleGuide.cbuild.top)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -72,22 +70,10 @@ public extension ViewCreator {
                 return
             }
 
-            if #available(iOS 11, tvOS 11, *) {
-                Constraintable.update(
-                    (UIViewWrapper($0)?.safe ?? $0).cbuild
-                        .top
-                        .greaterThanOrEqualTo(view.safeAreaLayoutGuide.cbuild.topMargin)
-                        .update()
-                        .constant(constant)
-                        .priority(priority)
-                )
-                return
-            }
-
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .top
-                    .greaterThanOrEqualTo(view.cbuild.topMargin)
+                    .greaterThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.top)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -101,22 +87,10 @@ public extension ViewCreator {
                 return
             }
 
-            if #available(iOS 11, tvOS 11, *) {
-                Constraintable.update(
-                    (UIViewWrapper($0)?.safe ?? $0).cbuild
-                        .top
-                        .lessThanOrEqualTo(view.cbuild.topMargin)
-                        .update()
-                        .constant(constant)
-                        .priority(priority)
-                )
-                return
-            }
-
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .top
-                    .lessThanOrEqualTo(view.cbuild.topMargin)
+                    .lessThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.top)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -130,22 +104,10 @@ public extension ViewCreator {
                 return
             }
 
-            if #available(iOS 11, tvOS 11, *) {
-                Constraintable.update(
-                    (UIViewWrapper($0)?.safe ?? $0).cbuild
-                        .bottom
-                        .equalTo(view.safeAreaLayoutGuide.cbuild.bottomMargin)
-                        .update()
-                        .constant(constant)
-                        .priority(priority)
-                )
-                return
-            }
-
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .bottom
-                    .equalTo(view.cbuild.bottomMargin)
+                    .equalTo(view.safeAreaCompatibleGuide.cbuild.bottom)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -159,22 +121,10 @@ public extension ViewCreator {
                 return
             }
 
-            if #available(iOS 11, tvOS 11, *) {
-                Constraintable.update(
-                    (UIViewWrapper($0)?.safe ?? $0).cbuild
-                        .bottom
-                        .greaterThanOrEqualTo(view.safeAreaLayoutGuide.cbuild.bottomMargin)
-                        .update()
-                        .constant(constant)
-                        .priority(priority)
-                )
-                return
-            }
-
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .bottom
-                    .greaterThanOrEqualTo(view.cbuild.bottomMargin)
+                    .greaterThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.bottom)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -188,22 +138,10 @@ public extension ViewCreator {
                 return
             }
 
-            if #available(iOS 11, tvOS 11, *) {
-                Constraintable.update(
-                    (UIViewWrapper($0)?.safe ?? $0).cbuild
-                        .bottom
-                        .lessThanOrEqualTo(view.safeAreaLayoutGuide.cbuild.bottomMargin)
-                        .update()
-                        .constant(constant)
-                        .priority(priority)
-                )
-                return
-            }
-
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .bottom
-                    .lessThanOrEqualTo(view.cbuild.bottomMargin)
+                    .lessThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.bottom)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -217,22 +155,10 @@ public extension ViewCreator {
                 return
             }
 
-            if #available(iOS 11, tvOS 11, *) {
-                Constraintable.update(
-                    (UIViewWrapper($0)?.safe ?? $0).cbuild
-                        .leading
-                        .equalTo(view.safeAreaLayoutGuide.cbuild.leadingMargin)
-                        .update()
-                        .constant(constant)
-                        .priority(priority)
-                )
-                return
-            }
-
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .leading
-                    .equalTo(view.cbuild.leadingMargin)
+                    .equalTo(view.safeAreaCompatibleGuide.cbuild.leading)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -246,22 +172,10 @@ public extension ViewCreator {
                 return
             }
 
-            if #available(iOS 11, tvOS 11, *) {
-                Constraintable.update(
-                    (UIViewWrapper($0)?.safe ?? $0).cbuild
-                        .leading
-                        .greaterThanOrEqualTo(view.safeAreaLayoutGuide.cbuild.leadingMargin)
-                        .update()
-                        .constant(constant)
-                        .priority(priority)
-                )
-                return
-            }
-
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .leading
-                    .greaterThanOrEqualTo(view.cbuild.leadingMargin)
+                    .greaterThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.leading)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -275,22 +189,10 @@ public extension ViewCreator {
                 return
             }
 
-            if #available(iOS 11, tvOS 11, *) {
-                Constraintable.update(
-                    (UIViewWrapper($0)?.safe ?? $0).cbuild
-                        .leading
-                        .lessThanOrEqualTo(view.safeAreaLayoutGuide.cbuild.leadingMargin)
-                        .update()
-                        .constant(constant)
-                        .priority(priority)
-                )
-                return
-            }
-
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .leading
-                    .lessThanOrEqualTo(view.cbuild.leadingMargin)
+                    .lessThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.leading)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -304,22 +206,10 @@ public extension ViewCreator {
                 return
             }
 
-            if #available(iOS 11, tvOS 11, *) {
-                Constraintable.update(
-                    (UIViewWrapper($0)?.safe ?? $0).cbuild
-                        .trailing
-                        .equalTo(view.safeAreaLayoutGuide.cbuild.trailingMargin)
-                        .update()
-                        .constant(constant)
-                        .priority(priority)
-                )
-                return
-            }
-
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .trailing
-                    .equalTo(view.cbuild.trailingMargin)
+                    .equalTo(view.safeAreaCompatibleGuide.cbuild.trailing)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -333,22 +223,10 @@ public extension ViewCreator {
                 return
             }
 
-            if #available(iOS 11, tvOS 11, *) {
-                Constraintable.update(
-                    (UIViewWrapper($0)?.safe ?? $0).cbuild
-                        .trailing
-                        .greaterThanOrEqualTo(view.safeAreaLayoutGuide.cbuild.trailingMargin)
-                        .update()
-                        .constant(constant)
-                        .priority(priority)
-                )
-                return
-            }
-
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .trailing
-                    .greaterThanOrEqualTo(view.cbuild.trailingMargin)
+                    .greaterThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.trailing)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -362,22 +240,10 @@ public extension ViewCreator {
                 return
             }
 
-            if #available(iOS 11, tvOS 11, *) {
-                Constraintable.update(
-                    (UIViewWrapper($0)?.safe ?? $0).cbuild
-                        .trailing
-                        .lessThanOrEqualTo(view.safeAreaLayoutGuide.cbuild.trailingMargin)
-                        .update()
-                        .constant(constant)
-                        .priority(priority)
-                )
-                return
-            }
-
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .trailing
-                    .lessThanOrEqualTo(view.cbuild.trailingMargin)
+                    .lessThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.trailing)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -812,8 +678,9 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .height
-                    .equalTo(constant)
+                    .equal
                     .update()
+                    .constant(constant)
                     .priority(priority)
             )
         }
@@ -824,8 +691,9 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .height
-                    .greaterThanOrEqualTo(constant)
+                    .greaterThanOrEqual
                     .update()
+                    .constant(constant)
                     .priority(priority)
             )
         }
@@ -836,8 +704,9 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .height
-                    .lessThanOrEqualTo(constant)
+                    .lessThanOrEqual
                     .update()
+                    .constant(constant)
                     .priority(priority)
             )
         }
@@ -848,8 +717,9 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .width
-                    .equalTo(constant)
+                    .equal
                     .update()
+                    .constant(constant)
                     .priority(priority)
             )
         }
@@ -860,8 +730,9 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .width
-                    .greaterThanOrEqualTo(constant)
+                    .greaterThanOrEqual
                     .update()
+                    .constant(constant)
                     .priority(priority)
             )
         }
@@ -872,8 +743,9 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .width
-                    .lessThanOrEqualTo(constant)
+                    .lessThanOrEqual
                     .update()
+                    .constant(constant)
                     .priority(priority)
             )
         }
@@ -1027,6 +899,161 @@ public extension ViewCreator {
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .centerY
                     .lessThanOrEqualTo(view.cbuild.centerY)
+                    .update()
+                    .constant(constant)
+                    .priority(priority)
+            )
+        }
+    }
+}
+
+public extension ViewCreator {
+    func safeArea(centerEqualTo constant: CGFloat = 0, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+                return
+            }
+
+            Constraintable.update(
+                (UIViewWrapper($0)?.safe ?? $0).cbuild
+                    .center
+                    .equalTo(view.safeAreaCompatibleGuide.cbuild.center)
+                    .update()
+                    .constant(constant)
+                    .priority(priority)
+            )
+        }
+    }
+
+    func safeArea(centerGreaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+                return
+            }
+
+            Constraintable.update(
+                (UIViewWrapper($0)?.safe ?? $0).cbuild
+                    .center
+                    .greaterThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.center)
+                    .update()
+                    .constant(constant)
+                    .priority(priority)
+            )
+        }
+    }
+
+    func safeArea(centerLessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+                return
+            }
+
+            Constraintable.update(
+                (UIViewWrapper($0)?.safe ?? $0).cbuild
+                    .center
+                    .lessThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.center)
+                    .update()
+                    .constant(constant)
+                    .priority(priority)
+            )
+        }
+    }
+
+    func safeArea(centerXEqualTo constant: CGFloat = 0, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+                return
+            }
+
+            Constraintable.update(
+                (UIViewWrapper($0)?.safe ?? $0).cbuild
+                    .centerX
+                    .equalTo(view.safeAreaCompatibleGuide.cbuild.centerX)
+                    .update()
+                    .constant(constant)
+                    .priority(priority)
+            )
+        }
+    }
+
+    func safeArea(centerXGreaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+                return
+            }
+
+            Constraintable.update(
+                (UIViewWrapper($0)?.safe ?? $0).cbuild
+                    .centerX
+                    .greaterThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.centerX)
+                    .update()
+                    .constant(constant)
+                    .priority(priority)
+            )
+        }
+    }
+
+    func safeArea(centerXLessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+                return
+            }
+
+            Constraintable.update(
+                (UIViewWrapper($0)?.safe ?? $0).cbuild
+                    .centerX
+                    .lessThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.centerX)
+                    .update()
+                    .constant(constant)
+                    .priority(priority)
+            )
+        }
+    }
+
+    func safeArea(centerYEqualTo constant: CGFloat = 0, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+                return
+            }
+
+            Constraintable.update(
+                (UIViewWrapper($0)?.safe ?? $0).cbuild
+                    .centerY
+                    .equalTo(view.safeAreaCompatibleGuide.cbuild.centerY)
+                    .update()
+                    .constant(constant)
+                    .priority(priority)
+            )
+        }
+    }
+
+    func safeArea(centerYGreaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+                return
+            }
+
+            Constraintable.update(
+                (UIViewWrapper($0)?.safe ?? $0).cbuild
+                    .centerY
+                    .greaterThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.centerY)
+                    .update()
+                    .constant(constant)
+                    .priority(priority)
+            )
+        }
+    }
+
+    func safeArea(centerYLessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        return self.onInTheScene {
+            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+                return
+            }
+
+            Constraintable.update(
+                (UIViewWrapper($0)?.safe ?? $0).cbuild
+                    .centerY
+                    .lessThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.centerY)
                     .update()
                     .constant(constant)
                     .priority(priority)

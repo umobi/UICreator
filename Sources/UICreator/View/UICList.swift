@@ -296,8 +296,8 @@ extension UITableView {
 }
 
 public extension UIViewCreator where View: UITableView {
-    func deleteRows(with animation: UITableView.RowAnimation,_ value: Value<[IndexPath]>, onCompletion: @escaping ([IndexPath]) -> Void) -> Self {
-        value.asRelay.next { [weak self] indexPaths in
+    func deleteRows(with animation: UITableView.RowAnimation,_ value: Relay<[IndexPath]>, onCompletion: @escaping ([IndexPath]) -> Void) -> Self {
+        value.next { [weak self] indexPaths in
             guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
                 Fatal.UICList.deleteRows(indexPaths).warning()
                 return
@@ -329,8 +329,8 @@ public extension UIViewCreator where View: UITableView {
         return self
     }
 
-    func deleteSections(with animation: UITableView.RowAnimation,_ value: Value<[Int]>, onCompletion: @escaping ([Int]) -> Void) -> Self {
-        value.asRelay.next { [weak self] sections in
+    func deleteSections(with animation: UITableView.RowAnimation,_ value: Relay<[Int]>, onCompletion: @escaping ([Int]) -> Void) -> Self {
+        value.next { [weak self] sections in
             guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
                 Fatal.UICList.deleteSections(sections).warning()
                 return
@@ -365,8 +365,8 @@ public extension UIViewCreator where View: UITableView {
 
 public extension UIViewCreator where View: UITableView {
 
-    func insertRows(with animation: UITableView.RowAnimation,_ value: Value<[IndexPath]>, perform: @escaping ([IndexPath]) -> Void) -> Self {
-        value.asRelay.next { [weak self] indexPaths in
+    func insertRows(with animation: UITableView.RowAnimation,_ value: Relay<[IndexPath]>, perform: @escaping ([IndexPath]) -> Void) -> Self {
+        value.next { [weak self] indexPaths in
             guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
                 Fatal.UICList.insertRows(indexPaths).warning()
                 return
@@ -396,8 +396,8 @@ public extension UIViewCreator where View: UITableView {
         return self
     }
 
-    func insertSections(with animation: UITableView.RowAnimation,_ value: Value<[Int]>, perform: @escaping ([Int]) -> Void) -> Self {
-        value.asRelay.next { [weak self] sections in
+    func insertSections(with animation: UITableView.RowAnimation,_ value: Relay<[Int]>, perform: @escaping ([Int]) -> Void) -> Self {
+        value.next { [weak self] sections in
             guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
                 Fatal.UICList.insertSections(sections).warning()
                 return

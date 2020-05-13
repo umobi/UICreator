@@ -24,14 +24,9 @@ import Foundation
 import UIKit
 
 public class UICFlow: UICCollection, CollectionLayout {
-    public convenience init() {
-        self.init {
-            UICollectionViewFlowLayout()
-        }
-    }
-
-    public var dynamicCollectionViewLayout: UICollectionViewFlowLayout {
-        return (self.uiView as? View)?.collectionViewLayout as! UICollectionViewFlowLayout
+    public typealias Layout = UICollectionViewFlowLayout
+    public convenience init(contents: @escaping () -> [ViewCreator]) {
+        self.init(layout: UICollectionViewFlowLayout(), contents)
     }
 }
 

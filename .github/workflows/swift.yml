@@ -1,0 +1,30 @@
+name: Swift
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build iOS
+      run: |
+        swift package generate-xcodeproj
+        xcodebuild build -sdk iphoneos -scheme 'UICreator-Package'
+        xcodebuild test -destination 'name=iPhone 11' -scheme 'UICreator-Package'
+        
+    - name: Build tvOS
+      run: |
+        swift package generate-xcodeproj
+        xcodebuild build -sdk appletvos -scheme 'UICreator-Package'
+        xcodebuild test -destination 'name=Apple TV' -scheme 'UICreator-Package'
+        
+    - name: cocoapods lint
+      run: |
+          pod lib lint --allow-warnings

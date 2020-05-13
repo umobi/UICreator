@@ -48,11 +48,10 @@ public extension UIViewCreator where Self: Control, View: UIControl {
 }
 
 public extension UIViewCreator where Self: Control, View: UIControl {
-    func isEnabled(_ value: Value<Bool>) -> Self {
-        let relay = value.asRelay
-        return self.onNotRendered { [relay] view in
+    func isEnabled(_ isEnabled: Relay<Bool>) -> Self {
+        return self.onNotRendered { view in
             weak var weakView = view
-            relay.sync {
+            isEnabled.sync {
                 (weakView as? View)?.isEnabled = $0
             }
         }

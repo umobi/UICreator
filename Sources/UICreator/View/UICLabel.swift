@@ -90,13 +90,11 @@ public class UICLabel: UIViewCreator, TextElement {
 }
 
 public extension UIViewCreator where View: UILabel, Self: TextElement {
-    init(_ text: Value<String?>) {
+    init(_ text: Relay<String?>) {
         self.init(text.wrappedValue)
-
-        let relay = text.asRelay
         self.onInTheScene {
             weak var view = $0 as? View
-            relay.sync {
+            text.sync {
                 view?.text = $0
             }
         }
@@ -125,7 +123,7 @@ public extension TextElement where View: UILabel {
     func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.font = font
-            ($0 as? View)?.isDynamicTextSize = isDynamicTextSize
+            ($0 as? View)?.adjustsFontForContentSizeCategory = isDynamicTextSize
         }
     }
 
@@ -164,7 +162,7 @@ public extension TextElement where View: UILabel {
 }
 
 public extension UIViewCreator where View: UILabel, Self: TextElement {
-    init(_ attributed: Value<NSAttributedString?>) {
+    init(_ attributed: Relay<NSAttributedString?>) {
         self.init(NSAttributedString?(nil))
 
         attributed.sync { [weak self] in

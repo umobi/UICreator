@@ -23,14 +23,15 @@
 import Foundation
 import UIKit
 
+extension NSObject: Opaque {}
+
 private struct UIViewPayload {
     typealias AppearState = UIView.AppearState
 
-    let viewCreator: Mutable<MEMOpaque> = .init(value: .nil)
+    let viewCreator: Mutable<MemorySwitch> = .init(value: .nil)
     let appearState: Mutable<AppearState> = .init(value: .unset)
 
     let viewMethods: Mutable<UIViewMethods> = .init(value: .init())
-    let tabBarItem: Mutable<UITabBarItem?> = .init(value: nil)
 }
 
 struct UIViewMethods: MutableEditable {
@@ -86,7 +87,7 @@ extension UIView {
         self.payload.viewMethods
     }
 
-    var opaqueViewCreator: MEMOpaque {
+    var opaqueViewCreator: MemorySwitch {
         get { self.payload.viewCreator.value }
         set { self.payload.viewCreator.value = newValue }
     }
@@ -94,11 +95,6 @@ extension UIView {
     var appearState: AppearState {
         get { self.payload.appearState.value }
         set { self.payload.appearState.value = newValue }
-    }
-
-    var tabBarItem: UITabBarItem? {
-        get { self.payload.tabBarItem.value }
-        set { self.payload.tabBarItem.value = newValue }
     }
 
     var appearHandler: UIHandler<UIView>? {

@@ -21,7 +21,6 @@
 //
 
 import Foundation
-import UIContainer
 import ConstraintBuilder
 import UIKit
 
@@ -63,7 +62,7 @@ public struct UICResized {
     }
 
     public func addSubview(_ subview: UIView) -> UICWeakResized {
-        AddSubview(self.superview)?.addSubview(subview)
+        UIView.CBSubview(self.superview)?.addSubview(subview)
 
         self.superview.translatesAutoresizingMaskIntoConstraints = true
         self.superview.autoresizingMask = [.flexibleHeight, .flexibleWidth]

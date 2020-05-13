@@ -53,9 +53,15 @@ extension _CollectionView: UICollectionViewDataSource {
                     return
                 }
 
+                guard let item = self?.layoutManager?.item(at: indexPath) else {
+                    return
+                }
+
                 guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath)
                     .horizontal(.equalTo(view.frame.width))
-                    .vertical(.equalTo(view.frame.height))) else { return }
+                    .vertical(.equalTo(view.frame.height))) else {
+                        return
+                }
 
                 self?.collectionViewLayout.invalidateLayout()
             }
@@ -82,6 +88,11 @@ extension _CollectionView: UICollectionViewDataSource {
                     guard view.frame.size != .zero else {
                         return
                     }
+
+                    guard let item = self?.layoutManager?.header(at: indexPath.section) else {
+                        return
+                    }
+
                     guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath.section)
                         .horizontal(.equalTo(view.frame.width))
                         .vertical(.equalTo(view.frame.height))) else { return }
@@ -108,6 +119,11 @@ extension _CollectionView: UICollectionViewDataSource {
                     guard view.frame.size != .zero else {
                         return
                     }
+
+                    guard let item = self?.layoutManager?.footer(at: indexPath.section) else {
+                        return
+                    }
+
                     guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath.section)
                         .horizontal(.equalTo(view.frame.width))
                         .vertical(.equalTo(view.frame.height))) else { return }
