@@ -143,4 +143,17 @@ public extension UIViewCreator where Self: Control, View: UIPageControl {
     func onPageChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onEvent(.valueChanged, handler)
     }
+
+    func currentPage(_ value: Relay<Int>) -> Self {
+        self.onNotRendered { [weak self] in
+            weak var view = $0 as? View
+            _ = self?.onPageChanged { _ in
+                value.wrappedValue = view?.currentPage ?? .zero
+            }
+
+            value.sync {
+                view?.currentPage = $0
+            }
+        }
+    }
 }

@@ -135,22 +135,25 @@ extension Optional: OptionalType {
 }
 
 public extension Relay where Value: OptionalType {
+    // Lazy bind
     func bind(to relay: Relay<Value>) {
-        self.next {
+        self.sync {
             relay.wrappedValue = $0
         }
     }
 }
 
 public extension Relay {
+    // Lazy bind
     func bind(to relay: Relay<Value>) {
-        self.next {
+        self.sync {
             relay.wrappedValue = $0
         }
     }
 
+    // Lazy bind
     func bind(to relay: Relay<Value?>) {
-        self.next {
+        self.sync {
             relay.wrappedValue = $0
         }
     }
