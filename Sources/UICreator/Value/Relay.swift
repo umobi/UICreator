@@ -249,3 +249,35 @@ public func <~><T>(left: Relay<T>?, right: Relay<T>?) {
 
     left <~> right
 }
+
+public prefix func !(_ relay: Relay<Bool>) -> Relay<Bool> {
+    relay.map { !$0 }
+}
+
+public func &&(_ left: Relay<Bool>,_ right: Relay<Bool>) -> Relay<Bool> {
+    let value = Value(wrappedValue: left.wrappedValue && right.wrappedValue)
+
+    left.next {
+        value.wrappedValue = $0 && right.wrappedValue
+    }
+
+    right.next {
+        value.wrappedValue = left.wrappedValue && $0
+    }
+
+    return value.projectedValue
+}
+
+public func ||(_ left: Relay<Bool>,_ right: Relay<Bool>) -> Relay<Bool> {
+    let value = Value(wrappedValue: left.wrappedValue || right.wrappedValue)
+
+    left.next {
+        value.wrappedValue = $0 || right.wrappedValue
+    }
+
+    right.next {
+        value.wrappedValue = left.wrappedValue || $0
+    }
+
+    return value.projectedValue
+}
