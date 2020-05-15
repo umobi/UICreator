@@ -92,12 +92,12 @@ public class Touch: UIGesture {
 public extension UIGesture where Gesture: TouchGesture {
     #if os(iOS)
     func number(ofTouchesRequired number: Int) -> Self {
-        (self.uiGesture as? Gesture)?.numberOfTouchedRequired = number
+        self.uiGesture.numberOfTouchedRequired = number
         return self
     }
 
     func cancelWhenTouchMoves(_ flag: Bool) -> Self {
-        (self.uiGesture as? Gesture)?.cancelWhenTouchMoves = flag
+        self.uiGesture.cancelWhenTouchMoves = flag
         return self
     }
     #endif

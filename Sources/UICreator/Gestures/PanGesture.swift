@@ -35,12 +35,12 @@ public class Pan: UIGesture {
 #if os(iOS)
 public extension UIGesture where Gesture: UIPanGestureRecognizer {
     func maximumNumber(ofTouches number: Int) -> Self {
-        (self.uiGesture as? Gesture)?.maximumNumberOfTouches = number
+        self.uiGesture.maximumNumberOfTouches = number
         return self
     }
 
     func minimumNumber(ofTouches number: Int) -> Self {
-        (self.uiGesture as? Gesture)?.minimumNumberOfTouches = number
+        self.uiGesture.minimumNumberOfTouches = number
         return self
     }
 }

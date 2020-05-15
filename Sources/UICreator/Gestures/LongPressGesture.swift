@@ -34,12 +34,12 @@ public class LongPress: UIGesture {
 
 public extension UIGesture where Gesture: UILongPressGestureRecognizer {
     func maximumMovement(_ value: CGFloat) -> Self {
-        (self.uiGesture as? Gesture)?.allowableMovement = value
+        self.uiGesture.allowableMovement = value
         return self
     }
 
     func minimumPressDuration(_ duration: TimeInterval) -> Self {
-        (self.uiGesture as? Gesture)?.minimumPressDuration = duration
+        self.uiGesture.minimumPressDuration = duration
         return self
     }
 }
