@@ -85,19 +85,19 @@ public class Touch: UIGesture {
 
     public required init(target view: UIView!) {
         self.setGesture(Gesture.init(target: view))
-        self.gesture.parent = self
+        self.uiGesture.parent = self
     }
 }
 
 public extension UIGesture where Gesture: TouchGesture {
     #if os(iOS)
     func number(ofTouchesRequired number: Int) -> Self {
-        (self.gesture as? Gesture)?.numberOfTouchedRequired = number
+        (self.uiGesture as? Gesture)?.numberOfTouchedRequired = number
         return self
     }
 
     func cancelWhenTouchMoves(_ flag: Bool) -> Self {
-        (self.gesture as? Gesture)?.cancelWhenTouchMoves = flag
+        (self.uiGesture as? Gesture)?.cancelWhenTouchMoves = flag
         return self
     }
     #endif

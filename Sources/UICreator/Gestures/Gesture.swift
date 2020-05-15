@@ -33,7 +33,11 @@ public protocol UIGesture: Gesture {
 
 public extension UIGesture {
     func add() {
-        self.gesture.targetView?.addGestureRecognizer(self.releaseGesture())
+        self.uiGesture.targetView?.addGestureRecognizer(self.releaseGesture())
+    }
+
+    var uiGesture: Gesture! {
+        (self as UICreator.Gesture).uiGesture as? Gesture
     }
 }
 
@@ -91,19 +95,19 @@ internal extension UIGestureRecognizer {
 }
 
 private var kGestureMutable: UInt = 0
-internal extension Gesture {
+public extension Gesture {
     private var gestureMutable: Mutable<MemorySwitch> {
         OBJCSet(self, &kGestureMutable) {
             .init(value: .nil)
         }
     }
 
-    var gesture: UIGestureRecognizer! {
+    private(set) var uiGesture: UIGestureRecognizer! {
         get { self.gestureMutable.value.castedObject() }
         set { setGesture(newValue, storeType: newValue?.view?.superview != nil ? .weak : .strong) }
     }
 
-    func setGesture(_ uiGesture: UIGestureRecognizer, storeType: MemoryStoreType = .strong) {
+    internal func setGesture(_ uiGesture: UIGestureRecognizer, storeType: MemoryStoreType = .strong) {
         switch storeType {
         case .weak:
             self.gestureMutable.value = .weak(uiGesture)
@@ -112,23 +116,16 @@ internal extension Gesture {
         }
     }
 
-    func releaseGesture() -> UIGestureRecognizer! {
-        let gesture: UIGestureRecognizer! = self.gesture
+    internal func releaseGesture() -> UIGestureRecognizer! {
+        let gesture: UIGestureRecognizer! = self.uiGesture
         self.setGesture(gesture, storeType: .weak)
         gesture.releaseParent()
         return gesture
     }
 }
 
-internal struct Handler {
-    let handler: (UIGestureRecognizer) -> Void
-
-    init(_ handler: @escaping (UIGestureRecognizer) -> Void) {
-        self.handler = handler
-    }
-}
-
-struct GesturePayload: MutableEditable {
+struct GestureMemory: MutableEditable {
+    typealias Handler = UIHandler<UIGestureRecognizer>
 
     let began: Handler?
     let cancelled: Handler?
@@ -150,7 +147,7 @@ struct GesturePayload: MutableEditable {
         self.anyOther = nil
     }
 
-    init(_ original: GesturePayload, editable: Editable) {
+    init(_ original: GestureMemory, editable: Editable) {
         self.began = editable.began
         self.cancelled = editable.cancelled
         self.changed = editable.changed
@@ -161,14 +158,14 @@ struct GesturePayload: MutableEditable {
         self.anyOther = editable.anyOther
     }
 
-    func edit(_ edit: @escaping (Editable) -> Void) -> GesturePayload {
+    func edit(_ edit: @escaping (Editable) -> Void) -> GestureMemory {
         let editable = Editable(self)
         edit(editable)
         return .init(self, editable: editable)
     }
 }
 
-extension GesturePayload {
+extension GestureMemory {
     class Editable {
         var began: Handler?
         var cancelled: Handler?
@@ -179,7 +176,7 @@ extension GesturePayload {
         var ended: Handler?
         var anyOther: Handler?
 
-        init(_ payload: GesturePayload) {
+        init(_ payload: GestureMemory) {
             self.began = payload.began
             self.cancelled = payload.cancelled
             self.changed = payload.changed
@@ -195,7 +192,7 @@ extension GesturePayload {
 private var kGestureWrapper: UInt = 0
 private var kGestureDelegate: UInt = 0
 internal extension Gesture {
-    var gestureWrapper: Mutable<GesturePayload> {
+    var gestureWrapper: Mutable<GestureMemory> {
         OBJCSet(self, &kGestureWrapper) {
             .init(value: .init())
         }
@@ -204,7 +201,7 @@ internal extension Gesture {
     var gestureDelegate: GestureDelegate {
         OBJCSet(self, &kGestureDelegate, policity: .OBJC_ASSOCIATION_RETAIN) {
             let delegate = GestureDelegate()
-            self.gesture.delegate = delegate
+            self.uiGesture.delegate = delegate
             return delegate
         }
     }
@@ -212,48 +209,48 @@ internal extension Gesture {
 
 public extension UIGesture {
     func `as`<UIGesture: UIGestureRecognizer>(_ outlet: UICOutlet<UIGesture>) -> Self {
-        outlet.ref(self.gesture as? UIGesture)
+        outlet.ref(self.uiGesture as? UIGesture)
         return self
     }
 
     func allowedPress(types pressTypes: Set<UIPress.PressType>) -> Self {
-        self.gesture.allowedPressTypes = pressTypes.map { NSNumber(value: $0.rawValue) }
+        self.uiGesture.allowedPressTypes = pressTypes.map { NSNumber(value: $0.rawValue) }
         return self
     }
 
     func allowedTouch(types touchTypes: Set<UITouch.TouchType>) -> Self {
-        self.gesture.allowedTouchTypes = touchTypes.map { NSNumber(value: $0.rawValue) }
+        self.uiGesture.allowedTouchTypes = touchTypes.map { NSNumber(value: $0.rawValue) }
         return self
     }
 
     func cancelsTouches(inView flag: Bool) -> Self {
-        self.gesture.cancelsTouchesInView = flag
+        self.uiGesture.cancelsTouchesInView = flag
         return self
     }
 
     func delaysTouches(atBegan flag: Bool) -> Self {
-        self.gesture.delaysTouchesEnded = flag
+        self.uiGesture.delaysTouchesEnded = flag
         return self
     }
 
     func delaysTouches(atEnded flag: Bool) -> Self {
-        self.gesture.delaysTouchesEnded = flag
+        self.uiGesture.delaysTouchesEnded = flag
         return self
     }
 
     func isEnabled(_ flag: Bool) -> Self {
-        self.gesture.isEnabled = flag
+        self.uiGesture.isEnabled = flag
         return self
     }
 
     @available(iOS 11, tvOS 11.0, *)
     func name(_ string: String?) -> Self {
-        self.gesture.name = string
+        self.uiGesture.name = string
         return self
     }
 
     func requiredExclusive(touchType flag: Bool) -> Self {
-        self.gesture.requiresExclusiveTouchType = flag
+        self.uiGesture.requiresExclusiveTouchType = flag
         return self
     }
 }
@@ -267,8 +264,8 @@ public extension UIGesture {
                     return
                 }
 
+                old?.commit(in: $0)
                 handler(gesture)
-                old?.handler(gesture)
             }
         }
         return self
@@ -282,8 +279,8 @@ public extension UIGesture {
                     return
                 }
 
+                old?.commit(in: $0)
                 handler(gesture)
-                old?.handler(gesture)
             }
         }
         return self
@@ -297,8 +294,8 @@ public extension UIGesture {
                     return
                 }
 
+                old?.commit(in: $0)
                 handler(gesture)
-                old?.handler(gesture)
             }
         }
         return self
@@ -312,8 +309,8 @@ public extension UIGesture {
                     return
                 }
 
+                old?.commit(in: $0)
                 handler(gesture)
-                old?.handler(gesture)
             }
         }
         return self
@@ -327,8 +324,8 @@ public extension UIGesture {
                     return
                 }
 
+                old?.commit(in: $0)
                 handler(gesture)
-                old?.handler(gesture)
             }
         }
         return self
@@ -342,8 +339,8 @@ public extension UIGesture {
                     return
                 }
 
+                old?.commit(in: $0)
                 handler(gesture)
-                old?.handler(gesture)
             }
         }
         return self
@@ -357,8 +354,8 @@ public extension UIGesture {
                     return
                 }
 
+                old?.commit(in: $0)
                 handler(gesture)
-                old?.handler(gesture)
             }
         }
         return self
@@ -372,8 +369,8 @@ public extension UIGesture {
                     return
                 }
 
+                old?.commit(in: $0)
                 handler(gesture)
-                old?.handler(gesture)
             }
         }
         return self
@@ -385,55 +382,55 @@ internal extension Gesture {
         let payload = self.gestureWrapper.value
         switch sender.state {
         case .possible:
-            (payload.possible ?? payload.recognized)?.handler(sender)
+            (payload.possible ?? payload.recognized)?.commit(in: sender)
         case .began:
-            (payload.began ?? payload.recognized)?.handler(sender)
+            (payload.began ?? payload.recognized)?.commit(in: sender)
         case .changed:
-            (payload.changed ?? payload.recognized)?.handler(sender)
+            (payload.changed ?? payload.recognized)?.commit(in: sender)
         case .ended:
-            (payload.ended ?? payload.recognized)?.handler(sender)
+            (payload.ended ?? payload.recognized)?.commit(in: sender)
         case .cancelled:
-            (payload.cancelled ?? payload.recognized)?.handler(sender)
+            (payload.cancelled ?? payload.recognized)?.commit(in: sender)
         case .failed:
-            (payload.failed ?? payload.recognized)?.handler(sender)
+            (payload.failed ?? payload.recognized)?.commit(in: sender)
         @unknown default:
-            payload.anyOther?.handler(sender)
+            payload.anyOther?.commit(in: sender)
         }
     }
 }
 
 public extension Gesture {
-    func onShouldBegin(_ handler: @escaping (UIView) -> Bool) -> Self {
+    func onShouldBegin(_ handler: @escaping (UIGestureRecognizer) -> Bool) -> Self {
         self.gestureDelegate.onShouldBegin(handler)
         return self
     }
 
-    func onShouldRecognizeSimultaneouslyOtherGesture(_ handler: @escaping (UIView, UIGestureRecognizer) -> Bool) -> Self {
+    func onShouldRecognizeSimultaneouslyOtherGesture(_ handler: @escaping (UIGestureRecognizer, UIGestureRecognizer) -> Bool) -> Self {
         self.gestureDelegate.onShouldRecognizeSimultaneouslyOtherGesture(handler)
         return self
     }
 
-    func onShouldRequireFailureOfOtherGesture(_ handler: @escaping (UIView, UIGestureRecognizer) -> Bool) -> Self {
+    func onShouldRequireFailureOfOtherGesture(_ handler: @escaping (UIGestureRecognizer, UIGestureRecognizer) -> Bool) -> Self {
         self.gestureDelegate.onShouldRequireFailureOfOtherGesture(handler)
         return self
     }
 
-    func onShouldBeRequiredToFailByOtherGesture(_ handler: @escaping (UIView, UIGestureRecognizer) -> Bool) -> Self {
+    func onShouldBeRequiredToFailByOtherGesture(_ handler: @escaping (UIGestureRecognizer, UIGestureRecognizer) -> Bool) -> Self {
         self.gestureDelegate.onShouldBeRequiredToFailByOtherGesture(handler)
         return self
     }
 
-    func onShouldReceiveTouch(_ handler: @escaping (UIView, UITouch) -> Bool) -> Self {
+    func onShouldReceiveTouch(_ handler: @escaping (UIGestureRecognizer, UITouch) -> Bool) -> Self {
         self.gestureDelegate.onShouldReceiveTouch(handler)
         return self
     }
 
-    func onShouldReceivePress(_ handler: @escaping (UIView, UIPress) -> Bool) -> Self {
+    func onShouldReceivePress(_ handler: @escaping (UIGestureRecognizer, UIPress) -> Bool) -> Self {
         self.gestureDelegate.onShouldReceivePress(handler)
         return self
     }
 
-    func onShouldReceiveEvent(_ handler: @escaping (UIView, UIEvent) -> Bool) -> Self {
+    func onShouldReceiveEvent(_ handler: @escaping (UIGestureRecognizer, UIEvent) -> Bool) -> Self {
         self.gestureDelegate.onShouldReceiveEvent(handler)
         return self
     }
@@ -441,8 +438,8 @@ public extension Gesture {
 
 public class GestureDelegate: NSObject, UIGestureRecognizerDelegate {
 
-    private var shouldBeginHandler: ((UIView) -> Bool)? = nil
-    func onShouldBegin(_ handler: @escaping (UIView) -> Bool) {
+    private var shouldBeginHandler: ((UIGestureRecognizer) -> Bool)? = nil
+    func onShouldBegin(_ handler: @escaping (UIGestureRecognizer) -> Bool) {
         let old = self.shouldBeginHandler
         self.shouldBeginHandler = {
             if old?($0) ?? false {
@@ -453,8 +450,8 @@ public class GestureDelegate: NSObject, UIGestureRecognizerDelegate {
         }
     }
 
-    private var shouldRecognizeSimultaneouslyOtherGestureHandler: ((UIView, UIGestureRecognizer) -> Bool)? = nil
-    func onShouldRecognizeSimultaneouslyOtherGesture(_ handler: @escaping (UIView, UIGestureRecognizer) -> Bool) {
+    private var shouldRecognizeSimultaneouslyOtherGestureHandler: ((UIGestureRecognizer, UIGestureRecognizer) -> Bool)? = nil
+    func onShouldRecognizeSimultaneouslyOtherGesture(_ handler: @escaping (UIGestureRecognizer, UIGestureRecognizer) -> Bool) {
         let old = self.shouldRecognizeSimultaneouslyOtherGestureHandler
         self.shouldRecognizeSimultaneouslyOtherGestureHandler = {
             if old?($0, $1) ?? false {
@@ -465,8 +462,8 @@ public class GestureDelegate: NSObject, UIGestureRecognizerDelegate {
         }
     }
 
-    private var shouldRequireFailureOfOtherGestureHandler: ((UIView, UIGestureRecognizer) -> Bool)? = nil
-    func onShouldRequireFailureOfOtherGesture(_ handler: @escaping (UIView, UIGestureRecognizer) -> Bool) {
+    private var shouldRequireFailureOfOtherGestureHandler: ((UIGestureRecognizer, UIGestureRecognizer) -> Bool)? = nil
+    func onShouldRequireFailureOfOtherGesture(_ handler: @escaping (UIGestureRecognizer, UIGestureRecognizer) -> Bool) {
         let old = self.shouldRequireFailureOfOtherGestureHandler
         self.shouldRequireFailureOfOtherGestureHandler = {
             if old?($0, $1) ?? false {
@@ -477,8 +474,8 @@ public class GestureDelegate: NSObject, UIGestureRecognizerDelegate {
         }
     }
 
-    private var shouldBeRequiredToFailByOtherGesture: ((UIView, UIGestureRecognizer) -> Bool)? = nil
-    func onShouldBeRequiredToFailByOtherGesture(_ handler: @escaping (UIView, UIGestureRecognizer) -> Bool) {
+    private var shouldBeRequiredToFailByOtherGesture: ((UIGestureRecognizer, UIGestureRecognizer) -> Bool)? = nil
+    func onShouldBeRequiredToFailByOtherGesture(_ handler: @escaping (UIGestureRecognizer, UIGestureRecognizer) -> Bool) {
         let old = self.shouldBeRequiredToFailByOtherGesture
         self.shouldBeRequiredToFailByOtherGesture = {
             if old?($0, $1) ?? false {
@@ -489,8 +486,8 @@ public class GestureDelegate: NSObject, UIGestureRecognizerDelegate {
         }
     }
 
-    private var shouldReceiveTouchHandler: ((UIView, UITouch) -> Bool)? = nil
-    func onShouldReceiveTouch(_ handler: @escaping (UIView, UITouch) -> Bool) {
+    private var shouldReceiveTouchHandler: ((UIGestureRecognizer, UITouch) -> Bool)? = nil
+    func onShouldReceiveTouch(_ handler: @escaping (UIGestureRecognizer, UITouch) -> Bool) {
         let old = self.shouldReceiveTouchHandler
         self.shouldReceiveTouchHandler = {
             if old?($0, $1) ?? false {
@@ -501,8 +498,8 @@ public class GestureDelegate: NSObject, UIGestureRecognizerDelegate {
         }
     }
 
-    private var shouldReceivePressHandler: ((UIView, UIPress) -> Bool)? = nil
-    func onShouldReceivePress(_ handler: @escaping (UIView, UIPress) -> Bool) {
+    private var shouldReceivePressHandler: ((UIGestureRecognizer, UIPress) -> Bool)? = nil
+    func onShouldReceivePress(_ handler: @escaping (UIGestureRecognizer, UIPress) -> Bool) {
         let old = self.shouldReceivePressHandler
         self.shouldReceivePressHandler = {
             if old?($0, $1) ?? false {
@@ -513,8 +510,8 @@ public class GestureDelegate: NSObject, UIGestureRecognizerDelegate {
         }
     }
 
-    private var shouldReceiveEventHandler: ((UIView, UIEvent) -> Bool)? = nil
-    func onShouldReceiveEvent(_ handler: @escaping (UIView, UIEvent) -> Bool) {
+    private var shouldReceiveEventHandler: ((UIGestureRecognizer, UIEvent) -> Bool)? = nil
+    func onShouldReceiveEvent(_ handler: @escaping (UIGestureRecognizer, UIEvent) -> Bool) {
         let old = self.shouldReceiveEventHandler
         self.shouldReceiveEventHandler = {
             if old?($0, $1) ?? false {
@@ -526,34 +523,34 @@ public class GestureDelegate: NSObject, UIGestureRecognizerDelegate {
     }
 
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        self.shouldBeginHandler?(gestureRecognizer.view!) ?? true
+        self.shouldBeginHandler?(gestureRecognizer) ?? true
     }
 
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        self.shouldRecognizeSimultaneouslyOtherGestureHandler?(gestureRecognizer.view!, otherGestureRecognizer) ?? false
+        self.shouldRecognizeSimultaneouslyOtherGestureHandler?(gestureRecognizer, otherGestureRecognizer) ?? false
     }
 
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        self.shouldRecognizeSimultaneouslyOtherGestureHandler?(gestureRecognizer.view!, otherGestureRecognizer) ?? gestureRecognizer.shouldRequireFailure(of: otherGestureRecognizer)
+        self.shouldRecognizeSimultaneouslyOtherGestureHandler?(gestureRecognizer, otherGestureRecognizer) ?? gestureRecognizer.shouldRequireFailure(of: otherGestureRecognizer)
     }
 
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        self.shouldRequireFailureOfOtherGestureHandler?(gestureRecognizer.view!, otherGestureRecognizer) ?? gestureRecognizer.shouldBeRequiredToFail(by: otherGestureRecognizer)
+        self.shouldRequireFailureOfOtherGestureHandler?(gestureRecognizer, otherGestureRecognizer) ?? gestureRecognizer.shouldBeRequiredToFail(by: otherGestureRecognizer)
     }
 
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        self.shouldReceiveTouchHandler?(gestureRecognizer.view!, touch) ?? true
+        self.shouldReceiveTouchHandler?(gestureRecognizer, touch) ?? true
     }
 
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive press: UIPress) -> Bool {
-        self.shouldReceivePressHandler?(gestureRecognizer.view!, press) ?? true
+        self.shouldReceivePressHandler?(gestureRecognizer, press) ?? true
     }
 
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive event: UIEvent) -> Bool {
         if #available(iOS 13.4, tvOS 13.4, *) {
-            return self.shouldReceiveEventHandler?(gestureRecognizer.view!, event) ?? gestureRecognizer.shouldReceive(event)
+            return self.shouldReceiveEventHandler?(gestureRecognizer, event) ?? gestureRecognizer.shouldReceive(event)
         }
 
-        return self.shouldReceiveEventHandler?(gestureRecognizer.view!, event) ?? true
+        return self.shouldReceiveEventHandler?(gestureRecognizer, event) ?? true
     }
 }

@@ -29,7 +29,7 @@ public class ScreenEdgePan: UIGesture {
 
     public required init(target view: UIView!) {
         self.setGesture(Gesture.init(target: view))
-        self.gesture.parent = self
+        self.uiGesture.parent = self
     }
 }
 

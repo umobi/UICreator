@@ -30,8 +30,8 @@ public class Hover: UIGesture {
     public typealias Gesture = UIHoverGestureRecognizer
 
     public required init(target view: UIView!) {
-        self.gesture = Gesture.init(target: view)
-        self.gesture.parent = self
+        self.setGesture(Gesture.init(target: view))
+        self.uiGesture.parent = self
     }
 }
 

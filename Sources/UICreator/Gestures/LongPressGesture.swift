@@ -28,18 +28,18 @@ public class LongPress: UIGesture {
 
     public required init(target view: UIView!) {
         self.setGesture(Gesture.init(target: view))
-        self.gesture.parent = self
+        self.uiGesture.parent = self
     }
 }
 
 public extension UIGesture where Gesture: UILongPressGestureRecognizer {
     func maximumMovement(_ value: CGFloat) -> Self {
-        (self.gesture as? Gesture)?.allowableMovement = value
+        (self.uiGesture as? Gesture)?.allowableMovement = value
         return self
     }
 
     func minimumPressDuration(_ duration: TimeInterval) -> Self {
-        (self.gesture as? Gesture)?.minimumPressDuration = duration
+        (self.uiGesture as? Gesture)?.minimumPressDuration = duration
         return self
     }
 }
