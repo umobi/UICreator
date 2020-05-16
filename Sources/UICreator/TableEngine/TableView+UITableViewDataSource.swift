@@ -38,7 +38,7 @@ extension UICTableView: UITableViewDataSource {
 
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let row = self.manager?.row(at: indexPath) else {
-            fatalError()
+            Fatal.Builder("UICList can't load row for indexPath at \(indexPath)").die()
         }
 
         guard
@@ -47,7 +47,7 @@ extension UICTableView: UITableViewDataSource {
                 for: indexPath
             ) as? TableViewCell
         else {
-            fatalError()
+            Fatal.Builder("UICList can't dequeue cell for indexPath at \(indexPath)").die()
         }
 
         cell.prepareCell(row)

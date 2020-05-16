@@ -104,7 +104,7 @@ extension ReactiveReferenceCenter {
             queue: nil,
             using: { notification in
                 guard let value = notification.userInfo?[Self.kNotificationNewValue] as? Value else {
-                    fatalError()
+                    Fatal.Builder("ReactiveCenter couldn't cast value to type of \(Value.self)").die()
                 }
 
                 handler(value)
@@ -129,7 +129,7 @@ extension ReactiveReferenceCenter {
             queue: nil,
             using: {
                 guard let value = $0.userInfo?[Self.kNotificationNewValue] as? Value else {
-                    fatalError()
+                    Fatal.Builder("ReactiveCenter couldn't cast value to type of \(Value.self)").die()
                 }
 
                 handler(value)
@@ -174,7 +174,7 @@ extension ReactiveReferenceCenter {
                     }
 
                 guard let value = $0.userInfo?[Self.kNotificationNewValue] as? Value else {
-                    fatalError()
+                    Fatal.Builder("ReactiveCenter couldn't cast value to type of \(Value.self)").die()
                 }
 
                 handler(value)
@@ -188,13 +188,5 @@ extension ReactiveReferenceCenter {
             ])
 
         self.reactiveCenter.removeObserver(observable)
-    }
-}
-
-extension ReactiveCenter {
-    enum Fatal: String, FatalType {
-        case unregistered = """
-        Identifier for Relay or Value isn't registered in ReactiveCenter
-        """
     }
 }

@@ -37,7 +37,7 @@ extension Control {
     public func removeEvent(_ event: UIControl.Event) {
         self.onRendered {
             guard let view = $0 as? UIControl else {
-                fatalError()
+                Fatal.Builder("UIView is not a UIControl").die()
             }
 
             view.removeTarget($0, action: nil, for: event)

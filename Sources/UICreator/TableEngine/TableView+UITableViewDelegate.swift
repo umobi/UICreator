@@ -34,7 +34,7 @@ extension UICTableView: UITableViewDelegate {
                 withIdentifier: header.identifier
             ) as? TableViewHeaderFooterCell
         else {
-            fatalError()
+            Fatal.Builder("UICList can't dequeue header for section at \(section)").die()
         }
 
         cell.prepareCell(header)
@@ -50,7 +50,7 @@ extension UICTableView: UITableViewDelegate {
                 withIdentifier: footer.identifier
             ) as? TableViewHeaderFooterCell
         else {
-            fatalError()
+            Fatal.Builder("UICList can't dequeue footer for section at \(section)").die()
         }
 
         cell.prepareCell(footer)

@@ -209,7 +209,7 @@ extension ListManager.RowManager: SupportForEach {
                 .section(at: compactCopy.indexPath.section)
                 .content(compactCopy, updatedWith: $0.map { content in
                     guard let row = content() as? UICRow else {
-                        fatalError()
+                        Fatal.Builder("Content is not a type of UICRow").die()
                     }
 
                     return compactCopy.restore(.init(row: row))

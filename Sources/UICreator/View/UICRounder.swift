@@ -48,11 +48,11 @@ public class UICRounderView: UIView, UICManagerContentView {
     }
 
     public override init(frame: CGRect) {
-        fatalError("init(frame:) not implemented")
+        Fatal.Builder("init(frame:) has not been implemented").die()
     }
 
     required public init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) not implemented")
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     override open var isHidden: Bool {

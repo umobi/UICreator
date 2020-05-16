@@ -41,11 +41,11 @@ public class UICSpacerView: UIView, UICManagerContentView {
     }
 
     public override init(frame: CGRect) {
-        fatalError("init(frame:) has not been implemented")
+        Fatal.Builder("init(frame:) has not been implemented").die()
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     override open var isHidden: Bool {

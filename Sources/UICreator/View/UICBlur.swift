@@ -101,7 +101,7 @@ public class UICBlurView: UIView {
     }
 
     public required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     private func reload() {

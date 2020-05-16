@@ -114,7 +114,9 @@ public extension NavigationRepresentable {
     var body: ViewCreator {
         UICContainer { [unowned self] in
             guard let content = self.content?.content else {
-                fatalError()
+                Fatal.Builder(
+                    "NavigationRepresentable couldn't load content. Maybe it may have been already loaded"
+                ).die()
             }
 
             self.content = nil
@@ -151,7 +153,7 @@ public extension NavigationRepresentable {
         guard let viewController = self.navigationController.viewControllers.first(where: {
             $0.view.contains(view)
         }) else {
-            fatalError("\(type(of: view)) is not on first hierarchy")
+            Fatal.Builder("\(type(of: view)) is not on first hierarchy").die()
         }
 
         self.navigationController.popToViewController(viewController, animated: animated)

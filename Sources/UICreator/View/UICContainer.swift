@@ -29,7 +29,7 @@ public class UICControllerContainerView<View: UIViewController>: UIView {
 
     public func contain(viewController: View, parentView: UIViewController? = nil) {
         guard let parentView = parentView ?? self.viewController else {
-            fatalError()
+            Fatal.Builder("UICControllerContainerView couldn't get parent viewController").die()
         }
 
         self.view?.view.removeFromSuperview()

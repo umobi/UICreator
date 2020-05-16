@@ -33,7 +33,7 @@ public class RootView: UIView {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     override open func willMove(toSuperview newSuperview: UIView?) {

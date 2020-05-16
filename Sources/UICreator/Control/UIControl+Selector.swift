@@ -168,7 +168,7 @@ extension Control {
     private func appendEvent(_ event: UIControl.Event, _ handler: @escaping (UIView) -> Void) {
         self.onNotRendered {
             guard let view = $0 as? UIControl else {
-                fatalError()
+                Fatal.Builder("UIView is not a UIControl").die()
             }
 
             let control = view.controlMemory

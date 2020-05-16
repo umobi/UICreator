@@ -64,7 +64,7 @@ public class UICDashedView: UIView, UICManagerContentView {
     }
 
     required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     private func createShape() -> CAShapeLayer {

@@ -141,7 +141,7 @@ open class UICScrollView: UIScrollView, UICManagerContentView {
     }
 
     public required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     override open var isHidden: Bool {

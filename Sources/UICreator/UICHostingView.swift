@@ -34,7 +34,9 @@ public class UICHostingView: UIViewController {
     }
 
     required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        UICreator.Fatal
+            .Builder("init(coder:) has not been implemented")
+            .die()
     }
 
     #if os(iOS)

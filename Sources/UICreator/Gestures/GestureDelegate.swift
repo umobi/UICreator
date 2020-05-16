@@ -119,7 +119,7 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         _ gestureRecognizer: UIGestureRecognizer) -> Bool {
 
         guard let gestureRecognizer = gestureRecognizer as? Gesture else {
-            fatalError()
+            Fatal.Builder("GestureRecognizer should be a type of \(Gesture.self)").die()
         }
 
         return self.shouldBeginHandler?(gestureRecognizer) ?? true
@@ -130,7 +130,7 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
 
         guard let gestureRecognizer = gestureRecognizer as? Gesture else {
-            fatalError()
+            Fatal.Builder("GestureRecognizer should be a type of \(Gesture.self)").die()
         }
 
         return self.shouldRecognizeSimultaneouslyGesture?(
@@ -144,7 +144,7 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer) -> Bool {
 
         guard let gestureRecognizer = gestureRecognizer as? Gesture else {
-            fatalError()
+            Fatal.Builder("GestureRecognizer should be a type of \(Gesture.self)").die()
         }
 
         return self.shouldRequireFailureOfGestureHandler?(
@@ -158,7 +158,7 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
 
         guard let gestureRecognizer = gestureRecognizer as? Gesture else {
-            fatalError()
+            Fatal.Builder("GestureRecognizer should be a type of \(Gesture.self)").die()
         }
 
         return self.shouldBeRequiredToFailByOtherGesture?(
@@ -172,7 +172,7 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         shouldReceive touch: UITouch) -> Bool {
 
         guard let gestureRecognizer = gestureRecognizer as? Gesture else {
-            fatalError()
+            Fatal.Builder("GestureRecognizer should be a type of \(Gesture.self)").die()
         }
 
         return self.shouldReceiveTouchHandler?(
@@ -186,7 +186,7 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         shouldReceive press: UIPress) -> Bool {
 
         guard let gestureRecognizer = gestureRecognizer as? Gesture else {
-            fatalError()
+            Fatal.Builder("GestureRecognizer should be a type of \(Gesture.self)").die()
         }
 
         return self.shouldReceivePressHandler?(
@@ -200,7 +200,7 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         shouldReceive event: UIEvent) -> Bool {
 
         guard let gestureRecognizer = gestureRecognizer as? Gesture else {
-            fatalError()
+            Fatal.Builder("GestureRecognizer should be a type of \(Gesture.self)").die()
         }
 
         if #available(iOS 13.4, tvOS 13.4, *) {

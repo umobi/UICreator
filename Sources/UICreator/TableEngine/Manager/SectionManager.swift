@@ -281,7 +281,9 @@ extension ListManager.SectionManager: SupportForEach {
                 return
             }
 
-            fatalError("Try using UICRow as wrapper for ViewCreators in list. It can be use UICForEach either")
+            Fatal.Builder(
+                "Try using UICRow as wrapper for ViewCreators in list. It can be use UICForEach either"
+            ).die()
         }
 
         return ListManager.SectionManager(manager)

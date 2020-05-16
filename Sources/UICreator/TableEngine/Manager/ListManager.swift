@@ -90,7 +90,7 @@ class ListManager: ListCollectionManager, ListContentSectionRestore {
         }
 
         if self.sections.count != contents.count {
-            fatalError("Verify your content")
+            Fatal.Builder("ListManager can't figure out what is in content").die()
         }
     }
 }
