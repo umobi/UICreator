@@ -23,6 +23,7 @@
 import Foundation
 import UIKit
 
+// swiftlint:disable class_delegate_protocol
 protocol ListSectionDelegate {
     func content(_ section: ListManager.SectionManager.Copy, updateSections: [ListManager.SectionManager])
     func content(updateSection: ListManager.SectionManager)
@@ -92,9 +93,9 @@ extension ListManager {
             }
         }
 
-        func identifier(_ id: Int) -> SectionManager {
+        func identifier(_ identifier: Int) -> SectionManager {
             self.edit {
-                $0.identifier = id
+                $0.identifier = identifier
             }
         }
 
@@ -133,9 +134,9 @@ extension ListManager {
         @discardableResult
         func loadForEachIfNeeded() -> Bool {
             guard let forEach = self.forEach, !forEach.isLoaded else {
-                return self.rows.reduce(false) {
-                    $0 || $1.loadForEachIfNeeded()
-                }
+                return self.rows.contains(where: {
+                    $0.loadForEachIfNeeded()
+                })
             }
 
             forEach.load()
@@ -237,9 +238,12 @@ extension ListManager.SectionManager: ListContentDelegate {
 }
 
 extension ListManager.SectionManager: SupportForEach {
-    static func mount(_ manager: ListManager & ListSectionDelegate, with contents: [ViewCreator]) -> ListManager.SectionManager {
-        var footer: ListManager.RowManager? = nil
-        var header: ListManager.RowManager? = nil
+    static func mount(
+        _ manager: ListManager & ListSectionDelegate,
+        with contents: [ViewCreator]) -> ListManager.SectionManager {
+
+        var footer: ListManager.RowManager?
+        var header: ListManager.RowManager?
         var rows: [ListManager.RowManager] = []
         var identifier = -1
 
@@ -285,13 +289,13 @@ extension ListManager.SectionManager: SupportForEach {
             .header(header)
             .footer(footer)
     }
-    
+
     func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
         sequence.sync { [compactCopy] contents in
             let sections = contents.compactMap {
                 ($0() as? UICSection)?.content
             }
-            
+
             if sections.isEmpty {
                 compactCopy.listManager?.content(compactCopy, updateSections: [])
                 return

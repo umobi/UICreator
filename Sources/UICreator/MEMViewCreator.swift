@@ -154,7 +154,7 @@ extension ViewCreator {
                 return uicView.makeView()
             }
 
-            fatalError()
+            ViewCreatorFatal.alreadyLoadedView.die()
         }()
 
         if loadView.viewCreator === self {
@@ -185,4 +185,10 @@ extension ViewCreator {
     func releaseLoader() {
         self.loadViewHandler = nil
     }
+}
+
+enum ViewCreatorFatal: String, FatalType {
+    case alreadyLoadedView = """
+    ViewCreator is trying to load a view, but it may be already loaded or some weird error occurred
+    """
 }

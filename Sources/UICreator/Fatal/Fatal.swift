@@ -23,7 +23,7 @@
 import Foundation
 
 struct Fatal {
-    static func die(_ type: FatalType) {
+    static func die(_ type: FatalType) -> Never {
         fatalError(type.error)
     }
 
@@ -34,7 +34,7 @@ struct Fatal {
 
 protocol FatalType {
     var error: String { get }
-    func die()
+    func die() -> Never
     func warning()
 }
 
@@ -45,7 +45,7 @@ extension FatalType where Self: RawRepresentable, RawValue == String {
 }
 
 extension FatalType {
-    func die() {
+    func die() -> Never {
         Fatal.die(self)
     }
 
@@ -57,7 +57,7 @@ extension FatalType {
 extension Fatal {
     struct Builder: FatalType {
         let error: String
-        
+
         init(_ string: String) {
             self.error = string
         }

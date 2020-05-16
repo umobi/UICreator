@@ -26,7 +26,7 @@ import UIKit
 protocol ReusableView: class {
     var hostedView: ViewCreator! { get }
     var contentView: UIView { get }
-//    var builder: ViewCreator! { get nonmutating set }
+
     func prepareCell(_ cell: UICCell)
 
     var cellLoaded: UICCell.Loaded! { get set }
@@ -51,7 +51,7 @@ extension ReusableView {
         get { self.mutableReusableObject.value }
         set { self.mutableReusableObject.value = newValue }
     }
-    
+
     fileprivate(set) var hostedView: ViewCreator! {
         get { self.reusableObject.viewCreator }
         set { self.reusableObject = .init(newValue) }

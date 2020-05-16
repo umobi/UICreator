@@ -52,7 +52,7 @@ internal class TableViewCell: UITableViewCell, ReusableView {
             RenderManager(self)?.frame(newValue)
         }
     }
-    
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         RenderManager(self)?.willMove(toSuperview: newSuperview)

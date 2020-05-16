@@ -41,7 +41,6 @@ class Tree {
             }).contains(where: { $0 === leaf })
         else {
             Fatal.rootCycle.die()
-            return
         }
 
         if self.leafs.contains(where: {
@@ -75,7 +74,6 @@ class Tree {
             $0.leaf === leaf
         }) else {
             Fatal.viewOutOfTree.die()
-            return
         }
 
         self.leafs = self.leafs.filter {
@@ -127,7 +125,12 @@ public extension UIView {
 
 extension Tree {
     enum Fatal: String, FatalType {
-        case rootCycle = "Appeding a leaf that is equal to root of the tree is not allowed. This bug cause a root cycle."
-        case viewOutOfTree = "Removing a leaf that is not in the tree is not allowed."
+        case rootCycle = """
+        Appeding a leaf that is equal to root of the tree is not allowed. This bug cause a root cycle.
+        """
+
+        case viewOutOfTree = """
+        Removing a leaf that is not in the tree is not allowed.
+        """
     }
 }

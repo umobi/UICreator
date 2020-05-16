@@ -29,10 +29,14 @@ extension TableView: UITableViewDelegate {
             return nil
         }
 
-        guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: header.identifier) as? TableViewHeaderFooterCell else {
+        guard
+            let cell = self.dequeueReusableHeaderFooterView(
+                withIdentifier: header.identifier
+            ) as? TableViewHeaderFooterCell
+        else {
             fatalError()
         }
-        
+
         cell.prepareCell(header)
         return cell
     }
@@ -42,7 +46,10 @@ extension TableView: UITableViewDelegate {
             return nil
         }
 
-        guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: footer.identifier) as? TableViewHeaderFooterCell else {
+        guard let cell = self.dequeueReusableHeaderFooterView(
+                withIdentifier: footer.identifier
+            ) as? TableViewHeaderFooterCell
+        else {
             fatalError()
         }
 
@@ -52,7 +59,9 @@ extension TableView: UITableViewDelegate {
 
     #if os(iOS)
     @available(iOS 11.0, *)
-    public func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    public func tableView(
+        _ tableView: UITableView,
+        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let reusableView = tableView.reusableView(at: indexPath) else {
             return nil
         }
@@ -73,7 +82,9 @@ extension TableView: UITableViewDelegate {
     }
 
     @available(iOS 11.0, *)
-    public func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    public func tableView(
+        _ tableView: UITableView,
+        leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let reusableView = tableView.reusableView(at: indexPath) else {
             return nil
         }
@@ -93,7 +104,9 @@ extension TableView: UITableViewDelegate {
         return configurator
     }
 
-    public func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+    public func tableView(
+        _ tableView: UITableView,
+        editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         guard let reusableView = tableView.reusableView(at: indexPath) else {
             return nil
         }

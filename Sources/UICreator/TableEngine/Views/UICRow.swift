@@ -26,8 +26,8 @@ import UIKit
 public class UICRow: ViewCreator {
     let content: () -> ViewCreator
 
-    fileprivate(set) var trailingActions: (() -> [RowAction])? = nil
-    fileprivate(set) var leadingActions: (() -> [RowAction])? = nil
+    fileprivate(set) var trailingActions: (() -> [RowAction])?
+    fileprivate(set) var leadingActions: (() -> [RowAction])?
     fileprivate(set) var accessoryType: UITableViewCell.AccessoryType = .none
 
     public init(content: @escaping () -> ViewCreator) {
@@ -69,11 +69,11 @@ public class UICContextualAction: RowAction {
     private(set) var indexPath: IndexPath
     private weak var tableView: UITableView!
 
-    public init(_ title: String? = nil,_ image: UIImage? = nil, style: UIContextualAction.Style) {
+    public init(_ title: String? = nil, _ image: UIImage? = nil, style: UIContextualAction.Style) {
         self.indexPath = .init(row: .zero, section: .zero)
         self.rowAction = UIContextualAction(style: style, title: title, handler: { (_, _, _) in })
         self.handler = nil
-        self.rowAction = self.rowAction.editHandler { [weak self] _,_, success in
+        self.rowAction = self.rowAction.editHandler { [weak self] _, _, success in
             success(self?.handler?(self!.indexPath) ?? false)
         }
 
@@ -100,7 +100,7 @@ public class UICContextualAction: RowAction {
         return self
     }
 
-    private var configuratorHandler: ((UISwipeActionsConfiguration) -> Void)? = nil
+    private var configuratorHandler: ((UISwipeActionsConfiguration) -> Void)?
     public func configurator(_ configuratorHandler: @escaping (UISwipeActionsConfiguration) -> Void) -> Self {
         self.configuratorHandler = configuratorHandler
         return self
@@ -110,10 +110,12 @@ public class UICContextualAction: RowAction {
         self.configuratorHandler?(configurator)
     }
 
-    public func deleteAction(with animation: UITableView.RowAnimation, onCompletion handler: @escaping (IndexPath) -> Void) -> Self {
+    public func deleteAction(
+        with animation: UITableView.RowAnimation,
+        onCompletion handler: @escaping (IndexPath) -> Void) -> Self {
         self.onAction { [weak self] indexPath in
             guard let manager = self?.tableView?.manager as? ListManager else {
-                Fatal.UICList.deleteRows([indexPath]).warning()
+                UICList.Fatal.deleteRows([indexPath]).warning()
                 return false
             }
 
@@ -142,11 +144,11 @@ public class UICRowAction: RowAction {
     private(set) var indexPath: IndexPath
     weak var tableView: UITableView!
 
-    public init(_ title: String? = nil,_ image: UIImage? = nil, style: UITableViewRowAction.Style) {
+    public init(_ title: String? = nil, _ image: UIImage? = nil, style: UITableViewRowAction.Style) {
         self.indexPath = .init(row: .zero, section: .zero)
         self.rowAction = UITableViewRowAction(style: style, title: title, handler: { (_, _) in })
         self.handler = nil
-        self.rowAction = self.rowAction.editHandler { [weak self] _,_  in
+        self.rowAction = self.rowAction.editHandler { [weak self] _, _ in
             self?.handler?(self!.indexPath)
         }
     }
@@ -176,10 +178,12 @@ public class UICRowAction: RowAction {
         return self
     }
 
-    public func deleteAction(with animation: UITableView.RowAnimation, onCompletion handler: @escaping (IndexPath) -> Void) -> Self {
+    public func deleteAction(
+        with animation: UITableView.RowAnimation,
+        onCompletion handler: @escaping (IndexPath) -> Void) -> Self {
         self.onAction { [weak self] indexPath in
             guard let manager = self?.tableView?.manager as? ListManager else {
-                Fatal.UICList.deleteRows([indexPath]).warning()
+                UICList.Fatal.deleteRows([indexPath]).warning()
                 return
             }
 

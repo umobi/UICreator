@@ -59,9 +59,9 @@ extension ListManager {
             self.forEach?.manager = self
         }
 
-        func identifier(_ id: Int) -> RowManager {
+        func identifier(_ identifier: Int) -> RowManager {
             self.edit {
-                $0.identifier = id
+                $0.identifier = identifier
             }
         }
 

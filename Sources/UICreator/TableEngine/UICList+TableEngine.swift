@@ -26,11 +26,11 @@ import UIKit
 extension TableView: ListSupport {}
 
 public extension UICList {
-    convenience init(style: UITableView.Style,_ contents: @escaping () -> [ViewCreator]) {
+    convenience init(style: UITableView.Style, _ contents: @escaping () -> [ViewCreator]) {
         self.init(style: style, ListManager(contents: contents()))
     }
 
-    private convenience init(style: UITableView.Style,_ manager: ListManager) {
+    private convenience init(style: UITableView.Style, _ manager: ListManager) {
         self.init(style: style)
 
         self.onNotRendered { [manager] in
@@ -38,7 +38,7 @@ public extension UICList {
             #if os(iOS)
             tableView.separatorStyle = .none
             #endif
-            
+
             manager.rowsIdentifier.forEach { [unowned tableView] in
                 tableView?.register(TableViewCell.self, forCellReuseIdentifier: $0)
             }

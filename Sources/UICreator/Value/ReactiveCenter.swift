@@ -191,15 +191,10 @@ extension ReactiveReferenceCenter {
     }
 }
 
-extension Fatal {
-    enum ReactiveCenter: FatalType {
-        case unregistered
-
-        var error: String {
-            switch self {
-                case .unregistered:
-                    return "Identifier for Relay or Value isn't registered in ReactiveCenter"
-            }
-        }
+extension ReactiveCenter {
+    enum Fatal: String, FatalType {
+        case unregistered = """
+        Identifier for Relay or Value isn't registered in ReactiveCenter
+        """
     }
 }

@@ -76,13 +76,33 @@ public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCol
         margins.forEach {
             switch $0 {
             case .top:
-                self.insets = .init(top: constant, left: self.insets.left, bottom: self.insets.bottom, right: self.insets.right)
+                self.insets = .init(
+                    top: constant,
+                    left: self.insets.left,
+                    bottom: self.insets.bottom,
+                    right: self.insets.right
+                )
             case .bottom:
-                self.insets = .init(top: self.insets.top, left: self.insets.left, bottom: constant, right: self.insets.right)
+                self.insets = .init(
+                    top: self.insets.top,
+                    left: self.insets.left,
+                    bottom: constant,
+                    right: self.insets.right
+                )
             case .leading:
-                self.insets = .init(top: self.insets.top, left: constant, bottom: self.insets.bottom, right: self.insets.right)
+                self.insets = .init(
+                    top: self.insets.top,
+                    left: constant,
+                    bottom: self.insets.bottom,
+                    right: self.insets.right
+                )
             case .trailing:
-                self.insets = .init(top: self.insets.top, left: self.insets.left, bottom: self.insets.bottom, right: constant)
+                self.insets = .init(
+                    top: self.insets.top,
+                    left: self.insets.left,
+                    bottom: self.insets.bottom,
+                    right: constant
+                )
             }
         }
 
@@ -91,8 +111,15 @@ public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCol
 
     private func size(_ size: CGSize) -> CGSize {
         return .init(
-            width: (self.size(relatedTo: size.width, applying: self.horizontal)) - (self.insets.left + self.insets.right),
-            height: self.size(relatedTo: size.height, applying: self.vertical) - (self.insets.top + self.insets.bottom)
+            width: (self.size(
+                relatedTo: size.width,
+                applying: self.horizontal
+            )) - (self.insets.left + self.insets.right),
+
+            height: self.size(
+                relatedTo: size.height,
+                applying: self.vertical
+            ) - (self.insets.top + self.insets.bottom)
         )
     }
 
@@ -125,7 +152,7 @@ public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCol
                 index -= groupNumberOfItems
 
             default:
-                fatalError()
+                Fatal.invalidContentType.die()
             }
         }
 
@@ -144,7 +171,7 @@ public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCol
             case let item as UICCollectionLayoutItem:
                 return $0 + (item.numberOfElements ?? 1)
             default:
-                fatalError()
+                Fatal.invalidContentType.die()
             }
         }
     }
@@ -182,6 +209,14 @@ public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCol
             }
         }
 
-        fatalError()
+        Fatal.invalidContentType.die()
+    }
+}
+
+extension UICCollectionLayoutGroup {
+    enum Fatal: String, FatalType {
+        case invalidContentType = """
+        UICCollectionLayoutGroup only accept UICCollectionLayoutGroup or UICCollectionLayoutItem as layout content
+        """
     }
 }

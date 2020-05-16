@@ -57,6 +57,26 @@ public struct Relay<Value> {
 //            $0[keyPath: keyPath]
 //        }
 //    }
+//
+//    public subscript<T>(dynamicMember keyPath: KeyPath<Value.Wrapped, T>) -> Relay<T?> where Value: OptionalType {
+//        return self.map {
+//            guard let value = $0.value else {
+//                return nil
+//            }
+//
+//            return value[keyPath: keyPath]
+//        }
+//    }
+//
+//    public subscript<T>(dynamicMember keyPath: KeyPath<Value.Wrapped, T>) -> Relay<T.Wrapped?> where Value: OptionalType, T: OptionalType {
+//        return self.map {
+//            guard let value = $0.value else {
+//                return nil
+//            }
+//
+//            return value[keyPath: keyPath].value
+//        }
+//    }
 
     public func next(_ handler: @escaping (Value) -> Void) {
         self.reference.reactive.valueDidChange(handler: handler)

@@ -23,6 +23,37 @@
 import Foundation
 import UIKit
 
+private var kCollectionViewCellLayoutHandler = 0
+private extension UIView {
+    private var collectionLayoutHandler: ((UIView) -> Void)? {
+        get { objc_getAssociatedObject(self, &kCollectionViewCellLayoutHandler) as? ((UIView) -> Void) }
+        set { objc_setAssociatedObject(self, &kCollectionViewCellLayoutHandler, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    }
+
+    @discardableResult
+    func onCellLayout(_ handler: @escaping (UIView) -> Void) -> Self {
+        guard self.collectionLayoutHandler == nil else {
+            self.collectionLayoutHandler = handler
+            return self
+        }
+
+        self.collectionLayoutHandler = handler
+
+        return self.onLayout { [weak self] in
+            self?.collectionLayoutHandler?($0)
+        }
+    }
+}
+
+private extension ViewCreator {
+    @discardableResult
+    func onCellLayout(_ handler: @escaping (UIView) -> Void) -> Self {
+        self.onNotRendered {
+            $0.onCellLayout(handler)
+        }
+    }
+}
+
 extension _CollectionView: UICollectionViewDataSource {
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
         self.manager?.numberOfSections ?? 0
@@ -38,17 +69,22 @@ extension _CollectionView: UICollectionViewDataSource {
 
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let row = self.manager?.row(at: indexPath) else {
-            fatalError()
+            Fatal.unexpectedRow(indexPath).die()
         }
 
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: row.identifier, for: indexPath) as? CollectionViewCell else {
-            fatalError()
+        guard
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: row.identifier,
+                for: indexPath
+            ) as? CollectionViewCell
+        else {
+            Fatal.unexpectedRow(indexPath).die()
         }
 
         cell.prepareCell(row)
 
         if let item = self.layoutManager?.item(at: indexPath), item.isDynamic, let loaded = cell.cellLoaded {
-            _ = cell.hostedView.onLayout { [weak self, loaded] view in
+            _ = cell.hostedView.onCellLayout { [weak self, loaded] view in
                 guard view.frame.size != .zero else {
                     return
                 }
@@ -73,18 +109,17 @@ extension _CollectionView: UICollectionViewDataSource {
         switch kind {
         case UICollectionView.elementKindSectionHeader:
             guard let header = self.manager?.header(at: indexPath.section) else {
-                assert(false)
-                return .init()
+                Fatal.unexpectedHeader(indexPath).die()
             }
 
             guard let cell = self.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: header.identifier, for: indexPath) as? CollectionReusableView else {
-                fatalError()
+                Fatal.unexpectedHeader(indexPath).die()
             }
 
             cell.prepareCell(header)
 
             if let item = self.layoutManager?.header(at: indexPath.section), item.isDynamic, let loaded = cell.cellLoaded {
-                _ = cell.hostedView.onLayout { [weak self, loaded] view in
+                _ = cell.hostedView.onCellLayout { [weak self, loaded] view in
                     guard view.frame.size != .zero else {
                         return
                     }
@@ -104,18 +139,17 @@ extension _CollectionView: UICollectionViewDataSource {
 
         case UICollectionView.elementKindSectionFooter:
             guard let footer = self.manager?.footer(at: indexPath.section) else {
-                assert(false)
-                return .init()
+                Fatal.unexpectedFooter(indexPath).die()
             }
 
             guard let cell = self.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: footer.identifier, for: indexPath) as? CollectionReusableView else {
-                fatalError()
+                Fatal.unexpectedFooter(indexPath).die()
             }
 
             cell.prepareCell(footer)
 
             if let item = self.layoutManager?.footer(at: indexPath.section), item.isDynamic, let loaded = cell.cellLoaded {
-                _ = cell.hostedView.onLayout { [weak self, loaded] view in
+                _ = cell.hostedView.onCellLayout { [weak self, loaded] view in
                     guard view.frame.size != .zero else {
                         return
                     }
@@ -134,8 +168,38 @@ extension _CollectionView: UICollectionViewDataSource {
             return cell
 
         default:
-            assert(false)
-            return .init()
+            Fatal.unrecognizedSupplementaryElement(kind, indexPath).die()
+        }
+    }
+}
+
+extension _CollectionView {
+    enum Fatal: FatalType {
+        case unexpectedRow(IndexPath)
+        case unexpectedHeader(IndexPath)
+        case unexpectedFooter(IndexPath)
+
+        case unrecognizedSupplementaryElement(String, IndexPath)
+
+        var error: String {
+            switch self {
+            case .unexpectedRow(let indexPath):
+                return """
+                UICollectionDataSource can't dequeue cell as expected at \(indexPath)
+                """
+            case .unexpectedHeader(let indexPath):
+                return """
+                UICollectionDataSource can't dequeue header as expected at \(indexPath)
+                """
+            case .unexpectedFooter(let indexPath):
+                return """
+                UICollectionDataSource can't dequeue footer as expected at \(indexPath)
+                """
+            case .unrecognizedSupplementaryElement(let identifier, let indexPath):
+                return """
+                UICollectionDataSource can't resolve supplementary element with identifier equals to \(identifier) at \(indexPath)
+                """
+            }
         }
     }
 }

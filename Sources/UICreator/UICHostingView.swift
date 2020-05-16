@@ -51,7 +51,7 @@ public class UICHostingView: UIViewController {
 
     public override func loadView() {
         guard let contentBuilder = self.contentBuilder else {
-            fatalError()
+            Fatal.noContentCreator.die()
         }
 
         self.contentView = contentBuilder
@@ -66,3 +66,22 @@ public class UICHostingView: UIViewController {
         self.view.setNeedsUpdateConstraints()
     }
 }
+
+extension UICHostingView {
+    enum Fatal: String, FatalType {
+        case noContentCreator = """
+        UICHostingView is trying to get the ViewCreator but no content has been set
+        """
+    }
+}
+
+//private func unzip(_ callback: @escaping () -> ViewCreator) -> ViewCreator {
+//    let viewCreator = callback()
+//    if let uicView = viewCreator as? UICView {
+//        
+//    }
+//}
+//
+//private func unzip<View>(_ callback: @escaping () -> View) -> View where View: ViewCreator {
+//    let viewCreator = callback()
+//}

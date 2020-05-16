@@ -27,7 +27,7 @@ struct UICCell {
     let rowManager: ListManager.RowManager
     let identifier: String
 
-    init(_ identifier: String,_ manager: ListManager.RowManager) {
+    init(_ identifier: String, _ manager: ListManager.RowManager) {
         self.rowManager = manager
         self.identifier = identifier
     }

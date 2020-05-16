@@ -41,7 +41,12 @@ extension TableView: UITableViewDataSource {
             fatalError()
         }
 
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: row.identifier, for: indexPath) as? TableViewCell else {
+        guard
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: row.identifier,
+                for: indexPath
+            ) as? TableViewCell
+        else {
             fatalError()
         }
 

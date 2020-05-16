@@ -21,30 +21,21 @@
 //
 
 import Foundation
-import UIKit
 
-public class UICHeader: ViewCreator {
-    let content: () -> ViewCreator
-    fileprivate(set) var height: CGFloat?
-
-    public init(content: @escaping () -> ViewCreator) {
-        self.content = content
+class Mutable<Value> {
+    var value: Value
+    init(value: Value) {
+        self.value = value
     }
 }
 
-public extension UICHeader {
-    func estimatedHeight(_ height: CGFloat) -> Self {
-        self.height = height
-        return self
-    }
+protocol MutableEditable {
+    associatedtype Editable
+    func edit(_ edit: @escaping (Editable) -> Void) -> Self
 }
 
-public extension UICHeader {
-    static var empty: UICHeader {
-        return UICHeader(content: {
-            UICEmpty()
-        })
-        .height(equalTo: 0)
-        .estimatedHeight(0)
+extension Mutable where Value: MutableEditable {
+    func update(_ update: @escaping (Value.Editable) -> Void) {
+        self.value = value.edit(update)
     }
 }

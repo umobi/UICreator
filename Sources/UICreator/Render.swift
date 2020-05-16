@@ -59,9 +59,9 @@ class Render {
         self.needs.contains(state)
     }
 
-    private var notRenderedHandler: ((UIView) -> Void)? = nil
-    private var renderedHandler: ((UIView) -> Void)? = nil
-    private var inTheSceneHandler: ((UIView) -> Void)? = nil
+    private var notRenderedHandler: ((UIView) -> Void)?
+    private var renderedHandler: ((UIView) -> Void)?
+    private var inTheSceneHandler: ((UIView) -> Void)?
 
     private var countingNotRendered: Int = 0
     private var countingRendered: Int = 0
@@ -101,7 +101,7 @@ class Render {
 
     func pop(_ state: UIView.RenderState) {
         guard self.needs(state) else {
-            fatalError()
+            Fatal.popedStatus(state).die()
         }
 
         self.needs.remove(state)
@@ -148,7 +148,7 @@ class Render {
 }
 
 private extension Render {
-    func recursive(commit state: UIView.RenderState){
+    func recursive(commit state: UIView.RenderState) {
         switch state {
         case .notRendered:
             self.manager.notRendered.reversed().forEach {
@@ -209,6 +209,21 @@ private extension ViewCreator {
 
         return [self] + self.tree.leafs.reduce([]) {
             $0 + $1.leaf.inTheScene
+        }
+    }
+}
+
+extension Render {
+    enum Fatal: FatalType {
+        case popedStatus(UIView.RenderState)
+
+        var error: String {
+            switch self {
+            case .popedStatus(let status):
+                return """
+                UICreator.Render is trying to pop render status '\(status)' but it wasn't necessarly
+                """
+            }
         }
     }
 }

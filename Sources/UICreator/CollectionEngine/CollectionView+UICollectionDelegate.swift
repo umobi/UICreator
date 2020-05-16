@@ -46,7 +46,7 @@ public extension UICollectionView {
     /// ViewCreator
     func sizeForItem(at indexPath: IndexPath) -> CGSize {
         guard let layoutManager = self.layoutManager else {
-            fatalError()
+            Fatal.noLayoutManagerConfigurated.die()
         }
 
         return layoutManager
@@ -57,7 +57,7 @@ public extension UICollectionView {
     /// ViewCreator
     func sizeForHeader(at section: Int) -> CGSize? {
         guard let layoutManager = self.layoutManager else {
-            fatalError()
+            Fatal.noLayoutManagerConfigurated.die()
         }
 
         return layoutManager
@@ -68,11 +68,19 @@ public extension UICollectionView {
     /// ViewCreator
     func sizeForFooter(at section: Int) -> CGSize? {
         guard let layoutManager = self.layoutManager else {
-            fatalError()
+            Fatal.noLayoutManagerConfigurated.die()
         }
 
         return layoutManager
             .footer(at: section)?
             .size(self.size, at: section)
+    }
+}
+
+extension UICollectionView {
+    enum Fatal: String, FatalType {
+        case noLayoutManagerConfigurated = """
+        UICollectionView is trying to get LayoutManager but there is no instance of it
+        """
     }
 }

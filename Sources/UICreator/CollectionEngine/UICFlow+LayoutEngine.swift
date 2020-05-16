@@ -57,7 +57,9 @@ public class UICCollectionLayoutSupplementary: UICCollectionLayoutSectionElement
         self.init(nil, nil)
     }
 
-    internal required init(_ vertical: CollectionLayoutSizeConstraint?,_ horizontal: CollectionLayoutSizeConstraint?) {
+    internal required init(
+        _ vertical: CollectionLayoutSizeConstraint?,
+        _ horizontal: CollectionLayoutSizeConstraint?) {
         self.vertical = vertical
         self.horizontal = horizontal
     }
@@ -114,15 +116,15 @@ public class UICCollectionLayoutSection: UICCollectionLayoutSectionElement {
         let contents = contents()
 
         if contents.contains(where: { $0 is UICCollectionLayoutSection }) {
-            fatalError()
+            Fatal.recursiveSections.die()
         }
 
-        if (contents.reduce(0) { $0 + ($1 is UICCollectionLayoutHeader ? 1 : 0) }) > 1 {
-            fatalError()
+        if contents.reduce(0) { $0 + ($1 is UICCollectionLayoutHeader ? 1 : 0) } > 1 {
+            Fatal.tooMuchHeaderInSection.die()
         }
 
-        if (contents.reduce(0) { $0 + ($1 is UICCollectionLayoutFooter ? 1 : 0) }) > 1 {
-            fatalError()
+        if contents.reduce(0) { $0 + ($1 is UICCollectionLayoutFooter ? 1 : 0) } > 1 {
+            Fatal.tooMuchFooterInSection.die()
         }
 
         self.numberOfSections = numberOfSections
@@ -172,11 +174,15 @@ class UICCollectionLayoutManager {
     private init(_ contents: [UICCollectionLayoutSectionElement]) {
         if contents.contains(where: { $0 is UICCollectionLayoutSection }) {
             if !contents.allSatisfy({ $0 is UICCollectionLayoutSection }) {
-                fatalError()
+                Fatal.nestedSectionsWithOtherContents.die()
             }
 
             self.contents = contents.map {
-                $0 as! UICCollectionLayoutSection
+                guard let section = $0 as? UICCollectionLayoutSection else {
+                    Fatal.invalidSectionType.die()
+                }
+
+                return section
             }
             return
         }
@@ -209,7 +215,7 @@ class UICCollectionLayoutManager {
             }
         }
 
-        fatalError()
+        Fatal.noSectionAtIndex(index).die()
     }
 
     var numberOfSections: Int {
@@ -225,10 +231,6 @@ class UICCollectionLayoutManager {
     func footer(at section: Int) -> UICCollectionLayoutFooter? {
         return self.section(at: section).footer
     }
-
-//    func replaceItem(at indexPath: IndexPath, with replaceItem: UICCollectionLayoutItem) {
-//        self.section(at: indexPath.section)
-//    }
 }
 
 internal extension CollectionLayoutConstraintable {
@@ -246,4 +248,47 @@ internal extension CollectionLayoutConstraintable {
 
          return value
      }
+}
+
+extension UICCollectionLayoutSection {
+    enum Fatal: String, FatalType {
+        case tooMuchHeaderInSection = """
+        UICCollectionLayoutSection found too much headers in one section
+        """
+
+        case tooMuchFooterInSection = """
+        UICCollectionLayoutSection found too much footers in one section
+        """
+
+        case recursiveSections = """
+        It is not allowed to create recursive sections layout
+        """
+    }
+}
+
+extension UICCollectionLayoutManager {
+    enum Fatal: FatalType {
+        case nestedSectionsWithOtherContents
+        case noSectionAtIndex(Int)
+        case invalidSectionType
+
+        var error: String {
+            switch self {
+            case .nestedSectionsWithOtherContents:
+                return """
+                UICCollectionLayoutSection found nested sections with other layout contents
+                """
+
+            case .noSectionAtIndex(let index):
+                return """
+                UICCollectionLayoutSection couldn't find section for index \(index)
+                """
+
+            case .invalidSectionType:
+                return """
+                UICCollectionLayoutSection was trying to cast sections but it has found a content that is not a section
+                """
+            }
+        }
+    }
 }
