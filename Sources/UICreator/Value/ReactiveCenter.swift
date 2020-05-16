@@ -27,7 +27,7 @@ private class ReactiveToken: CustomStringConvertible, Equatable {
         "\(ObjectIdentifier(self))"
     }
 
-    static func ==(_ left: ReactiveToken,_ right: ReactiveToken) -> Bool {
+    static func == (_ left: ReactiveToken, _ right: ReactiveToken) -> Bool {
         ObjectIdentifier(left) == ObjectIdentifier(right)
     }
 }
@@ -43,7 +43,7 @@ struct ReactiveReferenceCenter {
     fileprivate let reactiveCenter: ReactiveCenter
     fileprivate let reference: ReactiveItemReference
 
-    fileprivate init(reference: ReactiveItemReference,_ center: ReactiveCenter) {
+    fileprivate init(reference: ReactiveItemReference, _ center: ReactiveCenter) {
         self.reactiveCenter = center
         self.reference = reference
     }

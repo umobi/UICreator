@@ -45,7 +45,7 @@ public class PlaceholderView: UIView {
         super.willMove(toSuperview: newSuperview)
         RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
-    
+
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
         RenderManager(self)?.didMoveToSuperview()
@@ -72,12 +72,12 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
 
     let observable: Observable
     let content: (Value) -> ViewCreator
-    private var syncLoad: ((UIView) -> Void)? = nil
+    private var syncLoad: ((UIView) -> Void)?
 
     private func startObservation() {
         let content = self.content
         self.manager?.viewsDidChange(placeholderView: self.uiView, self.observable.map { element in
-            {
+            return {
                 content(element)
             }
         })

@@ -26,12 +26,16 @@ import ConstraintBuilder
 
 internal extension UIView {
 
-    /// The `add(_:)` function is used internally to add views inside view and constraint with required priority in all edges.
-    func add(priority: UILayoutPriority? = nil,_ view: UIView) {
+    /// The `add(_:)` function is used internally to add views
+    /// inside view and constraint with required priority in all edges.
+    func add(priority: UILayoutPriority? = nil, _ view: UIView) {
         CBSubview(self).addSubview(view)
 
-        let priority: UILayoutPriority = priority ?? ((self as UIView) is RootView && view is RootView ? .required :
-        .init(751))
+        let priority: UILayoutPriority = priority ?? {
+            return ((self as UIView) is RootView && view is RootView ?
+                .required :
+                .init(751))
+        }()
 
         Constraintable.activate(
             view.cbuild

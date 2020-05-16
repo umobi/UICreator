@@ -22,7 +22,9 @@
 
 import Foundation
 
-/// `NSProtocol` is a helper for delegates and dataSources for view creator. Some of UIKit delegates requires the main object to be a `NSObject` and ViewCreator don't respect that. In case of using `NSProtocol` remember to always set manager as *weak* var.
+/// `NSProtocol` is a helper for delegates and dataSources for view creator.
+/// Some of UIKit delegates requires the main object to be a `NSObject` and ViewCreator don't respect that.
+/// In case of using `NSProtocol` remember to always set manager as *weak* var.
 public protocol NSProtocol: NSObject {
     associatedtype Manager
     var manager: Manager! { get }

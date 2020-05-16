@@ -139,7 +139,12 @@ extension UIView {
 }
 
 private extension UIView {
-    private static func _recursiveToBottom(in view: UIView, visitedRoot: Bool = false, guard guardCheckHandler: @escaping (UIView) -> Bool, do doHandler: @escaping (UIView) -> Void) {
+    private static func _recursiveToBottom(
+        in view: UIView,
+        visitedRoot: Bool = false,
+        guard guardCheckHandler: @escaping (UIView) -> Bool,
+        do doHandler: @escaping (UIView) -> Void) {
+
         guard !visitedRoot || view.viewCreator == nil else {
             return
         }
@@ -156,11 +161,18 @@ private extension UIView {
         doHandler(view)
     }
 
-    static func recursiveToBottom(in view: UIView, guard guardCheckHandler: @escaping (UIView) -> Bool, do doHandler: @escaping (UIView) -> Void) {
+    static func recursiveToBottom(
+        in view: UIView,
+        guard guardCheckHandler: @escaping (UIView) -> Bool,
+        do doHandler: @escaping (UIView) -> Void) {
+
         self._recursiveToBottom(in: view, guard: guardCheckHandler, do: doHandler)
     }
 
-    static func recursiveToBottom(in view: UIView, do doHandler: @escaping (UIView) -> Void) {
+    static func recursiveToBottom(
+        in view: UIView,
+        do doHandler: @escaping (UIView) -> Void) {
+
         self._recursiveToBottom(in: view, guard: { _ in true }, do: doHandler)
     }
 }
@@ -318,7 +330,7 @@ public extension ViewCreator {
             view.onLayout(handler)
             return self
         }
-        
+
         self.layout = self.layout.merge(.init(handler))
         return self
     }

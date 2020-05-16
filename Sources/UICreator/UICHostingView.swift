@@ -10,7 +10,7 @@ import UIKit
 import ConstraintBuilder
 
 public class UICHostingView: UIViewController {
-    private var strongContentView: UIView? = nil
+    private var strongContentView: UIView?
     private var contentBuilder: ViewCreator?
 
     private weak var contentView: ViewCreator! {

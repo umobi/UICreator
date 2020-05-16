@@ -44,7 +44,7 @@ internal extension UIViewMaker {
             view.updateBuilder(self)
             return view
         }
-        
+
         return Adaptor(self).releaseUIView()
     }
 }
