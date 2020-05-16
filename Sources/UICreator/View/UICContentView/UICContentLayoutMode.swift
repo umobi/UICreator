@@ -21,13 +21,20 @@
 //
 
 import Foundation
-import UIKit
 
-/// Wrapper class for collection of Subviews
-public struct CBSubview {
-    public let views: [ViewCreator]
+public extension UICContentView {
+    enum LayoutMode {
+        case top
+        case topLeft
+        case topRight
 
-    public init(_ views: ViewCreator...) {
-        self.views = views
+        case bottom
+        case bottomLeft
+        case bottomRight
+
+        case left
+        case right
+
+        case center
     }
 }

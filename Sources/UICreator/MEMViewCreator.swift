@@ -130,7 +130,7 @@ extension ViewCreator {
             self.viewObject = .weak(uiView)
             return
         }
-        
+
         self.viewObject = .strong(uiView)
     }
 

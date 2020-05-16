@@ -119,11 +119,11 @@ public class UICCollectionLayoutSection: UICCollectionLayoutSectionElement {
             Fatal.recursiveSections.die()
         }
 
-        if contents.reduce(0) { $0 + ($1 is UICCollectionLayoutHeader ? 1 : 0) } > 1 {
+        if contents.reduce(0, { $0 + ($1 is UICCollectionLayoutHeader ? 1 : 0) }) > 1 {
             Fatal.tooMuchHeaderInSection.die()
         }
 
-        if contents.reduce(0) { $0 + ($1 is UICCollectionLayoutFooter ? 1 : 0) } > 1 {
+        if contents.reduce(0, { $0 + ($1 is UICCollectionLayoutFooter ? 1 : 0) }) > 1 {
             Fatal.tooMuchFooterInSection.die()
         }
 

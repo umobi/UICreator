@@ -64,7 +64,11 @@ private extension UIView {
     }
 }
 
-func OBJCSet<Object>(_ index: Any, _ key: UnsafeRawPointer, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN, orLoad: @escaping () -> Object) -> Object {
+func OBJCSet<Object>(
+    _ index: Any,
+    _ key: UnsafeRawPointer,
+    policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN,
+    orLoad: @escaping () -> Object) -> Object {
     guard let object = objc_getAssociatedObject(index, key) as? Object else {
         let object = orLoad()
         objc_setAssociatedObject(index, key, object, policity)

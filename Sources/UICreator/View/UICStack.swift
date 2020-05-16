@@ -94,7 +94,10 @@ public class UICStack: UIViewCreator {
         }
     }
 
-    public init(axis: NSLayoutConstraint.Axis, spacing: CGFloat = 0,_ contents: @escaping () -> [ViewCreator]) {
+    public init(
+        axis: NSLayoutConstraint.Axis,
+        spacing: CGFloat = 0,
+        _ contents: @escaping () -> [ViewCreator]) {
         self.prepare(axis: axis, spacing: spacing, contents)
     }
 }
@@ -160,14 +163,27 @@ extension UICStack: SupportForEach {
                 }
 
                 views.enumerated().forEach { newView in
-                    guard newView.offset <= endIndex - startIndex, let viewCreator = view?.arrangedSubviews[startIndex..<(view?.arrangedSubviews ?? []).count].enumerated().first(where: { $0.offset == newView.offset })?.element.viewCreator else {
-                        UIView.CBSubview(view)?.insertArrangedSubview(newView.element.releaseUIView(), at: startIndex + newView.offset)
+                    guard
+                        newView.offset <= endIndex - startIndex,
+                        let viewCreator = view?
+                            .arrangedSubviews[startIndex..<(view?.arrangedSubviews ?? []).count]
+                            .enumerated()
+                            .first(where: { $0.offset == newView.offset })?
+                            .element.viewCreator
+                    else {
+                        UIView.CBSubview(view)?.insertArrangedSubview(
+                            newView.element.releaseUIView(),
+                            at: startIndex + newView.offset
+                        )
                         return
                     }
 
                     if !ReplacementTree(viewCreator).replace(with: newView.element) {
                         (view?.arrangedSubviews ?? [])[startIndex + newView.offset].removeFromSuperview()
-                        UIView.CBSubview(view)?.insertArrangedSubview(newView.element.releaseUIView(), at: startIndex + newView.offset)
+                        UIView.CBSubview(view)?.insertArrangedSubview(
+                            newView.element.releaseUIView(), at:
+                            startIndex + newView.offset
+                        )
                     }
                 }
 
@@ -176,7 +192,7 @@ extension UICStack: SupportForEach {
             }
         }
     }
-    
+
     func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
         self.onRendered { [sequence, weak placeholderView] in
             weak var firstView: UIView? = placeholderView
@@ -200,7 +216,10 @@ extension UICStack: SupportForEach {
                 }
 
                 views.enumerated().forEach {
-                    UIView.CBSubview(view)?.insertArrangedSubview($0.element.releaseUIView(), at: startIndex + $0.offset)
+                    UIView.CBSubview(view)?.insertArrangedSubview(
+                        $0.element.releaseUIView(),
+                        at: startIndex + $0.offset
+                    )
                 }
 
                 firstView = views.first?.uiView

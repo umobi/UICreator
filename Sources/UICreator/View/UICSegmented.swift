@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public class _SegmentedControl: UISegmentedControl {
+public class UICSegmentedControlView: UISegmentedControl {
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -76,9 +76,9 @@ public class Segment {
 
     private let content: Content
     private var isEnabled: Bool = true
-    private var contentOffset: CGSize? = nil
-    private var width: CGFloat? = nil
-    private var onSelected: ((UIView) -> Void)? = nil
+    private var contentOffset: CGSize?
+    private var width: CGFloat?
+    private var onSelected: ((UIView) -> Void)?
     private var isSelected: Bool = false
 
     public init(content: Content) {
@@ -145,7 +145,7 @@ public class Segment {
 }
 
 public class UICSegmented: UIViewCreator, Control {
-    public typealias View = _SegmentedControl
+    public typealias View = UICSegmentedControlView
 
     public init(_ segments: @escaping () -> [Segment]) {
         self.loadView { [unowned self] in
@@ -166,12 +166,20 @@ public class UICSegmented: UIViewCreator, Control {
 public extension UIViewCreator where View: UISegmentedControl {
     func addSegment(title: String?, at index: Int? = nil) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.insertSegment(withTitle: title, at: index ?? ($0 as? View)?.numberOfSegments ?? 0, animated: false)
+            ($0 as? View)?.insertSegment(
+                withTitle: title,
+                at: index ?? ($0 as? View)?.numberOfSegments ?? 0,
+                animated: false
+            )
         }
     }
     func addSegment(image: UIImage?, at index: Int? = nil) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.insertSegment(with: image, at: index ?? ($0 as? View)?.numberOfSegments ?? 0, animated: false)
+            ($0 as? View)?.insertSegment(
+                with: image,
+                at: index ?? ($0 as? View)?.numberOfSegments ?? 0,
+                animated: false
+            )
         }
     }
 

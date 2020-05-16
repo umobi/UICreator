@@ -13,5 +13,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Build
-      run: pod lib lint --allow-warnings
+
+    - name: Swiftlint
+      run: |
+        brew install swiftlint
+        swiftlint
+
+    - name: cocoapods lint
+      run: |
+        pod lib lint --allow-warnings

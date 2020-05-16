@@ -24,212 +24,6 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public extension UITabBarController {
-    func selectedIndex(_ index: Int) {
-        guard index != self.selectedIndex else {
-            return
-        }
-        
-        guard let view = self.viewControllers?[index] else {
-            return
-        }
-
-        guard self.delegate?.tabBarController?(self, shouldSelect: view) ?? true else {
-            return
-        }
-
-        self.selectedViewController = view
-        self.delegate?.tabBarController?(self, didSelect: view)
-    }
-}
-
-public class UICTabContainer: UIView {
-    private(set) weak var container: UICControllerContainerView<UITabBarController>!
-    private var content: (() -> UITabBarController)? = nil
-
-    public var tabBarController: UITabBarController! {
-        self.container.view
-    }
-
-    func setContent(content: @escaping () -> UITabBarController) {
-        self.content = content
-    }
-
-    override open var isHidden: Bool {
-        get { super.isHidden }
-        set {
-            super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
-        }
-    }
-
-    override open var frame: CGRect {
-        get { super.frame }
-        set {
-            super.frame = newValue
-            RenderManager(self)?.frame(newValue)
-        }
-    }
-
-    override open func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
-    }
-
-    override open func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
-    }
-
-    override open func didMoveToWindow() {
-        super.didMoveToWindow()
-        self.container = self.container ?? {
-            let container = UICControllerContainerView<UITabBarController>()
-            container.contain(
-                viewController: {
-                    let viewController = self.content?()
-                    self.content = nil
-                    return viewController!
-                }(),
-                parentView: self.viewController
-            )
-
-            CBSubview(self).addSubview(container)
-            Constraintable.activate(
-                container.cbuild
-                    .edges
-            )
-            return container
-        }()
-        RenderManager(self)?.didMoveToWindow()
-    }
-
-    override open func layoutSubviews() {
-        super.layoutSubviews()
-        RenderManager(self)?.layoutSubviews()
-    }
-
-    override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        RenderManager(self)?.traitDidChange()
-    }
-}
-
-public struct UICTabItem {
-
-    let title: String?
-    let image: UIImage?
-    let selectedImage: UIImage?
-    let tabSystem: UITabBarItem.SystemItem?
-    let tag: Int
-    let content: () -> ViewCreator
-
-    public init(content: @escaping () -> ViewCreator) {
-        self.title = nil
-        self.content = content
-        self.image = nil
-        self.selectedImage = nil
-        self.tabSystem = nil
-        self.tag = 0
-    }
-
-    public init(title: String, content: @escaping () -> ViewCreator) {
-        self.title = title
-        self.content = content
-        self.image = nil
-        self.selectedImage = nil
-        self.tabSystem = nil
-        self.tag = 0
-    }
-
-    public init(image: UIImage, content: @escaping () -> ViewCreator) {
-        self.title = nil
-        self.content = content
-        self.image = image
-        self.selectedImage = nil
-        self.tabSystem = nil
-        self.tag = 0
-    }
-
-    public func title(_ title: String?) -> Self {
-        self.edit {
-            $0.title = title
-        }
-    }
-
-    public func image(_ image: UIImage?) -> Self {
-        self.edit {
-            $0.image = image
-        }
-    }
-
-    public func tag(_ tag: Int) -> Self {
-        self.edit {
-            $0.tag = tag
-        }
-    }
-
-    public func selectedImage(_ image: UIImage) -> Self {
-        self.edit {
-            $0.selectedImage = image
-        }
-    }
-
-    public func systemItem(_ systemItem: UITabBarItem.SystemItem) -> Self {
-        self.edit {
-            $0.tabSystem = systemItem
-        }
-    }
-
-    private init(_ original: UICTabItem, editable: Editable) {
-        self.title = editable.title
-        self.image = editable.image
-        self.selectedImage = editable.selectedImage
-        self.tabSystem = editable.tabSystem
-        self.tag = editable.tag
-        self.content = original.content
-    }
-
-    private func edit(_ edit: @escaping (Editable) -> Void) -> Self {
-        let editable = Editable(self)
-        edit(editable)
-        return .init(self, editable: editable)
-    }
-
-    private class Editable {
-        var title: String?
-        var image: UIImage?
-        var selectedImage: UIImage?
-        var tabSystem: UITabBarItem.SystemItem?
-        var tag: Int
-
-        init(_ tabItem: UICTabItem) {
-            self.title = tabItem.title
-            self.image = tabItem.image
-            self.selectedImage = tabItem.selectedImage
-            self.tabSystem = tabItem.tabSystem
-            self.tag = tabItem.tag
-        }
-    }
-
-    var tabItem: UITabBarItem {
-        if let tabSystem = self.tabSystem {
-            let tabItem = UITabBarItem(tabBarSystemItem: tabSystem, tag: self.tag)
-            tabItem.selectedImage = self.selectedImage
-            tabItem.title = self.title
-            tabItem.image = self.image
-            return tabItem
-        }
-
-        let tabItem = UITabBarItem()
-        tabItem.title = self.title
-        tabItem.image = self.image
-        tabItem.tag = self.tag
-        tabItem.selectedImage = self.selectedImage
-        return tabItem
-    }
-}
-
 public class UICTabCreator<TabController: UITabBarController>: UIViewCreator {
     public typealias View = UICTabContainer
 
@@ -367,13 +161,6 @@ public extension UICTabCreator {
     }
 }
 
-public extension UIView {
-    var tabBarItem: UITabBarItem? {
-        get { self.viewController.tabBarItem }
-        set { self.viewController.tabBarItem = newValue }
-    }
-}
-
 public extension ViewCreator {
     var tabBarItem: UITabBarItem? {
         get { self.uiView.tabBarItem }
@@ -450,7 +237,9 @@ public extension ViewCreator {
         }
     }
 
-    func tabBarItem(badgeTextAttributes attributes: [NSAttributedString.Key : Any]?, for state: UIControl.State) -> Self {
+    func tabBarItem(
+        badgeTextAttributes attributes: [NSAttributedString.Key: Any]?,
+        for state: UIControl.State) -> Self {
         self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
             tabItem.setBadgeTextAttributes(attributes, for: state)
@@ -461,9 +250,13 @@ public extension ViewCreator {
     func tabBarItem(badgeFont font: UIFont, for state: UIControl.State = .normal) -> Self {
         self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
-            tabItem.setBadgeTextAttributes(tabItem.badgeTextAttributes(for: state)?.merging([.font: font], uniquingKeysWith: {
-                $1
-            }), for: state)
+            tabItem.setBadgeTextAttributes(
+                tabItem
+                    .badgeTextAttributes(for: state)?
+                    .merging([.font: font], uniquingKeysWith: {
+                        $1
+                    }),
+                for: state)
             $0.tabBarItem = tabItem
         }
     }
@@ -471,26 +264,14 @@ public extension ViewCreator {
     func tabBarItem(badgeFontColor color: UIFont, for state: UIControl.State = .normal) -> Self {
         self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
-            tabItem.setBadgeTextAttributes(tabItem.badgeTextAttributes(for: state)?.merging([.foregroundColor: color], uniquingKeysWith: {
-                $1
-            }), for: state)
+            tabItem.setBadgeTextAttributes(
+                tabItem
+                    .badgeTextAttributes(for: state)?
+                    .merging([.foregroundColor: color], uniquingKeysWith: {
+                        $1
+                    }),
+                for: state)
             $0.tabBarItem = tabItem
-        }
-    }
-}
-
-public class Controller: UIViewCreator {
-    public typealias View = UICControllerContainerView<UICHostingView>
-
-    public init(content: @escaping () -> ViewCreator) {
-        let hostedController = UICHostingView(content: content)
-        self.tree.append(hostedController.hostedView)
-
-        self.loadView { [unowned self] in
-            View.init(builder: self)
-        }
-        .onInTheScene {
-            ($0 as? View)?.contain(viewController: hostedController)
         }
     }
 }

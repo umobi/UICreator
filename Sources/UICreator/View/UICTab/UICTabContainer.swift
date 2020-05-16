@@ -22,8 +22,19 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
-public class UICInputView: UIInputView {
+public class UICTabContainer: UIView {
+    private(set) weak var container: UICControllerContainerView<UITabBarController>!
+    private var content: (() -> UITabBarController)? = nil
+
+    public var tabBarController: UITabBarController! {
+        self.container.view
+    }
+
+    func setContent(content: @escaping () -> UITabBarController) {
+        self.content = content
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -41,55 +52,72 @@ public class UICInputView: UIInputView {
         }
     }
 
-    override public func willMove(toSuperview newSuperview: UIView?) {
+    override open func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         RenderManager(self)?.willMove(toSuperview: newSuperview)
     }
 
-    override public func didMoveToSuperview() {
+    override open func didMoveToSuperview() {
         super.didMoveToSuperview()
         RenderManager(self)?.didMoveToSuperview()
     }
 
-    override public func didMoveToWindow() {
+    override open func didMoveToWindow() {
         super.didMoveToWindow()
+        self.container = self.container ?? {
+            let container = UICControllerContainerView<UITabBarController>()
+            container.contain(
+                viewController: {
+                    let viewController = self.content?()
+                    self.content = nil
+                    return viewController!
+                }(),
+                parentView: self.viewController
+            )
+
+            CBSubview(self).addSubview(container)
+            Constraintable.activate(
+                container.cbuild
+                    .edges
+            )
+            return container
+        }()
         RenderManager(self)?.didMoveToWindow()
     }
 
-    override public func layoutSubviews() {
+    override open func layoutSubviews() {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
     }
 
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         RenderManager(self)?.traitDidChange()
     }
 }
 
-public class UICInput: UIViewCreator {
-    public typealias View = UICInputView
-
-    public init(
-        size: CGSize = .zero,
-        style: UIInputView.Style = .keyboard,
-        content: @escaping () -> ViewCreator) {
-        let content = UICHost(content: content)
-        self.tree.append(content)
-
-        self.loadView { [unowned self] in
-            return View.init(builder: self)
+public extension UITabBarController {
+    func selectedIndex(_ index: Int) {
+        guard index != self.selectedIndex else {
+            return
         }
-        .onNotRendered {
-            $0.add(content.releaseUIView())
+
+        guard let view = self.viewControllers?[index] else {
+            return
         }
+
+        guard self.delegate?.tabBarController?(self, shouldSelect: view) ?? true else {
+            return
+        }
+
+        self.selectedViewController = view
+        self.delegate?.tabBarController?(self, didSelect: view)
     }
 }
 
-public extension UIViewCreator where View: UIInputView {
-    func allowsSelfsSizing(_ flag: Bool) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.allowsSelfSizing = flag
-        }
+public extension UIView {
+    var tabBarItem: UITabBarItem? {
+        get { self.viewController.tabBarItem }
+        set { self.viewController.tabBarItem = newValue }
     }
 }
