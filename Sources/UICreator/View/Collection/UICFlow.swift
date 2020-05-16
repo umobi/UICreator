@@ -52,40 +52,58 @@ public extension UICFlow {
     func item(relativeHeight height: CGFloat) -> Self {
         return self.onLayout {
             let itemSize = self.dynamicCollectionViewLayout.itemSize
-            self.dynamicCollectionViewLayout.itemSize = .init(width: itemSize.width, height: $0.bounds.height * height)
+            self.dynamicCollectionViewLayout.itemSize = .init(
+                width: itemSize.width,
+                height: $0.bounds.height * height
+            )
         }
     }
 
     func item(relativeWidth width: CGFloat) -> Self {
         return self.onLayout {
             let itemSize = self.dynamicCollectionViewLayout.itemSize
-            self.dynamicCollectionViewLayout.itemSize = .init(width: $0.bounds.width * width, height: itemSize.height)
+            self.dynamicCollectionViewLayout.itemSize = .init(
+                width: $0.bounds.width * width,
+                height: itemSize.height
+            )
         }
     }
 
     func item(height: CGFloat) -> Self {
         return self.onLayout { _ in
             let itemSize = self.dynamicCollectionViewLayout.itemSize
-            self.dynamicCollectionViewLayout.itemSize = .init(width: itemSize.width, height: height)
+            self.dynamicCollectionViewLayout.itemSize = .init(
+                width: itemSize.width,
+                height: height
+            )
         }
     }
 
     func item(width: CGFloat) -> Self {
         return self.onLayout { _ in
             let itemSize = self.dynamicCollectionViewLayout.itemSize
-            self.dynamicCollectionViewLayout.itemSize = .init(width: width, height: itemSize.height)
+            self.dynamicCollectionViewLayout.itemSize = .init(
+                width: width,
+                height: itemSize.height
+            )
         }
     }
 
     func item(aspectRatioHeight constant: CGFloat) -> Self {
         return self.onLayout {
-            self.dynamicCollectionViewLayout.itemSize = .init(width: $0.bounds.height * constant, height: $0.bounds.height)
+            self.dynamicCollectionViewLayout.itemSize = .init(
+                width: $0.bounds.height * constant,
+                height: $0.bounds.height
+            )
         }
     }
 
     func item(aspectRatioWidth constant: CGFloat) -> Self {
         return self.onLayout {
-            self.dynamicCollectionViewLayout.itemSize = .init(width: $0.bounds.width, height: $0.bounds.width * constant)
+            self.dynamicCollectionViewLayout.itemSize = .init(
+                width: $0.bounds.width,
+                height: $0.bounds.width * constant
+            )
         }
     }
 

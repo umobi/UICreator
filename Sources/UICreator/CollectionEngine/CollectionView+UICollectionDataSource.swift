@@ -54,7 +54,7 @@ private extension ViewCreator {
     }
 }
 
-extension _CollectionView: UICollectionViewDataSource {
+extension UICCollectionView: UICollectionViewDataSource {
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
         self.manager?.numberOfSections ?? 0
     }
@@ -67,7 +67,10 @@ extension _CollectionView: UICollectionViewDataSource {
         return manager.numberOfRows(in: manager.section(at: section))
     }
 
-    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+
         guard let row = self.manager?.row(at: indexPath) else {
             Fatal.unexpectedRow(indexPath).die()
         }
@@ -83,88 +86,128 @@ extension _CollectionView: UICollectionViewDataSource {
 
         cell.prepareCell(row)
 
-        if let item = self.layoutManager?.item(at: indexPath), item.isDynamic, let loaded = cell.cellLoaded {
-            _ = cell.hostedView.onCellLayout { [weak self, loaded] view in
-                guard view.frame.size != .zero else {
-                    return
-                }
-
-                guard let item = self?.layoutManager?.item(at: indexPath) else {
-                    return
-                }
-
-                guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath)
-                    .horizontal(.equalTo(view.frame.width))
-                    .vertical(.equalTo(view.frame.height))) else {
-                        return
-                }
-
-                self?.collectionViewLayout.invalidateLayout()
-            }
+        guard
+            let item = self.layoutManager?
+                .item(at: indexPath),
+            item.isDynamic,
+            let loaded = cell.cellLoaded
+        else {
+            return cell
         }
+
+        cell.hostedView.onCellLayout { [weak self, loaded] view in
+            guard view.frame.size != .zero else {
+                return
+            }
+
+            guard let item = self?.layoutManager?.item(at: indexPath) else {
+                return
+            }
+
+            guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath)
+                .horizontal(.equalTo(view.frame.width))
+                .vertical(.equalTo(view.frame.height))) else {
+                    return
+            }
+
+            self?.collectionViewLayout.invalidateLayout()
+        }
+
         return cell
     }
-    
-    public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+
+    // swiftlint:disable function_body_length cyclomatic_complexity
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        viewForSupplementaryElementOfKind kind: String,
+        at indexPath: IndexPath) -> UICollectionReusableView {
+
         switch kind {
+        // MARK: - Section Header
         case UICollectionView.elementKindSectionHeader:
             guard let header = self.manager?.header(at: indexPath.section) else {
                 Fatal.unexpectedHeader(indexPath).die()
             }
 
-            guard let cell = self.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: header.identifier, for: indexPath) as? CollectionReusableView else {
+            guard
+                let cell = self.dequeueReusableSupplementaryView(
+                    ofKind: kind,
+                    withReuseIdentifier: header.identifier,
+                    for: indexPath) as? CollectionReusableView
+            else {
                 Fatal.unexpectedHeader(indexPath).die()
             }
 
             cell.prepareCell(header)
 
-            if let item = self.layoutManager?.header(at: indexPath.section), item.isDynamic, let loaded = cell.cellLoaded {
-                _ = cell.hostedView.onCellLayout { [weak self, loaded] view in
-                    guard view.frame.size != .zero else {
-                        return
-                    }
-
-                    guard let item = self?.layoutManager?.header(at: indexPath.section) else {
-                        return
-                    }
-
-                    guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath.section)
-                        .horizontal(.equalTo(view.frame.width))
-                        .vertical(.equalTo(view.frame.height))) else { return }
-
-                    self?.collectionViewLayout.invalidateLayout()
-                }
+            guard
+                let item = self.layoutManager?
+                    .header(at: indexPath.section),
+                item.isDynamic,
+                let loaded = cell.cellLoaded
+            else {
+                return cell
             }
+
+            cell.hostedView.onCellLayout { [weak self, loaded] view in
+                guard view.frame.size != .zero else {
+                    return
+                }
+
+                guard let item = self?.layoutManager?.header(at: indexPath.section) else {
+                    return
+                }
+
+                guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath.section)
+                    .horizontal(.equalTo(view.frame.width))
+                    .vertical(.equalTo(view.frame.height))) else { return }
+
+                self?.collectionViewLayout.invalidateLayout()
+            }
+
             return cell
 
+        // MARK: - Section Footer
         case UICollectionView.elementKindSectionFooter:
             guard let footer = self.manager?.footer(at: indexPath.section) else {
                 Fatal.unexpectedFooter(indexPath).die()
             }
 
-            guard let cell = self.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: footer.identifier, for: indexPath) as? CollectionReusableView else {
+            guard
+                let cell = self.dequeueReusableSupplementaryView(
+                    ofKind: kind,
+                    withReuseIdentifier: footer.identifier,
+                    for: indexPath) as? CollectionReusableView
+            else {
                 Fatal.unexpectedFooter(indexPath).die()
             }
 
             cell.prepareCell(footer)
 
-            if let item = self.layoutManager?.footer(at: indexPath.section), item.isDynamic, let loaded = cell.cellLoaded {
-                _ = cell.hostedView.onCellLayout { [weak self, loaded] view in
-                    guard view.frame.size != .zero else {
-                        return
-                    }
-
-                    guard let item = self?.layoutManager?.footer(at: indexPath.section) else {
-                        return
-                    }
-
-                    guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath.section)
-                        .horizontal(.equalTo(view.frame.width))
-                        .vertical(.equalTo(view.frame.height))) else { return }
-
-                    self?.collectionViewLayout.invalidateLayout()
-                }
+            guard
+                let item = self.layoutManager?.footer(at: indexPath.section),
+                item.isDynamic,
+                let loaded = cell.cellLoaded
+            else {
+                return cell
             }
+
+            cell.hostedView.onCellLayout { [weak self, loaded] view in
+                guard view.frame.size != .zero else {
+                    return
+                }
+
+                guard let item = self?.layoutManager?.footer(at: indexPath.section) else {
+                    return
+                }
+
+                guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath.section)
+                    .horizontal(.equalTo(view.frame.width))
+                    .vertical(.equalTo(view.frame.height))) else { return }
+
+                self?.collectionViewLayout.invalidateLayout()
+            }
+
             return cell
 
         default:
@@ -173,7 +216,7 @@ extension _CollectionView: UICollectionViewDataSource {
     }
 }
 
-extension _CollectionView {
+extension UICCollectionView {
     enum Fatal: FatalType {
         case unexpectedRow(IndexPath)
         case unexpectedHeader(IndexPath)
@@ -181,6 +224,7 @@ extension _CollectionView {
 
         case unrecognizedSupplementaryElement(String, IndexPath)
 
+        // swiftlint:disable line_length
         var error: String {
             switch self {
             case .unexpectedRow(let indexPath):

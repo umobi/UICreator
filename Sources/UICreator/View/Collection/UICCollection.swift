@@ -28,12 +28,12 @@ public protocol CollectionLayout: UIViewCreator where View: UICollectionView {
 }
 
 public extension CollectionLayout {
-    var dynamicCollectionViewLayout: Layout {
-        (self.uiView as? View)?.collectionViewLayout as! Layout
+    var dynamicCollectionViewLayout: Layout! {
+        (self.uiView as? View)?.collectionViewLayout as? Layout
     }
 }
 
-public class _CollectionView: UICollectionView {
+public class UICCollectionView: UICollectionView {
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -83,7 +83,7 @@ public class _CollectionView: UICollectionView {
 }
 
 open class UICCollection: UIViewCreator {
-    public typealias View = _CollectionView
+    public typealias View = UICCollectionView
 
     public init(layout: UICollectionViewLayout) {
         self.loadView { [unowned self] in

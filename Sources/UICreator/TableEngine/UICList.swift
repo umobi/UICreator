@@ -23,60 +23,8 @@
 import Foundation
 import UIKit
 
-public class TableView: UITableView {
-
-    override open var isHidden: Bool {
-        get { super.isHidden }
-        set {
-            super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
-        }
-    }
-
-    override open var frame: CGRect {
-        get { super.frame }
-        set {
-            super.frame = newValue
-            RenderManager(self)?.frame(newValue)
-        }
-    }
-
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
-    }
-
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
-    }
-
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        RenderManager(self)?.didMoveToWindow()
-    }
-
-    override public func setNeedsLayout() {
-        super.setNeedsLayout()
-    }
-
-    override public func layoutIfNeeded() {
-        super.layoutIfNeeded()
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        RenderManager(self)?.layoutSubviews()
-    }
-
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        RenderManager(self)?.traitDidChange()
-    }
-}
-
 public class UICList: UIViewCreator {
-    public typealias View = TableView
+    public typealias View = UICTableView
 
     public init(style: UITableView.Style) {
         self.loadView { [unowned self] in
@@ -88,30 +36,6 @@ public class UICList: UIViewCreator {
 }
 
 public extension UIViewCreator where View: UITableView {
-
-    func addCell(for identifier: String, _ cellClass: AnyClass?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.register(cellClass, forCellReuseIdentifier: identifier)
-        }
-    }
-
-    func addCell(for identifier: String, _ uiNib: UINib?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.register(uiNib, forCellReuseIdentifier: identifier)
-        }
-    }
-
-    func addHeaderOrFooter(for identifier: String, _ aClass: AnyClass?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.register(aClass, forHeaderFooterViewReuseIdentifier: identifier)
-        }
-    }
-
-    func addHeaderOrFooter(for identifier: String, _ uiNib: UINib?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.register(uiNib, forHeaderFooterViewReuseIdentifier: identifier)
-        }
-    }
 
     func row(height: CGFloat) -> Self {
         self.onNotRendered {
@@ -173,7 +97,7 @@ public extension UIViewCreator where View: UITableView {
         }
     }
 
-    @available(iOS 11.0,tvOS 11.0 , *)
+    @available(iOS 11.0, tvOS 11.0, *)
     func insetsContentViews(toSafeArea flag: Bool) -> Self {
         self.onInTheScene {
             ($0 as? View)?.insetsContentViewsToSafeArea = flag
@@ -273,30 +197,12 @@ public extension UIViewCreator where View: UITableView {
     }
 }
 
-extension UITableView {
-    private var tableViewCellHandler: ((UITableViewCell) -> Void)? {
-        get { self.loadManager.cellHandler.value }
-        set { self.loadManager.cellHandler.value = newValue }
-    }
-
-    @discardableResult
-    func appendCellHandler(handler: @escaping (UITableViewCell) -> Void) -> Self {
-        let all = self.tableViewCellHandler
-        self.tableViewCellHandler = {
-            all?($0)
-            handler($0)
-        }
-
-        return self
-    }
-
-    func commitCell(_ cell: UITableViewCell) {
-        self.tableViewCellHandler?(cell)
-    }
-}
-
 public extension UIViewCreator where View: UITableView {
-    func deleteRows(with animation: UITableView.RowAnimation,_ value: Relay<[IndexPath]>, onCompletion: @escaping ([IndexPath]) -> Void) -> Self {
+    func deleteRows(
+        with animation: UITableView.RowAnimation,
+        _ value: Relay<[IndexPath]>,
+        onCompletion: @escaping ([IndexPath]) -> Void) -> Self {
+
         value.next { [weak self] indexPaths in
             guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
                 UICList.Fatal.deleteRows(indexPaths).warning()
@@ -329,7 +235,11 @@ public extension UIViewCreator where View: UITableView {
         return self
     }
 
-    func deleteSections(with animation: UITableView.RowAnimation,_ value: Relay<[Int]>, onCompletion: @escaping ([Int]) -> Void) -> Self {
+    func deleteSections(
+        with animation: UITableView.RowAnimation,
+        _ value: Relay<[Int]>,
+        onCompletion: @escaping ([Int]) -> Void) -> Self {
+
         value.next { [weak self] sections in
             guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
                 UICList.Fatal.deleteSections(sections).warning()
@@ -365,13 +275,17 @@ public extension UIViewCreator where View: UITableView {
 
 public extension UIViewCreator where View: UITableView {
 
-    func insertRows(with animation: UITableView.RowAnimation,_ value: Relay<[IndexPath]>, perform: @escaping ([IndexPath]) -> Void) -> Self {
+    func insertRows(
+        with animation: UITableView.RowAnimation,
+        _ value: Relay<[IndexPath]>,
+        perform: @escaping ([IndexPath]) -> Void) -> Self {
+
         value.next { [weak self] indexPaths in
             guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
                 UICList.Fatal.insertRows(indexPaths).warning()
                 return
             }
-            
+
             (self?.uiView as? View)?.manager = ListManager.Append(manager)
             perform(indexPaths)
 
@@ -396,7 +310,11 @@ public extension UIViewCreator where View: UITableView {
         return self
     }
 
-    func insertSections(with animation: UITableView.RowAnimation,_ value: Relay<[Int]>, perform: @escaping ([Int]) -> Void) -> Self {
+    func insertSections(
+        with animation: UITableView.RowAnimation,
+        _ value: Relay<[Int]>,
+        perform: @escaping ([Int]) -> Void) -> Self {
+
         value.next { [weak self] sections in
             guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
                 UICList.Fatal.insertSections(sections).warning()

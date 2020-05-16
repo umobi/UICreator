@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public class _ImageView: UIImageView {
+public class UICImageView: UIImageView {
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -76,7 +76,7 @@ public class _ImageView: UIImageView {
 }
 
 public class UICImage: UIViewCreator {
-    public typealias View = _ImageView
+    public typealias View = UICImageView
 
     public init(mode: View.ContentMode = .scaleToFill) {
         self.loadView { [unowned self] in

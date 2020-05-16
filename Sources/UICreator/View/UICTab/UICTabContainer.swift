@@ -26,7 +26,7 @@ import ConstraintBuilder
 
 public class UICTabContainer: UIView {
     private(set) weak var container: UICControllerContainerView<UITabBarController>!
-    private var content: (() -> UITabBarController)? = nil
+    private var content: (() -> UITabBarController)?
 
     public var tabBarController: UITabBarController! {
         self.container.view

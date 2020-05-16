@@ -24,15 +24,19 @@ import Foundation
 import ConstraintBuilder
 import UIKit
 
+// swiftlint:disable file_length
 extension UIView {
     fileprivate var realSuperview: UIView? {
         guard let superview = self.superview else {
             return nil
         }
 
-        return sequence(first: superview, next: { (UIViewWrapper($0)?.safe ?? $0).superview }).first(where: {
-            !($0 is RootView)
-        })
+        return sequence(first: superview, next: {
+            (UIViewWrapper($0)?.safe ?? $0).superview })
+            .first(where: {
+                !($0 is RootView)
+            }
+        )
     }
 }
 
@@ -47,7 +51,11 @@ extension UIView {
 }
 
 public extension ViewCreator {
-    func safeArea(topEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        topEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -64,7 +72,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(topGreaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        topGreaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -81,7 +93,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(topLessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        topLessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -98,7 +114,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(bottomEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        bottomEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -115,7 +135,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(bottomGreaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        bottomGreaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -132,7 +156,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(bottomLessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        bottomLessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -149,7 +177,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(leadingEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        leadingEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -166,7 +198,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(leadingGreaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        leadingGreaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -183,7 +219,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(leadingLessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        leadingLessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -200,7 +240,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(trailingEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        trailingEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -217,7 +261,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(trailingGreaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        trailingGreaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -234,7 +282,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(trailingLessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        trailingLessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -251,14 +303,21 @@ public extension ViewCreator {
         }
     }
 
-    func safeAreaInsets(equalTo value: CGFloat = 0, priority: UILayoutPriority = .required) -> Self {
+    func safeAreaInsets(
+        equalTo value: CGFloat = 0,
+        priority: UILayoutPriority = .required) -> Self {
+
         return self.safeArea(topEqualTo: value, priority: priority)
             .safeArea(bottomEqualTo: value, priority: priority)
             .safeArea(leadingEqualTo: value, priority: priority)
             .safeArea(trailingEqualTo: value, priority: priority)
     }
 
-    func top(equalTo constant: CGFloat = 0, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func top(
+        equalTo constant: CGFloat = 0,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -275,7 +334,11 @@ public extension ViewCreator {
         }
     }
 
-    func top(greaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func top(
+        greaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -292,7 +355,11 @@ public extension ViewCreator {
         }
     }
 
-    func top(lessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func top(
+        lessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -309,7 +376,11 @@ public extension ViewCreator {
         }
     }
 
-    func bottom(equalTo constant: CGFloat = 0, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func bottom(
+        equalTo constant: CGFloat = 0,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -326,7 +397,11 @@ public extension ViewCreator {
         }
     }
 
-    func bottom(greaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func bottom(
+        greaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -343,7 +418,11 @@ public extension ViewCreator {
         }
     }
 
-    func bottom(lessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func bottom(
+        lessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -360,7 +439,11 @@ public extension ViewCreator {
         }
     }
 
-    func leading(equalTo constant: CGFloat = 0, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func leading(
+        equalTo constant: CGFloat = 0,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -377,7 +460,11 @@ public extension ViewCreator {
         }
     }
 
-    func leading(greaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func leading(
+        greaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -394,7 +481,11 @@ public extension ViewCreator {
         }
     }
 
-    func leading(lessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func leading(
+        lessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -411,7 +502,11 @@ public extension ViewCreator {
         }
     }
 
-    func trailing(equalTo constant: CGFloat = 0, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func trailing(
+        equalTo constant: CGFloat = 0,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -428,7 +523,11 @@ public extension ViewCreator {
         }
     }
 
-    func trailing(greaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func trailing(
+        greaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -445,7 +544,11 @@ public extension ViewCreator {
         }
     }
 
-    func trailing(lessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func trailing(
+        lessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -462,7 +565,11 @@ public extension ViewCreator {
         }
     }
 
-    func height(equalToSuperview multiplier: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func height(
+        equalToSuperview multiplier: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -479,7 +586,11 @@ public extension ViewCreator {
         }
     }
 
-    func height(greaterThanOrEqualToSuperview multiplier: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func height(
+        greaterThanOrEqualToSuperview multiplier: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -496,7 +607,11 @@ public extension ViewCreator {
         }
     }
 
-    func height(lessThanOrEqualToSuperview multiplier: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func height(
+        lessThanOrEqualToSuperview multiplier: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -515,7 +630,11 @@ public extension ViewCreator {
 
     typealias ConstraintRelatedView = () -> UIView
 
-    func width(equalToSuperview multiplier: CGFloat, priority: UILayoutPriority = .required, orView view: ConstraintRelatedView? = nil) -> Self {
+    func width(
+        equalToSuperview multiplier: CGFloat,
+        priority: UILayoutPriority = .required,
+        orView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -532,7 +651,11 @@ public extension ViewCreator {
         }
     }
 
-    func width(greaterThanOrEqualToSuperview multiplier: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func width(
+        greaterThanOrEqualToSuperview multiplier: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -549,7 +672,11 @@ public extension ViewCreator {
         }
     }
 
-    func width(lessThanOrEqualToSuperview multiplier: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func width(
+        lessThanOrEqualToSuperview multiplier: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -568,7 +695,11 @@ public extension ViewCreator {
 }
 
 public extension ViewCreator {
-    func insets(equalTo value: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func insets(
+        equalTo value: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.top(equalTo: value, priority: priority, toView: view)
             .bottom(equalTo: value, priority: priority, toView: view)
             .leading(equalTo: value, priority: priority, toView: view)
@@ -577,11 +708,17 @@ public extension ViewCreator {
 }
 
 public extension ViewCreator {
-    func aspectRatio(equalTo multiplier: CGFloat = 1, priority: UILayoutPriority = .required) -> Self {
+    func aspectRatio(
+        equalTo multiplier: CGFloat = 1,
+        priority: UILayoutPriority = .required) -> Self {
+
         return self.aspectRatio(heightEqualTo: multiplier, priority: priority)
     }
 
-    func aspectRatio(heightEqualTo multiplier: CGFloat, priority: UILayoutPriority = .required) -> Self {
+    func aspectRatio(
+        heightEqualTo multiplier: CGFloat,
+        priority: UILayoutPriority = .required) -> Self {
+
         return self.onNotRendered {
             let view = (UIViewWrapper($0)?.safe ?? $0)
 
@@ -596,7 +733,10 @@ public extension ViewCreator {
         }
     }
 
-    func aspectRatio(heightGreaterThanOrEqualTo multiplier: CGFloat, priority: UILayoutPriority = .required) -> Self {
+    func aspectRatio(
+        heightGreaterThanOrEqualTo multiplier: CGFloat,
+        priority: UILayoutPriority = .required) -> Self {
+
         return self.onNotRendered {
             let view = (UIViewWrapper($0)?.safe ?? $0)
 
@@ -611,7 +751,10 @@ public extension ViewCreator {
         }
     }
 
-    func aspectRatio(heightLessThanOrEqualTo multiplier: CGFloat, priority: UILayoutPriority = .required) -> Self {
+    func aspectRatio(
+        heightLessThanOrEqualTo multiplier: CGFloat,
+        priority: UILayoutPriority = .required) -> Self {
+
         return self.onNotRendered {
             let view = (UIViewWrapper($0)?.safe ?? $0)
 
@@ -626,7 +769,10 @@ public extension ViewCreator {
         }
     }
 
-    func aspectRatio(widthEqualTo multiplier: CGFloat, priority: UILayoutPriority = .required) -> Self {
+    func aspectRatio(
+        widthEqualTo multiplier: CGFloat,
+        priority: UILayoutPriority = .required) -> Self {
+
         return self.onNotRendered {
             let view = (UIViewWrapper($0)?.safe ?? $0)
 
@@ -641,7 +787,10 @@ public extension ViewCreator {
         }
     }
 
-    func aspectRatio(widthGreaterThanOrEqualTo multiplier: CGFloat, priority: UILayoutPriority = .required) -> Self {
+    func aspectRatio(
+        widthGreaterThanOrEqualTo multiplier: CGFloat,
+        priority: UILayoutPriority = .required) -> Self {
+
         return self.onNotRendered {
             let view = (UIViewWrapper($0)?.safe ?? $0)
 
@@ -656,7 +805,10 @@ public extension ViewCreator {
         }
     }
 
-    func aspectRatio(widthLessThanOrEqualTo multiplier: CGFloat, priority: UILayoutPriority = .required) -> Self {
+    func aspectRatio(
+        widthLessThanOrEqualTo multiplier: CGFloat,
+        priority: UILayoutPriority = .required) -> Self {
+
         return self.onNotRendered {
             let view = (UIViewWrapper($0)?.safe ?? $0)
 
@@ -673,7 +825,10 @@ public extension ViewCreator {
 }
 
 public extension ViewCreator {
-    func height(equalTo constant: CGFloat, priority: UILayoutPriority = .required) -> Self {
+    func height(
+        equalTo constant: CGFloat,
+        priority: UILayoutPriority = .required) -> Self {
+
         return self.onNotRendered {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
@@ -686,7 +841,10 @@ public extension ViewCreator {
         }
     }
 
-    func height(greaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required) -> Self {
+    func height(
+        greaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required) -> Self {
+
         return self.onNotRendered {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
@@ -699,7 +857,10 @@ public extension ViewCreator {
         }
     }
 
-    func height(lessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required) -> Self {
+    func height(
+        lessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required) -> Self {
+
         return self.onNotRendered {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
@@ -712,7 +873,10 @@ public extension ViewCreator {
         }
     }
 
-    func width(equalTo constant: CGFloat, priority: UILayoutPriority = .required) -> Self {
+    func width(
+        equalTo constant: CGFloat,
+        priority: UILayoutPriority = .required) -> Self {
+
         return self.onNotRendered {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
@@ -725,7 +889,10 @@ public extension ViewCreator {
         }
     }
 
-    func width(greaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required) -> Self {
+    func width(
+        greaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required) -> Self {
+
         return self.onNotRendered {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
@@ -738,7 +905,10 @@ public extension ViewCreator {
         }
     }
 
-    func width(lessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required) -> Self {
+    func width(
+        lessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required) -> Self {
+
         return self.onNotRendered {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
@@ -753,7 +923,11 @@ public extension ViewCreator {
 }
 
 public extension ViewCreator {
-    func center(equalTo constant: CGFloat = 0, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func center(
+        equalTo constant: CGFloat = 0,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -770,7 +944,11 @@ public extension ViewCreator {
         }
     }
 
-    func center(greaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func center(
+        greaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -787,7 +965,11 @@ public extension ViewCreator {
         }
     }
 
-    func center(lessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func center(
+        lessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -804,7 +986,11 @@ public extension ViewCreator {
         }
     }
 
-    func centerX(equalTo constant: CGFloat = 0, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func centerX(
+        equalTo constant: CGFloat = 0,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -821,7 +1007,11 @@ public extension ViewCreator {
         }
     }
 
-    func centerX(greaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func centerX(
+        greaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -838,7 +1028,11 @@ public extension ViewCreator {
         }
     }
 
-    func centerX(lessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func centerX(
+        lessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -855,7 +1049,11 @@ public extension ViewCreator {
         }
     }
 
-    func centerY(equalTo constant: CGFloat = 0, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func centerY(
+        equalTo constant: CGFloat = 0,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -872,7 +1070,11 @@ public extension ViewCreator {
         }
     }
 
-    func centerY(greaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func centerY(
+        greaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -889,7 +1091,11 @@ public extension ViewCreator {
         }
     }
 
-    func centerY(lessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func centerY(
+        lessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -908,7 +1114,11 @@ public extension ViewCreator {
 }
 
 public extension ViewCreator {
-    func safeArea(centerEqualTo constant: CGFloat = 0, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        centerEqualTo constant: CGFloat = 0,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -925,7 +1135,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(centerGreaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        centerGreaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -942,7 +1156,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(centerLessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        centerLessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -959,7 +1177,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(centerXEqualTo constant: CGFloat = 0, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        centerXEqualTo constant: CGFloat = 0,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -976,7 +1198,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(centerXGreaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        centerXGreaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -993,7 +1219,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(centerXLessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        centerXLessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -1010,7 +1240,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(centerYEqualTo constant: CGFloat = 0, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        centerYEqualTo constant: CGFloat = 0,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -1027,7 +1261,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(centerYGreaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        centerYGreaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -1044,7 +1282,11 @@ public extension ViewCreator {
         }
     }
 
-    func safeArea(centerYLessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+    func safeArea(
+        centerYLessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -1063,37 +1305,85 @@ public extension ViewCreator {
 }
 
 public extension ViewCreator {
-    func hugging(vertical verticalPriority: UILayoutPriority = .defaultLow, horizontal horizontalPriority: UILayoutPriority = .defaultLow) -> Self {
+    func hugging(
+        vertical verticalPriority: UILayoutPriority = .defaultLow,
+        horizontal horizontalPriority: UILayoutPriority = .defaultLow) -> Self {
+
         return self.onNotRendered {
-            (UIViewWrapper($0)?.safe ?? $0).setContentHuggingPriority(verticalPriority, for: .vertical)
-            (UIViewWrapper($0)?.safe ?? $0).setContentHuggingPriority(horizontalPriority, for: .horizontal)
+            (UIViewWrapper($0)?.safe ?? $0)
+                .setContentHuggingPriority(
+                    verticalPriority,
+                    for: .vertical
+            )
+            (UIViewWrapper($0)?.safe ?? $0)
+                .setContentHuggingPriority(
+                    horizontalPriority,
+                    for: .horizontal
+            )
         }
     }
 
-    func compression(vertical verticalPriority: UILayoutPriority = .defaultHigh, horizontal horizontalPriority: UILayoutPriority = .defaultHigh) -> Self {
+    func compression(
+        vertical verticalPriority: UILayoutPriority = .defaultHigh,
+        horizontal horizontalPriority: UILayoutPriority = .defaultHigh) -> Self {
+
         return self.onNotRendered {
-            (UIViewWrapper($0)?.safe ?? $0).setContentCompressionResistancePriority(verticalPriority, for: .vertical)
-            (UIViewWrapper($0)?.safe ?? $0).setContentCompressionResistancePriority(horizontalPriority, for: .horizontal)
+            (UIViewWrapper($0)?.safe ?? $0)
+                .setContentCompressionResistancePriority(
+                    verticalPriority,
+                    for: .vertical
+            )
+            (UIViewWrapper($0)?.safe ?? $0)
+                .setContentCompressionResistancePriority(
+                    horizontalPriority,
+                    for: .horizontal
+            )
         }
     }
 
-    func vertical(hugging huggingPriority: UILayoutPriority = .defaultLow, compression compressionPriority: UILayoutPriority = .defaultHigh) -> Self {
+    func vertical(
+        hugging huggingPriority: UILayoutPriority = .defaultLow,
+        compression compressionPriority: UILayoutPriority = .defaultHigh) -> Self {
+
         return self.onNotRendered {
-            (UIViewWrapper($0)?.safe ?? $0).setContentHuggingPriority(huggingPriority, for: .vertical)
-            (UIViewWrapper($0)?.safe ?? $0).setContentCompressionResistancePriority(compressionPriority, for: .vertical)
+            (UIViewWrapper($0)?.safe ?? $0)
+                .setContentHuggingPriority(
+                    huggingPriority,
+                    for: .vertical
+            )
+            (UIViewWrapper($0)?.safe ?? $0)
+                .setContentCompressionResistancePriority(
+                    compressionPriority,
+                    for: .vertical
+            )
         }
     }
 
-    func horizontal(hugging huggingPriority: UILayoutPriority = .defaultLow, compression compressionPriority: UILayoutPriority = .defaultHigh) -> Self {
+    func horizontal(
+        hugging huggingPriority: UILayoutPriority = .defaultLow,
+        compression compressionPriority: UILayoutPriority = .defaultHigh) -> Self {
+
         return self.onNotRendered {
-            (UIViewWrapper($0)?.safe ?? $0).setContentHuggingPriority(huggingPriority, for: .horizontal)
-            (UIViewWrapper($0)?.safe ?? $0).setContentCompressionResistancePriority(compressionPriority, for: .horizontal)
+            (UIViewWrapper($0)?.safe ?? $0)
+                .setContentHuggingPriority(
+                    huggingPriority,
+                    for: .horizontal
+            )
+            (UIViewWrapper($0)?.safe ?? $0)
+                .setContentCompressionResistancePriority(
+                    compressionPriority,
+                    for: .horizontal
+            )
         }
     }
 }
 
 public extension ViewCreator {
-    func topMargin(equalTo constant: CGFloat = 0, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func topMargin(
+        equalTo constant: CGFloat = 0,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -1110,7 +1400,11 @@ public extension ViewCreator {
         }
     }
 
-    func topMargin(greaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func topMargin(
+        greaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -1127,7 +1421,11 @@ public extension ViewCreator {
         }
     }
 
-    func topMargin(lessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func topMargin(
+        lessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -1144,7 +1442,11 @@ public extension ViewCreator {
         }
     }
 
-    func bottomMargin(equalTo constant: CGFloat = 0, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func bottomMargin(
+        equalTo constant: CGFloat = 0,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -1161,7 +1463,11 @@ public extension ViewCreator {
         }
     }
 
-    func bottomMargin(greaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func bottomMargin(
+        greaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -1178,7 +1484,11 @@ public extension ViewCreator {
         }
     }
 
-    func bottomMargin(lessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func bottomMargin(
+        lessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -1195,7 +1505,11 @@ public extension ViewCreator {
         }
     }
 
-    func leadingMargin(equalTo constant: CGFloat = 0, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func leadingMargin(
+        equalTo constant: CGFloat = 0,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -1212,7 +1526,11 @@ public extension ViewCreator {
         }
     }
 
-    func leadingMargin(greaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func leadingMargin(
+        greaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -1229,7 +1547,11 @@ public extension ViewCreator {
         }
     }
 
-    func leadingMargin(lessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func leadingMargin(
+        lessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -1246,7 +1568,11 @@ public extension ViewCreator {
         }
     }
 
-    func trailingMargin(equalTo constant: CGFloat = 0, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func trailingMargin(
+        equalTo constant: CGFloat = 0,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -1263,7 +1589,11 @@ public extension ViewCreator {
         }
     }
 
-    func trailingMargin(greaterThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func trailingMargin(
+        greaterThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return
@@ -1280,7 +1610,11 @@ public extension ViewCreator {
         }
     }
 
-    func trailingMargin(lessThanOrEqualTo constant: CGFloat, priority: UILayoutPriority = .required, toView view: ConstraintRelatedView? = nil) -> Self {
+    func trailingMargin(
+        lessThanOrEqualTo constant: CGFloat,
+        priority: UILayoutPriority = .required,
+        toView view: ConstraintRelatedView? = nil) -> Self {
+
         return self.onInTheScene {
             guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
                 return

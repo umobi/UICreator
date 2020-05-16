@@ -24,13 +24,13 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
+#if os(iOS)
 private var kVibrancyEffectStyle: UInt = 0
 
-#if os(iOS)
 @available(iOS 13, *)
 public extension UICBlurView {
-    fileprivate(set) var vibrancyEffect: UIVibrancyEffectStyle {
-        get { return objc_getAssociatedObject(self, &kVibrancyEffectStyle) as! UIVibrancyEffectStyle }
+    fileprivate(set) var vibrancyEffect: UIVibrancyEffectStyle! {
+        get { return objc_getAssociatedObject(self, &kVibrancyEffectStyle) as? UIVibrancyEffectStyle }
         set { objc_setAssociatedObject(self, &kVibrancyEffectStyle, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 }

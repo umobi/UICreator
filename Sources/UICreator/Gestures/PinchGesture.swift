@@ -49,6 +49,5 @@ public extension ViewCreator {
             }
         }
     }
-    
 }
 #endif

@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public class UICButtonView: UIButton {
+public class UICTableView: UITableView {
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -56,6 +56,14 @@ public class UICButtonView: UIButton {
         RenderManager(self)?.didMoveToWindow()
     }
 
+    override public func setNeedsLayout() {
+        super.setNeedsLayout()
+    }
+
+    override public func layoutIfNeeded() {
+        super.layoutIfNeeded()
+    }
+
     override public func layoutSubviews() {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
@@ -67,56 +75,24 @@ public class UICButtonView: UIButton {
     }
 }
 
-public class UICButton: UIViewCreator, Control {
-    public typealias View = UICButtonView
-
-    public init(_ title: String?, type: UIButton.ButtonType? = nil) {
-        self.loadView { [unowned self] in
-            if let type = type {
-                let view = View.init(type: type)
-                view.updateBuilder(self)
-                return view
-            }
-
-            return View.init(builder: self)
-        }
-        .onNotRendered {
-            ($0 as? View)?.setTitle(title, for: .normal)
-        }
-    }
-}
-
-public extension UIViewCreator where View: UIButton {
-
-    func title(_ string: String?, for state: UIControl.State = .normal) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.setTitle(string, for: state)
-        }
+extension UITableView {
+    private var tableViewCellHandler: ((UITableViewCell) -> Void)? {
+        get { self.loadManager.cellHandler.value }
+        set { self.loadManager.cellHandler.value = newValue }
     }
 
-    func title(_ attributedText: NSAttributedString?, for state: UIControl.State = .normal) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.setTitle(attributedText?.string, for: state)
-            ($0 as? View)?.titleLabel?.attributedText = attributedText
+    @discardableResult
+    func appendCellHandler(handler: @escaping (UITableViewCell) -> Void) -> Self {
+        let all = self.tableViewCellHandler
+        self.tableViewCellHandler = {
+            all?($0)
+            handler($0)
         }
+
+        return self
     }
 
-    func title(color: UIColor?, for state: UIControl.State = .normal) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.setTitleColor(color, for: state)
-        }
-    }
-
-    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> Self {
-        return self.onRendered {
-            ($0 as? View)?.titleLabel?.font = font
-            ($0 as? View)?.titleLabel?.adjustsFontForContentSizeCategory = isDynamicTextSize
-        }
-    }
-}
-
-public extension UIViewCreator where View: UIButton, Self: Control {
-    func onTouchInside(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.onEvent(.touchUpInside, handler)
+    func commitCell(_ cell: UITableViewCell) {
+        self.tableViewCellHandler?(cell)
     }
 }

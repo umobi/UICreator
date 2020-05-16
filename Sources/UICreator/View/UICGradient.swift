@@ -44,8 +44,8 @@ public class UICGradientView: UIView {
                 return (CGPoint(x: 1.0, y: 0), CGPoint(x: 0, y: 0))
             case .right:
                 return (CGPoint(x: 0.0, y: 0), CGPoint(x: 1.0, y: 0))
-            case .other(let from, let to):
-                return (from, to)
+            case .other(let fromPoint, let toPoint):
+                return (fromPoint, toPoint)
             }
         }
     }
@@ -74,8 +74,8 @@ public class UICGradientView: UIView {
 
         return self.colors.enumerated().map { color in
             return NSNumber(value: {
-                let r = Double(color.offset) / Double(lastIndex)
-                return r * Double(distance)
+                let location = Double(color.offset) / Double(lastIndex)
+                return location * Double(distance)
             }() as Double)
         }
     }
@@ -104,7 +104,7 @@ public class UICGradientView: UIView {
             RenderManager(self)?.frame(newValue)
         }
     }
-    
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         RenderManager(self)?.willMove(toSuperview: newSuperview)
@@ -134,6 +134,7 @@ public class UICGradientView: UIView {
 }
 
 public extension UICGradientView {
+    // swiftlint:disable identifier_name
     static func Linear(colors: [UIColor], direction: Direction) -> UICGradientView {
         let gradient = UICGradientView()
         gradient.colors = colors

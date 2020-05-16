@@ -69,7 +69,7 @@ extension UICView {
         let view = RootView(builder: self)
         let body = self.body
         self.tree.append(body)
-        
+
         self.onNotRendered {
             $0.add(priority: .required, body.releaseUIView())
         }.onNotRendered { [weak self] _ in

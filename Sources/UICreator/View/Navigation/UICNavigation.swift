@@ -23,104 +23,10 @@
 import Foundation
 import UIKit
 
-public struct UICPresent {
-    let presentingStyle: UIModalPresentationStyle
-    let transitionStyle: UIModalTransitionStyle
-    let fromView: ViewCreator
-    let toView: ViewCreator?
-    let onCompletion: (() -> Void)?
-    let animated: Bool
-
-    init(fromView: ViewCreator) {
-        self.fromView = fromView
-        self.toView = nil
-        self.onCompletion = nil
-        if #available(iOS 13, tvOS 13, *) {
-            self.presentingStyle = .automatic
-        } else {
-            self.presentingStyle = .currentContext
-        }
-        self.transitionStyle = .coverVertical
-        self.animated = true
-    }
-
-    private init(_ original: UICPresent, editable: Editable) {
-        self.presentingStyle = editable.presentingStyle
-        self.transitionStyle = editable.transitionStyle
-        self.fromView = original.fromView
-        self.toView = editable.toView
-        self.onCompletion = editable.onCompletion
-        self.animated = editable.animated
-    }
-
-    private func edit(_ edit: @escaping (Editable) -> Void) -> Self {
-        let editable = Editable(self)
-        edit(editable)
-        return .init(self, editable: editable)
-    }
-
-    public func presentingStyle(_ style: UIModalPresentationStyle) -> Self {
-        self.edit {
-            $0.presentingStyle = style
-        }
-    }
-
-    public func transitionStyle(_ style: UIModalTransitionStyle) -> Self {
-        self.edit {
-            $0.transitionStyle = style
-        }
-    }
-
-    public func onCompletion(_ handler: @escaping () -> Void) -> Self {
-        self.edit {
-            $0.onCompletion = handler
-        }
-    }
-
-    public func animated(_ flag: Bool) -> Self {
-        self.edit {
-            $0.animated = flag
-        }
-    }
-
-    func present() {
-        let viewController = UICHostingView {
-            self.toView!
-        }
-
-        viewController.modalPresentationStyle = self.presentingStyle
-        viewController.modalTransitionStyle = self.transitionStyle
-
-        self.fromView.present(animated: self.animated, onCompletion: self.onCompletion, viewController)
-    }
-
-    public func present(content: @escaping () -> ViewCreator) {
-        self.edit {
-            $0.toView = content()
-        }.present()
-    }
-
-    private class Editable {
-        var presentingStyle: UIModalPresentationStyle
-        var transitionStyle: UIModalTransitionStyle
-        var toView: ViewCreator?
-        var onCompletion: (() -> Void)?
-        var animated: Bool
-
-        init(_ present: UICPresent) {
-            self.presentingStyle = present.presentingStyle
-            self.transitionStyle = present.transitionStyle
-            self.toView = present.toView
-            self.onCompletion = present.onCompletion
-            self.animated = present.animated
-        }
-    }
-}
-
 public class UICNavigation: NavigationRepresentable {
 
     public var navigationLoader: (UIViewController) -> UINavigationController {
-        {
+        return {
             return .init(rootViewController: $0)
         }
     }
@@ -133,7 +39,7 @@ public class UICNavigation: NavigationRepresentable {
 public extension UICNavigation {
     class Other<NavigationController: UINavigationController>: UICNavigation {
         override public var navigationLoader: (UIViewController) -> UINavigationController {
-            {
+            return {
                 return NavigationController(rootViewController: $0)
             }
         }

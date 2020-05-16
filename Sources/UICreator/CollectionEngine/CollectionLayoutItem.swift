@@ -149,7 +149,11 @@ public class UICCollectionLayoutItem: UICCollectionLayoutSectionElement, UICColl
 
     fileprivate var modifiedItems: [UICCollectionLayoutModifiedItem] = []
 
-    convenience public init(vertical: CollectionLayoutSizeConstraint, horizontal: CollectionLayoutSizeConstraint, numberOfElements: Int? = nil) {
+    convenience public init(
+        vertical: CollectionLayoutSizeConstraint,
+        horizontal: CollectionLayoutSizeConstraint,
+        numberOfElements: Int? = nil) {
+
         self.init(vertical, horizontal, numberOfElements)
     }
 
@@ -165,21 +169,28 @@ public class UICCollectionLayoutItem: UICCollectionLayoutSectionElement, UICColl
         self.init(nil, nil, numberOfElements)
     }
 
-    private init(_ vertical: CollectionLayoutSizeConstraint?,_ horizontal: CollectionLayoutSizeConstraint?,_ numberOfElements: Int?) {
+    private init(
+        _ vertical: CollectionLayoutSizeConstraint?,
+        _ horizontal: CollectionLayoutSizeConstraint?,
+        _ numberOfElements: Int?) {
+
         self.numberOfElements = numberOfElements
         self.vertical = vertical
         self.horizontal = horizontal
     }
 
     var isDynamic: Bool {
-        return !self.delegate.isVerticalValid || !self.delegate.isHorizontalValid || (self.vertical?.isDynamic ?? false ) || (self.horizontal?.isDynamic ?? false)
+        return !self.delegate.isVerticalValid ||
+            !self.delegate.isHorizontalValid ||
+            (self.vertical?.isDynamic ?? false) ||
+            (self.horizontal?.isDynamic ?? false)
     }
 
     func size(_ size: CGSize, at indexPath: IndexPath) -> CGSize {
         if let modified = self.modifiedItems.first(where: { $0.indexPath == indexPath }) {
             return modified.size(size)
         }
-        
+
         return .init(
             width: self.size(relatedTo: size.width, applying: self.horizontal),
             height: self.size(relatedTo: size.height, applying: self.vertical)

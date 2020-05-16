@@ -222,8 +222,22 @@ public extension UICSpacer {
 }
 
 public extension UICSpacer {
-    convenience init(top: CGFloat, bottom: CGFloat, leading: CGFloat, trailing: CGFloat, content: @escaping () -> ViewCreator) {
-        self.init(margin: .init(top: top, bottom: bottom, leading: leading, trailing: trailing), content: content)
+    convenience init(
+        top: CGFloat,
+        bottom: CGFloat,
+        leading: CGFloat,
+        trailing: CGFloat,
+        content: @escaping () -> ViewCreator) {
+
+        self.init(
+            margin: .init(
+                top: top,
+                bottom: bottom,
+                leading: leading,
+                trailing: trailing
+            ),
+            content: content
+        )
     }
 
     convenience init(vertical: CGFloat, horizontal: CGFloat, content: @escaping () -> ViewCreator) {

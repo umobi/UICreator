@@ -41,15 +41,25 @@ public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCol
     private(set) var insets: UIEdgeInsets = .zero
     weak var delegate: UICCollectionLayoutGroupDelegate!
 
-    convenience public init(vertical: CollectionLayoutSizeConstraint, horizontal: CollectionLayoutSizeConstraint,_ contents: @escaping () -> [UICCollectionLayoutElement]) {
+    convenience public init(
+        vertical: CollectionLayoutSizeConstraint,
+        horizontal: CollectionLayoutSizeConstraint,
+        _ contents: @escaping () -> [UICCollectionLayoutElement]) {
+
         self.init(vertical, horizontal, contents)
     }
 
-    convenience public init(horizontal: CollectionLayoutSizeConstraint,_ contents: @escaping () -> [UICCollectionLayoutElement]) {
+    convenience public init(
+        horizontal: CollectionLayoutSizeConstraint,
+        _ contents: @escaping () -> [UICCollectionLayoutElement]) {
+
         self.init(nil, horizontal, contents)
     }
 
-    convenience public init(vertical: CollectionLayoutSizeConstraint,_ contents: @escaping () -> [UICCollectionLayoutElement]) {
+    convenience public init(
+        vertical: CollectionLayoutSizeConstraint,
+        _ contents: @escaping () -> [UICCollectionLayoutElement]) {
+
         self.init(vertical, nil, contents)
     }
 
@@ -57,7 +67,11 @@ public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCol
         self.init(nil, nil, contents)
     }
 
-    private init(_ vertical: CollectionLayoutSizeConstraint?,_ horizontal: CollectionLayoutSizeConstraint?,_ contents: @escaping () -> [UICCollectionLayoutElement]) {
+    private init(
+        _ vertical: CollectionLayoutSizeConstraint?,
+        _ horizontal: CollectionLayoutSizeConstraint?,
+        _ contents: @escaping () -> [UICCollectionLayoutElement]) {
+
         self.contents = contents()
         self.vertical = vertical
         self.horizontal = horizontal

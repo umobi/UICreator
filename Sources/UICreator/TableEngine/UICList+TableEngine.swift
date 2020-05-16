@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-extension TableView: ListSupport {}
+extension UICTableView: ListSupport {}
 
 public extension UICList {
     convenience init(style: UITableView.Style, _ contents: @escaping () -> [ViewCreator]) {

@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-extension TableView: UITableViewDelegate {
+extension UICTableView: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard let header = self.manager?.header(at: section) else {
             return nil
@@ -122,7 +122,7 @@ extension TableView: UITableViewDelegate {
     #endif
 }
 
-extension TableView {
+extension UICTableView {
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         guard self.manager?.header(at: section) != nil else {
             return .zero
@@ -148,7 +148,7 @@ extension TableView {
     }
 }
 
-extension TableView {
+extension UICTableView {
     public func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
         guard let header = self.manager?.header(at: section) else {
             return .zero

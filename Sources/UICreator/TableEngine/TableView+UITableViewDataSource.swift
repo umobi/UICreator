@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-extension TableView: UITableViewDataSource {
+extension UICTableView: UITableViewDataSource {
     public func numberOfSections(in tableView: UITableView) -> Int {
         self.manager?.numberOfSections ?? 0
     }

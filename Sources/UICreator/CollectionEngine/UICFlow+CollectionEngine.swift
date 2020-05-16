@@ -23,15 +23,16 @@
 import Foundation
 import UIKit
 
-extension _CollectionView: ListSupport {
-
-}
+extension UICCollectionView: ListSupport {}
 
 public extension UICCollection {
-    convenience init(layout: UICollectionViewLayout,_ contents: @escaping () -> [ViewCreator]) {
+    convenience init(
+        layout: UICollectionViewLayout,
+        _ contents: @escaping () -> [ViewCreator]) {
+
         self.init(layout: layout, ListManager(contents: contents()))
     }
-    
+
     private convenience init(layout: UICollectionViewLayout, _ manager: ListManager) {
         self.init(layout: layout)
 
@@ -39,15 +40,26 @@ public extension UICCollection {
             let collectionView: View! = $0 as? View
 
             manager.rowsIdentifier.forEach {
-                collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
+                collectionView.register(
+                    CollectionViewCell.self,
+                    forCellWithReuseIdentifier: $0
+                )
             }
 
             manager.headersIdentifier.forEach {
-                collectionView.register(CollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: $0)
+                collectionView.register(
+                    CollectionReusableView.self,
+                    forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                    withReuseIdentifier: $0
+                )
             }
 
             manager.footersIdentifier.forEach {
-                collectionView.register(CollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: $0)
+                collectionView.register(
+                    CollectionReusableView.self,
+                    forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+                    withReuseIdentifier: $0
+                )
             }
 
             collectionView.manager = manager
