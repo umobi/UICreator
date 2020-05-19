@@ -24,8 +24,7 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICTabCreator<TabController: UITabBarController>: UIViewCreator {
-    public typealias View = UICTabContainer
+public class UICTabCreator<TabController: UITabBarController>: ViewCreator {
 
     private lazy var _tabBarController: TabController? = {
         return .init()
@@ -43,10 +42,10 @@ public class UICTabCreator<TabController: UITabBarController>: UIViewCreator {
 
     public init(_ contents: @escaping () -> [UICTabItem]) {
         self.loadView { [unowned self] in
-            let view = View.init(builder: self)
+            let view = UICTabContainer.init(builder: self)
 
             self.tabController.viewControllers = contents().map { item in
-                let controller = UICHostingView(content: item.content)
+                let controller = UICHostingController(content: item.content)
                 controller.tabBarItem = item.tabItem
                 return controller
             }
@@ -279,7 +278,7 @@ public extension ViewCreator {
 public extension UICTabCreator {
     func selectedItem(_ selected: Relay<Int>) -> Self {
         self.onInTheScene {
-            weak var view = $0 as? View
+            weak var view = $0 as? UICTabContainer
 
             selected.sync {
                 view?.tabBarController.selectedIndex($0)
@@ -289,7 +288,7 @@ public extension UICTabCreator {
 
     func selectedItem<Enum: RawRepresentable>(_ selected: Relay<Enum>) -> Self where Enum.RawValue == Int {
         self.onInTheScene {
-            weak var view = $0 as? View
+            weak var view = $0 as? UICTabContainer
 
             selected.sync {
                 view?.tabBarController.selectedIndex($0.rawValue)

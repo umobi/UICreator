@@ -24,10 +24,94 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICGradientView: UIView {
-    fileprivate let gradientLayer = CAGradientLayer()
+public extension UICGradient {
+    class View: UIView {
+        fileprivate let gradientLayer = CAGradientLayer()
 
-    public enum Direction {
+        public var direction: Direction = .right {
+            didSet {
+                self.setupGradientLayer()
+            }
+        }
+
+        public var colors: [UIColor] = [] {
+            didSet {
+                self.setupGradientLayer()
+            }
+        }
+
+        var locations: [NSNumber] {
+            guard self.colors.count > 1 else {
+                return [0]
+            }
+
+            let lastIndex = self.colors.count - 1
+
+            let points = self.direction.points
+            let distance = points.0.distance(to: points.1)
+
+            return self.colors.enumerated().map { color in
+                return NSNumber(value: {
+                    let location = Double(color.offset) / Double(lastIndex)
+                    return location * Double(distance)
+                }() as Double)
+            }
+        }
+
+        private func setupGradientLayer() {
+            gradientLayer.frame = bounds
+
+            gradientLayer.locations = self.locations
+            gradientLayer.colors = self.colors.map { $0.cgColor }
+            gradientLayer.startPoint = self.direction.points.0
+            gradientLayer.endPoint = self.direction.points.1
+        }
+
+        override open var isHidden: Bool {
+            get { super.isHidden }
+            set {
+                super.isHidden = newValue
+                RenderManager(self)?.isHidden(newValue)
+            }
+        }
+
+        override open var frame: CGRect {
+            get { super.frame }
+            set {
+                super.frame = newValue
+                RenderManager(self)?.frame(newValue)
+            }
+        }
+
+        override public func willMove(toSuperview newSuperview: UIView?) {
+            super.willMove(toSuperview: newSuperview)
+            RenderManager(self)?.willMove(toSuperview: newSuperview)
+        }
+
+        override public func didMoveToSuperview() {
+            super.didMoveToSuperview()
+            RenderManager(self)?.didMoveToSuperview()
+        }
+
+        override public func didMoveToWindow() {
+            super.didMoveToWindow()
+            RenderManager(self)?.didMoveToWindow()
+        }
+
+        override public func layoutSubviews() {
+            super.layoutSubviews()
+            gradientLayer.frame = self.bounds
+            RenderManager(self)?.layoutSubviews()
+        }
+
+        override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+            super.traitCollectionDidChange(previousTraitCollection)
+            self.setupGradientLayer()
+            RenderManager(self)?.traitDidChange()
+        }
+    }
+
+    enum Direction {
         case top
         case bottom
         case left
@@ -49,94 +133,12 @@ public class UICGradientView: UIView {
             }
         }
     }
-
-    public var direction: Direction = .right {
-        didSet {
-            self.setupGradientLayer()
-        }
-    }
-
-    public var colors: [UIColor] = [] {
-        didSet {
-            self.setupGradientLayer()
-        }
-    }
-
-    var locations: [NSNumber] {
-        guard self.colors.count > 1 else {
-            return [0]
-        }
-
-        let lastIndex = self.colors.count - 1
-
-        let points = self.direction.points
-        let distance = points.0.distance(to: points.1)
-
-        return self.colors.enumerated().map { color in
-            return NSNumber(value: {
-                let location = Double(color.offset) / Double(lastIndex)
-                return location * Double(distance)
-            }() as Double)
-        }
-    }
-
-    private func setupGradientLayer() {
-        gradientLayer.frame = bounds
-
-        gradientLayer.locations = self.locations
-        gradientLayer.colors = self.colors.map { $0.cgColor }
-        gradientLayer.startPoint = self.direction.points.0
-        gradientLayer.endPoint = self.direction.points.1
-    }
-
-    override open var isHidden: Bool {
-        get { super.isHidden }
-        set {
-            super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
-        }
-    }
-
-    override open var frame: CGRect {
-        get { super.frame }
-        set {
-            super.frame = newValue
-            RenderManager(self)?.frame(newValue)
-        }
-    }
-
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
-    }
-
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
-    }
-
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        RenderManager(self)?.didMoveToWindow()
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        gradientLayer.frame = self.bounds
-        RenderManager(self)?.layoutSubviews()
-    }
-
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        self.setupGradientLayer()
-        RenderManager(self)?.traitDidChange()
-    }
 }
 
-public extension UICGradientView {
+public extension UICGradient.View {
     // swiftlint:disable identifier_name
-    static func Linear(colors: [UIColor], direction: Direction) -> UICGradientView {
-        let gradient = UICGradientView()
+    static func Linear(colors: [UIColor], direction: UICGradient.Direction) -> UICGradient.View {
+        let gradient = UICGradient.View()
         gradient.colors = colors
         gradient.direction = direction
         return gradient
@@ -154,9 +156,8 @@ extension CGPoint {
 }
 
 public class UICGradient: UIViewCreator {
-    public typealias View = UICGradientView
 
-    public init(_ colors: [UIColor], direction: View.Direction = .right) {
+    public init(_ colors: [UIColor], direction: UICGradient.Direction = .right) {
         self.colors(colors)
             .direction(direction)
             .loadView { [unowned self] in
@@ -164,12 +165,12 @@ public class UICGradient: UIViewCreator {
             }
     }
 
-    public convenience init(_ colors: UIColor..., direction: View.Direction = .right) {
+    public convenience init(_ colors: UIColor..., direction: UICGradient.Direction = .right) {
         self.init(colors, direction: direction)
     }
 }
 
-public extension UIViewCreator where View: UICGradientView {
+public extension UIViewCreator where View: UICGradient.View {
 
     func colors(_ colors: UIColor...) -> Self {
         self.onNotRendered {
@@ -183,7 +184,7 @@ public extension UIViewCreator where View: UICGradientView {
         }
     }
 
-    func direction(_ direction: View.Direction) -> Self {
+    func direction(_ direction: UICGradient.Direction) -> Self {
         self.onNotRendered {
             ($0 as? View)?.direction = direction
         }

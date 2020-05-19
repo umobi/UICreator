@@ -24,119 +24,121 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICSpacerView: UIView, UICManagerContentView {
-    private weak var view: UIView?
-    let margin: Edges
+public extension UICSpacer {
+    class View: UIView, UICManagerContentView {
+        private weak var view: UIView?
+        let margin: Edges
 
-    public required init(_ view: UIView!, margin: Edges) {
-        self.margin = margin
-        super.init(frame: .zero)
+        public required init(_ view: UIView!, margin: Edges) {
+            self.margin = margin
+            super.init(frame: .zero)
 
-        self.addContent(view)
-    }
-
-    public required init(margin: Edges) {
-        self.margin = margin
-        super.init(frame: .zero)
-    }
-
-    public override init(frame: CGRect) {
-        Fatal.Builder("init(frame:) has not been implemented").die()
-    }
-
-    required init?(coder: NSCoder) {
-        Fatal.Builder("init(coder:) has not been implemented").die()
-    }
-
-    override open var isHidden: Bool {
-        get { super.isHidden }
-        set {
-            super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
-        }
-    }
-
-    override open var frame: CGRect {
-        get { super.frame }
-        set {
-            super.frame = newValue
-            RenderManager(self)?.frame(newValue)
-        }
-    }
-
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
-    }
-
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
-    }
-
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        RenderManager(self)?.didMoveToWindow()
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        RenderManager(self)?.layoutSubviews()
-    }
-
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        RenderManager(self)?.traitDidChange()
-    }
-
-    private func layout() {
-        guard let view = self.view else {
-            return
+            self.addContent(view)
         }
 
-        Constraintable.update(
-            view.cbuild
-                .top
-                .equalTo(self)
-                .update()
-                .constant(self.margin.top),
-
-            view.cbuild
-                .bottom
-                .equalTo(self)
-                .update()
-                .constant(self.margin.bottom),
-
-            view.cbuild
-                .trailing
-                .equalTo(self)
-                .update()
-                .constant(self.margin.trailing),
-
-            view.cbuild
-                .leading
-                .equalTo(self)
-                .update()
-                .constant(self.margin.leading)
-        )
-    }
-
-    public func addContent(_ view: UIView) {
-        self.view = view
-        CBSubview(self).addSubview(view)
-        self.layout()
-    }
-
-    public func reloadContentLayout() {
-        guard self.view != nil else {
-            return
+        public required init(margin: Edges) {
+            self.margin = margin
+            super.init(frame: .zero)
         }
 
-        self.layout()
+        public override init(frame: CGRect) {
+            Fatal.Builder("init(frame:) has not been implemented").die()
+        }
+
+        required init?(coder: NSCoder) {
+            Fatal.Builder("init(coder:) has not been implemented").die()
+        }
+
+        override open var isHidden: Bool {
+            get { super.isHidden }
+            set {
+                super.isHidden = newValue
+                RenderManager(self)?.isHidden(newValue)
+            }
+        }
+
+        override open var frame: CGRect {
+            get { super.frame }
+            set {
+                super.frame = newValue
+                RenderManager(self)?.frame(newValue)
+            }
+        }
+
+        override public func willMove(toSuperview newSuperview: UIView?) {
+            super.willMove(toSuperview: newSuperview)
+            RenderManager(self)?.willMove(toSuperview: newSuperview)
+        }
+
+        override public func didMoveToSuperview() {
+            super.didMoveToSuperview()
+            RenderManager(self)?.didMoveToSuperview()
+        }
+
+        override public func didMoveToWindow() {
+            super.didMoveToWindow()
+            RenderManager(self)?.didMoveToWindow()
+        }
+
+        override public func layoutSubviews() {
+            super.layoutSubviews()
+            RenderManager(self)?.layoutSubviews()
+        }
+
+        override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+            super.traitCollectionDidChange(previousTraitCollection)
+            RenderManager(self)?.traitDidChange()
+        }
+
+        private func layout() {
+            guard let view = self.view else {
+                return
+            }
+
+            Constraintable.update(
+                view.cbuild
+                    .top
+                    .equalTo(self)
+                    .update()
+                    .constant(self.margin.top),
+
+                view.cbuild
+                    .bottom
+                    .equalTo(self)
+                    .update()
+                    .constant(self.margin.bottom),
+
+                view.cbuild
+                    .trailing
+                    .equalTo(self)
+                    .update()
+                    .constant(self.margin.trailing),
+
+                view.cbuild
+                    .leading
+                    .equalTo(self)
+                    .update()
+                    .constant(self.margin.leading)
+            )
+        }
+
+        public func addContent(_ view: UIView) {
+            self.view = view
+            CBSubview(self).addSubview(view)
+            self.layout()
+        }
+
+        public func reloadContentLayout() {
+            guard self.view != nil else {
+                return
+            }
+
+            self.layout()
+        }
     }
 }
 
-public extension UICSpacerView {
+public extension UICSpacer {
     struct Edges {
         public let top, bottom, leading, trailing: CGFloat
 
@@ -162,9 +164,8 @@ public extension UICSpacerView {
 }
 
 public class UICSpacer: UIViewCreator {
-    public typealias View = UICSpacerView
 
-    public required init(margin: View.Edges, content: @escaping () -> ViewCreator) {
+    public required init(margin: Edges, content: @escaping () -> ViewCreator) {
         let content = content()
         self.tree.append(content)
 
@@ -180,11 +181,9 @@ public class UICSpacer: UIViewCreator {
 }
 
 public class UICEmpty: ViewCreator {
-    public typealias View = UIView
-
     public init() {
         self.loadView { [unowned self] in
-            View(builder: self)
+            UIView(builder: self)
         }
     }
 }
@@ -204,8 +203,8 @@ public extension UICSpacer {
 
     convenience init(horizontal: CGFloat) {
         self.init(margin: .init(vertical: 0, horizontal: horizontal)) {
-           UICEmpty()
-       }
+            UICEmpty()
+        }
     }
 
     convenience init() {

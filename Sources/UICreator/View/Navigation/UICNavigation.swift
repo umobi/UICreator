@@ -63,7 +63,7 @@ public extension ViewCreator {
 
     @discardableResult
     func present(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> ViewCreator) -> Self {
-        let controller = UICHostingView(content: content)
+        let controller = UICHostingController(content: content)
         self.presentable?.present(controller, animated: animated, completion: onCompletion)
         return self
     }
@@ -80,7 +80,7 @@ public extension ViewCreator {
 
     @discardableResult
     func presentModal(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> ViewCreator) -> Self {
-        let controller = UICHostingView(content: content)
+        let controller = UICHostingController(content: content)
         controller.modalPresentationStyle = .overFullScreen
         self.presentable?.present(controller, animated: animated, completion: onCompletion)
         return self

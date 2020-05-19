@@ -45,12 +45,7 @@ public protocol NavigationRepresentable: UICView {
     func popTo(view: ViewCreator, animated: Bool) -> Self
 }
 
-struct ContentHandler {
-    let content: () -> ViewCreator
-    init(_ content: @escaping () -> ViewCreator) {
-        self.content = content
-    }
-}
+typealias ViewCreatorHandler = () -> ViewCreator
 
 private extension UIView {
     var lowerNavigationController: UINavigationController? {
@@ -100,33 +95,33 @@ public extension NavigationRepresentable {
         return self.navigationController.navigationBar
     }
 
-    private var contentMutable: Mutable<ContentHandler?> {
+    private var contentMutable: Mutable<ViewCreatorHandler?> {
         OBJCSet(self, &kContentHandler) {
             .init(value: nil)
         }
     }
 
-    internal var content: ContentHandler? {
+    internal var content: ViewCreatorHandler? {
         get { self.contentMutable.value }
         set { self.contentMutable.value = newValue }
     }
 
     var body: ViewCreator {
         UICContainer { [unowned self] in
-            guard let content = self.content?.content else {
+            guard let content = self.content else {
                 Fatal.Builder(
                     "NavigationRepresentable couldn't load content. Maybe it may have been already loaded"
                 ).die()
             }
 
             self.content = nil
-            return self.navigationLoader(UICHostingView(content: content))
+            return self.navigationLoader(UICHostingController(content: content))
         }
     }
 
     @discardableResult
     func push(animated: Bool, content: @escaping () -> ViewCreator) -> Self {
-        self.navigationController.pushViewController(UICHostingView(content: content), animated: animated)
+        self.navigationController.pushViewController(UICHostingController(content: content), animated: animated)
         return self
     }
 
@@ -173,8 +168,10 @@ public extension UIView {
             return true
         }
 
-        if let hostingView = self.next as? UICHostingView {
-            return hostingView.hostedView.uiView.contains(where: handler)
+        if let hostingController = self.next as? UICHostingController,
+            let hostingView = hostingController.view as? UICHostingView,
+            let viewCreator = hostingView.content.object as? ViewCreator {
+            return viewCreator.uiView.contains(where: handler)
         }
 
         return self.subviews.contains(where: {

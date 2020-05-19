@@ -24,11 +24,11 @@ import Foundation
 import UIKit
 
 public class UICList: UIViewCreator {
-    public typealias View = UICTableView
+    public typealias View = UITableView
 
     public init(style: UITableView.Style) {
         self.loadView { [unowned self] in
-            let view = View.init(frame: .zero, style: style)
+            let view = UICTableView.init(frame: .zero, style: style)
             view.updateBuilder(self)
             return view
         }
@@ -112,8 +112,7 @@ public extension UIViewCreator where View: UITableView {
                 .onAdd {
                     (tableView as? View)?.backgroundView = $0
                 }.addSubview(
-                    UICHost(content: content)
-                        .releaseUIView()
+                    UICHostingView(content: content)
                 )
                 .height(.required)
                 .width(.required)
@@ -162,8 +161,7 @@ public extension UIViewCreator where View: UITableView {
                 .onAdd {
                     (tableView as? View)?.tableHeaderView = $0
                 }.addSubview(
-                    UICHost(content: content)
-                        .releaseUIView()
+                    UICHostingView(content: content)
                 )
                 .width(.required)
                 .watch(in: tableView)
@@ -178,8 +176,7 @@ public extension UIViewCreator where View: UITableView {
                 .onAdd {
                     (tableView as? View)?.tableFooterView = $0
                 }.addSubview(
-                    UICHost(content: content)
-                        .releaseUIView()
+                    UICHostingView(content: content)
                 )
                 .width(.required)
                 .watch(in: tableView)

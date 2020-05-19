@@ -74,7 +74,7 @@ class ViewAdaptor: RootView {
     }
 }
 
-class Adaptor: ViewCreator {
+class Adaptor: UIViewCreator {
     public typealias View = ViewAdaptor
 
     public init(_ viewCreator: ViewCreator) {

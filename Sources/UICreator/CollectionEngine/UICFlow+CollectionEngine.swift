@@ -27,17 +27,17 @@ extension UICCollectionView: ListSupport {}
 
 public extension UICCollection {
     convenience init(
-        layout: UICollectionViewLayout,
+        layout: Layout,
         _ contents: @escaping () -> [ViewCreator]) {
 
         self.init(layout: layout, ListManager(contents: contents()))
     }
 
-    private convenience init(layout: UICollectionViewLayout, _ manager: ListManager) {
+    private convenience init(layout: Layout, _ manager: ListManager) {
         self.init(layout: layout)
 
         self.onNotRendered { [manager] in
-            let collectionView: View! = $0 as? View
+            let collectionView: UICCollectionView! = $0 as? UICCollectionView
 
             manager.rowsIdentifier.forEach {
                 collectionView.register(

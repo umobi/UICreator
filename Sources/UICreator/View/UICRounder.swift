@@ -29,76 +29,78 @@ public protocol UICManagerContentView {
     func reloadContentLayout()
 }
 
-public class UICRounderView: UIView, UICManagerContentView {
-    public var radius: CGFloat {
-        didSet {
+public extension UICRounder {
+    class View: UIView, UICManagerContentView {
+        public var radius: CGFloat {
+            didSet {
+                self.reloadContentLayout()
+            }
+        }
+
+        public required init(radius: CGFloat) {
+            self.radius = radius
+            super.init(frame: .zero)
+        }
+
+        public required init(_ view: UIView, radius: CGFloat) {
+            self.radius = radius
+            super.init(frame: .zero)
+            self.addContent(view)
+        }
+
+        public override init(frame: CGRect) {
+            Fatal.Builder("init(frame:) has not been implemented").die()
+        }
+
+        required public init?(coder aDecoder: NSCoder) {
+            Fatal.Builder("init(coder:) has not been implemented").die()
+        }
+
+        override open var isHidden: Bool {
+            get { super.isHidden }
+            set {
+                super.isHidden = newValue
+                RenderManager(self)?.isHidden(newValue)
+            }
+        }
+
+        override open var frame: CGRect {
+            get { super.frame }
+            set {
+                super.frame = newValue
+                RenderManager(self)?.frame(newValue)
+            }
+        }
+
+        override public func willMove(toSuperview newSuperview: UIView?) {
+            super.willMove(toSuperview: newSuperview)
+            RenderManager(self)?.willMove(toSuperview: newSuperview)
+        }
+
+        override public func didMoveToSuperview() {
+            super.didMoveToSuperview()
+            RenderManager(self)?.didMoveToSuperview()
+        }
+
+        override public func didMoveToWindow() {
+            super.didMoveToWindow()
+            RenderManager(self)?.didMoveToWindow()
+        }
+
+        override public func layoutSubviews() {
+            super.layoutSubviews()
             self.reloadContentLayout()
+            RenderManager(self)?.layoutSubviews()
         }
-    }
 
-    public required init(radius: CGFloat) {
-        self.radius = radius
-        super.init(frame: .zero)
-    }
-
-    public required init(_ view: UIView, radius: CGFloat) {
-        self.radius = radius
-        super.init(frame: .zero)
-        self.addContent(view)
-    }
-
-    public override init(frame: CGRect) {
-        Fatal.Builder("init(frame:) has not been implemented").die()
-    }
-
-    required public init?(coder aDecoder: NSCoder) {
-        Fatal.Builder("init(coder:) has not been implemented").die()
-    }
-
-    override open var isHidden: Bool {
-        get { super.isHidden }
-        set {
-            super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
+        override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+            super.traitCollectionDidChange(previousTraitCollection)
+            RenderManager(self)?.traitDidChange()
         }
-    }
-
-    override open var frame: CGRect {
-        get { super.frame }
-        set {
-            super.frame = newValue
-            RenderManager(self)?.frame(newValue)
-        }
-    }
-
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
-    }
-
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
-    }
-
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        RenderManager(self)?.didMoveToWindow()
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        self.reloadContentLayout()
-        RenderManager(self)?.layoutSubviews()
-    }
-
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        RenderManager(self)?.traitDidChange()
     }
 }
 
-public extension UICRounderView {
+public extension UICRounder.View {
 
     func addContent(_ view: UIView) {
         CBSubview(self).addSubview(view)
@@ -143,7 +145,6 @@ public extension UICRounderView {
 }
 
 public class UICRounder: UIViewCreator {
-    public typealias View = UICRounderView
 
     public init(radius: CGFloat, content: @escaping () -> ViewCreator) {
         let content = content()

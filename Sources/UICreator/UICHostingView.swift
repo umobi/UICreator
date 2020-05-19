@@ -9,27 +9,22 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICHostingView: UIViewController {
-    private var strongContentView: UIView?
-    private var contentBuilder: ViewCreator?
-
-    private weak var contentView: ViewCreator! {
-        willSet {
-            self.contentBuilder = nil
-        }
-    }
-
-    var hostedView: ViewCreator! {
-        self.contentView ?? self.contentBuilder
-    }
+public class UICHostingController: UIViewController {
+    private var viewCreator: ViewCreator?
 
     public init() {
-        self.contentBuilder = nil
-        super.init(nibName: nil, bundle: nil)
+        UICreator.Fatal
+            .Builder("init() has not been implemented")
+            .die()
     }
 
     public init(content: @escaping () -> ViewCreator) {
-        self.contentBuilder = content()
+        self.viewCreator = content()
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    public init(view: ViewCreator) {
+        self.viewCreator = view
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -52,14 +47,13 @@ public class UICHostingView: UIViewController {
     #endif
 
     public override func loadView() {
-        guard let contentBuilder = self.contentBuilder else {
+        guard let viewCreator = self.viewCreator else {
             Fatal.noContentCreator.die()
         }
 
-        self.contentView = contentBuilder
+        self.viewCreator = nil
 
-        let contentView: UIView! = contentBuilder.releaseUIView()
-        self.view = contentView
+        self.view = UICHostingView(view: viewCreator)
     }
 
     @available(iOS 11.0, tvOS 11, *)
@@ -69,7 +63,7 @@ public class UICHostingView: UIViewController {
     }
 }
 
-extension UICHostingView {
+extension UICHostingController {
     enum Fatal: String, FatalType {
         case noContentCreator = """
         UICHostingView is trying to get the ViewCreator but no content has been set

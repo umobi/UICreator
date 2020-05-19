@@ -23,10 +23,11 @@
 import Foundation
 import UIKit
 
-public class UICFlow: UICCollection, CollectionLayout {
-    public typealias Layout = UICollectionViewFlowLayout
+public typealias UICFlow = UICCollection<UICollectionViewFlowLayout>
+
+public extension UICFlow {
     public convenience init(contents: @escaping () -> [ViewCreator]) {
-        self.init(layout: UICollectionViewFlowLayout(), contents)
+        self.init(layout: .init(), contents)
     }
 }
 

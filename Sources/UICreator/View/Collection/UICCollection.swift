@@ -33,7 +33,7 @@ public extension CollectionLayout {
     }
 }
 
-public class UICCollectionView: UICollectionView {
+internal class UICCollectionView: UICollectionView {
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -82,12 +82,12 @@ public class UICCollectionView: UICollectionView {
     }
 }
 
-open class UICCollection: UIViewCreator {
-    public typealias View = UICCollectionView
+public class UICCollection<Layout>: UIViewCreator, CollectionLayout where Layout: UICollectionViewLayout {
+    public typealias View = UICollectionView
 
-    public init(layout: UICollectionViewLayout) {
+    public init(layout: Layout) {
         self.loadView { [unowned self] in
-            let view = View(frame: .zero, collectionViewLayout: layout)
+            let view = UICCollectionView(frame: .zero, collectionViewLayout: layout)
             view.updateBuilder(self)
             return view
         }
@@ -133,7 +133,7 @@ public extension UIViewCreator where View: UICollectionView {
 
     func background<Background: ViewCreator>(_ content: @escaping () -> Background) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.backgroundView = UICHost(content: content).releaseUIView()
+            ($0 as? View)?.backgroundView = UICHostingView(view: content())
         }
     }
 

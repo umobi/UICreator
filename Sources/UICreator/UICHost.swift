@@ -23,16 +23,49 @@
 import Foundation
 import UIKit
 
-public class UICHost: Root, UIViewCreator {
-    public init(size: CGSize = .zero, content: @escaping () -> ViewCreator) {
-        super.init()
+public class UICHostingView: UIView {
+    private(set) var content: MemorySwitch = .nil
 
-        let content = content()
-        self.tree.append(content)
-
-        self.onNotRendered { [content] in
-            $0.frame = .init(origin: $0.frame.origin, size: size)
-            $0.add(priority: .required, content.releaseUIView())
+    public override var isHidden: Bool {
+        willSet {
+            (self.content.object as? ViewCreator)?
+                .uiView?
+                .isHidden = newValue
         }
+    }
+
+    public init(content: @escaping () -> ViewCreator) {
+        self.content = .strong(content())
+        super.init(frame: .zero)
+    }
+
+    public init(view: ViewCreator) {
+        self.content = .strong(view)
+        super.init(frame: .zero)
+    }
+
+    public override func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+
+        guard
+            newSuperview != nil,
+            !self.content.isWeak,
+            let content = self.content.object as? ViewCreator
+        else {
+            return
+        }
+
+        let view: UIView! = content.releaseUIView()
+        self.content = .weak(content)
+
+        self.add(priority: .required, view)
+    }
+
+    override public init(frame: CGRect) {
+        Fatal.Builder("init(frame:) not implemented").die()
+    }
+
+    required init?(coder: NSCoder) {
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 }

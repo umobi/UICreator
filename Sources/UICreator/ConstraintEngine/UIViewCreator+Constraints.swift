@@ -1392,7 +1392,7 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .top
-                    .equalTo(view.cbuild.topMargin)
+                    .equalTo(view.layoutMarginsGuide.cbuild.top)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -1413,7 +1413,7 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .top
-                    .greaterThanOrEqualTo(view.cbuild.topMargin)
+                    .greaterThanOrEqualTo(view.layoutMarginsGuide.cbuild.top)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -1434,7 +1434,7 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .top
-                    .lessThanOrEqualTo(view.cbuild.topMargin)
+                    .lessThanOrEqualTo(view.layoutMarginsGuide.cbuild.top)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -1455,7 +1455,7 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .bottom
-                    .equalTo(view.cbuild.bottomMargin)
+                    .equalTo(view.layoutMarginsGuide.cbuild.bottom)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -1476,7 +1476,7 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .bottom
-                    .greaterThanOrEqualTo(view.cbuild.bottomMargin)
+                    .greaterThanOrEqualTo(view.layoutMarginsGuide.cbuild.bottom)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -1497,7 +1497,7 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .bottom
-                    .lessThanOrEqualTo(view.cbuild.bottomMargin)
+                    .lessThanOrEqualTo(view.layoutMarginsGuide.cbuild.bottom)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -1518,7 +1518,7 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .leading
-                    .equalTo(view.cbuild.leadingMargin)
+                    .equalTo(view.layoutMarginsGuide.cbuild.leading)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -1539,7 +1539,7 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .leading
-                    .greaterThanOrEqualTo(view.cbuild.leadingMargin)
+                    .greaterThanOrEqualTo(view.layoutMarginsGuide.cbuild.leading)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -1560,7 +1560,7 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .leading
-                    .lessThanOrEqualTo(view.cbuild.leadingMargin)
+                    .lessThanOrEqualTo(view.layoutMarginsGuide.cbuild.leading)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -1581,7 +1581,7 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .trailing
-                    .equalTo(view.cbuild.trailingMargin)
+                    .equalTo(view.layoutMarginsGuide.cbuild.trailing)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -1602,7 +1602,7 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .trailing
-                    .greaterThanOrEqualTo(view.cbuild.trailingMargin)
+                    .greaterThanOrEqualTo(view.layoutMarginsGuide.cbuild.trailing)
                     .update()
                     .constant(constant)
                     .priority(priority)
@@ -1623,7 +1623,7 @@ public extension ViewCreator {
             Constraintable.update(
                 (UIViewWrapper($0)?.safe ?? $0).cbuild
                     .trailing
-                    .lessThanOrEqualTo(view.cbuild.trailingMargin)
+                    .lessThanOrEqualTo(view.layoutMarginsGuide.cbuild.trailing)
                     .update()
                     .constant(constant)
                     .priority(priority)

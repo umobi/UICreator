@@ -24,12 +24,12 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICPageContainer: UIView {
-    private(set) weak var container: UICControllerContainerView<UICPageViewController>!
+internal class UICPageContainer: UIView {
+    private(set) weak var container: UICContainer<UICPageViewController>.View!
     private var content: (() -> UICPageViewController)?
 
     private weak var stackView: UIStackView!
-    private var indicatorLocation: IndicatorViewPosition?
+    private var indicatorLocation: UICPage.IndicatorViewPosition?
 
     var indicatorViews: [UIView] {
         return self.stackView?.arrangedSubviews ?? []
@@ -68,7 +68,7 @@ public class UICPageContainer: UIView {
     override open func didMoveToWindow() {
         super.didMoveToWindow()
         self.container = self.container ?? {
-            let container = UICControllerContainerView<UICPageViewController>()
+            let container = UICContainer<UICPageViewController>.View()
             container.contain(
                 viewController: {
                     let viewController = self.content?()
@@ -150,17 +150,8 @@ public class UICPageContainer: UIView {
         RenderManager(self)?.traitDidChange()
     }
 
-    public enum IndicatorViewPosition {
-        case topRespectedToSafeArea
-        case left
-        case right
-        case bottomRespectedToSafeArea
-        case bottom
-        case top
-    }
-
     // swiftlint:disable function_body_length
-    private func positionSV(_ stackView: UIStackView, orientedBy location: IndicatorViewPosition) {
+    private func positionSV(_ stackView: UIStackView, orientedBy location: UICPage.IndicatorViewPosition) {
         switch location {
         case .topRespectedToSafeArea:
             stackView.axis = .vertical
@@ -279,7 +270,7 @@ public class UICPageContainer: UIView {
         }
     }
 
-    func setIndicatorViews(location: IndicatorViewPosition, views: [UIView]) {
+    func setIndicatorViews(location: UICPage.IndicatorViewPosition, views: [UIView]) {
         self.stackView?.removeFromSuperview()
 
         if views.isEmpty {
@@ -296,5 +287,16 @@ public class UICPageContainer: UIView {
         self.stackView = stackView
         self.indicatorLocation = location
         self.setNeedsLayout()
+    }
+}
+
+public extension UICPage {
+    enum IndicatorViewPosition {
+        case topRespectedToSafeArea
+        case left
+        case right
+        case bottomRespectedToSafeArea
+        case bottom
+        case top
     }
 }

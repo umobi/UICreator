@@ -24,73 +24,73 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICControllerContainerView<View: UIViewController>: UIView {
-    weak var view: View!
+public extension UICContainer {
+    class View: UIView {
+        weak var view: ViewController!
 
-    public func contain(viewController: View, parentView: UIViewController? = nil) {
-        guard let parentView = parentView ?? self.viewController else {
-            Fatal.Builder("UICControllerContainerView couldn't get parent viewController").die()
+        public func contain(viewController: ViewController, parentView: UIViewController? = nil) {
+            guard let parentView = parentView ?? self.viewController else {
+                Fatal.Builder("UICContainer.ContainerView couldn't get parent viewController").die()
+            }
+
+            self.view?.view.removeFromSuperview()
+
+            self.view = viewController
+            parentView.addChild(viewController)
+            CBSubview(self).addSubview(viewController.view)
+
+            Constraintable.activate(
+                viewController.view.cbuild
+                    .edges
+            )
+
+            viewController.didMove(toParent: parentView)
         }
 
-        self.view?.view.removeFromSuperview()
-
-        self.view = viewController
-        parentView.addChild(viewController)
-        CBSubview(self).addSubview(viewController.view)
-
-        Constraintable.activate(
-            viewController.view.cbuild
-                .edges
-        )
-
-        viewController.didMove(toParent: parentView)
-    }
-
-    override open var isHidden: Bool {
-        get { super.isHidden }
-        set {
-            super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
+        override open var isHidden: Bool {
+            get { super.isHidden }
+            set {
+                super.isHidden = newValue
+                RenderManager(self)?.isHidden(newValue)
+            }
         }
-    }
 
-    override open var frame: CGRect {
-        get { super.frame }
-        set {
-            super.frame = newValue
-            RenderManager(self)?.frame(newValue)
+        override open var frame: CGRect {
+            get { super.frame }
+            set {
+                super.frame = newValue
+                RenderManager(self)?.frame(newValue)
+            }
         }
-    }
 
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
-    }
+        override public func willMove(toSuperview newSuperview: UIView?) {
+            super.willMove(toSuperview: newSuperview)
+            RenderManager(self)?.willMove(toSuperview: newSuperview)
+        }
 
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
-    }
+        override public func didMoveToSuperview() {
+            super.didMoveToSuperview()
+            RenderManager(self)?.didMoveToSuperview()
+        }
 
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        RenderManager(self)?.didMoveToWindow()
-    }
+        override public func didMoveToWindow() {
+            super.didMoveToWindow()
+            RenderManager(self)?.didMoveToWindow()
+        }
 
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        RenderManager(self)?.layoutSubviews()
-    }
+        override public func layoutSubviews() {
+            super.layoutSubviews()
+            RenderManager(self)?.layoutSubviews()
+        }
 
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        RenderManager(self)?.traitDidChange()
+        override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+            super.traitCollectionDidChange(previousTraitCollection)
+            RenderManager(self)?.traitDidChange()
+        }
     }
 }
 
 public class UICContainer<ViewController: UIViewController>: UIViewCreator {
-    public typealias View = UICControllerContainerView<ViewController>
-
     public required init(_ content: @escaping () -> ViewController) {
         self.loadView { [unowned self] in
             return View.init(builder: self)

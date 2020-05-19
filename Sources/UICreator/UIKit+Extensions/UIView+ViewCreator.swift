@@ -169,7 +169,7 @@ public extension ViewCreator {
     #if os(iOS)
     func statusBar(_ appearanceStyle: UIStatusBarStyle) -> Self {
         self.onInTheScene {
-            ($0.viewController as? UICHostingView)?.statusBarStyle = appearanceStyle
+            ($0.viewController as? UICHostingController)?.statusBarStyle = appearanceStyle
         }
     }
     #endif

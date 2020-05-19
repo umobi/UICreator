@@ -24,169 +24,171 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-open class UICScrollView: UIScrollView, UICManagerContentView {
-
-    public enum Axis {
+public extension UICScroll {
+    enum Axis {
         case vertical
         case horizontal
         case auto(vertical: UILayoutPriority, horizontal: UILayoutPriority)
     }
 
-    public enum Margin {
+    enum Margin {
         case safeArea
         case bounds
     }
 
-    private weak var contentView: UIView!
-    public var axis: Axis {
-        didSet {
-            self.reloadContentLayout()
+    class View: UIScrollView, UICManagerContentView {
+
+        private weak var contentView: UIView!
+        public var axis: Axis {
+            didSet {
+                self.reloadContentLayout()
+            }
         }
-    }
 
-    public var verticalMargin: Margin = .safeArea {
-        didSet {
-            self.reloadContentLayout()
+        public var verticalMargin: Margin = .safeArea {
+            didSet {
+                self.reloadContentLayout()
+            }
         }
-    }
 
-    public var horizontalMargin: Margin = .bounds {
-        didSet {
-            self.reloadContentLayout()
+        public var horizontalMargin: Margin = .bounds {
+            didSet {
+                self.reloadContentLayout()
+            }
         }
-    }
 
-    open override var contentInset: UIEdgeInsets {
-        didSet {
-            self.reloadContentLayout()
+        open override var contentInset: UIEdgeInsets {
+            didSet {
+                self.reloadContentLayout()
+            }
         }
-    }
 
-    public required init(_ view: UIView, axis: Axis = .vertical) {
-        self.axis = axis
-        super.init(frame: .zero)
+        public required init(_ view: UIView, axis: Axis = .vertical) {
+            self.axis = axis
+            super.init(frame: .zero)
 
-        self.addContent(view)
-    }
+            self.addContent(view)
+        }
 
-    public required init(axis: Axis = .vertical) {
-        self.axis = axis
-        super.init(frame: .zero)
-    }
+        public required init(axis: Axis = .vertical) {
+            self.axis = axis
+            super.init(frame: .zero)
+        }
 
-    public func addContent(_ view: UIView) {
-        let contentView = ContentView(view)
-        CBSubview(self).addSubview(contentView)
-        self.contentView = contentView
+        public func addContent(_ view: UIView) {
+            let contentView = ContentView(view)
+            CBSubview(self).addSubview(contentView)
+            self.contentView = contentView
 
-        Constraintable.activate(
-            contentView.cbuild
-                .edges
-        )
-
-        self.reloadContentLayout()
-    }
-
-    public func reloadContentLayout() {
-        Constraintable.deactivate(
-            self.contentView.cbuild.width.equalTo(self.cbuild.width),
-            self.contentView.cbuild.height.equalTo(self.cbuild.height)
-        )
-
-        switch axis {
-        case .vertical:
             Constraintable.activate(
                 contentView.cbuild
-                    .width
-                    .equalTo(self.widthMarginAnchor)
-                    .priority(.required)
-                    .constant(-self.horizontalOffset),
-
-                contentView.cbuild
-                    .height
-                    .equalTo(self.heightMarginAnchor)
-                    .priority(.fittingSizeLevel)
-                    .constant(-self.verticalOffset)
-            )
-        case .horizontal:
-            Constraintable.activate(
-                contentView.cbuild
-                    .width
-                    .equalTo(self.widthMarginAnchor)
-                    .priority(.fittingSizeLevel)
-                    .constant(-self.horizontalOffset),
-
-                contentView.cbuild
-                    .height
-                    .equalTo(self.heightMarginAnchor)
-                    .priority(.required)
-                    .constant(-self.verticalOffset)
+                    .edges
             )
 
-        case .auto(let vertical, let horizontal):
-            Constraintable.activate(
-                contentView.cbuild
-                    .width
-                    .equalTo(self.widthMarginAnchor)
-                    .priority(horizontal)
-                    .constant(-self.horizontalOffset),
+            self.reloadContentLayout()
+        }
 
-                contentView.cbuild
-                    .height
-                    .equalTo(self.heightMarginAnchor)
-                    .priority(vertical)
-                    .constant(-self.verticalOffset)
+        public func reloadContentLayout() {
+            Constraintable.deactivate(
+                self.contentView.cbuild.width.equalTo(self.cbuild.width),
+                self.contentView.cbuild.height.equalTo(self.cbuild.height)
             )
+
+            switch axis {
+            case .vertical:
+                Constraintable.activate(
+                    contentView.cbuild
+                        .width
+                        .equalTo(self.widthMarginAnchor)
+                        .priority(.required)
+                        .constant(-self.horizontalOffset),
+
+                    contentView.cbuild
+                        .height
+                        .equalTo(self.heightMarginAnchor)
+                        .priority(.fittingSizeLevel)
+                        .constant(-self.verticalOffset)
+                )
+            case .horizontal:
+                Constraintable.activate(
+                    contentView.cbuild
+                        .width
+                        .equalTo(self.widthMarginAnchor)
+                        .priority(.fittingSizeLevel)
+                        .constant(-self.horizontalOffset),
+
+                    contentView.cbuild
+                        .height
+                        .equalTo(self.heightMarginAnchor)
+                        .priority(.required)
+                        .constant(-self.verticalOffset)
+                )
+
+            case .auto(let vertical, let horizontal):
+                Constraintable.activate(
+                    contentView.cbuild
+                        .width
+                        .equalTo(self.widthMarginAnchor)
+                        .priority(horizontal)
+                        .constant(-self.horizontalOffset),
+
+                    contentView.cbuild
+                        .height
+                        .equalTo(self.heightMarginAnchor)
+                        .priority(vertical)
+                        .constant(-self.verticalOffset)
+                )
+            }
         }
-    }
 
-    public required init?(coder: NSCoder) {
-        Fatal.Builder("init(coder:) has not been implemented").die()
-    }
-
-    override open var isHidden: Bool {
-        get { super.isHidden }
-        set {
-            super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
+        public required init?(coder: NSCoder) {
+            Fatal.Builder("init(coder:) has not been implemented").die()
         }
-    }
 
-    override open var frame: CGRect {
-        get { super.frame }
-        set {
-            super.frame = newValue
-            RenderManager(self)?.frame(newValue)
+        override open var isHidden: Bool {
+            get { super.isHidden }
+            set {
+                super.isHidden = newValue
+                RenderManager(self)?.isHidden(newValue)
+            }
         }
-    }
 
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
-    }
+        override open var frame: CGRect {
+            get { super.frame }
+            set {
+                super.frame = newValue
+                RenderManager(self)?.frame(newValue)
+            }
+        }
 
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
-    }
+        override public func willMove(toSuperview newSuperview: UIView?) {
+            super.willMove(toSuperview: newSuperview)
+            RenderManager(self)?.willMove(toSuperview: newSuperview)
+        }
 
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        RenderManager(self)?.didMoveToWindow()
-    }
+        override public func didMoveToSuperview() {
+            super.didMoveToSuperview()
+            RenderManager(self)?.didMoveToSuperview()
+        }
 
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        RenderManager(self)?.layoutSubviews()
-    }
+        override public func didMoveToWindow() {
+            super.didMoveToWindow()
+            RenderManager(self)?.didMoveToWindow()
+        }
 
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        RenderManager(self)?.traitDidChange()
+        override public func layoutSubviews() {
+            super.layoutSubviews()
+            RenderManager(self)?.layoutSubviews()
+        }
+
+        override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+            super.traitCollectionDidChange(previousTraitCollection)
+            RenderManager(self)?.traitDidChange()
+        }
     }
 }
 
-private extension UICScrollView {
+private extension UICScroll.View {
     var heightMarginAnchor: ConstraintDimension {
         switch self.verticalMargin {
         case .bounds:
@@ -222,7 +224,7 @@ private extension UICScrollView {
     }
 }
 
-private extension UICScrollView {
+private extension UICScroll.View {
     var verticalOffset: CGFloat {
         return self.contentInset.top + self.contentInset.bottom
     }
@@ -232,7 +234,7 @@ private extension UICScrollView {
     }
 }
 
-private extension UICScrollView {
+private extension UICScroll.View {
     class ContentView: UIView {
         weak var view: UIView!
 
@@ -251,9 +253,8 @@ private extension UICScrollView {
 }
 
 public class UICScroll: UIViewCreator {
-    public typealias View = UICScrollView
 
-    public init(axis: View.Axis = .vertical, content: @escaping () -> ViewCreator) {
+    public init(axis: Axis = .vertical, content: @escaping () -> ViewCreator) {
         let content = content()
         self.tree.append(content)
 

@@ -24,6 +24,4 @@ import Foundation
 import UIKit
 
 @available(iOS 13.0, tvOS 13.0, *)
-public class UICCompositional: UICCollection, CollectionLayout {
-    public typealias Layout = UICollectionViewCompositionalLayout
-}
+public typealias UICCompositional = UICCollection<UICollectionViewCompositionalLayout>

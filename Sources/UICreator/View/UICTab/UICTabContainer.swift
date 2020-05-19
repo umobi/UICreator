@@ -24,8 +24,8 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICTabContainer: UIView {
-    private(set) weak var container: UICControllerContainerView<UITabBarController>!
+internal class UICTabContainer: UIView {
+    private(set) weak var container: UICContainer<UITabBarController>.View!
     private var content: (() -> UITabBarController)?
 
     public var tabBarController: UITabBarController! {
@@ -65,7 +65,7 @@ public class UICTabContainer: UIView {
     override open func didMoveToWindow() {
         super.didMoveToWindow()
         self.container = self.container ?? {
-            let container = UICControllerContainerView<UITabBarController>()
+            let container = UICContainer<UITabBarController>.View()
             container.contain(
                 viewController: {
                     let viewController = self.content?()

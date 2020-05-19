@@ -24,8 +24,7 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICPage: UIViewCreator {
-    public typealias View = UICPageContainer
+public class UICPage: ViewCreator {
 
     private(set) var transitionStyle: UIPageViewController.TransitionStyle = .scroll
     private(set) var navigationOrientation: UIPageViewController.NavigationOrientation = .horizontal
@@ -62,7 +61,7 @@ public class UICPage: UIViewCreator {
             self.transitionStyle = transitionStyle
             self.navigationOrientation = navigationOrientation
             self.options = options
-            let view = View.init(builder: self)
+            let view = UICPageContainer.init(builder: self)
             view.setContent { [unowned self] in
                 let pageViewController = self._pageViewController!
                 self.pageViewController = pageViewController
@@ -83,12 +82,10 @@ public extension UICPage {
     func pages(
         direction: UIPageViewController.NavigationDirection,
         _ contents: @escaping () -> [ViewCreator]) -> Self {
-        let contents = contents().map { content in
-            UICHostingView(content: { content })
-        }
+        let contents: [UICHostingController] = contents().map { content in
+            self.tree.append(content)
 
-        contents.forEach {
-            self.tree.append($0.hostedView)
+            return UICHostingController(view: content)
         }
 
         return self.onInTheScene { [unowned self] _ in
@@ -116,12 +113,12 @@ public extension UICPage {
         }
     }
 
-    func addIndicator(atLocation location: View.IndicatorViewPosition, content: @escaping () -> ViewCreator) -> Self {
-        let content = UICHost(content: content)
+    func addIndicator(atLocation location: IndicatorViewPosition, content: @escaping () -> ViewCreator) -> Self {
+        let content = content()
         self.tree.append(content)
 
         return self.onInTheScene {
-            ($0 as? View)?.setIndicatorViews(location: location, views: [content.releaseUIView()])
+            ($0 as? UICPageContainer)?.setIndicatorViews(location: location, views: [content.releaseUIView()])
         }
     }
 }

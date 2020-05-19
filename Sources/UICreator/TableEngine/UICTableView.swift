@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public class UICTableView: UITableView {
+internal class UICTableView: UITableView {
 
     override open var isHidden: Bool {
         get { super.isHidden }

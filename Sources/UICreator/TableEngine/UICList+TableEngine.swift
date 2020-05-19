@@ -34,7 +34,7 @@ public extension UICList {
         self.init(style: style)
 
         self.onNotRendered { [manager] in
-            let tableView: View! = $0 as? View
+            let tableView: UICTableView! = $0 as? UICTableView
             #if os(iOS)
             tableView.separatorStyle = .none
             #endif

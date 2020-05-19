@@ -84,7 +84,7 @@ public struct UICPresent {
     }
 
     func present() {
-        let viewController = UICHostingView {
+        let viewController = UICHostingController {
             self.toView!
         }
 

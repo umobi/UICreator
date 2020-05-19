@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICPageViewController: UIPageViewController {
+internal class UICPageViewController: UIPageViewController {
     private var queuedViewControllers: [UIViewController]!
     #if os(iOS)
     internal var spineLocationHandler: ((UIInterfaceOrientation) -> SpineLocation)?

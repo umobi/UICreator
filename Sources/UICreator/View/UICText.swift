@@ -25,51 +25,52 @@ import UIKit
 import ConstraintBuilder
 
 // swiftlint:disable file_length
-public class UICTextFieldView: UITextField {
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
-    }
-
-    override open var isHidden: Bool {
-        get { super.isHidden }
-        set {
-            super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
+public extension UICText {
+    class View: UITextField {
+        override public func willMove(toSuperview newSuperview: UIView?) {
+            super.willMove(toSuperview: newSuperview)
+            RenderManager(self)?.willMove(toSuperview: newSuperview)
         }
-    }
 
-    override open var frame: CGRect {
-        get { super.frame }
-        set {
-            super.frame = newValue
-            RenderManager(self)?.frame(newValue)
+        override open var isHidden: Bool {
+            get { super.isHidden }
+            set {
+                super.isHidden = newValue
+                RenderManager(self)?.isHidden(newValue)
+            }
         }
-    }
 
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
-    }
+        override open var frame: CGRect {
+            get { super.frame }
+            set {
+                super.frame = newValue
+                RenderManager(self)?.frame(newValue)
+            }
+        }
 
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        RenderManager(self)?.didMoveToWindow()
-    }
+        override public func didMoveToSuperview() {
+            super.didMoveToSuperview()
+            RenderManager(self)?.didMoveToSuperview()
+        }
 
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        RenderManager(self)?.layoutSubviews()
-    }
+        override public func didMoveToWindow() {
+            super.didMoveToWindow()
+            RenderManager(self)?.didMoveToWindow()
+        }
 
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        RenderManager(self)?.traitDidChange()
+        override public func layoutSubviews() {
+            super.layoutSubviews()
+            RenderManager(self)?.layoutSubviews()
+        }
+
+        override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+            super.traitCollectionDidChange(previousTraitCollection)
+            RenderManager(self)?.traitDidChange()
+        }
     }
 }
 
 public class UICText: UIViewCreator, TextElement, TextKeyboard, Control {
-    public typealias View = UICTextFieldView
 
     required public init(_ text: String?) {
         self.text(text)
@@ -270,11 +271,11 @@ public extension UIViewCreator where Self: Control, View: UITextField {
 
 public extension UIViewCreator where View: UITextField {
     func leftView(_ mode: UITextField.ViewMode = .always, content: @escaping () -> ViewCreator) -> Self {
-        let host = UICHost(content: content)
+        let host = content()
         self.tree.append(host)
 
         return self.onRendered { view in
-            (view as? View)?.leftView = host.releaseUIView()
+            (view as? View)?.leftView = UICHostingView(view: host)
             (view as? View)?.leftViewMode = mode
 
             var needsToAddConstraints = true
@@ -302,11 +303,11 @@ public extension UIViewCreator where View: UITextField {
     }
 
     func rightView(_ mode: UITextField.ViewMode = .always, content: @escaping () -> ViewCreator) -> Self {
-        let host = UICHost(content: content)
+        let host = content()
         self.tree.append(host)
 
         return self.onRendered { view in
-            (view as? View)?.rightView = host.releaseUIView()
+            (view as? View)?.rightView = UICHostingView(view: host)
             (view as? View)?.rightViewMode = mode
 
             var needsToAddConstraints = true
@@ -416,7 +417,7 @@ public extension TextKeyboard where View: UITextField {
         self.tree.append(content)
 
         return self.onRendered {
-           ($0 as? View)?.inputView = content.releaseUIView()
+           ($0 as? View)?.inputView = UICHostingView(view: content)
         }
     }
 
@@ -425,7 +426,7 @@ public extension TextKeyboard where View: UITextField {
         self.tree.append(content)
 
         return self.onRendered {
-            ($0 as? View)?.inputAccessoryView = content.releaseUIView()
+            ($0 as? View)?.inputAccessoryView = UICHostingView(view: content)
         }
     }
 

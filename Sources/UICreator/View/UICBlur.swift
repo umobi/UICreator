@@ -28,7 +28,7 @@ import ConstraintBuilder
 private var kVibrancyEffectStyle: UInt = 0
 
 @available(iOS 13, *)
-public extension UICBlurView {
+public extension UICBlur.View {
     fileprivate(set) var vibrancyEffect: UIVibrancyEffectStyle! {
         get { return objc_getAssociatedObject(self, &kVibrancyEffectStyle) as? UIVibrancyEffectStyle }
         set { objc_setAssociatedObject(self, &kVibrancyEffectStyle, newValue, .OBJC_ASSOCIATION_RETAIN) }
@@ -36,135 +36,137 @@ public extension UICBlurView {
 }
 #endif
 
-public class UICBlurView: UIView {
+public extension UICBlur {
+    class View: UIView {
 
-    private(set) var blurEffect: UIBlurEffect.Style
-    weak var blurView: UIVisualEffectView!
+        private(set) var blurEffect: UIBlurEffect.Style
+        weak var blurView: UIVisualEffectView!
 
-    public init(blur: UIBlurEffect.Style) {
-        self.blurEffect = blur
-        super.init(frame: .zero)
+        public init(blur: UIBlurEffect.Style) {
+            self.blurEffect = blur
+            super.init(frame: .zero)
+
+            #if os(iOS)
+            if #available(iOS 13, *) {
+                self.vibrancyEffect = .fill
+            }
+            #endif
+
+            self.blurView = self.createEffect()
+        }
 
         #if os(iOS)
-        if #available(iOS 13, *) {
-            self.vibrancyEffect = .fill
+        @available(iOS 13, *)
+        public init(blur: UIBlurEffect.Style, vibrancy: UIVibrancyEffectStyle) {
+            self.blurEffect = blur
+            super.init(frame: .zero)
+            self.vibrancyEffect = vibrancy
+
+            self.blurView = self.createEffect()
         }
         #endif
 
-        self.blurView = self.createEffect()
-    }
+        private func createEffect() -> UIVisualEffectView {
+            let blurEffect = UIBlurEffect(style: self.blurEffect)
+            let blurEffectView = UIVisualEffectView(effect: blurEffect)
 
-    #if os(iOS)
-    @available(iOS 13, *)
-    public init(blur: UIBlurEffect.Style, vibrancy: UIVibrancyEffectStyle) {
-        self.blurEffect = blur
-        super.init(frame: .zero)
-        self.vibrancyEffect = vibrancy
+            let vibrancyEffect: UIVibrancyEffect = {
+                #if os(iOS)
+                guard #available(iOS 13, *) else {
+                    return UIVibrancyEffect(blurEffect: blurEffect)
+                }
 
-        self.blurView = self.createEffect()
-    }
-    #endif
-
-    private func createEffect() -> UIVisualEffectView {
-        let blurEffect = UIBlurEffect(style: self.blurEffect)
-        let blurEffectView = UIVisualEffectView(effect: blurEffect)
-
-        let vibrancyEffect: UIVibrancyEffect = {
-            #if os(iOS)
-            guard #available(iOS 13, *) else {
+                return .init(blurEffect: blurEffect, style: self.vibrancyEffect)
+                #else
                 return UIVibrancyEffect(blurEffect: blurEffect)
+                #endif
+            }()
+            let vibrancyEffectView = UIVisualEffectView(effect: vibrancyEffect)
+
+            CBSubview(blurEffectView.contentView).addSubview(vibrancyEffectView)
+            vibrancyEffectView.translatesAutoresizingMaskIntoConstraints = false
+
+            Constraintable.activate(
+                vibrancyEffectView.cbuild
+                    .edges
+            )
+
+            CBSubview(self).addSubview(blurEffectView)
+
+            Constraintable.activate(
+                blurEffectView.cbuild
+                    .edges
+            )
+
+            return blurEffectView
+        }
+
+        public required init?(coder: NSCoder) {
+            Fatal.Builder("init(coder:) has not been implemented").die()
+        }
+
+        private func reload() {
+            self.subviews.forEach { $0.removeFromSuperview() }
+            self.blurView = self.createEffect()
+        }
+
+        private func reload(_ blurEffect: UIBlurEffect.Style) {
+            self.blurEffect = blurEffect
+            self.reload()
+        }
+
+        #if os(iOS)
+        @available(iOS 13, *)
+        private func reload(_ vibrancyEffect: UIVibrancyEffectStyle) {
+            self.vibrancyEffect = vibrancyEffect
+            self.reload()
+        }
+        #endif
+
+        override open var isHidden: Bool {
+            get { super.isHidden }
+            set {
+                super.isHidden = newValue
+                RenderManager(self)?.isHidden(newValue)
             }
-
-            return .init(blurEffect: blurEffect, style: self.vibrancyEffect)
-            #else
-            return UIVibrancyEffect(blurEffect: blurEffect)
-            #endif
-        }()
-        let vibrancyEffectView = UIVisualEffectView(effect: vibrancyEffect)
-
-        CBSubview(blurEffectView.contentView).addSubview(vibrancyEffectView)
-        vibrancyEffectView.translatesAutoresizingMaskIntoConstraints = false
-
-        Constraintable.activate(
-            vibrancyEffectView.cbuild
-                .edges
-        )
-
-        CBSubview(self).addSubview(blurEffectView)
-
-        Constraintable.activate(
-            blurEffectView.cbuild
-                .edges
-        )
-
-        return blurEffectView
-    }
-
-    public required init?(coder: NSCoder) {
-        Fatal.Builder("init(coder:) has not been implemented").die()
-    }
-
-    private func reload() {
-        self.subviews.forEach { $0.removeFromSuperview() }
-        self.blurView = self.createEffect()
-    }
-
-    private func reload(_ blurEffect: UIBlurEffect.Style) {
-        self.blurEffect = blurEffect
-        self.reload()
-    }
-
-    #if os(iOS)
-    @available(iOS 13, *)
-    private func reload(_ vibrancyEffect: UIVibrancyEffectStyle) {
-        self.vibrancyEffect = vibrancyEffect
-        self.reload()
-    }
-    #endif
-
-    override open var isHidden: Bool {
-        get { super.isHidden }
-        set {
-            super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
         }
-    }
 
-    override open var frame: CGRect {
-        get { super.frame }
-        set {
-            super.frame = newValue
-            RenderManager(self)?.frame(newValue)
+        override open var frame: CGRect {
+            get { super.frame }
+            set {
+                super.frame = newValue
+                RenderManager(self)?.frame(newValue)
+            }
         }
-    }
 
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
-    }
+        override public func willMove(toSuperview newSuperview: UIView?) {
+            super.willMove(toSuperview: newSuperview)
+            RenderManager(self)?.willMove(toSuperview: newSuperview)
+        }
 
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
-    }
+        override public func didMoveToSuperview() {
+            super.didMoveToSuperview()
+            RenderManager(self)?.didMoveToSuperview()
+        }
 
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        RenderManager(self)?.didMoveToWindow()
-    }
+        override public func didMoveToWindow() {
+            super.didMoveToWindow()
+            RenderManager(self)?.didMoveToWindow()
+        }
 
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        RenderManager(self)?.layoutSubviews()
-    }
+        override public func layoutSubviews() {
+            super.layoutSubviews()
+            RenderManager(self)?.layoutSubviews()
+        }
 
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        RenderManager(self)?.traitDidChange()
+        override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+            super.traitCollectionDidChange(previousTraitCollection)
+            RenderManager(self)?.traitDidChange()
+        }
     }
 }
 
-public extension UICBlurView {
+public extension UICBlur.View {
     func apply(blurEffect: UIBlurEffect.Style) {
         self.reload(blurEffect)
     }
@@ -172,7 +174,7 @@ public extension UICBlurView {
 
 #if os(iOS)
 @available(iOS 13, *)
-public extension UICBlurView {
+public extension UICBlur.View {
     func apply(vibrancyEffect: UIVibrancyEffectStyle) {
         self.reload(vibrancyEffect)
     }
@@ -180,7 +182,6 @@ public extension UICBlurView {
 #endif
 
 public class UICBlur: UIViewCreator {
-    public typealias View = UICBlurView
 
     public init(blur: UIBlurEffect.Style = .regular) {
         self.blur(style: blur)
@@ -192,7 +193,7 @@ public class UICBlur: UIViewCreator {
     }
 }
 
-public extension UIViewCreator where View: UICBlurView {
+public extension UIViewCreator where View: UICBlur.View {
     func blur(style: UIBlurEffect.Style) -> Self {
         return self.onRendered {
             ($0 as? View)?.apply(blurEffect: style)
@@ -202,7 +203,7 @@ public extension UIViewCreator where View: UICBlurView {
 
 #if os(iOS)
 @available(iOS 13, *)
-public extension UIViewCreator where View: UICBlurView {
+public extension UIViewCreator where View: UICBlur.View {
     func vibrancy(effect: UIVibrancyEffectStyle) -> Self {
         return self.onRendered {
             ($0 as? View)?.apply(vibrancyEffect: effect)

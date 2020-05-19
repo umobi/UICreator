@@ -23,52 +23,53 @@
 import Foundation
 import UIKit
 
-public class UICScrollTextView: UITextView {
+public extension UICScrollText {
+    class View: UITextView {
 
-    override open var isHidden: Bool {
-        get { super.isHidden }
-        set {
-            super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
+        override open var isHidden: Bool {
+            get { super.isHidden }
+            set {
+                super.isHidden = newValue
+                RenderManager(self)?.isHidden(newValue)
+            }
         }
-    }
 
-    override open var frame: CGRect {
-        get { super.frame }
-        set {
-            super.frame = newValue
-            RenderManager(self)?.frame(newValue)
+        override open var frame: CGRect {
+            get { super.frame }
+            set {
+                super.frame = newValue
+                RenderManager(self)?.frame(newValue)
+            }
         }
-    }
 
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
-    }
+        override public func willMove(toSuperview newSuperview: UIView?) {
+            super.willMove(toSuperview: newSuperview)
+            RenderManager(self)?.willMove(toSuperview: newSuperview)
+        }
 
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
-    }
+        override public func didMoveToSuperview() {
+            super.didMoveToSuperview()
+            RenderManager(self)?.didMoveToSuperview()
+        }
 
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        RenderManager(self)?.didMoveToWindow()
-    }
+        override public func didMoveToWindow() {
+            super.didMoveToWindow()
+            RenderManager(self)?.didMoveToWindow()
+        }
 
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        RenderManager(self)?.layoutSubviews()
-    }
+        override public func layoutSubviews() {
+            super.layoutSubviews()
+            RenderManager(self)?.layoutSubviews()
+        }
 
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        RenderManager(self)?.traitDidChange()
+        override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+            super.traitCollectionDidChange(previousTraitCollection)
+            RenderManager(self)?.traitDidChange()
+        }
     }
 }
 
 public class UICScrollText: UIViewCreator, TextElement, TextKeyboard {
-    public typealias View = UICScrollTextView
 
     required public init(_ text: String?) {
         self.loadView { [unowned self] in
@@ -235,7 +236,7 @@ public extension TextKeyboard where View: UITextView {
         self.tree.append(content)
 
         return self.onRendered {
-            ($0 as? View)?.inputView = content.releaseUIView()
+            ($0 as? View)?.inputView = UICHostingView(view: content)
         }
     }
 
@@ -244,7 +245,7 @@ public extension TextKeyboard where View: UITextView {
         self.tree.append(content)
 
         return self.onRendered {
-            ($0 as? View)?.inputAccessoryView = content.releaseUIView()
+            ($0 as? View)?.inputAccessoryView = UICHostingView(view: content)
         }
     }
 
