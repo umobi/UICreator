@@ -46,6 +46,16 @@ public class UICHostingController: UIViewController {
     }
     #endif
 
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+
+        guard let hostingView = self.view as? UICHostingView else {
+            return
+        }
+
+        hostingView.loadView()
+    }
+
     public override func loadView() {
         guard let viewCreator = self.viewCreator else {
             Fatal.noContentCreator.die()

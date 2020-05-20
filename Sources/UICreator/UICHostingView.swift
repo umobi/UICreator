@@ -47,8 +47,15 @@ public class UICHostingView: UIView {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
 
+        guard newSuperview != nil else {
+            return
+        }
+
+        self.loadView()
+    }
+
+    func loadView() {
         guard
-            newSuperview != nil,
             !self.content.isWeak,
             let content = self.content.object as? ViewCreator
         else {
