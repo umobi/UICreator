@@ -22,7 +22,7 @@
 
 import Foundation
 
-public extension UICContent {
+public extension ContentView {
     enum LayoutMode {
         case top
         case topLeft

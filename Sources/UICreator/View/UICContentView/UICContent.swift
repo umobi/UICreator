@@ -24,9 +24,10 @@ import Foundation
 import UIKit
 
 public class UICContent: UIViewCreator {
+    public typealias View = ContentView
 
     public init(
-        mode: LayoutMode = .center,
+        mode: ContentView.LayoutMode = .center,
         priority: UILayoutPriority = .required,
         content: @escaping () -> ViewCreator) {
         let content = content()
@@ -81,9 +82,9 @@ public func UICBottomRight(priority: UILayoutPriority = .required, content: @esc
     return .init(mode: .bottomRight, priority: priority, content: content)
 }
 
-public extension UIViewCreator where View: UICContent.View {
+public extension UIViewCreator where View: ContentView {
 
-    func content(mode: UICContent.LayoutMode) -> Self {
+    func content(mode: View.LayoutMode) -> Self {
         self.onNotRendered {
             ($0 as? View)?.layoutMode = mode
         }

@@ -147,7 +147,7 @@ extension RenderManager {
             return
         }
 
-        manager.commitLayout()
+        self.manager.commitLayout()
         self.frame(manager.uiView.frame)
     }
 
@@ -164,12 +164,12 @@ extension RenderManager {
             return
         }
 
-        manager.commitAppear()
+        self.manager.commitAppear()
     }
 
     func isHidden(_ isHidden: Bool) {
         if isHidden {
-            manager.commitDisappear()
+            self.manager.commitDisappear()
             return
         }
 

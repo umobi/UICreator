@@ -105,7 +105,7 @@ public extension UIViewCreator where View: UITableView {
     }
 
     func background(_ content: @escaping () -> ViewCreator) -> Self {
-        self.onNotRendered { tableView in
+        self.onInTheScene { tableView in
             weak var tableView = tableView
 
             UICResized(superview: (tableView as? View)?.backgroundView)

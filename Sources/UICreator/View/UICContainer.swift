@@ -24,73 +24,73 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public extension UICContainer {
-    class View: UIView {
-        weak var view: ViewController!
+public class ControllerView<ViewController: UIViewController>: UIView {
+    weak var view: ViewController!
 
-        public func contain(viewController: ViewController, parentView: UIViewController? = nil) {
-            guard let parentView = parentView ?? self.viewController else {
-                Fatal.Builder("UICContainer.ContainerView couldn't get parent viewController").die()
-            }
-
-            self.view?.view.removeFromSuperview()
-
-            self.view = viewController
-            parentView.addChild(viewController)
-            CBSubview(self).addSubview(viewController.view)
-
-            Constraintable.activate(
-                viewController.view.cbuild
-                    .edges
-            )
-
-            viewController.didMove(toParent: parentView)
+    public func contain(viewController: ViewController, parentView: UIViewController? = nil) {
+        guard let parentView = parentView ?? self.viewController else {
+            Fatal.Builder("UICContainer.ContainerView couldn't get parent viewController").die()
         }
 
-        override open var isHidden: Bool {
-            get { super.isHidden }
-            set {
-                super.isHidden = newValue
-                RenderManager(self)?.isHidden(newValue)
-            }
-        }
+        self.view?.view.removeFromSuperview()
 
-        override open var frame: CGRect {
-            get { super.frame }
-            set {
-                super.frame = newValue
-                RenderManager(self)?.frame(newValue)
-            }
-        }
+        self.view = viewController
+        parentView.addChild(viewController)
+        CBSubview(self).addSubview(viewController.view)
 
-        override public func willMove(toSuperview newSuperview: UIView?) {
-            super.willMove(toSuperview: newSuperview)
-            RenderManager(self)?.willMove(toSuperview: newSuperview)
-        }
+        Constraintable.activate(
+            viewController.view.cbuild
+                .edges
+        )
 
-        override public func didMoveToSuperview() {
-            super.didMoveToSuperview()
-            RenderManager(self)?.didMoveToSuperview()
-        }
+        viewController.didMove(toParent: parentView)
+    }
 
-        override public func didMoveToWindow() {
-            super.didMoveToWindow()
-            RenderManager(self)?.didMoveToWindow()
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
         }
+    }
 
-        override public func layoutSubviews() {
-            super.layoutSubviews()
-            RenderManager(self)?.layoutSubviews()
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
         }
+    }
 
-        override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-            super.traitCollectionDidChange(previousTraitCollection)
-            RenderManager(self)?.traitDidChange()
-        }
+    override public func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
+    }
+
+    override public func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
+    }
+
+    override public func didMoveToWindow() {
+        super.didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
+    }
+
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
+    }
+
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
     }
 }
 
 public class UICContainer<ViewController: UIViewController>: UIViewCreator {
+    public typealias View = ControllerView<ViewController>
+
     public required init(_ content: @escaping () -> ViewController) {
         self.loadView { [unowned self] in
             return View.init(builder: self)

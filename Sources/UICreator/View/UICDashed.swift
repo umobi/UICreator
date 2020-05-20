@@ -24,132 +24,130 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public extension UICDashed {
-    class View: UIView, UICManagerContentView {
+public class DashedView: UIView, UICManagerContentView {
 
-        weak var view: UIView?
-        private(set) var strokeColor: UIColor = .clear
-        private(set) var lineWidth: CGFloat = 1
-        private(set) var dashPattern: [NSNumber]
+    weak var view: UIView?
+    private(set) var strokeColor: UIColor = .clear
+    private(set) var lineWidth: CGFloat = 1
+    private(set) var dashPattern: [NSNumber]
 
-        private var shape: CAShapeLayer!
+    private var shape: CAShapeLayer!
 
-        public required init(_ view: UIView, dash pattern: [NSNumber]) {
-            self.dashPattern = pattern
-            super.init(frame: .zero)
-            self.addContent(view)
+    public required init(_ view: UIView, dash pattern: [NSNumber]) {
+        self.dashPattern = pattern
+        super.init(frame: .zero)
+        self.addContent(view)
+    }
+
+    public required init(dash pattern: [NSNumber]) {
+        self.dashPattern = pattern
+        super.init(frame: .zero)
+    }
+
+    public func addContent(_ view: UIView) {
+        CBSubview(self).addSubview(view)
+
+        Constraintable.activate(
+            view.cbuild
+                .edges
+        )
+
+        self.view = view
+    }
+
+    public func reloadContentLayout() {
+        self.shape = self.shape ?? self.createShape()
+
+        self.shape.strokeColor = strokeColor.cgColor
+        self.shape.lineWidth = self.lineWidth
+        self.shape.lineDashPattern = self.dashPattern
+    }
+
+    required public init?(coder: NSCoder) {
+        Fatal.Builder("init(coder:) has not been implemented").die()
+    }
+
+    private func createShape() -> CAShapeLayer {
+        guard let view = self.view else {
+            return CAShapeLayer()
         }
 
-        public required init(dash pattern: [NSNumber]) {
-            self.dashPattern = pattern
-            super.init(frame: .zero)
+        let shapeLayer: CAShapeLayer = CAShapeLayer()
+        let frameSize = self.frame.size
+        let shapeRect = CGRect(x: 0, y: 0, width: frameSize.width, height: frameSize.height)
+
+        shapeLayer.bounds = shapeRect
+        shapeLayer.position = CGPoint(x: frameSize.width/2, y: frameSize.height/2)
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        shapeLayer.strokeColor = strokeColor.cgColor
+        shapeLayer.lineWidth = self.lineWidth
+        shapeLayer.lineJoin = CAShapeLayerLineJoin.round
+        shapeLayer.lineDashPattern = self.dashPattern
+        shapeLayer.path = UIBezierPath(roundedRect: shapeRect, cornerRadius: view.layer.cornerRadius).cgPath
+
+        self.layer.addSublayer(shapeLayer)
+
+        return shapeLayer
+    }
+
+    func refreshView() {
+        guard let view = self.view else {
+            return
         }
 
-        public func addContent(_ view: UIView) {
-            CBSubview(self).addSubview(view)
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
 
-            Constraintable.activate(
-                view.cbuild
-                    .edges
-            )
+        self.shape.path = UIBezierPath(roundedRect: self.bounds, cornerRadius: view.layer.cornerRadius).cgPath
+        self.shape.frame = self.bounds
+        self.shape.cornerRadius = self.subviews.first!.layer.cornerRadius
+    }
 
-            self.view = view
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
         }
+    }
 
-        public func reloadContentLayout() {
-            self.shape = self.shape ?? self.createShape()
-
-            self.shape.strokeColor = strokeColor.cgColor
-            self.shape.lineWidth = self.lineWidth
-            self.shape.lineDashPattern = self.dashPattern
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
         }
+    }
 
-        required public init?(coder: NSCoder) {
-            Fatal.Builder("init(coder:) has not been implemented").die()
-        }
+    override public func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
+    }
 
-        private func createShape() -> CAShapeLayer {
-            guard let view = self.view else {
-                return CAShapeLayer()
-            }
+    override public func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
+    }
 
-            let shapeLayer: CAShapeLayer = CAShapeLayer()
-            let frameSize = self.frame.size
-            let shapeRect = CGRect(x: 0, y: 0, width: frameSize.width, height: frameSize.height)
+    override public func didMoveToWindow() {
+        super.didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
+    }
 
-            shapeLayer.bounds = shapeRect
-            shapeLayer.position = CGPoint(x: frameSize.width/2, y: frameSize.height/2)
-            shapeLayer.fillColor = UIColor.clear.cgColor
-            shapeLayer.strokeColor = strokeColor.cgColor
-            shapeLayer.lineWidth = self.lineWidth
-            shapeLayer.lineJoin = CAShapeLayerLineJoin.round
-            shapeLayer.lineDashPattern = self.dashPattern
-            shapeLayer.path = UIBezierPath(roundedRect: shapeRect, cornerRadius: view.layer.cornerRadius).cgPath
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        self.refreshView()
+        RenderManager(self)?.layoutSubviews()
+    }
 
-            self.layer.addSublayer(shapeLayer)
-
-            return shapeLayer
-        }
-
-        func refreshView() {
-            guard let view = self.view else {
-                return
-            }
-
-            view.setNeedsLayout()
-            view.layoutIfNeeded()
-
-            self.shape.path = UIBezierPath(roundedRect: self.bounds, cornerRadius: view.layer.cornerRadius).cgPath
-            self.shape.frame = self.bounds
-            self.shape.cornerRadius = self.subviews.first!.layer.cornerRadius
-        }
-
-        override open var isHidden: Bool {
-            get { super.isHidden }
-            set {
-                super.isHidden = newValue
-                RenderManager(self)?.isHidden(newValue)
-            }
-        }
-
-        override open var frame: CGRect {
-            get { super.frame }
-            set {
-                super.frame = newValue
-                RenderManager(self)?.frame(newValue)
-            }
-        }
-
-        override public func willMove(toSuperview newSuperview: UIView?) {
-            super.willMove(toSuperview: newSuperview)
-            RenderManager(self)?.willMove(toSuperview: newSuperview)
-        }
-
-        override public func didMoveToSuperview() {
-            super.didMoveToSuperview()
-            RenderManager(self)?.didMoveToSuperview()
-        }
-
-        override public func didMoveToWindow() {
-            super.didMoveToWindow()
-            RenderManager(self)?.didMoveToWindow()
-        }
-
-        override public func layoutSubviews() {
-            super.layoutSubviews()
-            self.refreshView()
-            RenderManager(self)?.layoutSubviews()
-        }
-
-        override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-            super.traitCollectionDidChange(previousTraitCollection)
-            self.reloadContentLayout()
-            RenderManager(self)?.traitDidChange()
-        }
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        self.reloadContentLayout()
+        RenderManager(self)?.traitDidChange()
     }
 }
 
-public extension UICDashed.View {
+public extension DashedView {
 
     func apply(strokeColor: UIColor) -> Self {
         self.strokeColor = strokeColor
@@ -172,6 +170,8 @@ public extension UICDashed.View {
 }
 
 public class UICDashed: UIViewCreator {
+    public typealias View = DashedView
+
     public init(color: UIColor, pattern: [NSNumber] = [2, 3], content: @escaping () -> ViewCreator) {
         let content = content()
         self.tree.append(content)
@@ -189,7 +189,7 @@ public class UICDashed: UIViewCreator {
     }
 }
 
-extension UIViewCreator where View: UICDashed.View {
+extension UIViewCreator where View: DashedView {
 
     public func dash(color: UIColor) -> Self {
         self.onNotRendered {

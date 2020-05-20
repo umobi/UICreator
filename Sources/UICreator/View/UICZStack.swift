@@ -24,54 +24,53 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public extension UICZStack {
-    class View: UIView {
+public class ZStackView: UIView {
 
-        override open var isHidden: Bool {
-            get { super.isHidden }
-            set {
-                super.isHidden = newValue
-                RenderManager(self)?.isHidden(newValue)
-            }
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
         }
+    }
 
-        override open var frame: CGRect {
-            get { super.frame }
-            set {
-                super.frame = newValue
-                RenderManager(self)?.frame(newValue)
-            }
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
         }
+    }
 
-        override public func willMove(toSuperview newSuperview: UIView?) {
-            super.willMove(toSuperview: newSuperview)
-            RenderManager(self)?.willMove(toSuperview: newSuperview)
-        }
+    override public func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
+    }
 
-        override public func didMoveToSuperview() {
-            super.didMoveToSuperview()
-            RenderManager(self)?.didMoveToSuperview()
-        }
+    override public func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
+    }
 
-        override public func didMoveToWindow() {
-            super.didMoveToWindow()
-            RenderManager(self)?.didMoveToWindow()
-        }
+    override public func didMoveToWindow() {
+        super.didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
+    }
 
-        override public func layoutSubviews() {
-            super.layoutSubviews()
-            RenderManager(self)?.layoutSubviews()
-        }
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
+    }
 
-        override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-            super.traitCollectionDidChange(previousTraitCollection)
-            RenderManager(self)?.traitDidChange()
-        }
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self)?.traitDidChange()
     }
 }
 
 /// `class UICZStack` is a view that holds more than one **subview**.
 public class UICZStack: UIViewCreator {
+    public typealias View = ZStackView
 
     public init(_ contents: @escaping () -> [ViewCreator]) {
         let contents = contents()

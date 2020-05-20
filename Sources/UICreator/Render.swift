@@ -104,33 +104,35 @@ class Render {
             Fatal.popedStatus(state).die()
         }
 
-        self.needs.remove(state)
-
         if self.state < state {
             self.state = state
         }
 
-        switch state {
-        case .notRendered:
+        if state >= .notRendered {
+            self.needs.remove(.notRendered)
+
             let handler = self.notRenderedHandler
             self.notRenderedHandler = nil
             self.countingNotRendered = 0
             handler?(self.manager.uiView)
+        }
 
-        case .rendered:
+        if state >= .rendered {
+            self.needs.remove(.rendered)
+
             let handler = self.renderedHandler
             self.renderedHandler = nil
             self.countingRendered = 0
             handler?(self.manager.uiView)
+        }
 
-        case .inTheScene:
+        if state == .inTheScene {
+            self.needs.remove(.inTheScene)
+
             let handler = self.inTheSceneHandler
             self.inTheSceneHandler = nil
             self.countingInTheScene = 0
             handler?(self.manager.uiView)
-
-        default:
-            break
         }
     }
 
@@ -189,7 +191,7 @@ private extension ViewCreator {
             return []
         }
 
-        guard self.render.needs(.rendered) else {
+        guard self.render.state >= .notRendered && self.render.needs(.rendered) else {
             return []
         }
 
@@ -203,7 +205,7 @@ private extension ViewCreator {
             return []
         }
 
-        guard self.render.needs(.inTheScene) else {
+        guard self.render.state >= .rendered && self.render.needs(.inTheScene) else {
             return []
         }
 
