@@ -26,7 +26,7 @@ import UIKit
 public typealias UICFlow = UICCollection<UICollectionViewFlowLayout>
 
 public extension UICFlow {
-    public convenience init(contents: @escaping () -> [ViewCreator]) {
+    convenience init(contents: @escaping () -> [ViewCreator]) {
         self.init(layout: .init(), contents)
     }
 }
