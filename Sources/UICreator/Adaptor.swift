@@ -23,13 +23,36 @@
 import Foundation
 import UIKit
 
-class ViewAdaptor: RootView {
-    weak var hosted: UIView!
+public protocol ViewCreatorNoLayoutConstraints {}
+
+class ViewAdaptor: UIView, ViewCreatorNoLayoutConstraints {
+    struct Weak<Object: NSObject> {
+        weak var object: Object!
+    }
+
+    enum Store {
+        case view(Weak<UIView>)
+        case viewController(Weak<UIViewController>)
+        case none
+
+        var uiView: UIView! {
+            switch self {
+            case .view(let weakObject):
+                return weakObject.object
+            case .viewController(let weakObject):
+                return weakObject.object?.view
+            case .none:
+                return nil
+            }
+        }
+    }
+
+    var store: Store = .none
 
     override open func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         RenderManager(self)?.willMove(toSuperview: newSuperview)
-        RenderManager(self.hosted)?.willMove(toSuperview: self)
+        RenderManager(self.store.uiView)?.willMove(toSuperview: self)
     }
 
     override open var isHidden: Bool {
@@ -37,7 +60,7 @@ class ViewAdaptor: RootView {
         set {
             super.isHidden = newValue
             RenderManager(self)?.isHidden(newValue)
-            RenderManager(self.hosted)?.isHidden(newValue)
+            RenderManager(self.store.uiView)?.isHidden(newValue)
         }
     }
 
@@ -46,48 +69,80 @@ class ViewAdaptor: RootView {
         set {
             super.frame = newValue
             RenderManager(self)?.frame(newValue)
-            RenderManager(self.hosted)?.frame(self.hosted.frame)
+            RenderManager(self.store.uiView)?.frame(self.store.uiView.frame)
         }
     }
 
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
         RenderManager(self)?.didMoveToSuperview()
-        RenderManager(self.hosted)?.didMoveToSuperview()
+        RenderManager(self.store.uiView)?.didMoveToSuperview()
     }
 
     override open func didMoveToWindow() {
         super.didMoveToWindow()
         RenderManager(self)?.didMoveToWindow()
-        RenderManager(self.hosted)?.didMoveToWindow()
+        RenderManager(self.store.uiView)?.didMoveToWindow()
     }
 
     override open func layoutSubviews() {
         super.layoutSubviews()
         RenderManager(self)?.layoutSubviews()
-        RenderManager(self.hosted)?.layoutSubviews()
+        RenderManager(self.store.uiView)?.layoutSubviews()
     }
 
     override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        RenderManager(self)?.traitDidChange()
+        RenderManager(self.store.uiView)?.traitDidChange()
     }
 }
 
 class Adaptor: ViewCreator {
     public typealias View = ViewAdaptor
 
-    public init(_ viewCreator: ViewCreator) {
+    enum Adaptable {
+        case view(ViewCreator)
+        case viewController(ViewCreator)
+
+        var viewCreator: ViewCreator {
+            switch self {
+            case .view(let viewCreator):
+                return viewCreator
+            case .viewController(let viewCreator):
+                return viewCreator
+            }
+        }
+    }
+
+    init(_ adapt: Adaptable) {
+        let viewCreator = adapt.viewCreator
         viewCreator.tree.supertree?.append(self)
         viewCreator.tree.supertree?.remove(viewCreator)
         self.tree.append(viewCreator)
-        let hostedView: UIView! = viewCreator.releaseUIView()
 
-        self.loadView { [unowned self] in
-            View.init(builder: self)
-        }.onNotRendered {
-            ($0 as? View)?.hosted = hostedView
-            ($0 as? View)?.add(priority: .required, hostedView)
+        switch adapt {
+        case .view:
+            let hostedView: UIView! = viewCreator.releaseUIView()
+
+            self.loadView {
+                View.init(builder: self)
+            }.onNotRendered {
+                ($0 as? View)?.store = .view(.init(object: hostedView))
+                ($0 as? View)?.add(priority: .required, hostedView)
+            }
+
+        case .viewController:
+            let hostedController: UIViewController! = viewCreator.releaseUIView().next as? UIViewController
+
+            self.loadView {
+                View.init(builder: self)
+            }.onNotRendered {
+                ($0 as? View)?.store = .viewController(.init(object: hostedController))
+            }.onInTheScene {
+                $0.viewController.addChild(hostedController)
+                $0.add(priority: .required, hostedController.view)
+                hostedController.didMove(toParent: $0.viewController)
+            }
         }
     }
 

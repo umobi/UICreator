@@ -24,13 +24,12 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-internal class UICPageViewController: UIPageViewController {
-    private var queuedViewControllers: [UIViewController]!
-    #if os(iOS)
-    internal var spineLocationHandler: ((UIInterfaceOrientation) -> SpineLocation)?
-    #endif
-    internal var onPageChangeHandler: ((Int) -> Void)?
-    internal var isInfinityScroll: Bool = false
+private var kQueueViewControllers = 0
+extension UIPageViewController {
+    var queuedViewControllers: [UIViewController]! {
+        get { objc_getAssociatedObject(self, &kQueueViewControllers) as? [UIViewController] }
+        set { objc_setAssociatedObject(self, &kQueueViewControllers, newValue, .OBJC_ASSOCIATION_COPY) }
+    }
 
     public func updateViewControllers(
         _ viewControllers: [UIViewController],
@@ -55,9 +54,9 @@ internal class UICPageViewController: UIPageViewController {
                 }
 
                 return (slice.offset, self.view.frame.intersection(rect))
-            }.sorted(by: {
-                ($0.1.size.height * $0.1.size.width) > ($1.1.size.height * $1.1.size.width)
-            }).first) else { return 0 }
+            }.max(by: {
+                ($0.1.size.height * $0.1.size.width) <= ($1.1.size.height * $1.1.size.width)
+            })) else { return 0 }
 
             return currentSlice.0
         }
@@ -83,7 +82,15 @@ internal class UICPageViewController: UIPageViewController {
     }
 }
 
-extension UICPageViewController: UIPageViewControllerDelegate {
+public class PageViewController: UIPageViewController {
+    #if os(iOS)
+    internal var spineLocationHandler: ((UIInterfaceOrientation) -> SpineLocation)?
+    #endif
+    internal var onPageChangeHandler: ((Int) -> Void)?
+    internal var isInfinityScroll: Bool = false
+}
+
+extension PageViewController: UIPageViewControllerDelegate {
     public func pageViewController(
         _ pageViewController: UIPageViewController,
         didFinishAnimating finished: Bool,
@@ -92,7 +99,7 @@ extension UICPageViewController: UIPageViewControllerDelegate {
         if !completed {
             return
         }
-
+        
         let currentPage = self.currentPage
         self.onPageChangeHandler?(currentPage)
     }
@@ -111,11 +118,11 @@ extension UICPageViewController: UIPageViewControllerDelegate {
     #endif
 }
 
-extension UICPageViewController: UIPageViewControllerDataSource {
+extension PageViewController: UIPageViewControllerDataSource {
     public func pageViewController(
         _ pageViewController: UIPageViewController,
         viewControllerBefore viewController: UIViewController) -> UIViewController? {
-        let queueViews = self.queuedViewControllers ?? []
+        let queueViews = self.queuedViewControllers!
         guard
             let viewControllerSlice = queueViews
                 .enumerated()

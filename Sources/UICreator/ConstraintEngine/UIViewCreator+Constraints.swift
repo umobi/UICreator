@@ -34,7 +34,7 @@ extension UIView {
         return sequence(first: superview, next: {
             (UIViewWrapper($0)?.safe ?? $0).superview })
             .first(where: {
-                !($0 is RootView)
+                !($0 is ViewCreatorNoLayoutConstraints)
             }
         )
     }

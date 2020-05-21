@@ -24,58 +24,46 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICPage: ViewCreator {
+public class UICPageCreator<PageController: UIPageViewController>: UICViewControllerRepresentable {
+    public typealias ViewController = PageController
 
     private(set) var transitionStyle: UIPageViewController.TransitionStyle = .scroll
     private(set) var navigationOrientation: UIPageViewController.NavigationOrientation = .horizontal
     private(set) var options: [UIPageViewController.OptionsKey: Any]?
 
-    private lazy var _pageViewController: UICPageViewController? = {
-        let pageController: UICPageViewController = .init(
+    public func makeUIViewController() -> PageController {
+        let pageController: PageController = .init(
             transitionStyle: self.transitionStyle,
             navigationOrientation: self.navigationOrientation,
             options: self.options
         )
 
-        pageController.dataSource = pageController
-        pageController.delegate = pageController
+        if let uicPage = pageController as? PageViewController {
+            pageController.dataSource = uicPage
+            pageController.delegate = uicPage
+        }
 
         return pageController
-    }()
-
-    private weak var pageViewController: UICPageViewController! {
-        willSet {
-            self._pageViewController = nil
-        }
     }
 
-    var pageController: UICPageViewController! {
-        return self._pageViewController ?? self.pageViewController
-    }
+    public func updateViewController(_ viewController: PageController) {}
 
     public init(
         transitionStyle: UIPageViewController.TransitionStyle,
         navigationOrientation: UIPageViewController.NavigationOrientation,
         options: [UIPageViewController.OptionsKey: Any]?) {
-        self.loadView { [unowned self] in
-            self.transitionStyle = transitionStyle
-            self.navigationOrientation = navigationOrientation
-            self.options = options
-            let view = UICPageContainer.init(builder: self)
-            view.setContent { [unowned self] in
-                let pageViewController = self._pageViewController!
-                self.pageViewController = pageViewController
-                return pageViewController
-            }
-            return view
-        }
+        self.transitionStyle = transitionStyle
+        self.navigationOrientation = navigationOrientation
+        self.options = options
     }
 }
 
-public extension UICPage {
+public typealias UICPage = UICPageCreator<UIPageViewController>
+
+public extension UICPageCreator {
     func `as`<Controller: UIPageViewController>(_ reference: UICOutlet<Controller>) -> Self {
         return self.onInTheScene { [weak self, reference] _ in
-            reference.ref(self?.pageController as? Controller)
+            reference.ref(self?.uiViewController as? Controller)
         }
     }
 
@@ -89,36 +77,29 @@ public extension UICPage {
         }
 
         return self.onInTheScene { [unowned self] _ in
-            self.pageController.updateViewControllers(contents, direction: direction, animated: false, completion: nil)
+            self.uiViewController.updateViewControllers(contents, direction: direction, animated: false, completion: nil)
         }
     }
+}
 
+public extension UICPageCreator where ViewController: PageViewController {
     #if os(iOS)
     func spineLocation(_ handler: @escaping (UIInterfaceOrientation) -> UIPageViewController.SpineLocation) -> Self {
         self.onInTheScene { [unowned self] _ in
-            self.pageController.spineLocationHandler = handler
+            self.uiViewController.spineLocationHandler = handler
         }
     }
     #endif
 
     func onPageChanged(_ handler: @escaping (Int) -> Void) -> Self {
         self.onInTheScene { [unowned self] _ in
-            self.pageController.onPageChangeHandler = handler
+            self.uiViewController.onPageChangeHandler = handler
         }
     }
 
     func isInfinityScroll(_ flag: Bool) -> Self {
         self.onInTheScene { [unowned self] _ in
-            self.pageController.isInfinityScroll = flag
-        }
-    }
-
-    func addIndicator(atLocation location: IndicatorViewPosition, content: @escaping () -> ViewCreator) -> Self {
-        let content = content()
-        self.tree.append(content)
-
-        return self.onInTheScene {
-            ($0 as? UICPageContainer)?.setIndicatorViews(location: location, views: [content.releaseUIView()])
+            self.uiViewController.isInfinityScroll = flag
         }
     }
 }

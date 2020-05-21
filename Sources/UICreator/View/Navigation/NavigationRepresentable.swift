@@ -23,7 +23,8 @@
 import Foundation
 import UIKit
 
-public protocol NavigationRepresentable: UICView {
+public protocol NavigationRepresentable: ViewCreator {
+
     var navigationLoader: (UIViewController) -> UINavigationController { get }
     var navigationBar: UINavigationBar { get }
 
@@ -86,6 +87,19 @@ public struct NavigationModifier {
 }
 
 private var kContentHandler: UInt = 0
+public extension UICViewControllerRepresentable where Self: NavigationRepresentable, ViewController: UINavigationController {
+    func makeUIViewController() -> ViewController {
+        guard let content = self.content else {
+            Fatal.Builder(
+                "NavigationRepresentable couldn't load content. Maybe it may have been already loaded"
+            ).die()
+        }
+
+        self.content = nil
+        return self.navigationLoader(UICHostingController(content: content)) as! ViewController
+    }
+}
+
 public extension NavigationRepresentable {
     internal var navigationController: UINavigationController! {
         return self.uiView.lowerNavigationController
@@ -105,20 +119,7 @@ public extension NavigationRepresentable {
         get { self.contentMutable.value }
         set { self.contentMutable.value = newValue }
     }
-
-    var body: ViewCreator {
-        UICContainer { [unowned self] in
-            guard let content = self.content else {
-                Fatal.Builder(
-                    "NavigationRepresentable couldn't load content. Maybe it may have been already loaded"
-                ).die()
-            }
-
-            self.content = nil
-            return self.navigationLoader(UICHostingController(content: content))
-        }
-    }
-
+    
     @discardableResult
     func push(animated: Bool, content: @escaping () -> ViewCreator) -> Self {
         self.navigationController.pushViewController(UICHostingController(content: content), animated: animated)

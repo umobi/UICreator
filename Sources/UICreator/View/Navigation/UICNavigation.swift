@@ -23,7 +23,10 @@
 import Foundation
 import UIKit
 
-public class UICNavigation: NavigationRepresentable {
+public class UICNavigation: UICViewControllerRepresentable, NavigationRepresentable {
+    public typealias ViewController = UINavigationController
+
+    public func updateViewController(_ viewController: UINavigationController) {}
 
     public var navigationLoader: (UIViewController) -> UINavigationController {
         return {
