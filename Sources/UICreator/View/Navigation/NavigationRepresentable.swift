@@ -23,12 +23,7 @@
 import Foundation
 import UIKit
 
-public protocol NavigationRepresentable: ViewCreator {
-
-    var navigationLoader: (UIViewController) -> UINavigationController { get }
-    var navigationBar: UINavigationBar { get }
-
-//    init(_ content: @escaping () -> ViewCreator)
+public protocol NavigationRepresentable: ViewControllerCreator {
 
     @discardableResult
     func push(animated: Bool, content: @escaping () -> ViewCreator) -> Self
@@ -44,20 +39,6 @@ public protocol NavigationRepresentable: ViewCreator {
 
     @discardableResult
     func popTo(view: ViewCreator, animated: Bool) -> Self
-}
-
-typealias ViewCreatorHandler = () -> ViewCreator
-
-private extension UIView {
-    var lowerNavigationController: UINavigationController? {
-        if self.next is UINavigationController {
-            return self.next as? UINavigationController
-        }
-
-        return self.subviews.first(where: {
-            $0.lowerNavigationController != nil
-        })?.lowerNavigationController
-    }
 }
 
 func OBJCSet<Object>(
@@ -86,38 +67,16 @@ public struct NavigationModifier {
     }
 }
 
-private var kContentHandler: UInt = 0
-public extension UICViewControllerRepresentable where Self: NavigationRepresentable, ViewController: UINavigationController {
-    func makeUIViewController() -> ViewController {
-        guard let content = self.content else {
-            Fatal.Builder(
-                "NavigationRepresentable couldn't load content. Maybe it may have been already loaded"
-            ).die()
-        }
-
-        self.content = nil
-        return self.navigationLoader(UICHostingController(content: content)) as! ViewController
+public extension NavigationRepresentable {
+    var navigationController: UINavigationController! {
+        self.weakViewControllerAdaptor?.adaptedViewController as? UINavigationController
     }
 }
 
 public extension NavigationRepresentable {
-    internal var navigationController: UINavigationController! {
-        return self.uiView.lowerNavigationController
-    }
 
     var navigationBar: UINavigationBar {
         return self.navigationController.navigationBar
-    }
-
-    private var contentMutable: Mutable<ViewCreatorHandler?> {
-        OBJCSet(self, &kContentHandler) {
-            .init(value: nil)
-        }
-    }
-
-    internal var content: ViewCreatorHandler? {
-        get { self.contentMutable.value }
-        set { self.contentMutable.value = newValue }
     }
     
     @discardableResult

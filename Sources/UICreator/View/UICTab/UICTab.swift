@@ -24,92 +24,89 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICTabCreator<TabController: UITabBarController>: UICViewControllerRepresentable {
-    public typealias ViewController = TabController
+public protocol UICTabExtendable {
+    func makeTabController(_ viewControllers: [UIViewController]) -> UITabBarController
+}
 
-    private var contents: (() -> [UICTabItem])? = nil
+open class UICTab: UIViewControllerCreator {
+    public typealias ViewController = UITabBarController
 
-    public func makeUIViewController() -> TabController {
-        let tabController = ViewController()
-
-        guard let contents = self.contents else {
-            return tabController
-        }
-
-        self.contents = nil
-
-        tabController.viewControllers = contents().map {
+    public init(_ contents: @escaping () -> [UICTabItem]) {
+        let viewControllers: [UIViewController] = contents().map {
             let controller = UICHostingController(content: $0.content)
             controller.tabBarItem = $0.tabItem
             return controller
         }
 
-        return tabController
-    }
+        if let extendable = self as? UICTabExtendable {
+            self.setViewController(extendable.makeTabController(viewControllers))
+            return
+        }
 
-    public func updateViewController(_ view: TabController) {}
-
-    public init(_ contents: @escaping () -> [UICTabItem]) {
-        self.contents = contents
+        self.setViewController({
+            let tabController = UITabBarController()
+            tabController.viewControllers = viewControllers
+            return tabController
+        }())
     }
 }
-
-public typealias UICTab = UICTabCreator<UITabBarController>
 
 public extension UICTab {
-    typealias Other<TabController: UITabBarController> = UICTabCreator<TabController>
+    var tabController: UITabBarController! {
+        (self.uiView as? View)?.adaptedViewController as? ViewController
+    }
 }
 
-public extension UICTabCreator {
+public extension UICTab {
     func tabBar(backgroundImage image: UIImage?) -> Self {
         self.onRendered { [unowned self] _ in
-            self.uiViewController.tabBar.backgroundImage = image
+            self.tabController.tabBar.backgroundImage = image
         }
     }
 
     #if os(iOS)
     func tabBar(barStyle style: UIBarStyle) -> Self {
         self.onRendered { [unowned self] _ in
-            self.uiViewController.tabBar.barStyle = style
+            self.tabController.tabBar.barStyle = style
         }
     }
     #endif
 
     func tabBar(barTintColor tintColor: UIColor?) -> Self {
         self.onRendered { [unowned self] _ in
-            self.uiViewController.tabBar.barTintColor = tintColor
+            self.tabController.tabBar.barTintColor = tintColor
         }
     }
 
     func tabBar(isTranslucent flag: Bool) -> Self {
         self.onRendered { [unowned self] _ in
-            self.uiViewController.tabBar.isTranslucent = flag
+            self.tabController.tabBar.isTranslucent = flag
         }
     }
 
     #if os(iOS)
     func tabBar(itemPositioning position: UITabBar.ItemPositioning) -> Self {
         self.onRendered { [unowned self] _ in
-            self.uiViewController.tabBar.itemPositioning = position
+            self.tabController.tabBar.itemPositioning = position
         }
     }
     #endif
 
     func tabBar(itemSpacing spacing: CGFloat) -> Self {
         self.onRendered { [unowned self] _ in
-            self.uiViewController.tabBar.itemSpacing = spacing
+            self.tabController.tabBar.itemSpacing = spacing
         }
     }
 
     func tabBar(itemWidth width: CGFloat) -> Self {
         self.onRendered { [unowned self] _ in
-            self.uiViewController.tabBar.itemWidth = width
+            self.tabController.tabBar.itemWidth = width
         }
     }
 
     func tabBar(selectedItem firstHandler: @escaping (UITabBarItem) -> Bool) -> Self {
         self.onRendered { [unowned self] _ in
-            self.uiViewController.tabBar.selectedItem = self.uiViewController.tabBar.items?.first(where: {
+            self.tabController.tabBar.selectedItem = self.tabController.tabBar.items?.first(where: {
                 firstHandler($0)
             })
         }
@@ -117,38 +114,38 @@ public extension UICTabCreator {
 
     func tabBar(selectionIndicatorImage image: UIImage?) -> Self {
         self.onRendered { [unowned self] _ in
-            self.uiViewController.tabBar.selectionIndicatorImage = image
+            self.tabController.tabBar.selectionIndicatorImage = image
         }
     }
 
     func tabBar(shadowImage image: UIImage?) -> Self {
         self.onRendered { [unowned self] _ in
-            self.uiViewController.tabBar.shadowImage = image
+            self.tabController.tabBar.shadowImage = image
         }
     }
 
     @available(iOS 13.0, tvOS 13, *)
     func tabBar(standardAppearance: UITabBarAppearance) -> Self {
         self.onRendered { [unowned self] _ in
-            self.uiViewController.tabBar.standardAppearance = standardAppearance
+            self.tabController.tabBar.standardAppearance = standardAppearance
         }
     }
 
     func tabBar(tintColor color: UIColor?) -> Self {
         self.onRendered { [unowned self] _ in
-            self.uiViewController.tabBar.tintColor = color
+            self.tabController.tabBar.tintColor = color
         }
     }
 
     func tabBar(unselectedItemTintColor color: UIColor?) -> Self {
         self.onRendered { [unowned self] _ in
-            self.uiViewController.tabBar.unselectedItemTintColor = color
+            self.tabController.tabBar.unselectedItemTintColor = color
         }
     }
 
     func tabBar(isHidden flag: Bool) -> Self {
         self.onInTheScene { [unowned self] _ in
-            self.uiViewController.tabBar.isHidden = flag
+            self.tabController.tabBar.isHidden = flag
         }
     }
 }
@@ -268,10 +265,10 @@ public extension ViewCreator {
     }
 }
 
-public extension UICTabCreator {
+public extension UICTab {
     func selectedItem(_ selected: Relay<Int>) -> Self {
         self.onInTheScene { [weak self] _ in
-            weak var viewController = self?.uiViewController
+            weak var viewController = self?.tabController
             selected.sync {
                 viewController?.selectedIndex($0)
             }
@@ -280,7 +277,7 @@ public extension UICTabCreator {
 
     func selectedItem<Enum: RawRepresentable>(_ selected: Relay<Enum>) -> Self where Enum.RawValue == Int {
         self.onInTheScene { [weak self] _ in
-            weak var viewController = self?.uiViewController
+            weak var viewController = self?.tabController
             selected.sync {
                 viewController?.selectedIndex($0.rawValue)
             }
@@ -309,7 +306,17 @@ public extension UITabBarController {
 
 public extension UIView {
     var tabBarItem: UITabBarItem? {
-        get { self.viewController.tabBarItem }
-        set { self.viewController.tabBarItem = newValue }
+        get {
+            ViewControllerSearch(
+                self,
+                searchFor: UITabBarController.self
+            ).viewNearFromSearch?.tabBarItem
+        }
+        set {
+            ViewControllerSearch(
+                self,
+                searchFor: UITabBarController.self
+            ).viewNearFromSearch?.tabBarItem = newValue
+        }
     }
 }
