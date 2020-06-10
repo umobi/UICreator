@@ -84,7 +84,7 @@ extension UICCollectionView: UICollectionViewDataSource {
             Fatal.unexpectedRow(indexPath).die()
         }
 
-        cell.prepareCell(row)
+        cell.prepareCell(row, axis: .horizontal)
 
         guard
             let item = self.layoutManager?
@@ -138,7 +138,7 @@ extension UICCollectionView: UICollectionViewDataSource {
                 Fatal.unexpectedHeader(indexPath).die()
             }
 
-            cell.prepareCell(header)
+            cell.prepareCell(header, axis: .center)
 
             guard
                 let item = self.layoutManager?
@@ -182,7 +182,7 @@ extension UICCollectionView: UICollectionViewDataSource {
                 Fatal.unexpectedFooter(indexPath).die()
             }
 
-            cell.prepareCell(footer)
+            cell.prepareCell(footer, axis: .horizontal)
 
             guard
                 let item = self.layoutManager?.footer(at: indexPath.section),
