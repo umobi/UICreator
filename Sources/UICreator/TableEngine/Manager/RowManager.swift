@@ -118,6 +118,13 @@ extension ListManager.RowManager {
         let leadingActions: (() -> [RowAction])?
         let accessoryType: UITableViewCell.AccessoryType
         let estimatedHeight: CGFloat?
+        let contentType: ContentType
+
+        enum ContentType {
+            case header
+            case footer
+            case row
+        }
 
         init(header: UICHeader) {
             self.content = header.content
@@ -125,6 +132,7 @@ extension ListManager.RowManager {
             self.leadingActions = nil
             self.accessoryType = .none
             self.estimatedHeight = header.height
+            self.contentType = .header
         }
 
         init(footer: UICFooter) {
@@ -133,6 +141,7 @@ extension ListManager.RowManager {
             self.leadingActions = nil
             self.accessoryType = .none
             self.estimatedHeight = nil
+            self.contentType = .footer
         }
 
         init(row: UICRow) {
@@ -141,6 +150,7 @@ extension ListManager.RowManager {
             self.leadingActions = row.leadingActions
             self.accessoryType = row.accessoryType
             self.estimatedHeight = nil
+            self.contentType = .row
         }
 
         var asRowManager: ListManager.RowManager {

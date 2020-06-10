@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-internal class TableViewHeaderFooterCell: UITableViewHeaderFooterView, ReusableView {
+internal class TableViewHeaderFooterCell: UITableViewHeaderFooterView, ReusableView, TableCellType {
     var cellLoaded: UICCell.Loaded!
 
     override init(reuseIdentifier: String?) {

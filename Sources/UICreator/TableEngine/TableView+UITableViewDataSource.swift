@@ -50,7 +50,7 @@ extension UICTableView: UITableViewDataSource {
             Fatal.Builder("UICList can't dequeue cell for indexPath at \(indexPath)").die()
         }
 
-        cell.prepareCell(row)
+        cell.prepareCell(row, axis: .horizontal)
         self.commitCell(cell)
 
         self.appendReusable(cell: cell)

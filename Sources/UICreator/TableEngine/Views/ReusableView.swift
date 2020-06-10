@@ -22,12 +22,34 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
+
+enum ReusableViewAxis {
+    case vertical
+    case horizontal
+    case center
+}
+
+private var kReusableAxis = 0
+private var kReusableUpdateBatch = 0
+
+private extension UIView {
+    var reusableAxis: ReusableViewAxis? {
+        get { objc_getAssociatedObject(self, &kReusableAxis) as? ReusableViewAxis }
+        set { objc_setAssociatedObject(self, &kReusableAxis, newValue, .OBJC_ASSOCIATION_COPY) }
+    }
+
+    var reusableUpdateBatch: ((UIView) -> Void)? {
+        get { objc_getAssociatedObject(self, &kReusableUpdateBatch) as? (UIView) -> Void }
+        set { objc_setAssociatedObject(self, &kReusableUpdateBatch, newValue, .OBJC_ASSOCIATION_COPY) }
+    }
+}
 
 protocol ReusableView: class {
     var hostedView: ViewCreator! { get }
     var contentView: UIView { get }
 
-    func prepareCell(_ cell: UICCell)
+    func prepareCell(_ cell: UICCell, axis: ReusableViewAxis)
 
     var cellLoaded: UICCell.Loaded! { get set }
 }
@@ -68,18 +90,112 @@ extension ReusableView {
 //        self.contentView.add(priority: .init(500), hosted.releaseUIView())
 //    }
 
-     func addView() {
-           guard let cellLoaded = self.cellLoaded else {
-               return
-           }
+    func addView(_ axis: ReusableViewAxis) {
+        guard let cellLoaded = self.cellLoaded else {
+            return
+        }
 
-           self.contentView.subviews.forEach {
-               $0.removeFromSuperview()
-           }
+        self.contentView.subviews.forEach {
+            $0.removeFromSuperview()
+        }
 
-           let host = cellLoaded.cell.rowManager.payload.content()
-           self.hostedView = host
-           self.contentView.add(priority: .init(500), host.releaseUIView())
+        let host = cellLoaded.cell.rowManager.payload.content()
+        self.hostedView = host
+
+        let hostedView: UIView! = host.releaseUIView()
+
+        if hostedView.reusableAxis != axis {
+            hostedView.reusableAxis = axis
+            hostedView.reusableUpdateBatch = {
+                guard
+                    let reusableView = sequence(first: $0, next: { $0.superview })
+                        .first(where: { $0 is ReusableView })
+                        as? ReusableView & UIView,
+                    let collectionView = sequence(first: reusableView.contentView, next: { $0.superview })
+                        .first(where: { $0 is TableCellType || $0 is CollectionCellType })
+                else {
+                    return
+                }
+
+                switch collectionView {
+                case is TableCellType:
+                    guard
+                        let tableView = sequence(first: collectionView, next: { $0.superview })
+                            .first(where: { $0 is UITableView }) as? UITableView
+                    else { return }
+
+                    tableView.beginUpdates()
+
+                    let rowManager = reusableView.cellLoaded.cell.rowManager
+                    let cellType = rowManager.payload.contentType
+                    let indexPath = rowManager.indexPath
+                    switch cellType {
+                    case .footer:
+                        let sizeCache = tableView.sizeManager.footer(at: indexPath.section) ?? .headerFooter(indexPath.section)
+                        tableView.sizeManager.updateFooter(sizeCache.height($0.frame.height))
+                    case .header:
+                        let sizeCache = tableView.sizeManager.header(at: indexPath.section) ?? .headerFooter(indexPath.section)
+                        tableView.sizeManager.updateHeader(sizeCache.height($0.frame.height))
+                    case .row:
+                        let sizeCache = tableView.sizeManager.row(at: indexPath) ?? .cell(indexPath)
+                        tableView.sizeManager.updateRow(sizeCache.height($0.frame.height))
+                    }
+
+                    tableView.endUpdates()
+                case is CollectionCellType:
+                    guard
+                        let collectionView = sequence(first: collectionView, next: { $0.superview })
+                            .first(where: { $0 is UICollectionView }) as? UICollectionView
+                    else { return }
+
+                    // TO-DO: CollectionView layout
+                default:
+                    return
+                }
+            }
+
+            hostedView.onLayout {
+                $0.reusableUpdateBatch?($0)
+            }
+        }
+
+        UIView.CBSubview(self.contentView).addSubview(hostedView)
+        switch axis {
+        case .center:
+            Constraintable.activate(
+                hostedView.cbuild
+                    .center
+                    .equalTo(self.contentView)
+                    .priority(.init(500))
+            )
+
+        case .horizontal:
+            Constraintable.activate(
+                hostedView.cbuild
+                    .centerY
+                    .equalTo(self.contentView.cbuild.centerY)
+                    .priority(.init(500)),
+
+                hostedView.cbuild
+                    .leading
+                    .trailing
+                    .equalTo(self.contentView)
+                    .priority(.init(500))
+            )
+        case .vertical:
+            Constraintable.activate(
+                hostedView.cbuild
+                    .centerX
+                    .equalTo(self.contentView.cbuild.centerX)
+                    .priority(.init(500)),
+
+                hostedView.cbuild
+                    .top
+                    .bottom
+                    .equalTo(self.contentView)
+                    .priority(.init(500))
+            )
+        }
     }
 
 //    func newReusableCell(_ cell: UICCell) {
@@ -109,10 +225,10 @@ extension ReusableView {
 //        }
 //    }
 
-    func reuseCell(_ cell: UICCell) {
+    func reuseCell(_ cell: UICCell, axis: ReusableViewAxis) {
         if self.cellLoaded == nil {
             self.cellLoaded = cell.load
-            self.addView()
+            self.addView(axis)
             return
         }
 
@@ -121,10 +237,18 @@ extension ReusableView {
         }
 
         self.cellLoaded = cell.load
-        self.addView()
+        self.addView(axis)
     }
 
-    func prepareCell(_ cell: UICCell) {
-        self.reuseCell(cell)
+    func prepareCell(_ cell: UICCell, axis: ReusableViewAxis) {
+        self.reuseCell(cell, axis: axis)
     }
+}
+
+protocol TableCellType {
+
+}
+
+protocol CollectionCellType {
+
 }

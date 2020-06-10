@@ -73,6 +73,11 @@ internal class UICTableView: UITableView {
         super.traitCollectionDidChange(previousTraitCollection)
         RenderManager(self)?.traitDidChange()
     }
+
+    override func reloadData() {
+        self.sizeManager.remove()
+        super.reloadData()
+    }
 }
 
 extension UITableView {
