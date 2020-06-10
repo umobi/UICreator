@@ -48,7 +48,11 @@ public class UIViewWrapper {
     }
 
     public var safe: UIView! {
-        if let maker = self.wrap as? UIViewMaker {
+        if let maker = self.wrap as? ViewRepresentable {
+            return maker.wrapper
+        }
+
+        if let maker = self.wrap as? ViewControllerRepresentable {
             return maker.wrapper
         }
 

@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 
 /// RootView is an internal view that is used to be the UIView of some view creator to support lazy loads.
-public class RootView: UIView {
+public class RootView: UIView, ViewCreatorNoLayoutConstraints {
     var willCommitNotRenderedHandler: (() -> Void)?
     var didCommitNotRenderedHandler: (() -> Void)?
 

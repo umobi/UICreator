@@ -24,50 +24,40 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICTabCreator<TabController: UITabBarController>: ViewCreator {
+public protocol UICTabExtendable {
+    func makeTabController(_ viewControllers: [UIViewController]) -> UITabBarController
+}
 
-    private lazy var _tabBarController: TabController? = {
-        return .init()
-    }()
-
-    private weak var tabBarController: TabController! {
-        willSet {
-            self._tabBarController = nil
-        }
-    }
-
-    var tabController: TabController! {
-        return self._tabBarController ?? self.tabBarController
-    }
+open class UICTab: UIViewControllerCreator {
+    public typealias ViewController = UITabBarController
 
     public init(_ contents: @escaping () -> [UICTabItem]) {
-        self.loadView { [unowned self] in
-            let view = UICTabContainer.init(builder: self)
-
-            self.tabController.viewControllers = contents().map { item in
-                let controller = UICHostingController(content: item.content)
-                controller.tabBarItem = item.tabItem
-                return controller
-            }
-
-            view.setContent { [unowned self] in
-                let tabBarController = self._tabBarController!
-                self.tabBarController = tabBarController
-                return tabBarController
-            }
-
-            return view
+        let viewControllers: [UIViewController] = contents().map {
+            let controller = UICHostingController(content: $0.content)
+            controller.tabBarItem = $0.tabItem
+            return controller
         }
+
+        if let extendable = self as? UICTabExtendable {
+            self.setViewController(extendable.makeTabController(viewControllers))
+            return
+        }
+
+        self.setViewController({
+            let tabController = UITabBarController()
+            tabController.viewControllers = viewControllers
+            return tabController
+        }())
     }
 }
 
-public typealias UICTab = UICTabCreator<UITabBarController>
-
 public extension UICTab {
-    typealias Other<TabController: UITabBarController> = UICTabCreator<TabController>
+    var tabController: UITabBarController! {
+        (self.uiView as? View)?.adaptedViewController as? ViewController
+    }
 }
 
-public extension UICTabCreator {
+public extension UICTab {
     func tabBar(backgroundImage image: UIImage?) -> Self {
         self.onRendered { [unowned self] _ in
             self.tabController.tabBar.backgroundImage = image
@@ -275,24 +265,58 @@ public extension ViewCreator {
     }
 }
 
-public extension UICTabCreator {
+public extension UICTab {
     func selectedItem(_ selected: Relay<Int>) -> Self {
-        self.onInTheScene {
-            weak var view = $0 as? UICTabContainer
-
+        self.onInTheScene { [weak self] _ in
+            weak var viewController = self?.tabController
             selected.sync {
-                view?.tabBarController.selectedIndex($0)
+                viewController?.selectedIndex($0)
             }
         }
     }
 
     func selectedItem<Enum: RawRepresentable>(_ selected: Relay<Enum>) -> Self where Enum.RawValue == Int {
-        self.onInTheScene {
-            weak var view = $0 as? UICTabContainer
-
+        self.onInTheScene { [weak self] _ in
+            weak var viewController = self?.tabController
             selected.sync {
-                view?.tabBarController.selectedIndex($0.rawValue)
+                viewController?.selectedIndex($0.rawValue)
             }
+        }
+    }
+}
+
+public extension UITabBarController {
+    func selectedIndex(_ index: Int) {
+        guard index != self.selectedIndex else {
+            return
+        }
+
+        guard let view = self.viewControllers?[index] else {
+            return
+        }
+
+        guard self.delegate?.tabBarController?(self, shouldSelect: view) ?? true else {
+            return
+        }
+
+        self.selectedViewController = view
+        self.delegate?.tabBarController?(self, didSelect: view)
+    }
+}
+
+public extension UIView {
+    var tabBarItem: UITabBarItem? {
+        get {
+            ViewControllerSearch(
+                self,
+                searchFor: UITabBarController.self
+            ).viewNearFromSearch?.tabBarItem
+        }
+        set {
+            ViewControllerSearch(
+                self,
+                searchFor: UITabBarController.self
+            ).viewNearFromSearch?.tabBarItem = newValue
         }
     }
 }

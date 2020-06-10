@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-internal class TableViewCell: UITableViewCell, ReusableView {
+internal class TableViewCell: UITableViewCell, ReusableView, TableCellType {
     var cellLoaded: UICCell.Loaded!
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -78,8 +78,8 @@ internal class TableViewCell: UITableViewCell, ReusableView {
         RenderManager(self)?.traitDidChange()
     }
 
-    func prepareCell(_ cell: UICCell) {
-        self.reuseCell(cell)
+    func prepareCell(_ cell: UICCell, axis: ReusableViewAxis) {
+        self.reuseCell(cell, axis: axis)
 
         self.accessoryType = cell.rowManager.payload.accessoryType
     }

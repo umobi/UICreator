@@ -37,7 +37,7 @@ extension UICTableView: UITableViewDelegate {
             Fatal.Builder("UICList can't dequeue header for section at \(section)").die()
         }
 
-        cell.prepareCell(header)
+        cell.prepareCell(header, axis: .horizontal)
         return cell
     }
 
@@ -53,7 +53,7 @@ extension UICTableView: UITableViewDelegate {
             Fatal.Builder("UICList can't dequeue footer for section at \(section)").die()
         }
 
-        cell.prepareCell(footer)
+        cell.prepareCell(footer, axis: .horizontal)
         return cell
     }
 
@@ -128,7 +128,7 @@ extension UICTableView {
             return .zero
         }
 
-        return tableView.sectionHeaderHeight
+        return tableView.sizeManager.header(at: section)?.size.height ?? tableView.sectionHeaderHeight
     }
 
     public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
@@ -136,7 +136,7 @@ extension UICTableView {
             return .zero
         }
 
-        return tableView.sectionFooterHeight
+        return tableView.sizeManager.footer(at: section)?.size.height ?? tableView.sectionFooterHeight
     }
 
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -144,32 +144,210 @@ extension UICTableView {
             return .zero
         }
 
-        return tableView.rowHeight
+        return tableView.sizeManager.row(at: indexPath)?.size.height ?? tableView.rowHeight
     }
 }
 
-extension UICTableView {
-    public func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
-        guard let header = self.manager?.header(at: section) else {
-            return .zero
+struct ReusableHeight {
+    let reusableView: ReusableView
+
+    init?(_ view: UIView?) {
+        guard let reusableView = view as? ReusableView else {
+            return nil
         }
 
-        return header.rowManager.payload.estimatedHeight ?? 1
+        self.reusableView = reusableView
     }
 
-    public func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection section: Int) -> CGFloat {
-        guard let footer = self.manager?.footer(at: section) else {
-            return .zero
-        }
+    var height: CGFloat {
+        self.reusableView.hostedView.uiView?.frame.height ?? .zero
+    }
+}
 
-        return footer.rowManager.payload.estimatedHeight ?? 1
+struct SizeCache {
+    enum ContentType {
+        case cell(IndexPath)
+        case headerFooter(Int)
     }
 
-    public func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard let row = self.manager?.row(at: indexPath) else {
-            return .zero
+    let contentType: ContentType
+    let size: CGSize
+
+    private init(_ contentType: ContentType, size: CGSize) {
+        self.contentType = contentType
+        self.size = size
+    }
+
+    func height(_ constant: CGFloat) -> SizeCache {
+        .init(self.contentType, size: .init(width: self.size.width, height: constant))
+    }
+
+    func width(_ constant: CGFloat) -> SizeCache {
+        .init(self.contentType, size: .init(width: constant, height: self.size.height))
+    }
+
+    static func cell(_ indexPath: IndexPath) -> SizeCache {
+        .init(.cell(indexPath), size: .zero)
+    }
+
+    static func headerFooter(_ section: Int) -> SizeCache {
+        .init(.headerFooter(section), size: .zero)
+    }
+}
+
+private var kTableSizeManager = 0
+
+extension UITableView {
+    var sizeManager: CollectionOfSizes {
+        OBJCSet(
+            self,
+            &kTableSizeManager,
+            orLoad: {
+                .init()
+            }
+        )
+    }
+}
+
+extension CGFloat {
+    func ifZero(_ constant: CGFloat) -> CGFloat {
+        self == .zero ? constant : self
+    }
+}
+
+struct CollectionOfSizes {
+    private let headers: Mutable<[SizeCache]> = .init(value: [])
+    private let footers: Mutable<[SizeCache]> = .init(value: [])
+    private let rows: Mutable<[Int: [SizeCache]]> = .init(value: [:])
+
+    init() {}
+
+    func header(at section: Int) -> SizeCache? {
+        guard self.headers.value.count > section else {
+            return nil
         }
 
-        return row.rowManager.payload.estimatedHeight ?? tableView.estimatedRowHeight
+        let header = self.headers.value[section]
+        guard
+            case .headerFooter(let section) = header.contentType,
+            section == section
+        else { return nil }
+
+        return header
+    }
+
+    func footer(at section: Int) -> SizeCache? {
+        guard self.footers.value.count > section else {
+            return nil
+        }
+
+        let footer = self.footers.value[section]
+        guard
+            case .headerFooter(let section) = footer.contentType,
+            section == section
+        else { return nil }
+
+        return footer
+    }
+
+    func row(at indexPath: IndexPath) -> SizeCache? {
+        guard
+            let rows = self.rows.value[indexPath.section],
+            rows.count > indexPath.row
+        else {
+            return nil
+        }
+
+        let row = rows[indexPath.row]
+        guard
+            case .cell(let indexPath) = row.contentType,
+            indexPath.row == indexPath.row
+        else { return nil }
+
+        return row
+    }
+
+    func updateRow(_ sizeCache: SizeCache) {
+        guard case .cell(let indexPath) = sizeCache.contentType else {
+            return
+        }
+
+        guard var rows = self.rows.value[indexPath.section] else {
+            self.rows.value[indexPath.section] = [sizeCache]
+            return
+        }
+
+        if rows.count <= indexPath.row {
+            self.rows.value[indexPath.section] = rows + [sizeCache]
+            return
+        }
+
+        guard case .cell(let otherIndexPath) = rows[indexPath.row].contentType else {
+            fatalError()
+        }
+
+        if otherIndexPath.row == indexPath.row {
+            rows[indexPath.row] = sizeCache
+            self.rows.value[indexPath.section] = rows
+            return
+        }
+
+        self.rows.value[indexPath.section] = rows[0..<indexPath.row] +
+            [sizeCache] +
+            rows[indexPath.row..<rows.count]
+    }
+
+    func updateHeader(_ sizeCache: SizeCache) {
+        guard case .headerFooter(let section) = sizeCache.contentType else {
+            return
+        }
+
+        if self.headers.value.count <= section {
+            self.headers.value = self.headers.value + [sizeCache]
+            return
+        }
+
+        guard case .headerFooter(let otherSection) = self.headers.value[section].contentType else {
+            fatalError()
+        }
+
+        if otherSection == section {
+            self.headers.value[section] = sizeCache
+            return
+        }
+
+        self.headers.value = self.headers.value[0..<section] +
+            [sizeCache] +
+            self.headers.value[section..<self.headers.value.count]
+    }
+
+    func updateFooter(_ sizeCache: SizeCache) {
+        guard case .headerFooter(let section) = sizeCache.contentType else {
+            return
+        }
+
+        if self.footers.value.count <= section {
+            self.footers.value = self.footers.value + [sizeCache]
+            return
+        }
+
+        guard case .headerFooter(let otherSection) = self.footers.value[section].contentType else {
+            fatalError()
+        }
+
+        if otherSection == section {
+            self.footers.value[section] = sizeCache
+            return
+        }
+
+        self.footers.value = self.footers.value[0..<section] +
+            [sizeCache] +
+            self.footers.value[section..<self.footers.value.count]
+    }
+
+    func remove() {
+        self.footers.value = []
+        self.headers.value = []
+        self.rows.value = [:]
     }
 }

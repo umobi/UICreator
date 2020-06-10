@@ -23,26 +23,119 @@
 import Foundation
 import UIKit
 
-public class UICNavigation: NavigationRepresentable {
+public class ViewControllerAdaptor: UIView, ViewCreatorNoLayoutConstraints {
+    weak var adaptedViewController: UIViewController!
 
-    public var navigationLoader: (UIViewController) -> UINavigationController {
-        return {
-            return .init(rootViewController: $0)
+    override open func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
+        RenderManager(self.adaptedViewController?.view)?.willMove(toSuperview: self)
+    }
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
+            RenderManager(self.adaptedViewController?.view)?.isHidden(newValue)
         }
     }
 
-    public init(_ content: @escaping () -> ViewCreator) {
-        self.content = .init(content)
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
+            RenderManager(self.adaptedViewController?.view)?.frame(self.adaptedViewController.view.frame)
+        }
+    }
+
+    override open func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
+        RenderManager(self.adaptedViewController?.view)?.didMoveToSuperview()
+    }
+
+    override open func didMoveToWindow() {
+        super.didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
+        RenderManager(self.adaptedViewController?.view)?.didMoveToWindow()
+    }
+
+    override open func layoutSubviews() {
+        super.layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
+        RenderManager(self.adaptedViewController?.view)?.layoutSubviews()
+    }
+
+    override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self.adaptedViewController?.view)?.traitDidChange()
     }
 }
 
-public extension UICNavigation {
-    class Other<NavigationController: UINavigationController>: UICNavigation {
-        override public var navigationLoader: (UIViewController) -> UINavigationController {
-            return {
-                return NavigationController(rootViewController: $0)
-            }
+private var kViewControllerAdaptor = 0
+public protocol ViewControllerCreator: ViewCreator {}
+
+extension ViewControllerCreator {
+    var weakViewControllerAdaptor: ViewControllerAdaptor! {
+        get {
+            (objc_getAssociatedObject(
+                self,
+                &kViewControllerAdaptor
+            ) as? ViewAdaptor.Weak<ViewControllerAdaptor>)?.object
         }
+
+        set {
+            objc_setAssociatedObject(
+                self,
+                &kViewControllerAdaptor,
+                ViewAdaptor.Weak(object: newValue),
+                .OBJC_ASSOCIATION_COPY
+            )
+        }
+    }
+}
+
+public protocol UIViewControllerCreator: UIViewCreator, ViewControllerCreator where View == ViewControllerAdaptor {
+    associatedtype ViewController: UIViewController
+}
+
+extension UIViewControllerCreator {
+
+    func setViewController(_ viewController: ViewController) {
+        let viewAdaptor = ViewControllerAdaptor(builder: self)
+        self.weakViewControllerAdaptor = viewAdaptor
+        self.loadView {
+            return viewAdaptor
+        }
+        .onNotRendered {
+            ($0 as? View)?.adaptedViewController = viewController
+        }
+        .onInTheScene {
+            $0.viewController.addChild(viewController)
+            $0.add(priority: .required, viewController.view)
+            viewController.didMove(toParent: $0.viewController)
+        }
+    }
+}
+
+public protocol UICNavigationExtendable {
+    func makeNavigationController(_ rootViewController: UIViewController) -> UINavigationController
+}
+
+open class UICNavigation: UIViewControllerCreator, NavigationRepresentable {
+    public typealias ViewController = UINavigationController
+
+    public init(_ content: @escaping () -> ViewCreator) {
+        let viewController = UICHostingController(content: content)
+
+        if let extended = self as? UICNavigationExtendable {
+            self.setViewController(extended.makeNavigationController(viewController))
+            return
+        }
+
+        self.setViewController(UINavigationController(rootViewController: viewController))
     }
 }
 
@@ -100,12 +193,44 @@ public extension ViewCreator {
     }
 
     var navigationItem: UINavigationItem! {
-        return self.viewController?.navigationItem
+        return self.uiView?.navigationItem
     }
 }
 
 public extension UIView {
     var navigationItem: UINavigationItem! {
-        return self.viewController?.navigationItem
+        return ViewControllerSearch(
+            self,
+            searchFor: UINavigationController.self
+        ).viewNearFromSearch?.navigationItem
+    }
+}
+
+struct ViewControllerSearch<ViewController: UIViewController> {
+    weak var view: UIView!
+
+    init(_ view: UIView, searchFor type: ViewController.Type) {
+        self.view = view
+    }
+
+    var viewNearFromSearch: UIViewController? {
+        let responders = sequence(
+            first: self.view! as UIResponder,
+            next: { $0.next }
+        )
+
+        var viewNearFromNavigation: UIViewController? = nil
+
+        for responder in responders {
+            if responder is ViewController {
+                return viewNearFromNavigation
+            }
+
+            if let viewController = responder as? UIViewController {
+                viewNearFromNavigation = viewController
+            }
+        }
+
+        return viewNearFromNavigation
     }
 }

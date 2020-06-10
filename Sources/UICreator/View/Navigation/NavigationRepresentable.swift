@@ -23,11 +23,7 @@
 import Foundation
 import UIKit
 
-public protocol NavigationRepresentable: UICView {
-    var navigationLoader: (UIViewController) -> UINavigationController { get }
-    var navigationBar: UINavigationBar { get }
-
-//    init(_ content: @escaping () -> ViewCreator)
+public protocol NavigationRepresentable: ViewControllerCreator {
 
     @discardableResult
     func push(animated: Bool, content: @escaping () -> ViewCreator) -> Self
@@ -43,20 +39,6 @@ public protocol NavigationRepresentable: UICView {
 
     @discardableResult
     func popTo(view: ViewCreator, animated: Bool) -> Self
-}
-
-typealias ViewCreatorHandler = () -> ViewCreator
-
-private extension UIView {
-    var lowerNavigationController: UINavigationController? {
-        if self.next is UINavigationController {
-            return self.next as? UINavigationController
-        }
-
-        return self.subviews.first(where: {
-            $0.lowerNavigationController != nil
-        })?.lowerNavigationController
-    }
 }
 
 func OBJCSet<Object>(
@@ -85,40 +67,18 @@ public struct NavigationModifier {
     }
 }
 
-private var kContentHandler: UInt = 0
 public extension NavigationRepresentable {
-    internal var navigationController: UINavigationController! {
-        return self.uiView.lowerNavigationController
+    var navigationController: UINavigationController! {
+        self.weakViewControllerAdaptor?.adaptedViewController as? UINavigationController
     }
+}
+
+public extension NavigationRepresentable {
 
     var navigationBar: UINavigationBar {
         return self.navigationController.navigationBar
     }
-
-    private var contentMutable: Mutable<ViewCreatorHandler?> {
-        OBJCSet(self, &kContentHandler) {
-            .init(value: nil)
-        }
-    }
-
-    internal var content: ViewCreatorHandler? {
-        get { self.contentMutable.value }
-        set { self.contentMutable.value = newValue }
-    }
-
-    var body: ViewCreator {
-        UICContainer { [unowned self] in
-            guard let content = self.content else {
-                Fatal.Builder(
-                    "NavigationRepresentable couldn't load content. Maybe it may have been already loaded"
-                ).die()
-            }
-
-            self.content = nil
-            return self.navigationLoader(UICHostingController(content: content))
-        }
-    }
-
+    
     @discardableResult
     func push(animated: Bool, content: @escaping () -> ViewCreator) -> Self {
         self.navigationController.pushViewController(UICHostingController(content: content), animated: animated)
