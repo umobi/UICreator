@@ -124,24 +124,26 @@ extension ReusableView {
                             .first(where: { $0 is UITableView }) as? UITableView
                     else { return }
 
-                    tableView.beginUpdates()
+                    tableView.itemHeightUpdate(
+                        $0,
+                        rowManager: reusableView.cellLoaded.cell.rowManager
+                    )
 
-                    let rowManager = reusableView.cellLoaded.cell.rowManager
-                    let cellType = rowManager.payload.contentType
-                    let indexPath = rowManager.indexPath
-                    switch cellType {
-                    case .footer:
-                        let sizeCache = tableView.sizeManager.footer(at: indexPath.section) ?? .headerFooter(indexPath.section)
-                        tableView.sizeManager.updateFooter(sizeCache.height($0.frame.height))
-                    case .header:
-                        let sizeCache = tableView.sizeManager.header(at: indexPath.section) ?? .headerFooter(indexPath.section)
-                        tableView.sizeManager.updateHeader(sizeCache.height($0.frame.height))
-                    case .row:
-                        let sizeCache = tableView.sizeManager.row(at: indexPath) ?? .cell(indexPath)
-                        tableView.sizeManager.updateRow(sizeCache.height($0.frame.height))
+                    if #available(iOS 11, tvOS 11, *) {
+                        tableView.addUniqueCallback {
+                            UIView.performWithoutAnimation {
+                                tableView.performBatchUpdates(nil, completion: nil)
+                            }
+                        }
+                        return
                     }
 
-                    tableView.endUpdates()
+                    tableView.addUniqueCallback {
+                        UIView.performWithoutAnimation {
+                            tableView.beginUpdates()
+                            tableView.endUpdates()
+                        }
+                    }
                 case is CollectionCellType:
                     guard
                         let collectionView = sequence(first: collectionView, next: { $0.superview })
@@ -251,4 +253,44 @@ protocol TableCellType {
 
 protocol CollectionCellType {
 
+}
+
+var kTableViewCallbackIsPending = 0
+extension UITableView {
+    func itemHeightUpdate(_ view: UIView, rowManager: ListManager.RowManager) {
+        let cellType = rowManager.payload.contentType
+        let indexPath = rowManager.indexPath
+        switch cellType {
+        case .footer:
+            let sizeCache = self.sizeManager.footer(at: indexPath.section) ?? .headerFooter(indexPath.section)
+            self.sizeManager.updateFooter(sizeCache.height(view.frame.height))
+        case .header:
+            let sizeCache = self.sizeManager.header(at: indexPath.section) ?? .headerFooter(indexPath.section)
+            self.sizeManager.updateHeader(sizeCache.height(view.frame.height))
+        case .row:
+            print("Reloading", indexPath)
+            let sizeCache = self.sizeManager.row(at: indexPath) ?? .cell(indexPath)
+            self.sizeManager.updateRow(sizeCache.height(view.frame.height))
+        }
+    }
+
+    var callbackIsPending: Mutable<Bool> {
+        OBJCSet(
+            self,
+            &kTableViewCallbackIsPending,
+            orLoad: { .init(value: false) }
+        )
+    }
+
+    func addUniqueCallback(_ callback: @escaping () -> Void) {
+        if self.callbackIsPending.value {
+            return
+        }
+
+        self.callbackIsPending.value = true
+        OperationQueue.main.addOperation {
+            self.callbackIsPending.value = false
+            callback()
+        }
+    }
 }

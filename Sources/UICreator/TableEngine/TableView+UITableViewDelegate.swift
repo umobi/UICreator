@@ -124,27 +124,56 @@ extension UICTableView: UITableViewDelegate {
 
 extension UICTableView {
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        guard self.manager?.header(at: section) != nil else {
-            return .zero
-        }
-
-        return tableView.sizeManager.header(at: section)?.size.height ?? tableView.sectionHeaderHeight
+        tableView.heightForHeader(in: section) ?? tableView.sectionHeaderHeight
     }
 
     public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        guard self.manager?.footer(at: section) != nil else {
-            return .zero
-        }
-
-        return tableView.sizeManager.footer(at: section)?.size.height ?? tableView.sectionFooterHeight
+        tableView.heightForFooter(in: section) ?? tableView.sectionFooterHeight
     }
 
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard self.manager?.row(at: indexPath) != nil else {
-            return .zero
+        tableView.heightForRow(at: indexPath) ?? tableView.rowHeight
+    }
+}
+
+extension UICTableView {
+
+    public func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
+        tableView.heightForHeader(in: section) ?? tableView.estimatedSectionHeaderHeight
+    }
+
+    public func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection section: Int) -> CGFloat {
+        tableView.heightForFooter(in: section) ?? tableView.estimatedSectionFooterHeight
+    }
+
+    public func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        tableView.heightForRow(at: indexPath) ?? tableView.estimatedRowHeight
+    }
+}
+
+extension UITableView {
+    func heightForHeader(in section: Int) -> CGFloat? {
+        guard self.manager?.header(at: section) != nil else {
+            return nil
         }
 
-        return tableView.sizeManager.row(at: indexPath)?.size.height ?? tableView.rowHeight
+        return self.sizeManager.header(at: section)?.size.height
+    }
+
+    func heightForFooter(in section: Int) -> CGFloat? {
+        guard self.manager?.footer(at: section) != nil else {
+            return nil
+        }
+
+        return self.sizeManager.footer(at: section)?.size.height
+    }
+
+    func heightForRow(at indexPath: IndexPath) -> CGFloat? {
+        guard self.manager?.row(at: indexPath) != nil else {
+            return nil
+        }
+
+        return self.sizeManager.row(at: indexPath)?.size.height
     }
 }
 
@@ -227,8 +256,14 @@ struct CollectionOfSizes {
             return nil
         }
 
-        let header = self.headers.value[section]
         guard
+            let header = self.headers.value.binarySearch({
+                guard case .headerFooter(let searchSection) = $0.contentType else {
+                    fatalError()
+                }
+
+                return searchSection.compare(section)
+            }),
             case .headerFooter(let section) = header.contentType,
             section == section
         else { return nil }
@@ -241,8 +276,15 @@ struct CollectionOfSizes {
             return nil
         }
 
-        let footer = self.footers.value[section]
+
         guard
+            let footer = self.footers.value.binarySearch({
+                guard case .headerFooter(let searchSection) = $0.contentType else {
+                    fatalError()
+                }
+
+                return searchSection.compare(section)
+            }),
             case .headerFooter(let section) = footer.contentType,
             section == section
         else { return nil }
@@ -251,18 +293,24 @@ struct CollectionOfSizes {
     }
 
     func row(at indexPath: IndexPath) -> SizeCache? {
-        guard
-            let rows = self.rows.value[indexPath.section],
-            rows.count > indexPath.row
-        else {
+        guard let rows = self.rows.value[indexPath.section] else {
             return nil
         }
 
-        let row = rows[indexPath.row]
         guard
+            let row = rows.binarySearch({
+                guard case .cell(let searchIndexPath) = $0.contentType else {
+                    fatalError()
+                }
+
+                return searchIndexPath.compare(indexPath)
+            }),
             case .cell(let indexPath) = row.contentType,
             indexPath.row == indexPath.row
-        else { return nil }
+        else {
+            return nil
+
+        }
 
         return row
     }
@@ -277,24 +325,23 @@ struct CollectionOfSizes {
             return
         }
 
-        if rows.count <= indexPath.row {
-            self.rows.value[indexPath.section] = rows + [sizeCache]
+        let index = rows.binaryInsert {
+            $0.contentType.compare(sizeCache.contentType)
+        }
+
+        if index == rows.count {
+            self.rows.value[indexPath.section]  = rows + [sizeCache]
             return
         }
 
-        guard case .cell(let otherIndexPath) = rows[indexPath.row].contentType else {
-            fatalError()
-        }
-
-        if otherIndexPath.row == indexPath.row {
-            rows[indexPath.row] = sizeCache
+        if case .cell(let searchIndexPath) = rows[index].contentType, searchIndexPath.row == indexPath.row {
+            rows[index] = sizeCache
             self.rows.value[indexPath.section] = rows
             return
         }
 
-        self.rows.value[indexPath.section] = rows[0..<indexPath.row] +
-            [sizeCache] +
-            rows[indexPath.row..<rows.count]
+        rows.insert(sizeCache, at: index)
+        self.rows.value[indexPath.section] = rows
     }
 
     func updateHeader(_ sizeCache: SizeCache) {
@@ -302,23 +349,21 @@ struct CollectionOfSizes {
             return
         }
 
-        if self.headers.value.count <= section {
-            self.headers.value = self.headers.value + [sizeCache]
+        let index = self.headers.value.binaryInsert {
+            $0.contentType.compare(sizeCache.contentType)
+        }
+
+        if index == self.headers.value.count {
+            self.headers.value.append(sizeCache)
             return
         }
 
-        guard case .headerFooter(let otherSection) = self.headers.value[section].contentType else {
-            fatalError()
-        }
-
-        if otherSection == section {
-            self.headers.value[section] = sizeCache
+        if case .headerFooter(let searchSection) = self.headers.value[index].contentType, searchSection == section {
+            self.headers.value[index] = sizeCache
             return
         }
 
-        self.headers.value = self.headers.value[0..<section] +
-            [sizeCache] +
-            self.headers.value[section..<self.headers.value.count]
+        self.headers.value.insert(sizeCache, at: index)
     }
 
     func updateFooter(_ sizeCache: SizeCache) {
@@ -326,28 +371,133 @@ struct CollectionOfSizes {
             return
         }
 
-        if self.footers.value.count <= section {
-            self.footers.value = self.footers.value + [sizeCache]
+        let index = self.footers.value.binaryInsert {
+            $0.contentType.compare(sizeCache.contentType)
+        }
+
+        if index == self.footers.value.count {
+            self.footers.value.append(sizeCache)
             return
         }
 
-        guard case .headerFooter(let otherSection) = self.footers.value[section].contentType else {
-            fatalError()
-        }
-
-        if otherSection == section {
-            self.footers.value[section] = sizeCache
+        if case .headerFooter(let searchSection) = self.footers.value[index].contentType, searchSection == section {
+            self.footers.value[index] = sizeCache
             return
         }
 
-        self.footers.value = self.footers.value[0..<section] +
-            [sizeCache] +
-            self.footers.value[section..<self.footers.value.count]
+        self.footers.value.insert(sizeCache, at: index)
     }
 
-    func remove() {
-        self.footers.value = []
-        self.headers.value = []
-        self.rows.value = [:]
+    func sections(count: Int) {
+        if self.headers.value.count > count {
+            self.headers.value = Array(self.headers.value[0..<count])
+        }
+
+        if self.footers.value.count > count {
+            self.footers.value = Array(self.footers.value[0..<count])
+        }
+    }
+
+    func rows(count: Int, in section: Int) {
+        let rows = Array((self.rows.value[section] ?? []))
+
+        guard rows.count > count else {
+            return
+        }
+
+        self.rows.value[section] = count == 0 ? nil : Array(rows[0..<count])
+    }
+}
+
+private extension Array {
+    func binaryInsert(_ searchItemHandler: @escaping (Element) -> ComparisonResult) -> Int {
+        var start = self.startIndex
+        var end = self.endIndex
+        while start < end {
+            let middle = start + (end - start) / 2
+            if searchItemHandler(self[middle]) == .orderedAscending {
+                start = middle + 1
+            } else {
+                end = middle
+            }
+        }
+
+        assert(start == end)
+        return start
+    }
+
+    func binarySearch(_ searchItemHandler: @escaping (Element) -> ComparisonResult) -> Element? {
+        var lowerIndex = 0
+        var upperIndex = self.count - 1
+
+        while (true) {
+            let currentIndex = (lowerIndex + upperIndex)/2
+            if(searchItemHandler(self[currentIndex]) == .orderedSame) {
+                return self[currentIndex]
+            } else if (lowerIndex > upperIndex) {
+                return nil
+            } else {
+                if (searchItemHandler(self[currentIndex]) == .orderedDescending) {
+                    upperIndex = currentIndex - 1
+                } else {
+                    lowerIndex = currentIndex + 1
+                }
+            }
+        }
+    }
+}
+
+extension SizeCache.ContentType: Comparable {
+    static func < (lhs: Self, rhs: Self) -> Bool {
+        switch lhs {
+        case .cell(let indexPath):
+            guard case .cell(let rIndexPath) = rhs else {
+                fatalError()
+            }
+
+            return indexPath < rIndexPath
+        case .headerFooter(let section):
+            guard case .headerFooter(let rSection) = rhs else {
+                fatalError()
+            }
+
+            return section < rSection
+        }
+    }
+
+    static func ==(lhs: Self, rhs: Self) -> Bool {
+        switch lhs {
+        case .cell(let indexPath):
+            guard case .cell(let rIndexPath) = rhs else {
+                fatalError()
+            }
+
+            return indexPath == rIndexPath
+        case .headerFooter(let section):
+            guard case .headerFooter(let rSection) = rhs else {
+                fatalError()
+            }
+
+            return section == rSection
+        }
+    }
+
+    func compare(_ other: Self) -> ComparisonResult {
+        if self == other {
+            return .orderedSame
+        }
+
+        return self < other ? .orderedAscending : .orderedDescending
+    }
+
+}
+
+private extension Int {
+    func compare(_ other: Self) -> ComparisonResult {
+        if self == other {
+            return .orderedSame
+        }
+
+        return self < other ? .orderedAscending : .orderedDescending
     }
 }
