@@ -82,26 +82,42 @@ extension ListManager: ListSectionDelegate {
         })
     }
 
-    func content(_ section: ListManager.SectionManager.Copy, updateSections: [ListManager.SectionManager]) {
-        var updateSections = updateSections
+    func updatedSections(
+        _ compactCopy: ListManager.SectionManager.Copy,
+        updatedWith sequence: [ListManager.SectionManager]) -> [ListManager.SectionManager] {
+        guard
+            let first = self.sections
+                .enumerated()
+                .reversed()
+                .last(where: {
+                    $0.element.identifier >= compactCopy.identifier
+                })
+            else { return self.sections + sequence }
 
-        if self.sections.isEmpty {
-            self.update(sections: updateSections.enumerated().map {
-                $0.element.index($0.offset)
-            })
-            return
+        if self.sections[first.offset].identifier == compactCopy.identifier {
+            return Array(self.sections[0..<first.offset]) +
+                sequence +
+                Array(self.sections[first.offset+1..<self.sections.count])
+                    .filter {
+                        $0.identifier != compactCopy.identifier
+                    }
         }
 
-        self.update(sections: self.sections.reduce([]) { sum, next in
-            if next.identifier == section.identifier {
-                let toAppend = updateSections
-                updateSections = []
-                return sum + toAppend.enumerated().map {
-                    $0.element.index(sum.count + $0.offset)
-                }
-            }
+        return Array(self.sections[0..<first.offset]) +
+            sequence +
+            Array(self.sections[first.offset..<self.sections.count])
+    }
 
-            return sum + [next.index(sum.count)]
-        })
+    func content(_ section: ListManager.SectionManager.Copy, updateSections: [ListManager.SectionManager]) {
+        self.update(
+            sections: self.updatedSections(
+                section,
+                updatedWith: updateSections
+            )
+            .enumerated()
+            .map {
+                $0.element.index($0.offset)
+            }
+        )
     }
 }

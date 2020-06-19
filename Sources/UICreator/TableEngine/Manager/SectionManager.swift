@@ -221,19 +221,41 @@ extension ListManager.SectionManager {
 }
 
 extension ListManager.SectionManager: ListContentDelegate {
+    func updatedRows(
+        _ compactCopy: ListManager.RowManager.Copy,
+        updatedWith sequence: [ListManager.RowManager]) -> [ListManager.RowManager] {
+        guard
+            let first = self.rows
+                .enumerated()
+                .reversed()
+                .last(where: {
+                    $0.element.identifier >= compactCopy.identifier
+                })
+            else { return self.rows + sequence }
+
+        if self.rows[first.offset].identifier == compactCopy.identifier {
+            return Array(self.rows[0..<first.offset]) +
+                sequence +
+                Array(self.rows[first.offset+1..<self.rows.count])
+                    .filter {
+                        $0.identifier != compactCopy.identifier
+                    }
+        }
+
+        return Array(self.rows[0..<first.offset]) +
+            sequence +
+            Array(self.rows[first.offset..<self.rows.count])
+    }
+
     func content(_ compactCopy: ListManager.RowManager.Copy, updatedWith sequence: [ListManager.RowManager]) {
-        var updateRows = sequence
-        let rows = self.rows.reduce([ListManager.RowManager]()) { sum, next -> [ListManager.RowManager] in
-            if next.identifier == compactCopy.identifier {
-                let toAppend = updateRows
-                updateRows = []
-                return sum + toAppend
-            }
-
-            return sum + [next]
-        } + updateRows
-
-        self.listManager.content(updateSection: self.rows(rows))
+        self.listManager.content(
+            updateSection: self.rows(
+                self.updatedRows(
+                    compactCopy,
+                    updatedWith: sequence
+                )
+            )
+        )
     }
 }
 

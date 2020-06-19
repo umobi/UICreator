@@ -124,6 +124,13 @@ extension ReusableView {
                             .first(where: { $0 is UITableView }) as? UITableView
                     else { return }
 
+                    guard
+                        (tableView.needsToUpdateHeightOf(
+                            $0, rowManager:
+                            reusableView.cellLoaded.cell.rowManager
+                        ))
+                        else { return }
+
                     tableView.itemHeightUpdate(
                         $0,
                         rowManager: reusableView.cellLoaded.cell.rowManager
@@ -257,6 +264,34 @@ protocol CollectionCellType {
 
 var kTableViewCallbackIsPending = 0
 extension UITableView {
+    func needsToUpdateHeightOf(_ view: UIView, rowManager: ListManager.RowManager) -> Bool {
+        let cellType = rowManager.payload.contentType
+        let indexPath = rowManager.indexPath
+        switch cellType {
+        case .footer:
+            guard
+                let sizeCache = self.sizeManager.footer(at: indexPath.section),
+                sizeCache.size.height == view.frame.height
+                else { return true }
+
+            return false
+        case .header:
+            guard
+                let sizeCache = self.sizeManager.header(at: indexPath.section),
+                sizeCache.size.height == view.frame.height
+                else { return true }
+
+            return false
+        case .row:
+            guard
+                let sizeCache = self.sizeManager.row(at: indexPath),
+                sizeCache.size.height == view.frame.height
+                else { return true }
+
+            return false
+        }
+    }
+
     func itemHeightUpdate(_ view: UIView, rowManager: ListManager.RowManager) {
         let cellType = rowManager.payload.contentType
         let indexPath = rowManager.indexPath
@@ -268,7 +303,6 @@ extension UITableView {
             let sizeCache = self.sizeManager.header(at: indexPath.section) ?? .headerFooter(indexPath.section)
             self.sizeManager.updateHeader(sizeCache.height(view.frame.height))
         case .row:
-            print("Reloading", indexPath)
             let sizeCache = self.sizeManager.row(at: indexPath) ?? .cell(indexPath)
             self.sizeManager.updateRow(sizeCache.height(view.frame.height))
         }
