@@ -276,3 +276,43 @@ public func || (_ left: Relay<Bool>, _ right: Relay<Bool>) -> Relay<Bool> {
 
     return value.projectedValue
 }
+
+public func || (_ left: Bool, _ right: Relay<Bool>) -> Relay<Bool> {
+    let value = Value(wrappedValue: left || right.wrappedValue)
+
+    right.next {
+        value.wrappedValue = left || $0
+    }
+
+    return value.projectedValue
+}
+
+public func || (_ left: Relay<Bool>, _ right: Bool) -> Relay<Bool> {
+    let value = Value(wrappedValue: left.wrappedValue || right)
+
+    left.next {
+        value.wrappedValue = $0 || right
+    }
+
+    return value.projectedValue
+}
+
+public func && (_ left: Bool, _ right: Relay<Bool>) -> Relay<Bool> {
+    let value = Value(wrappedValue: left && right.wrappedValue)
+
+    right.next {
+        value.wrappedValue = left && $0
+    }
+
+    return value.projectedValue
+}
+
+public func && (_ left: Relay<Bool>, _ right: Bool) -> Relay<Bool> {
+    let value = Value(wrappedValue: left.wrappedValue && right)
+
+    left.next {
+        value.wrappedValue = $0 && right
+    }
+
+    return value.projectedValue
+}
