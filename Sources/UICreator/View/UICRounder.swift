@@ -29,7 +29,7 @@ public protocol UICManagerContentView {
     func reloadContentLayout()
 }
 
-public class UICRounderView: UIView, UICManagerContentView {
+public class RounderView: UIView, UICManagerContentView {
     public var radius: CGFloat {
         didSet {
             self.reloadContentLayout()
@@ -48,11 +48,11 @@ public class UICRounderView: UIView, UICManagerContentView {
     }
 
     public override init(frame: CGRect) {
-        fatalError("init(frame:) not implemented")
+        Fatal.Builder("init(frame:) has not been implemented").die()
     }
 
     required public init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) not implemented")
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     override open var isHidden: Bool {
@@ -98,7 +98,7 @@ public class UICRounderView: UIView, UICManagerContentView {
     }
 }
 
-public extension UICRounderView {
+public extension RounderView {
 
     func addContent(_ view: UIView) {
         CBSubview(self).addSubview(view)
@@ -143,7 +143,7 @@ public extension UICRounderView {
 }
 
 public class UICRounder: UIViewCreator {
-    public typealias View = UICRounderView
+    public typealias View = RounderView
 
     public init(radius: CGFloat, content: @escaping () -> ViewCreator) {
         let content = content()

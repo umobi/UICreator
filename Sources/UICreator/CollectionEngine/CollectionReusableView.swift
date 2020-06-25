@@ -36,7 +36,7 @@ public class CollectionReusableView: UICollectionReusableView, ReusableView {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     override open var isHidden: Bool {

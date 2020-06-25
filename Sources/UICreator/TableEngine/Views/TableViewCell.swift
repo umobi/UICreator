@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-internal class TableViewCell: UITableViewCell, ReusableView {
+internal class TableViewCell: UITableViewCell, ReusableView, TableCellType {
     var cellLoaded: UICCell.Loaded!
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -34,7 +34,7 @@ internal class TableViewCell: UITableViewCell, ReusableView {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     override open var isHidden: Bool {
@@ -52,7 +52,7 @@ internal class TableViewCell: UITableViewCell, ReusableView {
             RenderManager(self)?.frame(newValue)
         }
     }
-    
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         RenderManager(self)?.willMove(toSuperview: newSuperview)
@@ -78,8 +78,8 @@ internal class TableViewCell: UITableViewCell, ReusableView {
         RenderManager(self)?.traitDidChange()
     }
 
-    func prepareCell(_ cell: UICCell) {
-        self.reuseCell(cell)
+    func prepareCell(_ cell: UICCell, axis: ReusableViewAxis) {
+        self.reuseCell(cell, axis: axis)
 
         self.accessoryType = cell.rowManager.payload.accessoryType
     }

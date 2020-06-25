@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICDashedView: UIView, UICManagerContentView {
+public class DashedView: UIView, UICManagerContentView {
 
     weak var view: UIView?
     private(set) var strokeColor: UIColor = .clear
@@ -64,7 +64,7 @@ public class UICDashedView: UIView, UICManagerContentView {
     }
 
     required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     private func createShape() -> CAShapeLayer {
@@ -118,7 +118,7 @@ public class UICDashedView: UIView, UICManagerContentView {
             RenderManager(self)?.frame(newValue)
         }
     }
-    
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         RenderManager(self)?.willMove(toSuperview: newSuperview)
@@ -147,7 +147,7 @@ public class UICDashedView: UIView, UICManagerContentView {
     }
 }
 
-public extension UICDashedView {
+public extension DashedView {
 
     func apply(strokeColor: UIColor) -> Self {
         self.strokeColor = strokeColor
@@ -170,7 +170,7 @@ public extension UICDashedView {
 }
 
 public class UICDashed: UIViewCreator {
-    public typealias View = UICDashedView
+    public typealias View = DashedView
 
     public init(color: UIColor, pattern: [NSNumber] = [2, 3], content: @escaping () -> ViewCreator) {
         let content = content()
@@ -189,7 +189,7 @@ public class UICDashed: UIViewCreator {
     }
 }
 
-extension UIViewCreator where View: UICDashedView {
+extension UIViewCreator where View: DashedView {
 
     public func dash(color: UIColor) -> Self {
         self.onNotRendered {

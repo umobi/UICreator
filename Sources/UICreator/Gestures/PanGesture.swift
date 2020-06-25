@@ -28,19 +28,19 @@ public class Pan: UIGesture {
 
     public required init(target view: UIView!) {
         self.setGesture(Gesture.init(target: view))
-        self.gesture.parent = self
+        self.uiGesture.parent = self
     }
 }
 
 #if os(iOS)
 public extension UIGesture where Gesture: UIPanGestureRecognizer {
     func maximumNumber(ofTouches number: Int) -> Self {
-        (self.gesture as? Gesture)?.maximumNumberOfTouches = number
+        self.uiGesture.maximumNumberOfTouches = number
         return self
     }
 
     func minimumNumber(ofTouches number: Int) -> Self {
-        (self.gesture as? Gesture)?.minimumNumberOfTouches = number
+        self.uiGesture.minimumNumberOfTouches = number
         return self
     }
 }

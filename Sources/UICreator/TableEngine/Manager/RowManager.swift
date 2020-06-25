@@ -59,9 +59,9 @@ extension ListManager {
             self.forEach?.manager = self
         }
 
-        func identifier(_ id: Int) -> RowManager {
+        func identifier(_ identifier: Int) -> RowManager {
             self.edit {
-                $0.identifier = id
+                $0.identifier = identifier
             }
         }
 
@@ -112,12 +112,19 @@ extension ListManager {
 }
 
 extension ListManager.RowManager {
+    enum ContentType {
+        case header
+        case footer
+        case row
+    }
+
     struct Payload {
         let content: () -> ViewCreator
         let trailingActions: (() -> [RowAction])?
         let leadingActions: (() -> [RowAction])?
         let accessoryType: UITableViewCell.AccessoryType
         let estimatedHeight: CGFloat?
+        let contentType: ContentType
 
         init(header: UICHeader) {
             self.content = header.content
@@ -125,6 +132,7 @@ extension ListManager.RowManager {
             self.leadingActions = nil
             self.accessoryType = .none
             self.estimatedHeight = header.height
+            self.contentType = .header
         }
 
         init(footer: UICFooter) {
@@ -133,6 +141,7 @@ extension ListManager.RowManager {
             self.leadingActions = nil
             self.accessoryType = .none
             self.estimatedHeight = nil
+            self.contentType = .footer
         }
 
         init(row: UICRow) {
@@ -141,6 +150,7 @@ extension ListManager.RowManager {
             self.leadingActions = row.leadingActions
             self.accessoryType = row.accessoryType
             self.estimatedHeight = nil
+            self.contentType = .row
         }
 
         var asRowManager: ListManager.RowManager {
@@ -209,7 +219,7 @@ extension ListManager.RowManager: SupportForEach {
                 .section(at: compactCopy.indexPath.section)
                 .content(compactCopy, updatedWith: $0.map { content in
                     guard let row = content() as? UICRow else {
-                        fatalError()
+                        Fatal.Builder("Content is not a type of UICRow").die()
                     }
 
                     return compactCopy.restore(.init(row: row))

@@ -62,19 +62,19 @@ extension UICView {
 
     func makeView() -> UIView {
         guard !self.didConfiguredView else {
-            fatalError()
+            Fatal.Builder("UICView is trying to load a view that was already loaded").die()
         }
 
         self.didConfiguredView = true
         let view = RootView(builder: self)
         let body = self.body
         self.tree.append(body)
-        
+
         self.onNotRendered {
             $0.add(priority: .required, body.releaseUIView())
         }.onNotRendered { [weak self] _ in
             guard let self = self else {
-                fatalError()
+                Fatal.Builder("Property self already deallocated").die()
             }
 
             if !self.didViewLoad {

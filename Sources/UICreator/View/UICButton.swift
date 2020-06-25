@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public class _Button: UIButton {
+public class Button: UIButton {
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -68,7 +68,7 @@ public class _Button: UIButton {
 }
 
 public class UICButton: UIViewCreator, Control {
-    public typealias View = _Button
+    public typealias View = Button
 
     public init(_ title: String?, type: UIButton.ButtonType? = nil) {
         self.loadView { [unowned self] in
@@ -120,4 +120,3 @@ public extension UIViewCreator where View: UIButton, Self: Control {
         self.onEvent(.touchUpInside, handler)
     }
 }
-

@@ -23,5 +23,5 @@
 import Foundation
 import UIKit
 
-extension _CollectionView: UICollectionViewDelegateFlowLayout {
+extension UICCollectionView: UICollectionViewDelegateFlowLayout {
 }

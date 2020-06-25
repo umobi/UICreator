@@ -24,12 +24,12 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICControllerContainerView<View: UIViewController>: UIView {
-    weak var view: View!
+public class ControllerView<ViewController: UIViewController>: UIView {
+    weak var view: ViewController!
 
-    public func contain(viewController: View, parentView: UIViewController? = nil) {
+    public func contain(viewController: ViewController, parentView: UIViewController? = nil) {
         guard let parentView = parentView ?? self.viewController else {
-            fatalError()
+            Fatal.Builder("UICContainer.ContainerView couldn't get parent viewController").die()
         }
 
         self.view?.view.removeFromSuperview()
@@ -89,7 +89,7 @@ public class UICControllerContainerView<View: UIViewController>: UIView {
 }
 
 public class UICContainer<ViewController: UIViewController>: UIViewCreator {
-    public typealias View = UICControllerContainerView<ViewController>
+    public typealias View = ControllerView<ViewController>
 
     public required init(_ content: @escaping () -> ViewController) {
         self.loadView { [unowned self] in

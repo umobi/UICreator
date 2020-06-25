@@ -24,31 +24,8 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICGradientView: UIView {
+public class GradientView: UIView {
     fileprivate let gradientLayer = CAGradientLayer()
-
-    public enum Direction {
-        case top
-        case bottom
-        case left
-        case right
-        case other(CGPoint, CGPoint)
-
-        var points: (CGPoint, CGPoint) {
-            switch self {
-            case .top:
-                return (CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1.0))
-            case .bottom:
-                return (CGPoint(x: 0, y: 1.0), CGPoint(x: 0, y: 0))
-            case .left:
-                return (CGPoint(x: 1.0, y: 0), CGPoint(x: 0, y: 0))
-            case .right:
-                return (CGPoint(x: 0.0, y: 0), CGPoint(x: 1.0, y: 0))
-            case .other(let from, let to):
-                return (from, to)
-            }
-        }
-    }
 
     public var direction: Direction = .right {
         didSet {
@@ -74,9 +51,9 @@ public class UICGradientView: UIView {
 
         return self.colors.enumerated().map { color in
             return NSNumber(value: {
-                let r = Double(color.offset) / Double(lastIndex)
-                return r * Double(distance)
-            }() as Double)
+                let location = Double(color.offset) / Double(lastIndex)
+                return location * Double(distance)
+                }() as Double)
         }
     }
 
@@ -104,7 +81,7 @@ public class UICGradientView: UIView {
             RenderManager(self)?.frame(newValue)
         }
     }
-    
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         RenderManager(self)?.willMove(toSuperview: newSuperview)
@@ -133,9 +110,35 @@ public class UICGradientView: UIView {
     }
 }
 
-public extension UICGradientView {
-    static func Linear(colors: [UIColor], direction: Direction) -> UICGradientView {
-        let gradient = UICGradientView()
+public extension GradientView {
+    enum Direction {
+        case top
+        case bottom
+        case left
+        case right
+        case other(CGPoint, CGPoint)
+
+        var points: (CGPoint, CGPoint) {
+            switch self {
+            case .top:
+                return (CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1.0))
+            case .bottom:
+                return (CGPoint(x: 0, y: 1.0), CGPoint(x: 0, y: 0))
+            case .left:
+                return (CGPoint(x: 1.0, y: 0), CGPoint(x: 0, y: 0))
+            case .right:
+                return (CGPoint(x: 0.0, y: 0), CGPoint(x: 1.0, y: 0))
+            case .other(let fromPoint, let toPoint):
+                return (fromPoint, toPoint)
+            }
+        }
+    }
+}
+
+public extension GradientView {
+    // swiftlint:disable identifier_name
+    static func Linear(colors: [UIColor], direction: Direction) -> UICGradient.View {
+        let gradient = UICGradient.View()
         gradient.colors = colors
         gradient.direction = direction
         return gradient
@@ -153,7 +156,7 @@ extension CGPoint {
 }
 
 public class UICGradient: UIViewCreator {
-    public typealias View = UICGradientView
+    public typealias View = GradientView
 
     public init(_ colors: [UIColor], direction: View.Direction = .right) {
         self.colors(colors)
@@ -168,7 +171,7 @@ public class UICGradient: UIViewCreator {
     }
 }
 
-public extension UIViewCreator where View: UICGradientView {
+public extension UIViewCreator where View: GradientView {
 
     func colors(_ colors: UIColor...) -> Self {
         self.onNotRendered {

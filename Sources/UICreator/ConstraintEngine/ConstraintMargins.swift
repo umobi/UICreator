@@ -31,7 +31,11 @@ public enum Margin: CaseIterable {
 }
 
 public extension ViewCreator {
-    func safeArea(priority: UILayoutPriority = .required,_ margins: Margin..., equalTo value: CGFloat = 0) -> Self {
+    func safeArea(
+        priority: UILayoutPriority = .required,
+        _ margins: Margin...,
+        equalTo value: CGFloat = 0) -> Self {
+
         Set(margins.isEmpty ? Margin.allCases : margins).reduce(self) {
             switch $1 {
             case .top:
@@ -46,7 +50,11 @@ public extension ViewCreator {
         }
     }
 
-    func insets(priority: UILayoutPriority = .required,_ margins: Margin..., equalTo value: CGFloat = 0) -> Self {
+    func insets(
+        priority: UILayoutPriority = .required,
+        _ margins: Margin...,
+        equalTo value: CGFloat = 0) -> Self {
+
         Set(margins.isEmpty ? Margin.allCases : margins).reduce(self) {
             switch $1 {
             case .top:
@@ -61,7 +69,11 @@ public extension ViewCreator {
         }
     }
 
-    func margin(priority: UILayoutPriority = .required,_ margins: Margin..., equalTo value: CGFloat = 0) -> Self {
+    func margin(
+        priority: UILayoutPriority = .required,
+        _ margins: Margin...,
+        equalTo value: CGFloat = 0) -> Self {
+
         Set(margins.isEmpty ? Margin.allCases : margins).reduce(self) {
             switch $1 {
             case .top:

@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public class _PageControl: UIPageControl {
+public class PageControl: UIPageControl {
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -68,7 +68,7 @@ public class _PageControl: UIPageControl {
 }
 
 public class UICPageControl: UIViewCreator, Control {
-    public typealias View = _PageControl
+    public typealias View = PageControl
 
     public init(numberOfPages: Int) {
         self.loadView { [unowned self] in

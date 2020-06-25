@@ -23,7 +23,10 @@
 import Foundation
 import UIKit
 
-/// `TextElement` may be removed from this project. It turns some shared methods needed in some view creators. The problem that makes TextElement unnecessary is that it always will need to extend it when creating text elements like Label using `UICViewRepresentable`.
+/// `TextElement` may be removed from this project.
+/// It turns some shared methods needed in some view creators.
+/// The problem that makes TextElement unnecessary is that it always will need to extend
+/// it when creating text elements like Label using `UICViewRepresentable`.
 public protocol TextElement: UIViewCreator {
     func text(_ string: String?) -> Self
     func text(_ attributedText: NSAttributedString?) -> Self
@@ -42,9 +45,7 @@ public protocol TextElement: UIViewCreator {
 
 public extension TextElement {
     func textScale(_ scale: CGFloat) -> Self {
-        Fatal.Builder("text(scale:) not implemented")
-            .warning()
-        
+        Fatal.Builder("text(scale:) not implemented").warning()
         return self
     }
 }

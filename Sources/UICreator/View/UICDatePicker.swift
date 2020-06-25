@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 
 #if os(iOS)
-public class _DatePicker: UIDatePicker {
+public class DatePicker: UIDatePicker {
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -69,7 +69,7 @@ public class _DatePicker: UIDatePicker {
 }
 
 public class UICDatePicker: UIViewCreator, Control {
-    public typealias View = _DatePicker
+    public typealias View = DatePicker
 
     public init(calendar: Calendar? = nil) {
         self.loadView { [unowned self] in

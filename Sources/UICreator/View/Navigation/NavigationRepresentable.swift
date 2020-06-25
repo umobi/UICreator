@@ -23,11 +23,7 @@
 import Foundation
 import UIKit
 
-public protocol NavigationRepresentable: UICView {
-    var navigationLoader: (UIViewController) -> UINavigationController { get }
-    var navigationBar: UINavigationBar { get }
-
-//    init(_ content: @escaping () -> ViewCreator)
+public protocol NavigationRepresentable: ViewControllerCreator {
 
     @discardableResult
     func push(animated: Bool, content: @escaping () -> ViewCreator) -> Self
@@ -45,26 +41,11 @@ public protocol NavigationRepresentable: UICView {
     func popTo(view: ViewCreator, animated: Bool) -> Self
 }
 
-struct ContentHandler {
-    let content: () -> ViewCreator
-    init(_ content: @escaping () -> ViewCreator) {
-        self.content = content
-    }
-}
-
-private extension UIView {
-    var lowerNavigationController: UINavigationController? {
-        if self.next is UINavigationController {
-            return self.next as? UINavigationController
-        }
-
-        return self.subviews.first(where: {
-            $0.lowerNavigationController != nil
-        })?.lowerNavigationController
-    }
-}
-
-func OBJCSet<Object>(_ index: Any, _ key: UnsafeRawPointer, policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN, orLoad: @escaping () -> Object) -> Object {
+func OBJCSet<Object>(
+    _ index: Any,
+    _ key: UnsafeRawPointer,
+    policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN,
+    orLoad: @escaping () -> Object) -> Object {
     guard let object = objc_getAssociatedObject(index, key) as? Object else {
         let object = orLoad()
         objc_setAssociatedObject(index, key, object, policity)
@@ -86,41 +67,21 @@ public struct NavigationModifier {
     }
 }
 
-private var kContentHandler: UInt = 0
 public extension NavigationRepresentable {
-    internal var navigationController: UINavigationController! {
-        return self.uiView.lowerNavigationController
+    var navigationController: UINavigationController! {
+        self.weakViewControllerAdaptor?.adaptedViewController as? UINavigationController
     }
+}
+
+public extension NavigationRepresentable {
 
     var navigationBar: UINavigationBar {
         return self.navigationController.navigationBar
     }
 
-    private var contentMutable: Mutable<ContentHandler?> {
-        OBJCSet(self, &kContentHandler) {
-            .init(value: nil)
-        }
-    }
-
-    internal var content: ContentHandler? {
-        get { self.contentMutable.value }
-        set { self.contentMutable.value = newValue }
-    }
-
-    var body: ViewCreator {
-        UICContainer { [unowned self] in
-            guard let content = self.content?.content else {
-                fatalError()
-            }
-
-            self.content = nil
-            return self.navigationLoader(UICHostingView(content: content))
-        }
-    }
-
     @discardableResult
     func push(animated: Bool, content: @escaping () -> ViewCreator) -> Self {
-        self.navigationController.pushViewController(UICHostingView(content: content), animated: animated)
+        self.navigationController.pushViewController(UICHostingController(content: content), animated: animated)
         return self
     }
 
@@ -147,7 +108,7 @@ public extension NavigationRepresentable {
         guard let viewController = self.navigationController.viewControllers.first(where: {
             $0.view.contains(view)
         }) else {
-            fatalError("\(type(of: view)) is not on first hierarchy")
+            Fatal.Builder("\(type(of: view)) is not on first hierarchy").die()
         }
 
         self.navigationController.popToViewController(viewController, animated: animated)
@@ -167,8 +128,10 @@ public extension UIView {
             return true
         }
 
-        if let hostingView = self.next as? UICHostingView {
-            return hostingView.hostedView.uiView.contains(where: handler)
+        if let hostingController = self.next as? UICHostingController,
+            let hostingView = hostingController.view as? UICHostingView,
+            let viewCreator = hostingView.content.object as? ViewCreator {
+            return viewCreator.uiView.contains(where: handler)
         }
 
         return self.subviews.contains(where: {

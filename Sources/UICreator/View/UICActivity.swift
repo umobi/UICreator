@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public class UICActivityIndicatorView: UIActivityIndicatorView {
+public class ActivityIndicatorView: UIActivityIndicatorView {
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -40,7 +40,7 @@ public class UICActivityIndicatorView: UIActivityIndicatorView {
             RenderManager(self)?.frame(newValue)
         }
     }
-    
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         RenderManager(self)?.willMove(toSuperview: newSuperview)
@@ -68,7 +68,7 @@ public class UICActivityIndicatorView: UIActivityIndicatorView {
 }
 
 public class UICActivity: UIViewCreator {
-    public typealias View = UICActivityIndicatorView
+    public typealias View = ActivityIndicatorView
 
     public init(style: View.Style) {
         self.loadView { [unowned self] in

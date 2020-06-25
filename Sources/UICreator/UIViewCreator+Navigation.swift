@@ -60,9 +60,7 @@ public extension ViewCreator {
     func toolbar(_ contents: @escaping () -> [ViewCreator]) -> Self {
         self.onInTheScene {
             $0.viewController.toolbarItems = contents().map { view in
-                UIBarButtonItem(customView: UICHost {
-                    view
-                }.releaseUIView())
+                UIBarButtonItem(customView: UICHostingView(view: view))
             }
         }
     }
@@ -70,9 +68,7 @@ public extension ViewCreator {
     func toolbar(_ views: [ViewCreator]) -> Self {
         self.onInTheScene {
             $0.viewController.toolbarItems = views.map { view in
-                UIBarButtonItem(customView: UICHost {
-                    view
-                }.releaseUIView())
+                UIBarButtonItem(customView: UICHostingView(view: view))
             }
         }
     }
@@ -145,34 +141,55 @@ public extension ViewCreator {
 
     func navigation(titleView content: @escaping () -> ViewCreator) -> Self {
         return self.onInTheScene {
-            $0.navigationItem.titleView = UICHost(content: content).releaseUIView()
+            $0.navigationItem.titleView = UICHostingView(content: content)
         }
     }
 
-    func navigation(background image: UIImage?, for position: UIBarPosition = .any
-        , barMetrics: UIBarMetrics = .default) -> Self {
+    func navigation(
+        background image: UIImage?,
+        for position: UIBarPosition = .any,
+        barMetrics: UIBarMetrics = .default) -> Self {
         return self.onInTheScene {
-            $0.navigation?.navigationController?.navigationBar.setBackgroundImage(image, for: position, barMetrics: barMetrics)
+            $0.navigation?
+                .navigationController?
+                .navigationBar
+                .setBackgroundImage(
+                    image,
+                    for: position,
+                    barMetrics: barMetrics
+                )
         }
     }
 
     #if os(iOS)
     func navigation(backButton item: @escaping () -> ViewCreator) -> Self {
         return self.onInTheScene {
-            $0.navigationItem.backBarButtonItem = .init(title: "", style: .plain, target: nil, action: nil)
+            $0.navigationItem.backBarButtonItem = .init(
+                title: "",
+                style: .plain,
+                target: nil,
+                action: nil
+            )
+
             guard ($0.navigation?.navigationController?.viewControllers.count ?? 0) > 1 else {
                 print("Navigation doesn't accepted backButton, you may try to assign as leftButton")
                 return
             }
 
-            $0.navigationItem.setLeftBarButton(.init(customView: UICHost(content: item).releaseUIView()), animated: false)
+            $0.navigationItem.setLeftBarButton(
+                .init(customView: UICHostingView(content: item)),
+                animated: false
+            )
         }
     }
     #endif
 
     func navigation(leftButton item: @escaping () -> ViewCreator) -> Self {
         return self.onInTheScene {
-            $0.navigationItem.setLeftBarButton(.init(customView: UICHost(content: item).releaseUIView()), animated: false)
+            $0.navigationItem.setLeftBarButton(
+                .init(customView: UICHostingView(content: item)),
+                animated: false
+            )
         }
     }
 
@@ -180,14 +197,17 @@ public extension ViewCreator {
         return self.onInTheScene {
             $0.navigationItem
                 .setLeftBarButtonItems(contents().map { view in
-                    .init(customView: UICHost(content: { view }).releaseUIView())
+                    .init(customView: UICHostingView(view: view))
                 }, animated: false)
         }
     }
 
     func navigation(rightButton item: @escaping () -> ViewCreator) -> Self {
         return self.onInTheScene {
-            $0.navigationItem.setRightBarButton(.init(customView: UICHost(content: item).releaseUIView()), animated: false)
+            $0.navigationItem.setRightBarButton(
+                .init(customView: UICHostingView(content: item)),
+                animated: false
+            )
         }
     }
 
@@ -195,7 +215,7 @@ public extension ViewCreator {
         return self.onInTheScene {
             $0.navigationItem
                 .setRightBarButtonItems(contents().map { view in
-                    .init(customView: UICHost(content: { view }).releaseUIView())
+                    .init(customView: UICHostingView(view: view))
                 }, animated: false)
         }
     }

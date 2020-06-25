@@ -23,6 +23,7 @@
 import Foundation
 import UIKit
 
+// swiftlint:disable class_delegate_protocol
 protocol ListSectionDelegate {
     func content(_ section: ListManager.SectionManager.Copy, updateSections: [ListManager.SectionManager])
     func content(updateSection: ListManager.SectionManager)
@@ -92,9 +93,9 @@ extension ListManager {
             }
         }
 
-        func identifier(_ id: Int) -> SectionManager {
+        func identifier(_ identifier: Int) -> SectionManager {
             self.edit {
-                $0.identifier = id
+                $0.identifier = identifier
             }
         }
 
@@ -133,9 +134,9 @@ extension ListManager {
         @discardableResult
         func loadForEachIfNeeded() -> Bool {
             guard let forEach = self.forEach, !forEach.isLoaded else {
-                return self.rows.reduce(false) {
-                    $0 || $1.loadForEachIfNeeded()
-                }
+                return self.rows.contains(where: {
+                    $0.loadForEachIfNeeded()
+                })
             }
 
             forEach.load()
@@ -220,26 +221,51 @@ extension ListManager.SectionManager {
 }
 
 extension ListManager.SectionManager: ListContentDelegate {
+    func updatedRows(
+        _ compactCopy: ListManager.RowManager.Copy,
+        updatedWith sequence: [ListManager.RowManager]) -> [ListManager.RowManager] {
+        guard
+            let first = self.rows
+                .enumerated()
+                .reversed()
+                .last(where: {
+                    $0.element.identifier >= compactCopy.identifier
+                })
+            else { return self.rows + sequence }
+
+        if self.rows[first.offset].identifier == compactCopy.identifier {
+            return Array(self.rows[0..<first.offset]) +
+                sequence +
+                Array(self.rows[first.offset+1..<self.rows.count])
+                    .filter {
+                        $0.identifier != compactCopy.identifier
+                    }
+        }
+
+        return Array(self.rows[0..<first.offset]) +
+            sequence +
+            Array(self.rows[first.offset..<self.rows.count])
+    }
+
     func content(_ compactCopy: ListManager.RowManager.Copy, updatedWith sequence: [ListManager.RowManager]) {
-        var updateRows = sequence
-        let rows = self.rows.reduce([ListManager.RowManager]()) { sum, next -> [ListManager.RowManager] in
-            if next.identifier == compactCopy.identifier {
-                let toAppend = updateRows
-                updateRows = []
-                return sum + toAppend
-            }
-
-            return sum + [next]
-        } + updateRows
-
-        self.listManager.content(updateSection: self.rows(rows))
+        self.listManager.content(
+            updateSection: self.rows(
+                self.updatedRows(
+                    compactCopy,
+                    updatedWith: sequence
+                )
+            )
+        )
     }
 }
 
 extension ListManager.SectionManager: SupportForEach {
-    static func mount(_ manager: ListManager & ListSectionDelegate, with contents: [ViewCreator]) -> ListManager.SectionManager {
-        var footer: ListManager.RowManager? = nil
-        var header: ListManager.RowManager? = nil
+    static func mount(
+        _ manager: ListManager & ListSectionDelegate,
+        with contents: [ViewCreator]) -> ListManager.SectionManager {
+
+        var footer: ListManager.RowManager?
+        var header: ListManager.RowManager?
         var rows: [ListManager.RowManager] = []
         var identifier = -1
 
@@ -277,7 +303,9 @@ extension ListManager.SectionManager: SupportForEach {
                 return
             }
 
-            fatalError("Try using UICRow as wrapper for ViewCreators in list. It can be use UICForEach either")
+            Fatal.Builder(
+                "Try using UICRow as wrapper for ViewCreators in list. It can be use UICForEach either"
+            ).die()
         }
 
         return ListManager.SectionManager(manager)
@@ -285,13 +313,13 @@ extension ListManager.SectionManager: SupportForEach {
             .header(header)
             .footer(footer)
     }
-    
+
     func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
         sequence.sync { [compactCopy] contents in
             let sections = contents.compactMap {
                 ($0() as? UICSection)?.content
             }
-            
+
             if sections.isEmpty {
                 compactCopy.listManager?.content(compactCopy, updateSections: [])
                 return

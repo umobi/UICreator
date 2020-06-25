@@ -23,120 +23,119 @@
 import Foundation
 import UIKit
 
-public struct UICPresent {
-    let presentingStyle: UIModalPresentationStyle
-    let transitionStyle: UIModalTransitionStyle
-    let fromView: ViewCreator
-    let toView: ViewCreator?
-    let onCompletion: (() -> Void)?
-    let animated: Bool
+public class ViewControllerAdaptor: UIView, ViewCreatorNoLayoutConstraints {
+    weak var adaptedViewController: UIViewController!
 
-    init(fromView: ViewCreator) {
-        self.fromView = fromView
-        self.toView = nil
-        self.onCompletion = nil
-        if #available(iOS 13, tvOS 13, *) {
-            self.presentingStyle = .automatic
-        } else {
-            self.presentingStyle = .currentContext
-        }
-        self.transitionStyle = .coverVertical
-        self.animated = true
+    override open func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        RenderManager(self)?.willMove(toSuperview: newSuperview)
+        RenderManager(self.adaptedViewController?.view)?.willMove(toSuperview: self)
     }
 
-    private init(_ original: UICPresent, editable: Editable) {
-        self.presentingStyle = editable.presentingStyle
-        self.transitionStyle = editable.transitionStyle
-        self.fromView = original.fromView
-        self.toView = editable.toView
-        self.onCompletion = editable.onCompletion
-        self.animated = editable.animated
-    }
-
-    private func edit(_ edit: @escaping (Editable) -> Void) -> Self {
-        let editable = Editable(self)
-        edit(editable)
-        return .init(self, editable: editable)
-    }
-
-    public func presentingStyle(_ style: UIModalPresentationStyle) -> Self {
-        self.edit {
-            $0.presentingStyle = style
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            RenderManager(self)?.isHidden(newValue)
+            RenderManager(self.adaptedViewController?.view)?.isHidden(newValue)
         }
     }
 
-    public func transitionStyle(_ style: UIModalTransitionStyle) -> Self {
-        self.edit {
-            $0.transitionStyle = style
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            RenderManager(self)?.frame(newValue)
+            RenderManager(self.adaptedViewController?.view)?.frame(self.adaptedViewController.view.frame)
         }
     }
 
-    public func onCompletion(_ handler: @escaping () -> Void) -> Self {
-        self.edit {
-            $0.onCompletion = handler
+    override open func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        RenderManager(self)?.didMoveToSuperview()
+        RenderManager(self.adaptedViewController?.view)?.didMoveToSuperview()
+    }
+
+    override open func didMoveToWindow() {
+        super.didMoveToWindow()
+        RenderManager(self)?.didMoveToWindow()
+        RenderManager(self.adaptedViewController?.view)?.didMoveToWindow()
+    }
+
+    override open func layoutSubviews() {
+        super.layoutSubviews()
+        RenderManager(self)?.layoutSubviews()
+        RenderManager(self.adaptedViewController?.view)?.layoutSubviews()
+    }
+
+    override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        RenderManager(self.adaptedViewController?.view)?.traitDidChange()
+    }
+}
+
+private var kViewControllerAdaptor = 0
+public protocol ViewControllerCreator: ViewCreator {}
+
+extension ViewControllerCreator {
+    var weakViewControllerAdaptor: ViewControllerAdaptor! {
+        get {
+            (objc_getAssociatedObject(
+                self,
+                &kViewControllerAdaptor
+            ) as? ViewAdaptor.Weak<ViewControllerAdaptor>)?.object
         }
-    }
 
-    public func animated(_ flag: Bool) -> Self {
-        self.edit {
-            $0.animated = flag
-        }
-    }
-
-    func present() {
-        let viewController = UICHostingView {
-            self.toView!
-        }
-
-        viewController.modalPresentationStyle = self.presentingStyle
-        viewController.modalTransitionStyle = self.transitionStyle
-
-        self.fromView.present(animated: self.animated, onCompletion: self.onCompletion, viewController)
-    }
-
-    public func present(content: @escaping () -> ViewCreator) {
-        self.edit {
-            $0.toView = content()
-        }.present()
-    }
-
-    private class Editable {
-        var presentingStyle: UIModalPresentationStyle
-        var transitionStyle: UIModalTransitionStyle
-        var toView: ViewCreator?
-        var onCompletion: (() -> Void)?
-        var animated: Bool
-
-        init(_ present: UICPresent) {
-            self.presentingStyle = present.presentingStyle
-            self.transitionStyle = present.transitionStyle
-            self.toView = present.toView
-            self.onCompletion = present.onCompletion
-            self.animated = present.animated
+        set {
+            objc_setAssociatedObject(
+                self,
+                &kViewControllerAdaptor,
+                ViewAdaptor.Weak(object: newValue),
+                .OBJC_ASSOCIATION_COPY
+            )
         }
     }
 }
 
-public class UICNavigation: NavigationRepresentable {
+public protocol UIViewControllerCreator: UIViewCreator, ViewControllerCreator where View == ViewControllerAdaptor {
+    associatedtype ViewController: UIViewController
+}
 
-    public var navigationLoader: (UIViewController) -> UINavigationController {
-        {
-            return .init(rootViewController: $0)
+extension UIViewControllerCreator {
+
+    func setViewController(_ viewController: ViewController) {
+        let viewAdaptor = ViewControllerAdaptor(builder: self)
+        self.weakViewControllerAdaptor = viewAdaptor
+        self.loadView {
+            return viewAdaptor
+        }
+        .onNotRendered {
+            ($0 as? View)?.adaptedViewController = viewController
+        }
+        .onInTheScene {
+            $0.viewController.addChild(viewController)
+            $0.add(priority: .required, viewController.view)
+            viewController.didMove(toParent: $0.viewController)
         }
     }
+}
+
+public protocol UICNavigationExtendable {
+    func makeNavigationController(_ rootViewController: UIViewController) -> UINavigationController
+}
+
+open class UICNavigation: UIViewControllerCreator, NavigationRepresentable {
+    public typealias ViewController = UINavigationController
 
     public init(_ content: @escaping () -> ViewCreator) {
-        self.content = .init(content)
-    }
-}
+        let viewController = UICHostingController(content: content)
 
-public extension UICNavigation {
-    class Other<NavigationController: UINavigationController>: UICNavigation {
-        override public var navigationLoader: (UIViewController) -> UINavigationController {
-            {
-                return NavigationController(rootViewController: $0)
-            }
+        if let extended = self as? UICNavigationExtendable {
+            self.setViewController(extended.makeNavigationController(viewController))
+            return
         }
+
+        self.setViewController(UINavigationController(rootViewController: viewController))
     }
 }
 
@@ -157,7 +156,7 @@ public extension ViewCreator {
 
     @discardableResult
     func present(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> ViewCreator) -> Self {
-        let controller = UICHostingView(content: content)
+        let controller = UICHostingController(content: content)
         self.presentable?.present(controller, animated: animated, completion: onCompletion)
         return self
     }
@@ -174,7 +173,7 @@ public extension ViewCreator {
 
     @discardableResult
     func presentModal(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> ViewCreator) -> Self {
-        let controller = UICHostingView(content: content)
+        let controller = UICHostingController(content: content)
         controller.modalPresentationStyle = .overFullScreen
         self.presentable?.present(controller, animated: animated, completion: onCompletion)
         return self
@@ -194,12 +193,44 @@ public extension ViewCreator {
     }
 
     var navigationItem: UINavigationItem! {
-        return self.viewController?.navigationItem
+        return self.uiView?.navigationItem
     }
 }
 
 public extension UIView {
     var navigationItem: UINavigationItem! {
-        return self.viewController?.navigationItem
+        return ViewControllerSearch(
+            self,
+            searchFor: UINavigationController.self
+        ).viewNearFromSearch?.navigationItem
+    }
+}
+
+struct ViewControllerSearch<ViewController: UIViewController> {
+    weak var view: UIView!
+
+    init(_ view: UIView, searchFor type: ViewController.Type) {
+        self.view = view
+    }
+
+    var viewNearFromSearch: UIViewController? {
+        let responders = sequence(
+            first: self.view! as UIResponder,
+            next: { $0.next }
+        )
+
+        var viewNearFromNavigation: UIViewController?
+
+        for responder in responders {
+            if responder is ViewController {
+                return viewNearFromNavigation
+            }
+
+            if let viewController = responder as? UIViewController {
+                viewNearFromNavigation = viewController
+            }
+        }
+
+        return viewNearFromNavigation
     }
 }

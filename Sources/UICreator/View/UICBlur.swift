@@ -24,19 +24,19 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
+#if os(iOS)
 private var kVibrancyEffectStyle: UInt = 0
 
-#if os(iOS)
 @available(iOS 13, *)
-public extension UICBlurView {
-    fileprivate(set) var vibrancyEffect: UIVibrancyEffectStyle {
-        get { return objc_getAssociatedObject(self, &kVibrancyEffectStyle) as! UIVibrancyEffectStyle }
+public extension BlurView {
+    fileprivate(set) var vibrancyEffect: UIVibrancyEffectStyle! {
+        get { return objc_getAssociatedObject(self, &kVibrancyEffectStyle) as? UIVibrancyEffectStyle }
         set { objc_setAssociatedObject(self, &kVibrancyEffectStyle, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 }
 #endif
 
-public class UICBlurView: UIView {
+public class BlurView: UIView {
 
     private(set) var blurEffect: UIBlurEffect.Style
     weak var blurView: UIVisualEffectView!
@@ -101,7 +101,7 @@ public class UICBlurView: UIView {
     }
 
     public required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     private func reload() {
@@ -164,7 +164,7 @@ public class UICBlurView: UIView {
     }
 }
 
-public extension UICBlurView {
+public extension BlurView {
     func apply(blurEffect: UIBlurEffect.Style) {
         self.reload(blurEffect)
     }
@@ -172,7 +172,7 @@ public extension UICBlurView {
 
 #if os(iOS)
 @available(iOS 13, *)
-public extension UICBlurView {
+public extension BlurView {
     func apply(vibrancyEffect: UIVibrancyEffectStyle) {
         self.reload(vibrancyEffect)
     }
@@ -180,7 +180,7 @@ public extension UICBlurView {
 #endif
 
 public class UICBlur: UIViewCreator {
-    public typealias View = UICBlurView
+    public typealias View = BlurView
 
     public init(blur: UIBlurEffect.Style = .regular) {
         self.blur(style: blur)
@@ -192,7 +192,7 @@ public class UICBlur: UIViewCreator {
     }
 }
 
-public extension UIViewCreator where View: UICBlurView {
+public extension UIViewCreator where View: UICBlur.View {
     func blur(style: UIBlurEffect.Style) -> Self {
         return self.onRendered {
             ($0 as? View)?.apply(blurEffect: style)
@@ -202,7 +202,7 @@ public extension UIViewCreator where View: UICBlurView {
 
 #if os(iOS)
 @available(iOS 13, *)
-public extension UIViewCreator where View: UICBlurView {
+public extension UIViewCreator where View: UICBlur.View {
     func vibrancy(effect: UIVibrancyEffectStyle) -> Self {
         return self.onRendered {
             ($0 as? View)?.apply(vibrancyEffect: effect)

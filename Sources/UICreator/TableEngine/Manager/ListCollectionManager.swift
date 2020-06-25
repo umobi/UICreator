@@ -51,7 +51,7 @@ extension ListCollectionManager {
             return ($0.offset, footer)
         }
     }
-    
+
     func numberOfRows(in section: ListManager.SectionManager) -> Int {
         return section.rows.count
     }

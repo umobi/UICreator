@@ -32,7 +32,7 @@ public struct UICWeakResized {
     fileprivate let width: UILayoutPriority?
     fileprivate let addHandler: ((UIView) -> Void)?
 
-    init(_ superview: UIView!, subview: UIView!,_ addHandler: ((UIView) -> Void)?) {
+    init(_ superview: UIView!, subview: UIView!, _ addHandler: ((UIView) -> Void)?) {
         self.superview = superview
         self.subview = subview
         self.height = nil
@@ -40,7 +40,11 @@ public struct UICWeakResized {
         self.addHandler = addHandler
     }
 
-    private init(_ original: UICWeakResized, height: UILayoutPriority?, width: UILayoutPriority?) {
+    private init(
+        _ original: UICWeakResized,
+        height: UILayoutPriority?,
+        width: UILayoutPriority?) {
+
         self.superview = original.superview
         self.subview = original.subview
         self.height = height ?? original.height

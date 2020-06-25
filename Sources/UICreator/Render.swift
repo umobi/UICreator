@@ -59,9 +59,9 @@ class Render {
         self.needs.contains(state)
     }
 
-    private var notRenderedHandler: ((UIView) -> Void)? = nil
-    private var renderedHandler: ((UIView) -> Void)? = nil
-    private var inTheSceneHandler: ((UIView) -> Void)? = nil
+    private var notRenderedHandler: ((UIView) -> Void)?
+    private var renderedHandler: ((UIView) -> Void)?
+    private var inTheSceneHandler: ((UIView) -> Void)?
 
     private var countingNotRendered: Int = 0
     private var countingRendered: Int = 0
@@ -101,36 +101,38 @@ class Render {
 
     func pop(_ state: UIView.RenderState) {
         guard self.needs(state) else {
-            fatalError()
+            Fatal.popedStatus(state).die()
         }
-
-        self.needs.remove(state)
 
         if self.state < state {
             self.state = state
         }
 
-        switch state {
-        case .notRendered:
+        if state >= .notRendered {
+            self.needs.remove(.notRendered)
+
             let handler = self.notRenderedHandler
             self.notRenderedHandler = nil
             self.countingNotRendered = 0
             handler?(self.manager.uiView)
+        }
 
-        case .rendered:
+        if state >= .rendered {
+            self.needs.remove(.rendered)
+
             let handler = self.renderedHandler
             self.renderedHandler = nil
             self.countingRendered = 0
             handler?(self.manager.uiView)
+        }
 
-        case .inTheScene:
+        if state == .inTheScene {
+            self.needs.remove(.inTheScene)
+
             let handler = self.inTheSceneHandler
             self.inTheSceneHandler = nil
             self.countingInTheScene = 0
             handler?(self.manager.uiView)
-
-        default:
-            break
         }
     }
 
@@ -148,7 +150,7 @@ class Render {
 }
 
 private extension Render {
-    func recursive(commit state: UIView.RenderState){
+    func recursive(commit state: UIView.RenderState) {
         switch state {
         case .notRendered:
             self.manager.notRendered.reversed().forEach {
@@ -189,7 +191,7 @@ private extension ViewCreator {
             return []
         }
 
-        guard self.render.needs(.rendered) else {
+        guard self.render.state >= .notRendered && self.render.needs(.rendered) else {
             return []
         }
 
@@ -203,12 +205,27 @@ private extension ViewCreator {
             return []
         }
 
-        guard self.render.needs(.inTheScene) else {
+        guard self.render.state >= .rendered && self.render.needs(.inTheScene) else {
             return []
         }
 
         return [self] + self.tree.leafs.reduce([]) {
             $0 + $1.leaf.inTheScene
+        }
+    }
+}
+
+extension Render {
+    enum Fatal: FatalType {
+        case popedStatus(UIView.RenderState)
+
+        var error: String {
+            switch self {
+            case .popedStatus(let status):
+                return """
+                UICreator.Render is trying to pop render status '\(status)' but it wasn't necessarly
+                """
+            }
         }
     }
 }

@@ -29,14 +29,26 @@ public extension UIView {
         let duration: TimeInterval
         let animations: (UIView) -> Void
 
-        private init(startAt startTime: TimeInterval, duration: TimeInterval, animations: @escaping (UIView) -> Void) {
+        private init(
+            startAt startTime: TimeInterval,
+            duration: TimeInterval,
+            animations: @escaping (UIView) -> Void) {
+
             self.startTime = startTime
             self.duration = duration
             self.animations = animations
         }
 
-        public static func keyframe(startAt startTime: TimeInterval, duration: TimeInterval, animations: @escaping (UIView) -> Void) -> CreatorKeyframe{
-            return .init(startAt: startTime, duration: duration, animations: animations)
+        public static func keyframe(
+            startAt startTime: TimeInterval,
+            duration: TimeInterval,
+            animations: @escaping (UIView) -> Void) -> CreatorKeyframe {
+
+            return .init(
+                startAt: startTime,
+                duration: duration,
+                animations: animations
+            )
         }
     }
 

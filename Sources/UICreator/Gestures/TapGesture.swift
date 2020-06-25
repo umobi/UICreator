@@ -27,20 +27,20 @@ public class Tap: UIGesture {
     public typealias Gesture = UITapGestureRecognizer
 
     public required init(target view: UIView!) {
-        self.gesture = Gesture.init(target: view)
-        self.gesture.parent = self
+        self.setGesture(Gesture.init(target: view))
+        self.uiGesture.parent = self
     }
 }
 
 public extension UIGesture where Gesture: UITapGestureRecognizer {
     func number(ofTapsRequired number: Int) -> Self {
-        (self.gesture as? Gesture)?.numberOfTapsRequired = number
+        self.uiGesture?.numberOfTapsRequired = number
         return self
     }
 
     #if os(iOS)
     func number(ofTouchesRequired number: Int) -> Self {
-        (self.gesture as? Gesture)?.numberOfTouchesRequired = number
+        self.uiGesture?.numberOfTouchesRequired = number
         return self
     }
     #endif
@@ -61,4 +61,3 @@ public extension ViewCreator {
         }
     }
 }
- 

@@ -23,8 +23,10 @@
 import Foundation
 import UIKit
 
-/// `struct Handler` is a wrap for callbacks used by Core to execute some of the style configurations and other callbacks.
-/// It always return the `self` view as a parameter, so you will not need to create memory dependency in callbacks.
+/// `struct Handler` is a wrap for callbacks used by Core to
+/// execute some of the style configurations and other callbacks.
+/// It always return the `self` view as a parameter, so you will not
+/// need to create memory dependency in callbacks.
 /// As a tip, you may just cast like `$0 as? View`, that may work.
 struct UIHandler<Object> {
     private let handler: ((Object) -> Void)?

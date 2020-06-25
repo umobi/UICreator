@@ -52,12 +52,6 @@ public struct Relay<Value> {
 
     public var projectedValue: Relay<Value> { self }
 
-//    public subscript<T>(dynamicMember keyPath: KeyPath<Value, T>) -> Relay<T> {
-//        return self.map {
-//            $0[keyPath: keyPath]
-//        }
-//    }
-
     public func next(_ handler: @escaping (Value) -> Void) {
         self.reference.reactive.valueDidChange(handler: handler)
     }
@@ -97,7 +91,8 @@ public extension Relay {
 
 public extension Relay {
     @available(*, deprecated, message: "no substitute")
-    func bind<Object, ObjectValue>(_ keyPath: KeyPath<Object, ObjectValue>) -> Relay<ObjectValue?> where Value == Optional<Object> {
+    // swiftlint:disable line_length
+    func bind<Object, ObjectValue>(_ keyPath: KeyPath<Object, ObjectValue>) -> Relay<ObjectValue?> where Value == Object? {
         return self.map {
             guard let object = $0 else {
                 return nil
@@ -162,7 +157,7 @@ public extension Relay {
 /// Sync from left
 infix operator <->
 /// Sync from left
-public func <-><T>(left: Relay<T>, right: Relay<T>) {
+public func <-> <T>(left: Relay<T>, right: Relay<T>) {
     var isLocked = false
 
     left.sync {
@@ -187,7 +182,7 @@ public func <-><T>(left: Relay<T>, right: Relay<T>) {
 }
 
 /// Sync from left
-public func <-><T>(left: Relay<T>?, right: Relay<T>) {
+public func <-> <T>(left: Relay<T>?, right: Relay<T>) {
     guard let left = left else {
         return
     }
@@ -196,7 +191,7 @@ public func <-><T>(left: Relay<T>?, right: Relay<T>) {
 }
 
 /// Sync from left
-public func <-><T>(left: Relay<T>?, right: Relay<T>?) {
+public func <-> <T>(left: Relay<T>?, right: Relay<T>?) {
     guard let left = left, let right = right else {
         return
     }
@@ -208,7 +203,7 @@ public func <-><T>(left: Relay<T>?, right: Relay<T>?) {
 infix operator <~>
 
 /// Lazy operator
-public func <~><T>(left: Relay<T>, right: Relay<T>) {
+public func <~> <T>(left: Relay<T>, right: Relay<T>) {
     var isLocked = false
 
     left.next {
@@ -233,7 +228,7 @@ public func <~><T>(left: Relay<T>, right: Relay<T>) {
 }
 
 /// Lazy operator
-public func <~><T>(left: Relay<T>?, right: Relay<T>) {
+public func <~> <T>(left: Relay<T>?, right: Relay<T>) {
     guard let left = left else {
         return
     }
@@ -242,10 +237,82 @@ public func <~><T>(left: Relay<T>?, right: Relay<T>) {
 }
 
 /// Lazy operator
-public func <~><T>(left: Relay<T>?, right: Relay<T>?) {
+public func <~> <T>(left: Relay<T>?, right: Relay<T>?) {
     guard let left = left, let right = right else {
         return
     }
 
     left <~> right
+}
+
+public prefix func ! (_ relay: Relay<Bool>) -> Relay<Bool> {
+    relay.map { !$0 }
+}
+
+public func && (_ left: Relay<Bool>, _ right: Relay<Bool>) -> Relay<Bool> {
+    let value = Value(wrappedValue: left.wrappedValue && right.wrappedValue)
+
+    left.next {
+        value.wrappedValue = $0 && right.wrappedValue
+    }
+
+    right.next {
+        value.wrappedValue = left.wrappedValue && $0
+    }
+
+    return value.projectedValue
+}
+
+public func || (_ left: Relay<Bool>, _ right: Relay<Bool>) -> Relay<Bool> {
+    let value = Value(wrappedValue: left.wrappedValue || right.wrappedValue)
+
+    left.next {
+        value.wrappedValue = $0 || right.wrappedValue
+    }
+
+    right.next {
+        value.wrappedValue = left.wrappedValue || $0
+    }
+
+    return value.projectedValue
+}
+
+public func || (_ left: Bool, _ right: Relay<Bool>) -> Relay<Bool> {
+    let value = Value(wrappedValue: left || right.wrappedValue)
+
+    right.next {
+        value.wrappedValue = left || $0
+    }
+
+    return value.projectedValue
+}
+
+public func || (_ left: Relay<Bool>, _ right: Bool) -> Relay<Bool> {
+    let value = Value(wrappedValue: left.wrappedValue || right)
+
+    left.next {
+        value.wrappedValue = $0 || right
+    }
+
+    return value.projectedValue
+}
+
+public func && (_ left: Bool, _ right: Relay<Bool>) -> Relay<Bool> {
+    let value = Value(wrappedValue: left && right.wrappedValue)
+
+    right.next {
+        value.wrappedValue = left && $0
+    }
+
+    return value.projectedValue
+}
+
+public func && (_ left: Relay<Bool>, _ right: Bool) -> Relay<Bool> {
+    let value = Value(wrappedValue: left.wrappedValue && right)
+
+    left.next {
+        value.wrappedValue = $0 && right
+    }
+
+    return value.projectedValue
 }

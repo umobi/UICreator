@@ -21,23 +21,20 @@
 //
 
 import Foundation
-import UIKit
 
-public class Link: UICHost {
-    public init(content: @escaping () -> ViewCreator) {
-        super.init(content: content)
-    }
-}
+public extension ContentView {
+    enum LayoutMode {
+        case top
+        case topLeft
+        case topRight
 
-public extension Link {
-    func destination(content: @escaping () -> ViewCreator) -> Self {
-        self.onInTheScene {
-            _ = $0.viewCreator?.onTap {
-                if $0.navigationController != nil {
-                    $0.navigation?.push(animated: true, content: content)
-                    return
-                }
-            }
-        }
+        case bottom
+        case bottomLeft
+        case bottomRight
+
+        case left
+        case right
+
+        case center
     }
 }

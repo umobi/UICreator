@@ -23,22 +23,22 @@
 import Foundation
 import UIKit
 
-extension TableView: ListSupport {}
+extension UICTableView: ListSupport {}
 
 public extension UICList {
-    convenience init(style: UITableView.Style,_ contents: @escaping () -> [ViewCreator]) {
+    convenience init(style: UITableView.Style, _ contents: @escaping () -> [ViewCreator]) {
         self.init(style: style, ListManager(contents: contents()))
     }
 
-    private convenience init(style: UITableView.Style,_ manager: ListManager) {
+    private convenience init(style: UITableView.Style, _ manager: ListManager) {
         self.init(style: style)
 
         self.onNotRendered { [manager] in
-            let tableView: View! = $0 as? View
+            let tableView: UICTableView! = $0 as? UICTableView
             #if os(iOS)
             tableView.separatorStyle = .none
             #endif
-            
+
             manager.rowsIdentifier.forEach { [unowned tableView] in
                 tableView?.register(TableViewCell.self, forCellReuseIdentifier: $0)
             }

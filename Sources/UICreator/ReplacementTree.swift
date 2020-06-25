@@ -78,9 +78,11 @@ class ReplacementTree {
     }
 
     func replace(with newManager: ViewCreator) -> Bool {
-        if let maker = newManager as? UIViewMaker, let adaptor = self.manager as? Adaptor {
+        if let maker = newManager as? ViewRepresentable, let adaptor = self.manager as? Adaptor {
             adaptor.removeSubviews()
-            let newAdaptor = maker.makeView().viewCreator as! Adaptor
+            guard let newAdaptor = maker.privateMakeUIView().viewCreator as? Adaptor else {
+                Fatal.Builder("Can't cast ViewCreator as Adaptor").die()
+            }
             self.swap(newAdaptor)
             self.commit(newAdaptor)
             return true

@@ -13,6 +13,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: Swiftlint
+      run: |
+        brew install swiftlint
+        swiftlint
+
+    - name: cocoapods lint
+      run: |
+          pod lib lint --allow-warnings
+
     - name: Build iOS
       run: |
         swift package generate-xcodeproj
@@ -24,7 +34,3 @@ jobs:
         swift package generate-xcodeproj
         xcodebuild build -sdk appletvos -scheme 'UICreator-Package'
         xcodebuild test -destination 'name=Apple TV' -scheme 'UICreator-Package'
-        
-    - name: cocoapods lint
-      run: |
-          pod lib lint --allow-warnings

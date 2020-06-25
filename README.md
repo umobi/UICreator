@@ -26,7 +26,7 @@ UIView | UICSpacer | ✅ | It contains a lot of properties from UIView and helps
 UIStackView | UICStack | ✅ | It has two variation `UICVStack` and `UICHStack`.
 UILabel | UICLabel | ✅ | It shows the text on the screen.
 UITextField | UICText | ✅ | Is a text that can be edited.
-UITextView | UICTextView | ✅ | It is a scrollable text that can be edited.
+UITextView | UICScrollText | ✅ | It is a scrollable text that can be edited.
 UIScrollView | UICScroll | ✅ | Scrollable content with two variation `UICVScroll` and `UICHScroll`.
 UIImageView | UICImage | ✅ | It shows the image on the screen.
 UIButton | UICButton | ✅ | It is a view with control settings.

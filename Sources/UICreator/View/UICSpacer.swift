@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICSpacerView: UIView, UICManagerContentView {
+public class SpacerView: UIView, UICManagerContentView {
     private weak var view: UIView?
     let margin: Edges
 
@@ -41,11 +41,11 @@ public class UICSpacerView: UIView, UICManagerContentView {
     }
 
     public override init(frame: CGRect) {
-        fatalError("init(frame:) has not been implemented")
+        Fatal.Builder("init(frame:) has not been implemented").die()
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     override open var isHidden: Bool {
@@ -136,7 +136,7 @@ public class UICSpacerView: UIView, UICManagerContentView {
     }
 }
 
-public extension UICSpacerView {
+public extension SpacerView {
     struct Edges {
         public let top, bottom, leading, trailing: CGFloat
 
@@ -162,7 +162,7 @@ public extension UICSpacerView {
 }
 
 public class UICSpacer: UIViewCreator {
-    public typealias View = UICSpacerView
+    public typealias View = SpacerView
 
     public required init(margin: View.Edges, content: @escaping () -> ViewCreator) {
         let content = content()
@@ -180,11 +180,9 @@ public class UICSpacer: UIViewCreator {
 }
 
 public class UICEmpty: ViewCreator {
-    public typealias View = UIView
-
     public init() {
         self.loadView { [unowned self] in
-            View(builder: self)
+            UIView(builder: self)
         }
     }
 }
@@ -204,8 +202,8 @@ public extension UICSpacer {
 
     convenience init(horizontal: CGFloat) {
         self.init(margin: .init(vertical: 0, horizontal: horizontal)) {
-           UICEmpty()
-       }
+            UICEmpty()
+        }
     }
 
     convenience init() {
@@ -222,8 +220,22 @@ public extension UICSpacer {
 }
 
 public extension UICSpacer {
-    convenience init(top: CGFloat, bottom: CGFloat, leading: CGFloat, trailing: CGFloat, content: @escaping () -> ViewCreator) {
-        self.init(margin: .init(top: top, bottom: bottom, leading: leading, trailing: trailing), content: content)
+    convenience init(
+        top: CGFloat,
+        bottom: CGFloat,
+        leading: CGFloat,
+        trailing: CGFloat,
+        content: @escaping () -> ViewCreator) {
+
+        self.init(
+            margin: .init(
+                top: top,
+                bottom: bottom,
+                leading: leading,
+                trailing: trailing
+            ),
+            content: content
+        )
     }
 
     convenience init(vertical: CGFloat, horizontal: CGFloat, content: @escaping () -> ViewCreator) {

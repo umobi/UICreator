@@ -23,30 +23,45 @@
 import Foundation
 import UIKit
 
-extension _CollectionView: UICollectionViewDelegate {
+extension UICCollectionView: UICollectionViewDelegate {
 
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath) -> CGSize {
+
         return self.sizeForItem(at: indexPath)
     }
 
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForHeaderInSection section: Int) -> CGSize {
+
         return self.sizeForHeader(at: section) ?? .zero
     }
 
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForFooterInSection section: Int) -> CGSize {
+
         return self.sizeForFooter(at: section) ?? .zero
     }
 }
 
 public extension UICollectionView {
     fileprivate var size: CGSize {
-        return .init(width: self.frame.size.width - (self.contentInset.left + self.contentInset.right), height: self.frame.height - (self.contentInset.top + self.contentInset.bottom))
+        return .init(
+            width: self.frame.size.width - (self.contentInset.left + self.contentInset.right),
+            height: self.frame.height - (self.contentInset.top + self.contentInset.bottom)
+        )
     }
 
     /// ViewCreator
     func sizeForItem(at indexPath: IndexPath) -> CGSize {
         guard let layoutManager = self.layoutManager else {
-            fatalError()
+            Fatal.noLayoutManagerConfigurated.die()
         }
 
         return layoutManager
@@ -57,7 +72,7 @@ public extension UICollectionView {
     /// ViewCreator
     func sizeForHeader(at section: Int) -> CGSize? {
         guard let layoutManager = self.layoutManager else {
-            fatalError()
+            Fatal.noLayoutManagerConfigurated.die()
         }
 
         return layoutManager
@@ -68,11 +83,19 @@ public extension UICollectionView {
     /// ViewCreator
     func sizeForFooter(at section: Int) -> CGSize? {
         guard let layoutManager = self.layoutManager else {
-            fatalError()
+            Fatal.noLayoutManagerConfigurated.die()
         }
 
         return layoutManager
             .footer(at: section)?
             .size(self.size, at: section)
+    }
+}
+
+extension UICollectionView {
+    enum Fatal: String, FatalType {
+        case noLayoutManagerConfigurated = """
+        UICollectionView is trying to get LayoutManager but there is no instance of it
+        """
     }
 }

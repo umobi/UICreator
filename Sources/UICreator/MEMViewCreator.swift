@@ -130,7 +130,7 @@ extension ViewCreator {
             self.viewObject = .weak(uiView)
             return
         }
-        
+
         self.viewObject = .strong(uiView)
     }
 
@@ -146,15 +146,19 @@ extension ViewCreator {
                 return view
             }
 
-            if let viewMaker = self as? UIViewMaker {
-                return viewMaker.makeView()
+            if let viewMaker = self as? ViewRepresentable {
+                return viewMaker.privateMakeUIView()
+            }
+
+            if let viewMaker = self as? ViewControllerRepresentable {
+                return viewMaker.privateMakeUIView()
             }
 
             if let uicView = self as? UICView {
                 return uicView.makeView()
             }
 
-            fatalError()
+            ViewCreatorFatal.alreadyLoadedView.die()
         }()
 
         if loadView.viewCreator === self {
@@ -185,4 +189,10 @@ extension ViewCreator {
     func releaseLoader() {
         self.loadViewHandler = nil
     }
+}
+
+enum ViewCreatorFatal: String, FatalType {
+    case alreadyLoadedView = """
+    ViewCreator is trying to load a view, but it may be already loaded or some weird error occurred
+    """
 }

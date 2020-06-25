@@ -26,9 +26,9 @@ import UIKit
 public class TouchGesture: UIGestureRecognizer {
     public var numberOfTouchedRequired: Int = 1
     private var _numberOfTouches: Int = 0
-    private var lastDateTouched: Date? = nil
+    private var lastDateTouched: Date?
     public var cancelWhenTouchMoves: Bool = false
-    public var lastLocation: CGPoint? = nil
+    public var lastLocation: CGPoint?
 
     public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
         if self.state == .possible {
@@ -51,7 +51,7 @@ public class TouchGesture: UIGestureRecognizer {
 
     public override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
         self.cleanVariables()
-        
+
         if cancelWhenTouchMoves, let oldLocation = self.lastLocation {
             let newLocation = self.location(in: self.view)
             if abs(oldLocation.x - newLocation.x) > 10 || abs(oldLocation.y - newLocation.y) > 10 {
@@ -85,19 +85,19 @@ public class Touch: UIGesture {
 
     public required init(target view: UIView!) {
         self.setGesture(Gesture.init(target: view))
-        self.gesture.parent = self
+        self.uiGesture.parent = self
     }
 }
 
 public extension UIGesture where Gesture: TouchGesture {
     #if os(iOS)
     func number(ofTouchesRequired number: Int) -> Self {
-        (self.gesture as? Gesture)?.numberOfTouchedRequired = number
+        self.uiGesture.numberOfTouchedRequired = number
         return self
     }
 
     func cancelWhenTouchMoves(_ flag: Bool) -> Self {
-        (self.gesture as? Gesture)?.cancelWhenTouchMoves = flag
+        self.uiGesture.cancelWhenTouchMoves = flag
         return self
     }
     #endif

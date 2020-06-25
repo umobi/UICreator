@@ -24,31 +24,15 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public extension UICContentView {
-    enum LayoutMode {
-        case top
-        case topLeft
-        case topRight
-
-        case bottom
-        case bottomLeft
-        case bottomRight
-
-        case left
-        case right
-
-        case center
-    }
-}
-
-public class UICContentView: UIView, UICManagerContentView {
+// swiftlint:disable file_length type_body_length
+public class ContentView: UIView, UICManagerContentView {
     public var priority: UILayoutPriority {
         didSet {
             self.reloadContentLayout()
         }
     }
 
-    public var layoutMode: LayoutMode {
+    var layoutMode: LayoutMode {
         didSet {
             self.reloadContentLayout(oldValue)
         }
@@ -69,7 +53,7 @@ public class UICContentView: UIView, UICManagerContentView {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     override open var isHidden: Bool {
@@ -124,6 +108,7 @@ public class UICContentView: UIView, UICManagerContentView {
         self.reloadContentLayout(nil)
     }
 
+    // swiftlint:disable function_body_length
     private func reloadContentLayout(_ oldLayoutMode: LayoutMode?) {
         guard let view = self.view else {
             return
@@ -339,6 +324,7 @@ public class UICContentView: UIView, UICManagerContentView {
         }
     }
 
+    // swiftlint:disable function_body_length
     private func removeConstraints(_ oldValue: LayoutMode) {
         guard let view = self.view else {
             return
@@ -513,77 +499,6 @@ public class UICContentView: UIView, UICManagerContentView {
                     .leading
                     .greaterThanOrEqualTo(0)
             )
-        }
-    }
-}
-
-public class UICContent: UIViewCreator {
-    public typealias View = UICContentView
-
-    public init(mode: View.LayoutMode = .center, priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) {
-        let content = content()
-        self.tree.append(content)
-
-        self.loadView { [unowned self] in
-            View(builder: self)
-        }
-        .onNotRendered {
-            ($0 as? View)?.layoutMode = mode
-            ($0 as? View)?.priority = priority
-        }
-        .onNotRendered {
-            ($0 as? View)?.addContent(content.releaseUIView())
-        }
-    }
-}
-
-public func UICCenter(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .center, priority: priority, content: content)
-}
-
-public func UICTopLeft(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .topLeft, priority: priority, content: content)
-}
-
-public func UICTop(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .top, priority: priority, content: content)
-}
-
-public func UICTopRight(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .topRight, priority: priority, content: content)
-}
-
-public func UICLeft(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .left, priority: priority, content: content)
-}
-
-public func UICRight(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .right, priority: priority, content: content)
-}
-
-public func UICBottomLeft(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .bottomLeft, priority: priority, content: content)
-}
-
-public func UICBottom(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .bottom, priority: priority, content: content)
-}
-
-public func UICBottomRight(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .bottomRight, priority: priority, content: content)
-}
-
-public extension UIViewCreator where View: UICContentView {
-
-    func content(mode: UICContentView.LayoutMode) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.layoutMode = mode
-        }
-    }
-
-    func fitting(priority: UILayoutPriority) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.priority = priority
         }
     }
 }

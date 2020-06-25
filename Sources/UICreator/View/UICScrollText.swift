@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public class _TextView: UITextView {
+public class TextView: UITextView {
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -67,8 +67,8 @@ public class _TextView: UITextView {
     }
 }
 
-public class UICTextView: UIViewCreator, TextElement, TextKeyboard {
-    public typealias View = _TextView
+public class UICScrollText: UIViewCreator, TextElement, TextKeyboard {
+    public typealias View = TextView
 
     required public init(_ text: String?) {
         self.loadView { [unowned self] in
@@ -166,7 +166,6 @@ public extension TextKeyboard where View: UITextView {
         }
     }
 
-
     func keyboardType(_ type: UIKeyboardType) -> Self {
         return self.onNotRendered {
             ($0 as? View)?.keyboardType = type
@@ -236,7 +235,7 @@ public extension TextKeyboard where View: UITextView {
         self.tree.append(content)
 
         return self.onRendered {
-            ($0 as? View)?.inputView = content.releaseUIView()
+            ($0 as? View)?.inputView = UICHostingView(view: content)
         }
     }
 
@@ -245,7 +244,7 @@ public extension TextKeyboard where View: UITextView {
         self.tree.append(content)
 
         return self.onRendered {
-            ($0 as? View)?.inputAccessoryView = content.releaseUIView()
+            ($0 as? View)?.inputAccessoryView = UICHostingView(view: content)
         }
     }
 
@@ -255,10 +254,9 @@ public extension TextKeyboard where View: UITextView {
         }
     }
 
-    func typingAttributes(_ attributes: [NSAttributedString.Key : Any]?) -> Self {
+    func typingAttributes(_ attributes: [NSAttributedString.Key: Any]?) -> Self {
        self.onNotRendered {
             ($0 as? View)?.typingAttributes = attributes ?? [:]
        }
    }
 }
-

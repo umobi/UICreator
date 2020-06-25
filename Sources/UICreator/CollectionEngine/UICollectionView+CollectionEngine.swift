@@ -56,7 +56,7 @@ extension UICollectionView {
         guard let content = self.layoutManagerCallback else {
             return
         }
-        
+
         self.layoutManager = UICCollectionLayoutManager(contents: content())
         self.invalidateIntrinsicContentSize()
     }

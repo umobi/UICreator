@@ -26,12 +26,14 @@ import Foundation
 import SwiftUI
 
 @available(iOS 13, tvOS 13, *)
-/// `LivePreview` is the main class that will manipulate the view creator for SwiftUI. It is necessary to use it as SwiftUI.View
+/// `LivePreview` is the main class that will manipulate the view creator for SwiftUI.
+///  It is necessary to use it as SwiftUI.View
 public struct LivePreview: SwiftUI.View {
 
     let view: ViewCreator
 
-    /// The init supports directly constructor of view creator or it can be used the callback constructor. Since view creator doesn’t have a default constructor, it is needed to be created outside of LivePreview.
+    /// The init supports directly constructor of view creator or it can be used the callback constructor.
+    /// Since view creator doesn’t have a default constructor, it is needed to be created outside of LivePreview.
     public init(_ initClass: ViewCreator) {
         self.view = initClass
     }

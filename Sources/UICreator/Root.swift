@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 
 /// RootView is an internal view that is used to be the UIView of some view creator to support lazy loads.
-public class RootView: UIView {
+public class RootView: UIView, ViewCreatorNoLayoutConstraints {
     var willCommitNotRenderedHandler: (() -> Void)?
     var didCommitNotRenderedHandler: (() -> Void)?
 
@@ -32,13 +32,8 @@ public class RootView: UIView {
         super.init(frame: .zero)
     }
 
-    weak var hostingView: UICHostingView? = nil
-    override public var next: UIResponder? {
-        super.next ?? (self.hostingView?.view)
-    }
-
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     override open func willMove(toSuperview newSuperview: UIView?) {
@@ -96,9 +91,11 @@ extension RootView: RenderWillMoveToSuperviewState {
 }
 
 /**
- The root is the base view creator class for some of the view creators. You shouldn’t use this directly, instead, check `UICView` or `UICViewRepresentable`.
+ The root is the base view creator class for some of the view creators.
+ You shouldn’t use this directly, instead, check `UICView` or `UICViewRepresentable`.
 
- Root support some of the protocols that is used in some of representable of view controllers like the protocol `ViewControllerAppearStates`.
+ Root support some of the protocols that is used in some of representable of
+ view controllers like the protocol `ViewControllerAppearStates`.
  */
 open class Root: ViewCreator {
     public typealias View = RootView

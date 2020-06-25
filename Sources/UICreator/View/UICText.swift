@@ -24,7 +24,8 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class _TextField: UITextField {
+// swiftlint:disable file_length
+public class TextField: UITextField {
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         RenderManager(self)?.willMove(toSuperview: newSuperview)
@@ -68,7 +69,7 @@ public class _TextField: UITextField {
 }
 
 public class UICText: UIViewCreator, TextElement, TextKeyboard, Control {
-    public typealias View = _TextField
+    public typealias View = TextField
 
     required public init(_ text: String?) {
         self.text(text)
@@ -125,8 +126,15 @@ public extension TextElement where View: UITextField {
                 return
             }
 
-            let muttable = NSMutableAttributedString(attributedString: label.attributedPlaceholder ?? .init(string: label.placeholder ?? ""))
-            muttable.addAttribute(.foregroundColor, value: color ?? .clear, range: (muttable.string as NSString).range(of: muttable.string))
+            let muttable = NSMutableAttributedString(attributedString:
+                label.attributedPlaceholder ??
+                    .init(string: label.placeholder ?? "")
+            )
+            muttable.addAttribute(
+                .foregroundColor,
+                value: color ?? .clear,
+                range: (muttable.string as NSString).range(of: muttable.string)
+            )
             label.attributedPlaceholder = muttable
         }
     }
@@ -137,8 +145,15 @@ public extension TextElement where View: UITextField {
                 return
             }
 
-            let muttable = NSMutableAttributedString(attributedString: label.attributedPlaceholder ?? .init(string: label.placeholder ?? ""))
-            muttable.addAttribute(.font, value: font, range: (muttable.string as NSString).range(of: muttable.string))
+            let muttable = NSMutableAttributedString(attributedString:
+                label.attributedPlaceholder ??
+                    .init(string: label.placeholder ?? "")
+            )
+            muttable.addAttribute(
+                .font,
+                value: font,
+                range: (muttable.string as NSString).range(of: muttable.string)
+            )
             label.attributedPlaceholder = muttable
         }
     }
@@ -255,11 +270,11 @@ public extension UIViewCreator where Self: Control, View: UITextField {
 
 public extension UIViewCreator where View: UITextField {
     func leftView(_ mode: UITextField.ViewMode = .always, content: @escaping () -> ViewCreator) -> Self {
-        let host = UICHost(content: content)
+        let host = content()
         self.tree.append(host)
 
         return self.onRendered { view in
-            (view as? View)?.leftView = host.releaseUIView()
+            (view as? View)?.leftView = UICHostingView(view: host)
             (view as? View)?.leftViewMode = mode
 
             var needsToAddConstraints = true
@@ -287,11 +302,11 @@ public extension UIViewCreator where View: UITextField {
     }
 
     func rightView(_ mode: UITextField.ViewMode = .always, content: @escaping () -> ViewCreator) -> Self {
-        let host = UICHost(content: content)
+        let host = content()
         self.tree.append(host)
 
         return self.onRendered { view in
-            (view as? View)?.rightView = host.releaseUIView()
+            (view as? View)?.rightView = UICHostingView(view: host)
             (view as? View)?.rightViewMode = mode
 
             var needsToAddConstraints = true
@@ -401,7 +416,7 @@ public extension TextKeyboard where View: UITextField {
         self.tree.append(content)
 
         return self.onRendered {
-           ($0 as? View)?.inputView = content.releaseUIView()
+           ($0 as? View)?.inputView = UICHostingView(view: content)
         }
     }
 
@@ -410,7 +425,7 @@ public extension TextKeyboard where View: UITextField {
         self.tree.append(content)
 
         return self.onRendered {
-            ($0 as? View)?.inputAccessoryView = content.releaseUIView()
+            ($0 as? View)?.inputAccessoryView = UICHostingView(view: content)
         }
     }
 
@@ -420,7 +435,7 @@ public extension TextKeyboard where View: UITextField {
         }
     }
 
-    func typingAttributes(_ attributes: [NSAttributedString.Key : Any]?) -> Self {
+    func typingAttributes(_ attributes: [NSAttributedString.Key: Any]?) -> Self {
        self.onNotRendered {
            ($0 as? View)?.typingAttributes = attributes
        }
@@ -478,7 +493,6 @@ public extension UIViewCreator where Self: TextElement & Control, View: UITextFi
                 guard !isLocked else {
                     return
                 }
-
 
                 isLocked = true
                 (view as? View)?.text = $0

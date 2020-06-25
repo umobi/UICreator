@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public class _Label: UILabel {
+public class Label: UILabel {
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -68,7 +68,7 @@ public class _Label: UILabel {
 }
 
 public class UICLabel: UIViewCreator, TextElement {
-    public typealias View = _Label
+    public typealias View = Label
 
     required public init(_ text: String?) {
         self.loadView {

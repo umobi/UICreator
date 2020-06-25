@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 
 #if os(iOS)
-public class _Slider: UISlider {
+public class Slider: UISlider {
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -69,7 +69,7 @@ public class _Slider: UISlider {
 }
 
 public class UICSlider: UIViewCreator, Control {
-    public typealias View = _Slider
+    public typealias View = Slider
 
     public init() {
         self.loadView { [unowned self] in

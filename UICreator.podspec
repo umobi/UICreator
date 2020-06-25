@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'UICreator'
-  s.version          = '1.0.0-alpha.10'
+  s.version          = '1.0.0-alpha.11'
   s.summary          = 'UICreator use declarative programming to create view interface using UIKit by Apple'
   s.homepage         = 'https://github.com/umobi/UICreator'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
@@ -22,10 +22,10 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '10.0'
   s.tvos.deployment_target = '10.0'
-  s.swift_version = '5.1'
+  s.swift_version = '5.2'
 
   s.source_files = 'Sources/UICreator/**/*'
 
-  s.dependency 'ConstraintBuilder', '>= 1.0.5', "< 2.0.0"
+  s.dependency 'ConstraintBuilder', '>= 1.0.6', "< 2.0.0"
 
 end

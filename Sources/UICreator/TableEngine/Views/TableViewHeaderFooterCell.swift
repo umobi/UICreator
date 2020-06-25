@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-internal class TableViewHeaderFooterCell: UITableViewHeaderFooterView, ReusableView {
+internal class TableViewHeaderFooterCell: UITableViewHeaderFooterView, ReusableView, TableCellType {
     var cellLoaded: UICCell.Loaded!
 
     override init(reuseIdentifier: String?) {
@@ -33,7 +33,7 @@ internal class TableViewHeaderFooterCell: UITableViewHeaderFooterView, ReusableV
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     override open var isHidden: Bool {

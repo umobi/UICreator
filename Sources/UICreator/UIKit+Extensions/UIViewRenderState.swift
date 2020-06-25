@@ -26,7 +26,8 @@ import UIKit
 internal extension UIView {
 
     /// `enum Mode` The view rendering mode. It is updated depending on the hierarchy of the view.
-    /// To execute each state, the superview should call `commitNotRendered()`, `commitRendered()` and `commitInTheScene()`
+    /// To execute each state, the superview should call `commitNotRendered()`,
+    /// `commitRendered()` and `commitInTheScene()`
     /// provided by `protocol ViewCreator` .
     enum RenderState {
         case notRendered
@@ -41,36 +42,57 @@ extension UIView.RenderState {
         return [.unset, .notRendered, .rendered, .inTheScene]
     }
 
-    static func >(left: UIView.RenderState, right: UIView.RenderState) -> Bool {
+    static func > (left: UIView.RenderState, right: UIView.RenderState) -> Bool {
         let allCases = self.allCases
-        guard let leftOffset = allCases.enumerated().first(where: { $0.element == left })?.offset else {
+        guard
+            let leftOffset = allCases
+                .enumerated()
+                .first(where: { $0.element == left })?
+                .offset
+        else {
             return false
         }
 
         return allCases[0..<leftOffset].contains(right)
     }
 
-    static func <(left: UIView.RenderState, right: UIView.RenderState) -> Bool {
+    static func < (left: UIView.RenderState, right: UIView.RenderState) -> Bool {
         let allCases = self.allCases
-        guard let leftOffset = allCases.enumerated().first(where: { $0.element == left })?.offset else {
+        guard
+            let leftOffset = allCases
+                .enumerated()
+                .first(where: { $0.element == left })?
+                .offset
+        else {
             return false
         }
 
         return allCases[(leftOffset+1)..<allCases.count].contains(right)
     }
 
-    static func >=(left: UIView.RenderState, right: UIView.RenderState) -> Bool {
+    static func >= (left: UIView.RenderState, right: UIView.RenderState) -> Bool {
         let allCases = self.allCases
-        guard let leftOffset = allCases.enumerated().first(where: { $0.element == left })?.offset else {
+
+        guard
+            let leftOffset = allCases
+                .enumerated()
+                .first(where: { $0.element == left })?
+                .offset
+        else {
             return false
         }
 
         return allCases[0...leftOffset].contains(right)
     }
 
-    static func <=(left: UIView.RenderState, right: UIView.RenderState) -> Bool {
+    static func <= (left: UIView.RenderState, right: UIView.RenderState) -> Bool {
         let allCases = self.allCases
-        guard let leftOffset = allCases.enumerated().first(where: { $0.element == left })?.offset else {
+        guard
+            let leftOffset = allCases
+                .enumerated()
+                .first(where: { $0.element == left })?
+                .offset
+        else {
             return false
         }
 

@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public class _InputView: UIInputView {
+public class InputView: UIInputView {
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -68,10 +68,13 @@ public class _InputView: UIInputView {
 }
 
 public class UICInput: UIViewCreator {
-    public typealias View = _InputView
+    public typealias View = InputView
 
-    public init(size: CGSize = .zero, style: UIInputView.Style = .keyboard, content: @escaping () -> ViewCreator) {
-        let content = UICHost(content: content)
+    public init(
+        size: CGSize = .zero,
+        style: UIInputView.Style = .keyboard,
+        content: @escaping () -> ViewCreator) {
+        let content = content()
         self.tree.append(content)
 
         self.loadView { [unowned self] in

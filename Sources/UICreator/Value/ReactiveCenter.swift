@@ -27,7 +27,7 @@ private class ReactiveToken: CustomStringConvertible, Equatable {
         "\(ObjectIdentifier(self))"
     }
 
-    static func ==(_ left: ReactiveToken,_ right: ReactiveToken) -> Bool {
+    static func == (_ left: ReactiveToken, _ right: ReactiveToken) -> Bool {
         ObjectIdentifier(left) == ObjectIdentifier(right)
     }
 }
@@ -43,7 +43,7 @@ struct ReactiveReferenceCenter {
     fileprivate let reactiveCenter: ReactiveCenter
     fileprivate let reference: ReactiveItemReference
 
-    fileprivate init(reference: ReactiveItemReference,_ center: ReactiveCenter) {
+    fileprivate init(reference: ReactiveItemReference, _ center: ReactiveCenter) {
         self.reactiveCenter = center
         self.reference = reference
     }
@@ -104,7 +104,7 @@ extension ReactiveReferenceCenter {
             queue: nil,
             using: { notification in
                 guard let value = notification.userInfo?[Self.kNotificationNewValue] as? Value else {
-                    fatalError()
+                    Fatal.Builder("ReactiveCenter couldn't cast value to type of \(Value.self)").die()
                 }
 
                 handler(value)
@@ -129,7 +129,7 @@ extension ReactiveReferenceCenter {
             queue: nil,
             using: {
                 guard let value = $0.userInfo?[Self.kNotificationNewValue] as? Value else {
-                    fatalError()
+                    Fatal.Builder("ReactiveCenter couldn't cast value to type of \(Value.self)").die()
                 }
 
                 handler(value)
@@ -174,7 +174,7 @@ extension ReactiveReferenceCenter {
                     }
 
                 guard let value = $0.userInfo?[Self.kNotificationNewValue] as? Value else {
-                    fatalError()
+                    Fatal.Builder("ReactiveCenter couldn't cast value to type of \(Value.self)").die()
                 }
 
                 handler(value)
@@ -188,18 +188,5 @@ extension ReactiveReferenceCenter {
             ])
 
         self.reactiveCenter.removeObserver(observable)
-    }
-}
-
-extension Fatal {
-    enum ReactiveCenter: FatalType {
-        case unregistered
-
-        var error: String {
-            switch self {
-                case .unregistered:
-                    return "Identifier for Relay or Value isn't registered in ReactiveCenter"
-            }
-        }
     }
 }

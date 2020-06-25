@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 
 #if os(iOS)
-public class _Switch: UISwitch {
+public class SwitchView: UISwitch {
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -69,15 +69,15 @@ public class _Switch: UISwitch {
 }
 
 public class UICSwitch: UIViewCreator, Control {
-    public typealias View = _Switch
+    public typealias View = SwitchView
 
-    public init(on: Bool) {
+    public init(isOn: Bool) {
         self.loadView { [unowned self] in
             let view = View.init(builder: self)
             return view
         }
         .onNotRendered {
-            ($0 as? View)?.isOn = on
+            ($0 as? View)?.isOn = isOn
         }
     }
 }
@@ -122,8 +122,8 @@ public extension UIViewCreator where Self: Control, View: UISwitch {
 }
 
 public extension UICSwitch {
-    convenience init(_ isOn: Relay<Bool>) {
-        self.init(on: isOn.wrappedValue)
+    convenience init(isOn: Relay<Bool>) {
+        self.init(isOn: isOn.wrappedValue)
 
         var isLocked = false
 

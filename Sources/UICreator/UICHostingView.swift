@@ -1,103 +1,78 @@
 //
-//  UICHostingView.swift
-//  ConstraintBuilder
+// Copyright (c) 2019-Present Umobi - https://github.com/umobi
 //
-//  Created by brennobemoura on 24/04/20.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
 
 import Foundation
 import UIKit
-import ConstraintBuilder
 
-public class UICHostingView: UIViewController {
-    private var strongContentView: UIView? = nil
-    private var contentBuilder: ViewCreator?
+public class UICHostingView: UIView {
+    private(set) var content: MemorySwitch = .nil
 
-    private weak var contentView: ViewCreator! {
+    public override var isHidden: Bool {
         willSet {
-            self.contentBuilder = nil
+            (self.content.object as? ViewCreator)?
+                .uiView?
+                .isHidden = newValue
         }
-    }
-
-    var hostedView: ViewCreator! {
-        self.contentView ?? self.contentBuilder
-    }
-
-    public init() {
-        self.contentBuilder = nil
-        super.init(nibName: nil, bundle: nil)
     }
 
     public init(content: @escaping () -> ViewCreator) {
-        self.contentBuilder = content()
-        super.init(nibName: nil, bundle: nil)
+        self.content = .strong(content())
+        super.init(frame: .zero)
     }
 
-    required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    public init(view: ViewCreator) {
+        self.content = .strong(view)
+        super.init(frame: .zero)
     }
 
-    override public func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override public func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
 
-        guard let strongView = self.strongContentView, strongView.superview == nil else {
+        guard newSuperview != nil else {
             return
         }
 
-        self.strongContentView = nil
-
-        UIView.CBSubview(self.view).addSubview(strongView)
-
-        Constraintable.activate(
-            strongView.cbuild.edges
-        )
+        self.loadView()
     }
 
-    override public func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        guard let view = self.hostedView.uiView else {
+    func loadView() {
+        guard
+            !self.content.isWeak,
+            let content = self.content.object as? ViewCreator
+        else {
             return
         }
 
-        self.strongContentView = view
-        view.removeFromSuperview()
+        let view: UIView! = content.releaseUIView()
+        self.content = .weak(content)
+
+        self.add(priority: .required, view)
     }
 
-    #if os(iOS)
-    public var statusBarStyle: UIStatusBarStyle? = nil {
-        didSet {
-            self.setNeedsStatusBarAppearanceUpdate()
-        }
+    override public init(frame: CGRect) {
+        Fatal.Builder("init(frame:) not implemented").die()
     }
 
-    public override var preferredStatusBarStyle: UIStatusBarStyle {
-        return self.statusBarStyle ?? UIApplication.shared.statusBarStyle
-    }
-    #endif
-
-    override public func viewDidLoad() {
-        super.viewDidLoad()
-
-        guard let contentBuilder = self.contentBuilder else {
-            fatalError()
-        }
-
-        let hostView = UICHost(content: { contentBuilder })
-        self.contentView = hostView
-
-        let contentView: UIView! = hostView.releaseUIView()
-        UIView.CBSubview(self.view).addSubview(contentView)
-
-        (contentView as? RootView)?.hostingView = self
-
-        Constraintable.activate(
-            contentView.cbuild.edges
-        )
-    }
-
-    @available(iOS 11.0, tvOS 11, *)
-    override public func viewSafeAreaInsetsDidChange() {
-        super.viewSafeAreaInsetsDidChange()
-        self.view.setNeedsUpdateConstraints()
+    required init?(coder: NSCoder) {
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 }

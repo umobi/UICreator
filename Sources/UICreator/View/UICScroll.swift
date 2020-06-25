@@ -24,18 +24,20 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-open class UICScrollView: UIScrollView, UICManagerContentView {
-
-    public enum Axis {
+public extension ScrollView {
+    enum Axis {
         case vertical
         case horizontal
         case auto(vertical: UILayoutPriority, horizontal: UILayoutPriority)
     }
 
-    public enum Margin {
+    enum Margin {
         case safeArea
         case bounds
     }
+}
+
+public class ScrollView: UIScrollView, UICManagerContentView {
 
     private weak var contentView: UIView!
     public var axis: Axis {
@@ -141,7 +143,7 @@ open class UICScrollView: UIScrollView, UICManagerContentView {
     }
 
     public required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     override open var isHidden: Bool {
@@ -186,7 +188,7 @@ open class UICScrollView: UIScrollView, UICManagerContentView {
     }
 }
 
-private extension UICScrollView {
+private extension ScrollView {
     var heightMarginAnchor: ConstraintDimension {
         switch self.verticalMargin {
         case .bounds:
@@ -222,7 +224,7 @@ private extension UICScrollView {
     }
 }
 
-private extension UICScrollView {
+private extension ScrollView {
     var verticalOffset: CGFloat {
         return self.contentInset.top + self.contentInset.bottom
     }
@@ -232,7 +234,7 @@ private extension UICScrollView {
     }
 }
 
-private extension UICScrollView {
+private extension ScrollView {
     class ContentView: UIView {
         weak var view: UIView!
 
@@ -251,7 +253,7 @@ private extension UICScrollView {
 }
 
 public class UICScroll: UIViewCreator {
-    public typealias View = UICScrollView
+    public typealias View = ScrollView
 
     public init(axis: View.Axis = .vertical, content: @escaping () -> ViewCreator) {
         let content = content()

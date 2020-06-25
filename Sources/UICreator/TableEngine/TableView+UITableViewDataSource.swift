@@ -23,29 +23,39 @@
 import Foundation
 import UIKit
 
-extension TableView: UITableViewDataSource {
+extension UICTableView: UITableViewDataSource {
     public func numberOfSections(in tableView: UITableView) -> Int {
-        self.manager?.numberOfSections ?? 0
+        let numberOfSections = self.manager?.numberOfSections ?? 0
+        self.sizeManager.sections(count: numberOfSections)
+        return numberOfSections
     }
 
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard let manager = self.manager else {
+            self.sizeManager.rows(count: .zero, in: section)
             return 0
         }
 
-        return manager.numberOfRows(in: manager.section(at: section))
+        let numberOfRows = manager.numberOfRows(in: manager.section(at: section))
+        self.sizeManager.rows(count: numberOfRows, in: section)
+        return numberOfRows
     }
 
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let row = self.manager?.row(at: indexPath) else {
-            fatalError()
+            Fatal.Builder("UICList can't load row for indexPath at \(indexPath)").die()
         }
 
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: row.identifier, for: indexPath) as? TableViewCell else {
-            fatalError()
+        guard
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: row.identifier,
+                for: indexPath
+            ) as? TableViewCell
+        else {
+            Fatal.Builder("UICList can't dequeue cell for indexPath at \(indexPath)").die()
         }
 
-        cell.prepareCell(row)
+        cell.prepareCell(row, axis: .horizontal)
         self.commitCell(cell)
 
         self.appendReusable(cell: cell)

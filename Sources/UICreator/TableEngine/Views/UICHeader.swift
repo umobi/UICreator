@@ -25,7 +25,7 @@ import UIKit
 
 public class UICHeader: ViewCreator {
     let content: () -> ViewCreator
-    fileprivate(set) var height: CGFloat? = nil
+    fileprivate(set) var height: CGFloat?
 
     public init(content: @escaping () -> ViewCreator) {
         self.content = content

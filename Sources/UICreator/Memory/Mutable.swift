@@ -21,18 +21,21 @@
 //
 
 import Foundation
-import UIKit
 
-public class UICHost: Root, UIViewCreator {
-    public init(size: CGSize = .zero, content: @escaping () -> ViewCreator) {
-        super.init()
+class Mutable<Value> {
+    var value: Value
+    init(value: Value) {
+        self.value = value
+    }
+}
 
-        let content = content()
-        self.tree.append(content)
+protocol MutableEditable {
+    associatedtype Editable
+    func edit(_ edit: @escaping (Editable) -> Void) -> Self
+}
 
-        self.onNotRendered { [content] in
-            $0.frame = .init(origin: $0.frame.origin, size: size)
-            $0.add(priority: .required, content.releaseUIView())
-        }
+extension Mutable where Value: MutableEditable {
+    func update(_ update: @escaping (Value.Editable) -> Void) {
+        self.value = value.edit(update)
     }
 }

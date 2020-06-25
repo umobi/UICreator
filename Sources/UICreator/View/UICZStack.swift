@@ -41,7 +41,7 @@ public class ZStackView: UIView {
             RenderManager(self)?.frame(newValue)
         }
     }
-    
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         RenderManager(self)?.willMove(toSuperview: newSuperview)
@@ -68,7 +68,7 @@ public class ZStackView: UIView {
     }
 }
 
-/// `class Child` is a view that holds more than one **subview**.
+/// `class UICZStack` is a view that holds more than one **subview**.
 public class UICZStack: UIViewCreator {
     public typealias View = ZStackView
 

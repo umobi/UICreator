@@ -48,5 +48,5 @@ public protocol TextKeyboard: UIViewCreator {
     func inputView(content: @escaping () -> ViewCreator) -> Self
     func inputDelegate(_ delegate: UITextInputDelegate) -> Self
 
-    func typingAttributes(_ attributes: [NSAttributedString.Key : Any]?) -> Self
+    func typingAttributes(_ attributes: [NSAttributedString.Key: Any]?) -> Self
 }
