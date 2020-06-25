@@ -23,6 +23,7 @@
 import Foundation
 import UIKit
 
+// swiftlint:disable file_length
 extension UICTableView: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard let header = self.manager?.header(at: section) else {
@@ -276,7 +277,6 @@ struct CollectionOfSizes {
             return nil
         }
 
-
         guard
             let footer = self.footers.value.binarySearch({
                 guard case .headerFooter(let searchSection) = $0.contentType else {
@@ -430,14 +430,14 @@ private extension Array {
         var lowerIndex = 0
         var upperIndex = self.count - 1
 
-        while (true) {
+        while true {
             let currentIndex = (lowerIndex + upperIndex)/2
-            if(searchItemHandler(self[currentIndex]) == .orderedSame) {
+            if searchItemHandler(self[currentIndex]) == .orderedSame {
                 return self[currentIndex]
-            } else if (lowerIndex > upperIndex) {
+            } else if lowerIndex > upperIndex {
                 return nil
             } else {
-                if (searchItemHandler(self[currentIndex]) == .orderedDescending) {
+                if searchItemHandler(self[currentIndex]) == .orderedDescending {
                     upperIndex = currentIndex - 1
                 } else {
                     lowerIndex = currentIndex + 1
@@ -465,7 +465,7 @@ extension SizeCache.ContentType: Comparable {
         }
     }
 
-    static func ==(lhs: Self, rhs: Self) -> Bool {
+    static func == (lhs: Self, rhs: Self) -> Bool {
         switch lhs {
         case .cell(let indexPath):
             guard case .cell(let rIndexPath) = rhs else {

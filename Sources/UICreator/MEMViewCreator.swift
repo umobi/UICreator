@@ -147,11 +147,11 @@ extension ViewCreator {
             }
 
             if let viewMaker = self as? ViewRepresentable {
-                return viewMaker._makeUIView()
+                return viewMaker.privateMakeUIView()
             }
 
             if let viewMaker = self as? ViewControllerRepresentable {
-                return viewMaker._makeUIView()
+                return viewMaker.privateMakeUIView()
             }
 
             if let uicView = self as? UICView {

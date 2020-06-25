@@ -78,7 +78,7 @@ public extension NavigationRepresentable {
     var navigationBar: UINavigationBar {
         return self.navigationController.navigationBar
     }
-    
+
     @discardableResult
     func push(animated: Bool, content: @escaping () -> ViewCreator) -> Self {
         self.navigationController.pushViewController(UICHostingController(content: content), animated: animated)

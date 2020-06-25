@@ -219,7 +219,7 @@ struct ViewControllerSearch<ViewController: UIViewController> {
             next: { $0.next }
         )
 
-        var viewNearFromNavigation: UIViewController? = nil
+        var viewNearFromNavigation: UIViewController?
 
         for responder in responders {
             if responder is ViewController {

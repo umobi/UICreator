@@ -112,6 +112,12 @@ extension ListManager {
 }
 
 extension ListManager.RowManager {
+    enum ContentType {
+        case header
+        case footer
+        case row
+    }
+
     struct Payload {
         let content: () -> ViewCreator
         let trailingActions: (() -> [RowAction])?
@@ -119,12 +125,6 @@ extension ListManager.RowManager {
         let accessoryType: UITableViewCell.AccessoryType
         let estimatedHeight: CGFloat?
         let contentType: ContentType
-
-        enum ContentType {
-            case header
-            case footer
-            case row
-        }
 
         init(header: UICHeader) {
             self.content = header.content

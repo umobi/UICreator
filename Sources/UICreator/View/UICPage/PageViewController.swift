@@ -99,7 +99,7 @@ extension PageViewController: UIPageViewControllerDelegate {
         if !completed {
             return
         }
-        
+
         let currentPage = self.currentPage
         self.onPageChangeHandler?(currentPage)
     }

@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 
 public protocol ViewRepresentable: ViewCreator {
-    func _makeUIView() -> UIView
+    func privateMakeUIView() -> UIView
 }
 
 public protocol UICViewRepresentable: UIViewCreator, ViewRepresentable {
@@ -39,7 +39,7 @@ internal extension ViewRepresentable {
 }
 
 public extension UICViewRepresentable {
-    func _makeUIView() -> UIView {
+    func privateMakeUIView() -> UIView {
         if let view = self.uiView {
             return view
         }
@@ -49,7 +49,10 @@ public extension UICViewRepresentable {
             view.updateBuilder(self)
             return view
         }.onInTheScene { [weak self] in
-            self?.updateView($0 as! View)
+            guard let view = $0 as? View else {
+                fatalError()
+            }
+            self?.updateView(view)
         }
 
         return Adaptor(.view(self)).releaseUIView()

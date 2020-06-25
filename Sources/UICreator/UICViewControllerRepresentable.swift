@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 
 public protocol ViewControllerRepresentable: ViewCreator {
-    func _makeUIView() -> UIView
+    func privateMakeUIView() -> UIView
 }
 
 public protocol UICViewControllerRepresentable: ViewControllerRepresentable {
@@ -40,7 +40,7 @@ internal extension ViewControllerRepresentable {
 }
 
 public extension UICViewControllerRepresentable {
-    func _makeUIView() -> UIView {
+    func privateMakeUIView() -> UIView {
         if let view = self.uiView {
             return view
         }

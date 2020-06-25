@@ -119,38 +119,12 @@ extension ReusableView {
 
                 switch collectionView {
                 case is TableCellType:
-                    guard
-                        let tableView = sequence(first: collectionView, next: { $0.superview })
-                            .first(where: { $0 is UITableView }) as? UITableView
-                    else { return }
-
-                    guard
-                        (tableView.needsToUpdateHeightOf(
-                            $0, rowManager:
-                            reusableView.cellLoaded.cell.rowManager
-                        ))
-                        else { return }
-
-                    tableView.itemHeightUpdate(
-                        $0,
-                        rowManager: reusableView.cellLoaded.cell.rowManager
+                    self.updateTableViewBatching(
+                        listView: collectionView,
+                        reusableView: reusableView,
+                        view: $0
                     )
 
-                    if #available(iOS 11, tvOS 11, *) {
-                        tableView.addUniqueCallback {
-                            UIView.performWithoutAnimation {
-                                tableView.performBatchUpdates(nil, completion: nil)
-                            }
-                        }
-                        return
-                    }
-
-                    tableView.addUniqueCallback {
-                        UIView.performWithoutAnimation {
-                            tableView.beginUpdates()
-                            tableView.endUpdates()
-                        }
-                    }
                 case is CollectionCellType:
                     guard
                         let collectionView = sequence(first: collectionView, next: { $0.superview })
@@ -168,6 +142,49 @@ extension ReusableView {
             }
         }
 
+        self.addConstraints(hostedView, axis)
+    }
+
+    func updateTableViewBatching(
+        listView: UIView,
+        reusableView: UIView & ReusableView,
+        view: UIView) {
+
+        guard
+            let tableView = sequence(first: listView, next: { $0.superview })
+                .first(where: { $0 is UITableView }) as? UITableView
+        else { return }
+
+        guard
+            tableView.needsToUpdateHeightOf(
+                view, rowManager:
+                reusableView.cellLoaded.cell.rowManager
+            )
+            else { return }
+
+        tableView.itemHeightUpdate(
+            view,
+            rowManager: reusableView.cellLoaded.cell.rowManager
+        )
+
+        if #available(iOS 11, tvOS 11, *) {
+            tableView.addUniqueCallback {
+                UIView.performWithoutAnimation {
+                    tableView.performBatchUpdates(nil, completion: nil)
+                }
+            }
+            return
+        }
+
+        tableView.addUniqueCallback {
+            UIView.performWithoutAnimation {
+                tableView.beginUpdates()
+                tableView.endUpdates()
+            }
+        }
+    }
+
+    private func addConstraints(_ hostedView: UIView, _ axis: ReusableViewAxis) {
         UIView.CBSubview(self.contentView).addSubview(hostedView)
         switch axis {
         case .center:
