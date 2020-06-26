@@ -119,7 +119,7 @@ extension ReusableView {
 
                 switch collectionView {
                 case is TableCellType:
-                    self.updateTableViewBatching(
+                    Self.updateTableViewBatching(
                         listView: collectionView,
                         reusableView: reusableView,
                         view: $0
@@ -145,7 +145,7 @@ extension ReusableView {
         self.addConstraints(hostedView, axis)
     }
 
-    func updateTableViewBatching(
+    static func updateTableViewBatching(
         listView: UIView,
         reusableView: UIView & ReusableView,
         view: UIView) {
