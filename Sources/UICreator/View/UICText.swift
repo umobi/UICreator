@@ -417,6 +417,7 @@ public extension TextKeyboard where View: UITextField {
 
         return self.onRendered {
            ($0 as? View)?.inputView = UICHostingView(view: content)
+            ($0 as? View)?.inputView?.sizeToFit()
         }
     }
 
@@ -426,6 +427,7 @@ public extension TextKeyboard where View: UITextField {
 
         return self.onRendered {
             ($0 as? View)?.inputAccessoryView = UICHostingView(view: content)
+            ($0 as? View)?.inputAccessoryView?.sizeToFit()
         }
     }
 
