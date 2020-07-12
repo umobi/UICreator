@@ -118,209 +118,209 @@ public class ContentView: UIView, UICManagerContentView {
 
         switch self.layoutMode {
         case .bottom:
-            Constraintable.activate(
+            Constraintable.activate {
                 view.cbuild
                     .bottom
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .centerX
                     .equalTo(self.cbuild.centerX)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .top
                     .greaterThanOrEqualTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .leading
                     .trailing
                     .greaterThanOrEqualTo(0)
                     .priority(priority)
-            )
+            }
         case .bottomLeft:
-            Constraintable.activate(
+            Constraintable.activate {
                 view.cbuild
                     .bottom
                     .equalTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .leading
                     .equalTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .top
                     .greaterThanOrEqualTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .trailing
                     .greaterThanOrEqualTo(0)
                     .priority(priority)
-            )
+            }
 
         case .bottomRight:
-            Constraintable.activate(
+            Constraintable.activate {
                 view.cbuild
                     .bottom
                     .equalTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .trailing
                     .equalTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .top
                     .greaterThanOrEqualTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .leading
                     .greaterThanOrEqualTo(0)
                     .priority(priority)
-            )
+            }
         case .center:
-            Constraintable.activate(
+            Constraintable.activate {
                 view.cbuild
                     .center
                     .equalTo(self.cbuild.center)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .top
                     .bottom
                     .greaterThanOrEqualTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .leading
                     .trailing
                     .greaterThanOrEqualTo(0)
                     .priority(priority)
-            )
+            }
 
         case .left:
-            Constraintable.activate(
+            Constraintable.activate {
                 view.cbuild
                     .top
                     .bottom
                     .greaterThanOrEqualTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .trailing
                     .greaterThanOrEqualTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .leading
                     .equalTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .centerY
                     .equalTo(self.cbuild.centerY)
                     .priority(priority)
-            )
+            }
 
         case .right:
-            Constraintable.activate(
+            Constraintable.activate {
                 view.cbuild
                     .top
                     .bottom
                     .greaterThanOrEqualTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .leading
                     .greaterThanOrEqualTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .trailing
                     .equalTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .centerY
                     .equalTo(self.cbuild.centerY)
                     .priority(priority)
-            )
+            }
 
         case .top:
-            Constraintable.activate(
+            Constraintable.activate {
                 view.cbuild
                     .top
                     .equalTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .bottom
                     .greaterThanOrEqualTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .leading
                     .trailing
                     .greaterThanOrEqualTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .centerX
                     .equalTo(self.cbuild.centerX)
                     .priority(priority)
-            )
+            }
 
         case .topLeft:
-            Constraintable.activate(
+            Constraintable.activate {
                 view.cbuild
                     .top
                     .equalTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .leading
                     .equalTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .bottom
                     .greaterThanOrEqualTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .trailing
                     .greaterThanOrEqualTo(0)
                     .priority(priority)
-            )
+            }
 
         case .topRight:
-            Constraintable.activate(
+            Constraintable.activate {
                 view.cbuild
                     .top
                     .equalTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .trailing
                     .equalTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .bottom
                     .greaterThanOrEqualTo(0)
-                    .priority(priority),
+                    .priority(priority)
 
                 view.cbuild
                     .leading
                     .greaterThanOrEqualTo(0)
                     .priority(priority)
-            )
+            }
         }
     }
 
@@ -332,173 +332,173 @@ public class ContentView: UIView, UICManagerContentView {
 
         switch oldValue {
         case .bottom:
-            Constraintable.deactivate(
-                view.cbuild
-                    .bottom,
-
-                view.cbuild
-                    .centerX
-                    .equalTo(self.cbuild.centerX),
-
-                view.cbuild
-                    .top
-                    .greaterThanOrEqualTo(0),
-
-                view.cbuild
-                    .trailing
-                    .leading
-                    .greaterThanOrEqualTo(0)
-            )
-
-        case .bottomLeft:
-            Constraintable.deactivate(
+            Constraintable.deactivate {
                 view.cbuild
                     .bottom
-                    .equalTo(0),
-
-                view.cbuild
-                    .leading
-                    .equalTo(0),
-
-                view.cbuild
-                    .top
-                    .greaterThanOrEqualTo(0),
-
-                view.cbuild
-                    .trailing
-                    .greaterThanOrEqualTo(0)
-            )
-
-        case .bottomRight:
-            Constraintable.deactivate(
-                view.cbuild
-                    .bottom
-                    .equalTo(0),
-
-                view.cbuild
-                    .trailing
-                    .equalTo(0),
-
-                view.cbuild
-                    .top
-                    .greaterThanOrEqualTo(0),
-
-                view.cbuild
-                    .leading
-                    .greaterThanOrEqualTo(0)
-            )
-
-        case .center:
-            Constraintable.deactivate(
-                view.cbuild
-                    .center
-                    .equalTo(self.cbuild.center),
-
-                view.cbuild
-                    .top
-                    .bottom
-                    .greaterThanOrEqualTo(0),
-
-                view.cbuild
-                    .trailing
-                    .leading
-                    .greaterThanOrEqualTo(0)
-            )
-
-        case .left:
-            Constraintable.deactivate(
-                view.cbuild
-                    .top
-                    .bottom
-                    .greaterThanOrEqualTo(0),
-
-                view.cbuild
-                    .trailing
-                    .greaterThanOrEqualTo(0),
-
-                view.cbuild
-                    .leading
-                    .equalTo(0),
-
-                view.cbuild
-                    .centerY
-                    .equalTo(self.cbuild.centerY)
-            )
-
-        case .right:
-            Constraintable.deactivate(
-                view.cbuild
-                    .top
-                    .bottom
-                    .greaterThanOrEqualTo(0),
-
-                view.cbuild
-                    .leading
-                    .greaterThanOrEqualTo(0),
-
-                view.cbuild
-                    .trailing
-                    .equalTo(0),
-
-                view.cbuild
-                    .centerY
-                    .equalTo(self.cbuild.centerY)
-            )
-
-        case .top:
-            Constraintable.deactivate(
-                view.cbuild
-                    .top
-                    .bottom
-                    .equalTo(0),
-
-                view.cbuild
-                    .leading
-                    .trailing
-                    .greaterThanOrEqualTo(0),
 
                 view.cbuild
                     .centerX
                     .equalTo(self.cbuild.centerX)
-            )
+
+                view.cbuild
+                    .top
+                    .greaterThanOrEqualTo(0)
+
+                view.cbuild
+                    .trailing
+                    .leading
+                    .greaterThanOrEqualTo(0)
+            }
+
+        case .bottomLeft:
+            Constraintable.deactivate {
+                view.cbuild
+                    .bottom
+                    .equalTo(0)
+
+                view.cbuild
+                    .leading
+                    .equalTo(0)
+
+                view.cbuild
+                    .top
+                    .greaterThanOrEqualTo(0)
+
+                view.cbuild
+                    .trailing
+                    .greaterThanOrEqualTo(0)
+            }
+
+        case .bottomRight:
+            Constraintable.deactivate {
+                view.cbuild
+                    .bottom
+                    .equalTo(0)
+
+                view.cbuild
+                    .trailing
+                    .equalTo(0)
+
+                view.cbuild
+                    .top
+                    .greaterThanOrEqualTo(0)
+
+                view.cbuild
+                    .leading
+                    .greaterThanOrEqualTo(0)
+            }
+
+        case .center:
+            Constraintable.deactivate {
+                view.cbuild
+                    .center
+                    .equalTo(self.cbuild.center)
+
+                view.cbuild
+                    .top
+                    .bottom
+                    .greaterThanOrEqualTo(0)
+
+                view.cbuild
+                    .trailing
+                    .leading
+                    .greaterThanOrEqualTo(0)
+            }
+
+        case .left:
+            Constraintable.deactivate {
+                view.cbuild
+                    .top
+                    .bottom
+                    .greaterThanOrEqualTo(0)
+
+                view.cbuild
+                    .trailing
+                    .greaterThanOrEqualTo(0)
+
+                view.cbuild
+                    .leading
+                    .equalTo(0)
+
+                view.cbuild
+                    .centerY
+                    .equalTo(self.cbuild.centerY)
+            }
+
+        case .right:
+            Constraintable.deactivate {
+                view.cbuild
+                    .top
+                    .bottom
+                    .greaterThanOrEqualTo(0)
+
+                view.cbuild
+                    .leading
+                    .greaterThanOrEqualTo(0)
+
+                view.cbuild
+                    .trailing
+                    .equalTo(0)
+
+                view.cbuild
+                    .centerY
+                    .equalTo(self.cbuild.centerY)
+            }
+
+        case .top:
+            Constraintable.deactivate {
+                view.cbuild
+                    .top
+                    .bottom
+                    .equalTo(0)
+
+                view.cbuild
+                    .leading
+                    .trailing
+                    .greaterThanOrEqualTo(0)
+
+                view.cbuild
+                    .centerX
+                    .equalTo(self.cbuild.centerX)
+            }
 
         case .topLeft:
-            Constraintable.deactivate(
+            Constraintable.deactivate {
                 view.cbuild
                     .top
-                    .equalTo(0),
+                    .equalTo(0)
 
                 view.cbuild
                     .leading
-                    .equalTo(0),
+                    .equalTo(0)
 
                 view.cbuild
                     .bottom
-                    .greaterThanOrEqualTo(0),
+                    .greaterThanOrEqualTo(0)
 
                 view.cbuild
                     .trailing
                     .greaterThanOrEqualTo(0)
-            )
+            }
 
         case .topRight:
-            Constraintable.deactivate(
+            Constraintable.deactivate {
                 view.cbuild
                     .top
-                    .equalTo(0),
+                    .equalTo(0)
 
                 view.cbuild
                     .trailing
-                    .equalTo(0),
+                    .equalTo(0)
 
                 view.cbuild
                     .bottom
-                    .greaterThanOrEqualTo(0),
+                    .greaterThanOrEqualTo(0)
 
                 view.cbuild
                     .leading
                     .greaterThanOrEqualTo(0)
-            )
+            }
         }
     }
 }

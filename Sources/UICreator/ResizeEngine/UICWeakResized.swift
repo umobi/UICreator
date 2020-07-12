@@ -116,23 +116,23 @@ public extension UICWeakResized {
 
         if let muttable = muttable {
             if let width = self.width {
-                Constraintable.activate(
+                Constraintable.activate {
                     muttable.subview.cbuild
                         .width
                         .equalTo(resizableView.cbuild.width)
                         .priority(width)
-                )
+                }
 
                 muttable.superview.autoresizingMask.insert(.flexibleWidth)
             }
 
             if let height = self.height {
-                Constraintable.activate(
+                Constraintable.activate {
                     muttable.subview.cbuild
                         .height
                         .equalTo(resizableView.cbuild.height)
                         .priority(height)
-                )
+                }
 
                 muttable.superview.autoresizingMask.insert(.flexibleHeight)
             }

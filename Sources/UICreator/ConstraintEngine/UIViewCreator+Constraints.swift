@@ -54,252 +54,252 @@ public extension ViewCreator {
     func safeArea(
         topEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .top
-                    .equalTo(view.safeAreaCompatibleGuide.cbuild.top)
+                    .equalTo(superview.safeAreaCompatibleGuide.cbuild.top)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         topGreaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .top
-                    .greaterThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.top)
+                    .greaterThanOrEqualTo(superview.safeAreaCompatibleGuide.cbuild.top)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         topLessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .top
-                    .lessThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.top)
+                    .lessThanOrEqualTo(superview.safeAreaCompatibleGuide.cbuild.top)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         bottomEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .bottom
-                    .equalTo(view.safeAreaCompatibleGuide.cbuild.bottom)
+                    .equalTo(superview.safeAreaCompatibleGuide.cbuild.bottom)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         bottomGreaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .bottom
-                    .greaterThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.bottom)
+                    .greaterThanOrEqualTo(superview.safeAreaCompatibleGuide.cbuild.bottom)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         bottomLessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .bottom
-                    .lessThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.bottom)
+                    .lessThanOrEqualTo(superview.safeAreaCompatibleGuide.cbuild.bottom)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         leadingEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .leading
-                    .equalTo(view.safeAreaCompatibleGuide.cbuild.leading)
+                    .equalTo(superview.safeAreaCompatibleGuide.cbuild.leading)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         leadingGreaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .leading
-                    .greaterThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.leading)
+                    .greaterThanOrEqualTo(superview.safeAreaCompatibleGuide.cbuild.leading)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         leadingLessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .leading
-                    .lessThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.leading)
+                    .lessThanOrEqualTo(superview.safeAreaCompatibleGuide.cbuild.leading)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         trailingEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .trailing
-                    .equalTo(view.safeAreaCompatibleGuide.cbuild.trailing)
+                    .equalTo(superview.safeAreaCompatibleGuide.cbuild.trailing)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         trailingGreaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .trailing
-                    .greaterThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.trailing)
+                    .greaterThanOrEqualTo(superview.safeAreaCompatibleGuide.cbuild.trailing)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         trailingLessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .trailing
-                    .lessThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.trailing)
+                    .lessThanOrEqualTo(superview.safeAreaCompatibleGuide.cbuild.trailing)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
@@ -316,315 +316,315 @@ public extension ViewCreator {
     func top(
         equalTo constant: CGFloat = 0,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .top
-                    .equalTo(view.cbuild.top)
+                    .equalTo(superview.cbuild.top)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func top(
         greaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .top
-                    .greaterThanOrEqualTo(view.cbuild.top)
+                    .greaterThanOrEqualTo(superview.cbuild.top)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func top(
         lessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .top
-                    .lessThanOrEqualTo(view.cbuild.top)
+                    .lessThanOrEqualTo(superview.cbuild.top)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func bottom(
         equalTo constant: CGFloat = 0,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .bottom
-                    .equalTo(view.cbuild.bottom)
+                    .equalTo(superview.cbuild.bottom)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func bottom(
         greaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .bottom
-                    .greaterThanOrEqualTo(view.cbuild.bottom)
+                    .greaterThanOrEqualTo(superview.cbuild.bottom)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func bottom(
         lessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .bottom
-                    .lessThanOrEqualTo(view.cbuild.bottom)
+                    .lessThanOrEqualTo(superview.cbuild.bottom)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func leading(
         equalTo constant: CGFloat = 0,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .leading
-                    .equalTo(view.cbuild.leading)
+                    .equalTo(superview.cbuild.leading)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func leading(
         greaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .leading
-                    .greaterThanOrEqualTo(view.cbuild.leading)
+                    .greaterThanOrEqualTo(superview.cbuild.leading)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func leading(
         lessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .leading
-                    .lessThanOrEqualTo(view.cbuild.leading)
+                    .lessThanOrEqualTo(superview.cbuild.leading)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func trailing(
         equalTo constant: CGFloat = 0,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .trailing
-                    .equalTo(view.cbuild.trailing)
+                    .equalTo(superview.cbuild.trailing)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func trailing(
         greaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .trailing
-                    .greaterThanOrEqualTo(view.cbuild.trailing)
+                    .greaterThanOrEqualTo(superview.cbuild.trailing)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func trailing(
         lessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .trailing
-                    .lessThanOrEqualTo(view.cbuild.trailing)
+                    .lessThanOrEqualTo(superview.cbuild.trailing)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func height(
         equalToSuperview multiplier: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .height
-                    .equalTo(view.cbuild.height)
+                    .equalTo(superview.cbuild.height)
                     .update()
                     .multiplier(multiplier)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func height(
         greaterThanOrEqualToSuperview multiplier: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .height
-                    .greaterThanOrEqualTo(view.cbuild.height)
+                    .greaterThanOrEqualTo(superview.cbuild.height)
                     .update()
                     .multiplier(multiplier)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func height(
         lessThanOrEqualToSuperview multiplier: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .height
-                    .lessThanOrEqualTo(view.cbuild.height)
+                    .lessThanOrEqualTo(superview.cbuild.height)
                     .update()
                     .multiplier(multiplier)
                     .priority(priority)
-            )
+            }
         }
     }
 
@@ -633,63 +633,63 @@ public extension ViewCreator {
     func width(
         equalToSuperview multiplier: CGFloat,
         priority: UILayoutPriority = .required,
-        orView view: ConstraintRelatedView? = nil) -> Self {
+        orView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .width
-                    .equalTo(view.cbuild.width)
+                    .equalTo(superview.cbuild.width)
                     .update()
                     .multiplier(multiplier)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func width(
         greaterThanOrEqualToSuperview multiplier: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .width
-                    .greaterThanOrEqualTo(view.cbuild.width)
+                    .greaterThanOrEqualTo(superview.cbuild.width)
                     .update()
                     .multiplier(multiplier)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func width(
         lessThanOrEqualToSuperview multiplier: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .width
-                    .lessThanOrEqualTo(view.cbuild.width)
+                    .lessThanOrEqualTo(superview.cbuild.width)
                     .update()
                     .multiplier(multiplier)
                     .priority(priority)
-            )
+            }
         }
     }
 }
@@ -698,12 +698,12 @@ public extension ViewCreator {
     func insets(
         equalTo value: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.top(equalTo: value, priority: priority, toView: view)
-            .bottom(equalTo: value, priority: priority, toView: view)
-            .leading(equalTo: value, priority: priority, toView: view)
-            .trailing(equalTo: value, priority: priority, toView: view)
+        return self.top(equalTo: value, priority: priority, toView: relatedView)
+            .bottom(equalTo: value, priority: priority, toView: relatedView)
+            .leading(equalTo: value, priority: priority, toView: relatedView)
+            .trailing(equalTo: value, priority: priority, toView: relatedView)
     }
 }
 
@@ -719,17 +719,17 @@ public extension ViewCreator {
         heightEqualTo multiplier: CGFloat,
         priority: UILayoutPriority = .required) -> Self {
 
-        return self.onNotRendered {
-            let view = (UIViewWrapper($0)?.safe ?? $0)
+        return self.onNotRendered { view in
+            let superview = (UIViewWrapper(view)?.safe ?? view)
 
-            Constraintable.update(
+            Constraintable.update {
                 view.cbuild
                     .height
-                    .equalTo(view.cbuild.width)
+                    .equalTo(superview.cbuild.width)
                     .update()
                     .multiplier(multiplier)
                     .priority(priority)
-            )
+            }
         }
     }
 
@@ -737,17 +737,17 @@ public extension ViewCreator {
         heightGreaterThanOrEqualTo multiplier: CGFloat,
         priority: UILayoutPriority = .required) -> Self {
 
-        return self.onNotRendered {
-            let view = (UIViewWrapper($0)?.safe ?? $0)
+        return self.onNotRendered { view in
+            let superview = (UIViewWrapper(view)?.safe ?? view)
 
-            Constraintable.update(
+            Constraintable.update {
                 view.cbuild
                     .height
-                    .greaterThanOrEqualTo(view.cbuild.width)
+                    .greaterThanOrEqualTo(superview.cbuild.width)
                     .update()
                     .multiplier(multiplier)
                     .priority(priority)
-            )
+            }
         }
     }
 
@@ -755,17 +755,17 @@ public extension ViewCreator {
         heightLessThanOrEqualTo multiplier: CGFloat,
         priority: UILayoutPriority = .required) -> Self {
 
-        return self.onNotRendered {
-            let view = (UIViewWrapper($0)?.safe ?? $0)
+        return self.onNotRendered { view in
+            let superview = (UIViewWrapper(view)?.safe ?? view)
 
-            Constraintable.update(
+            Constraintable.update {
                 view.cbuild
                     .height
-                    .lessThanOrEqualTo(view.cbuild.width)
+                    .lessThanOrEqualTo(superview.cbuild.width)
                     .update()
                     .multiplier(multiplier)
                     .priority(priority)
-            )
+            }
         }
     }
 
@@ -773,17 +773,17 @@ public extension ViewCreator {
         widthEqualTo multiplier: CGFloat,
         priority: UILayoutPriority = .required) -> Self {
 
-        return self.onNotRendered {
-            let view = (UIViewWrapper($0)?.safe ?? $0)
+        return self.onNotRendered { view in
+            let superview = (UIViewWrapper(view)?.safe ?? view)
 
-            Constraintable.update(
+            Constraintable.update {
                 view.cbuild
                     .width
-                    .equalTo(view.cbuild.height)
+                    .equalTo(superview.cbuild.height)
                     .update()
                     .multiplier(multiplier)
                     .priority(priority)
-            )
+            }
         }
     }
 
@@ -791,17 +791,17 @@ public extension ViewCreator {
         widthGreaterThanOrEqualTo multiplier: CGFloat,
         priority: UILayoutPriority = .required) -> Self {
 
-        return self.onNotRendered {
-            let view = (UIViewWrapper($0)?.safe ?? $0)
+        return self.onNotRendered { view in
+            let superview = (UIViewWrapper(view)?.safe ?? view)
 
-            Constraintable.update(
+            Constraintable.update {
                 view.cbuild
                     .width
-                    .greaterThanOrEqualTo(view.cbuild.height)
+                    .greaterThanOrEqualTo(superview.cbuild.height)
                     .update()
                     .multiplier(multiplier)
                     .priority(priority)
-            )
+            }
         }
     }
 
@@ -809,17 +809,17 @@ public extension ViewCreator {
         widthLessThanOrEqualTo multiplier: CGFloat,
         priority: UILayoutPriority = .required) -> Self {
 
-        return self.onNotRendered {
-            let view = (UIViewWrapper($0)?.safe ?? $0)
+        return self.onNotRendered { view in
+            let superview = (UIViewWrapper(view)?.safe ?? view)
 
-            Constraintable.update(
+            Constraintable.update {
                 view.cbuild
                     .width
-                    .lessThanOrEqualTo(view.cbuild.height)
+                    .lessThanOrEqualTo(superview.cbuild.height)
                     .update()
                     .multiplier(multiplier)
                     .priority(priority)
-            )
+            }
         }
     }
 }
@@ -829,15 +829,15 @@ public extension ViewCreator {
         equalTo constant: CGFloat,
         priority: UILayoutPriority = .required) -> Self {
 
-        return self.onNotRendered {
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+        return self.onNotRendered { view in
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .height
                     .equal
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
@@ -845,15 +845,15 @@ public extension ViewCreator {
         greaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required) -> Self {
 
-        return self.onNotRendered {
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+        return self.onNotRendered { view in
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .height
                     .greaterThanOrEqual
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
@@ -861,15 +861,15 @@ public extension ViewCreator {
         lessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required) -> Self {
 
-        return self.onNotRendered {
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+        return self.onNotRendered { view in
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .height
                     .lessThanOrEqual
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
@@ -877,15 +877,15 @@ public extension ViewCreator {
         equalTo constant: CGFloat,
         priority: UILayoutPriority = .required) -> Self {
 
-        return self.onNotRendered {
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+        return self.onNotRendered { view in
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .width
                     .equal
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
@@ -893,15 +893,15 @@ public extension ViewCreator {
         greaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required) -> Self {
 
-        return self.onNotRendered {
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+        return self.onNotRendered { view in
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .width
                     .greaterThanOrEqual
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
@@ -909,15 +909,15 @@ public extension ViewCreator {
         lessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required) -> Self {
 
-        return self.onNotRendered {
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+        return self.onNotRendered { view in
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .width
                     .lessThanOrEqual
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 }
@@ -926,189 +926,189 @@ public extension ViewCreator {
     func center(
         equalTo constant: CGFloat = 0,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .center
-                    .equalTo(view.cbuild.center)
+                    .equalTo(superview.cbuild.center)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func center(
         greaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .center
-                    .greaterThanOrEqualTo(view.cbuild.center)
+                    .greaterThanOrEqualTo(superview.cbuild.center)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func center(
         lessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .center
-                    .lessThanOrEqualTo(view.cbuild.center)
+                    .lessThanOrEqualTo(superview.cbuild.center)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func centerX(
         equalTo constant: CGFloat = 0,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .centerX
-                    .equalTo(view.cbuild.centerX)
+                    .equalTo(superview.cbuild.centerX)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func centerX(
         greaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .centerX
-                    .greaterThanOrEqualTo(view.cbuild.centerX)
+                    .greaterThanOrEqualTo(superview.cbuild.centerX)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func centerX(
         lessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .centerX
-                    .lessThanOrEqualTo(view.cbuild.centerX)
+                    .lessThanOrEqualTo(superview.cbuild.centerX)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func centerY(
         equalTo constant: CGFloat = 0,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .centerY
-                    .equalTo(view.cbuild.centerY)
+                    .equalTo(superview.cbuild.centerY)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func centerY(
         greaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .centerY
-                    .greaterThanOrEqualTo(view.cbuild.centerY)
+                    .greaterThanOrEqualTo(superview.cbuild.centerY)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func centerY(
         lessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .centerY
-                    .lessThanOrEqualTo(view.cbuild.centerY)
+                    .lessThanOrEqualTo(superview.cbuild.centerY)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 }
@@ -1117,189 +1117,189 @@ public extension ViewCreator {
     func safeArea(
         centerEqualTo constant: CGFloat = 0,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .center
-                    .equalTo(view.safeAreaCompatibleGuide.cbuild.center)
+                    .equalTo(superview.safeAreaCompatibleGuide.cbuild.center)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         centerGreaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .center
-                    .greaterThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.center)
+                    .greaterThanOrEqualTo(superview.safeAreaCompatibleGuide.cbuild.center)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         centerLessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .center
-                    .lessThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.center)
+                    .lessThanOrEqualTo(superview.safeAreaCompatibleGuide.cbuild.center)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         centerXEqualTo constant: CGFloat = 0,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .centerX
-                    .equalTo(view.safeAreaCompatibleGuide.cbuild.centerX)
+                    .equalTo(superview.safeAreaCompatibleGuide.cbuild.centerX)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         centerXGreaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .centerX
-                    .greaterThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.centerX)
+                    .greaterThanOrEqualTo(superview.safeAreaCompatibleGuide.cbuild.centerX)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         centerXLessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .centerX
-                    .lessThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.centerX)
+                    .lessThanOrEqualTo(superview.safeAreaCompatibleGuide.cbuild.centerX)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         centerYEqualTo constant: CGFloat = 0,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .centerY
-                    .equalTo(view.safeAreaCompatibleGuide.cbuild.centerY)
+                    .equalTo(superview.safeAreaCompatibleGuide.cbuild.centerY)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         centerYGreaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .centerY
-                    .greaterThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.centerY)
+                    .greaterThanOrEqualTo(superview.safeAreaCompatibleGuide.cbuild.centerY)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func safeArea(
         centerYLessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        orRelatedView view: ConstraintRelatedView? = nil) -> Self {
+        orRelatedView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .centerY
-                    .lessThanOrEqualTo(view.safeAreaCompatibleGuide.cbuild.centerY)
+                    .lessThanOrEqualTo(superview.safeAreaCompatibleGuide.cbuild.centerY)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 }
@@ -1315,6 +1315,7 @@ public extension ViewCreator {
                     verticalPriority,
                     for: .vertical
             )
+
             (UIViewWrapper($0)?.safe ?? $0)
                 .setContentHuggingPriority(
                     horizontalPriority,
@@ -1333,6 +1334,7 @@ public extension ViewCreator {
                     verticalPriority,
                     for: .vertical
             )
+
             (UIViewWrapper($0)?.safe ?? $0)
                 .setContentCompressionResistancePriority(
                     horizontalPriority,
@@ -1369,6 +1371,7 @@ public extension ViewCreator {
                     huggingPriority,
                     for: .horizontal
             )
+
             (UIViewWrapper($0)?.safe ?? $0)
                 .setContentCompressionResistancePriority(
                     compressionPriority,
@@ -1382,252 +1385,252 @@ public extension ViewCreator {
     func topMargin(
         equalTo constant: CGFloat = 0,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .top
-                    .equalTo(view.layoutMarginsGuide.cbuild.top)
+                    .equalTo(superview.layoutMarginsGuide.cbuild.top)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func topMargin(
         greaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .top
-                    .greaterThanOrEqualTo(view.layoutMarginsGuide.cbuild.top)
+                    .greaterThanOrEqualTo(superview.layoutMarginsGuide.cbuild.top)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func topMargin(
         lessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .top
-                    .lessThanOrEqualTo(view.layoutMarginsGuide.cbuild.top)
+                    .lessThanOrEqualTo(superview.layoutMarginsGuide.cbuild.top)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func bottomMargin(
         equalTo constant: CGFloat = 0,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .bottom
-                    .equalTo(view.layoutMarginsGuide.cbuild.bottom)
+                    .equalTo(superview.layoutMarginsGuide.cbuild.bottom)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func bottomMargin(
         greaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .bottom
-                    .greaterThanOrEqualTo(view.layoutMarginsGuide.cbuild.bottom)
+                    .greaterThanOrEqualTo(superview.layoutMarginsGuide.cbuild.bottom)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func bottomMargin(
         lessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .bottom
-                    .lessThanOrEqualTo(view.layoutMarginsGuide.cbuild.bottom)
+                    .lessThanOrEqualTo(superview.layoutMarginsGuide.cbuild.bottom)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func leadingMargin(
         equalTo constant: CGFloat = 0,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .leading
-                    .equalTo(view.layoutMarginsGuide.cbuild.leading)
+                    .equalTo(superview.layoutMarginsGuide.cbuild.leading)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func leadingMargin(
         greaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .leading
-                    .greaterThanOrEqualTo(view.layoutMarginsGuide.cbuild.leading)
+                    .greaterThanOrEqualTo(superview.layoutMarginsGuide.cbuild.leading)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func leadingMargin(
         lessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .leading
-                    .lessThanOrEqualTo(view.layoutMarginsGuide.cbuild.leading)
+                    .lessThanOrEqualTo(superview.layoutMarginsGuide.cbuild.leading)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func trailingMargin(
         equalTo constant: CGFloat = 0,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .trailing
-                    .equalTo(view.layoutMarginsGuide.cbuild.trailing)
+                    .equalTo(superview.layoutMarginsGuide.cbuild.trailing)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func trailingMargin(
         greaterThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .trailing
-                    .greaterThanOrEqualTo(view.layoutMarginsGuide.cbuild.trailing)
+                    .greaterThanOrEqualTo(superview.layoutMarginsGuide.cbuild.trailing)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 
     func trailingMargin(
         lessThanOrEqualTo constant: CGFloat,
         priority: UILayoutPriority = .required,
-        toView view: ConstraintRelatedView? = nil) -> Self {
+        toView relatedView: ConstraintRelatedView? = nil) -> Self {
 
-        return self.onInTheScene {
-            guard let view = view?() ?? (UIViewWrapper($0)?.safe ?? $0).realSuperview else {
+        return self.onInTheScene { view in
+            guard let superview = relatedView?() ?? (UIViewWrapper(view)?.safe ?? view).realSuperview else {
                 return
             }
 
-            Constraintable.update(
-                (UIViewWrapper($0)?.safe ?? $0).cbuild
+            Constraintable.update {
+                (UIViewWrapper(view)?.safe ?? view).cbuild
                     .trailing
-                    .lessThanOrEqualTo(view.layoutMarginsGuide.cbuild.trailing)
+                    .lessThanOrEqualTo(superview.layoutMarginsGuide.cbuild.trailing)
                     .update()
                     .constant(constant)
                     .priority(priority)
-            )
+            }
         }
     }
 }

@@ -103,10 +103,10 @@ public extension RounderView {
     func addContent(_ view: UIView) {
         CBSubview(self).addSubview(view)
 
-        Constraintable.activate(
+        Constraintable.activate {
             view.cbuild
                 .edges
-        )
+        }
         self.clipsToBounds = true
         self.reloadContentLayout()
     }

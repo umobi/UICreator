@@ -47,10 +47,10 @@ public class DashedView: UIView, UICManagerContentView {
     public func addContent(_ view: UIView) {
         CBSubview(self).addSubview(view)
 
-        Constraintable.activate(
+        Constraintable.activate {
             view.cbuild
                 .edges
-        )
+        }
 
         self.view = view
     }

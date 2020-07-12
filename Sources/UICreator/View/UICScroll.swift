@@ -81,64 +81,64 @@ public class ScrollView: UIScrollView, UICManagerContentView {
         CBSubview(self).addSubview(contentView)
         self.contentView = contentView
 
-        Constraintable.activate(
+        Constraintable.activate {
             contentView.cbuild
                 .edges
-        )
+        }
 
         self.reloadContentLayout()
     }
 
     public func reloadContentLayout() {
-        Constraintable.deactivate(
-            self.contentView.cbuild.width.equalTo(self.cbuild.width),
+        Constraintable.deactivate {
+            self.contentView.cbuild.width.equalTo(self.cbuild.width)
             self.contentView.cbuild.height.equalTo(self.cbuild.height)
-        )
+        }
 
         switch axis {
         case .vertical:
-            Constraintable.activate(
+            Constraintable.activate {
                 contentView.cbuild
                     .width
                     .equalTo(self.widthMarginAnchor)
                     .priority(.required)
-                    .constant(-self.horizontalOffset),
+                    .constant(-self.horizontalOffset)
 
                 contentView.cbuild
                     .height
                     .equalTo(self.heightMarginAnchor)
                     .priority(.fittingSizeLevel)
                     .constant(-self.verticalOffset)
-            )
+            }
         case .horizontal:
-            Constraintable.activate(
+            Constraintable.activate {
                 contentView.cbuild
                     .width
                     .equalTo(self.widthMarginAnchor)
                     .priority(.fittingSizeLevel)
-                    .constant(-self.horizontalOffset),
+                    .constant(-self.horizontalOffset)
 
                 contentView.cbuild
                     .height
                     .equalTo(self.heightMarginAnchor)
                     .priority(.required)
                     .constant(-self.verticalOffset)
-            )
+            }
 
         case .auto(let vertical, let horizontal):
-            Constraintable.activate(
+            Constraintable.activate {
                 contentView.cbuild
                     .width
                     .equalTo(self.widthMarginAnchor)
                     .priority(horizontal)
-                    .constant(-self.horizontalOffset),
+                    .constant(-self.horizontalOffset)
 
                 contentView.cbuild
                     .height
                     .equalTo(self.heightMarginAnchor)
                     .priority(vertical)
                     .constant(-self.verticalOffset)
-            )
+            }
         }
     }
 
@@ -244,10 +244,10 @@ private extension ScrollView {
 
             CBSubview(self).addSubview(view)
 
-            Constraintable.activate(
+            Constraintable.activate {
                 view.cbuild
                     .edges
-            )
+            }
         }
     }
 }

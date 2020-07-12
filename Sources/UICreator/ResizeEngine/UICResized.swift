@@ -67,11 +67,11 @@ public struct UICResized {
         self.superview.translatesAutoresizingMaskIntoConstraints = true
         self.superview.autoresizingMask = [.flexibleHeight, .flexibleWidth]
 
-        Constraintable.activate(
+        Constraintable.activate {
             subview.cbuild
                 .center
                 .equalTo(self.superview.cbuild.center)
-        )
+        }
 
         self.addHandler?(self.superview)
 
