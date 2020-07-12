@@ -26,7 +26,7 @@ import UIKit
 struct MEMCollectionPayload {
     let manager: Mutable<ListCollectionManager?> = .init(value: nil)
     let layoutManager: Mutable<UICCollectionLayoutManager?> = .init(value: nil)
-    let layoutManagerCallback: Mutable<(() -> [UICCollectionLayoutSectionElement])?> = .init(value: nil)
+    let layoutManagerCallback: Mutable<(() -> UICCollectionLayoutSectionElement)?> = .init(value: nil)
 }
 
 private var kMEMCollectionPayload: UInt = 0
@@ -47,7 +47,7 @@ extension UICollectionView {
         set { self.collectionPayload.layoutManager.value = newValue }
     }
 
-    fileprivate var layoutManagerCallback: (() -> [UICCollectionLayoutSectionElement])? {
+    fileprivate var layoutManagerCallback: (() -> UICCollectionLayoutSectionElement)? {
         get { self.collectionPayload.layoutManagerCallback.value }
         set { self.collectionPayload.layoutManagerCallback.value = newValue }
     }
@@ -57,13 +57,13 @@ extension UICollectionView {
             return
         }
 
-        self.layoutManager = UICCollectionLayoutManager(contents: content())
+        self.layoutManager = UICCollectionLayoutManager(contents: content().zip)
         self.invalidateIntrinsicContentSize()
     }
 }
 
 public extension UICCollection {
-    func layoutMaker(content: @escaping () -> [UICCollectionLayoutSectionElement]) -> Self {
+    func layoutMaker(@UICCollectionLayoutSectionBuilder content: @escaping () -> UICCollectionLayoutSectionElement) -> Self {
         return self.onInTheScene {
             ($0 as? View)?.layoutManagerCallback = content
             ($0 as? View)?.invalidateLayoutMaker()

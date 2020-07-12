@@ -21,16 +21,49 @@
 //
 
 import Foundation
-import UIKit
 
-public class UICSection: ViewCreator {
-    public let content: [ViewCreator]
-
-    public convenience init(@UICViewBuilder _ contents: @escaping () -> ViewCreator) {
-        self.init(contents().zip)
+@_functionBuilder
+public struct UICViewBuilder {
+    static public func buildBlock(_ segments: ViewCreator...) -> ViewCreator {
+        CombinedViews(children: segments)
     }
 
-    internal init(_ content: [ViewCreator]) {
-        self.content = content
+    static public func buildEither(first: ViewCreator) -> ViewCreator {
+        return first
+    }
+
+    static public func buildEither(second: ViewCreator) -> ViewCreator {
+        return second
+    }
+
+    static public func buildIf(_ view: ViewCreator?) -> ViewCreator {
+        view ?? EmptyViewResult()
+    }
+}
+
+internal class CombinedViews: ViewCreator {
+    let children: [ViewCreator]
+
+    init(children: [ViewCreator]) {
+        self.children = children
+    }
+}
+
+internal class EmptyViewResult: ViewCreator {
+
+}
+
+internal extension ViewCreator {
+    var zip: [ViewCreator] {
+        switch self {
+        case let views as CombinedViews:
+            return views.children.filter {
+                !($0 is EmptyViewResult)
+            }.reduce([]) { $0 + $1.zip }
+        case is EmptyViewResult:
+            return []
+        default:
+            return [self]
+        }
     }
 }

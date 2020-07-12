@@ -26,8 +26,8 @@ import UIKit
 public class UICRow: ViewCreator {
     let content: () -> ViewCreator
 
-    fileprivate(set) var trailingActions: (() -> [RowAction])?
-    fileprivate(set) var leadingActions: (() -> [RowAction])?
+    fileprivate(set) var trailingActions: (() -> RowAction)?
+    fileprivate(set) var leadingActions: (() -> RowAction)?
     fileprivate(set) var accessoryType: UITableViewCell.AccessoryType = .none
 
     public init(content: @escaping () -> ViewCreator) {
@@ -39,6 +39,32 @@ public extension UICRow {
     func accessoryType(_ type: UITableViewCell.AccessoryType) -> Self {
         self.accessoryType = type
         return self
+    }
+}
+
+@_functionBuilder
+public struct RowActionBuilder {
+    static public func buildBlock(_ segments: RowAction...) -> RowAction {
+        CombinedRowActions(children: segments)
+    }
+}
+
+internal class CombinedRowActions: RowAction {
+    let children: [RowAction]
+
+    init(children: [RowAction]) {
+        self.children = children
+    }
+}
+
+internal extension RowAction {
+    var zip: [RowAction] {
+        switch self {
+        case let views as CombinedRowActions:
+            return views.children
+        default:
+            return [self]
+        }
     }
 }
 
@@ -214,12 +240,12 @@ public class UICRowAction: RowAction {
 }
 
 public extension UICRow {
-    func trailingActions(_ actions: @escaping () -> [RowAction]) -> Self {
+    func trailingActions(@RowActionBuilder _ actions: @escaping () -> RowAction) -> Self {
         self.trailingActions = actions
         return self
     }
 
-    func leadingActions(_ actions: @escaping () -> [RowAction]) -> Self {
+    func leadingActions(@RowActionBuilder _ actions: @escaping () -> RowAction) -> Self {
         self.leadingActions = actions
         return self
     }

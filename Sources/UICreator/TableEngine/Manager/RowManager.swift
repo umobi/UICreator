@@ -120,8 +120,8 @@ extension ListManager.RowManager {
 
     struct Payload {
         let content: () -> ViewCreator
-        let trailingActions: (() -> [RowAction])?
-        let leadingActions: (() -> [RowAction])?
+        let trailingActions: (() -> RowAction)?
+        let leadingActions: (() -> RowAction)?
         let accessoryType: UITableViewCell.AccessoryType
         let estimatedHeight: CGFloat?
         let contentType: ContentType

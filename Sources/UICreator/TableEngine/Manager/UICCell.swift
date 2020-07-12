@@ -41,8 +41,8 @@ extension UICCell {
 
         fileprivate init(_ cell: UICCell) {
             self.cell = cell
-            self.trailingActions = cell.rowManager.payload.trailingActions?() ?? []
-            self.leadingActions = cell.rowManager.payload.leadingActions?() ?? []
+            self.trailingActions = cell.rowManager.payload.trailingActions?().zip ?? []
+            self.leadingActions = cell.rowManager.payload.leadingActions?().zip ?? []
         }
     }
 

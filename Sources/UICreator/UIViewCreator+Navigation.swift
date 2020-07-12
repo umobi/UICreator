@@ -57,17 +57,9 @@ public extension UIView {
 
 #if os(iOS)
 public extension ViewCreator {
-    func toolbar(_ contents: @escaping () -> [ViewCreator]) -> Self {
+    func toolbar(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> Self {
         self.onInTheScene {
-            $0.viewController.toolbarItems = contents().map { view in
-                UIBarButtonItem(customView: UICHostingView(view: view))
-            }
-        }
-    }
-
-    func toolbar(_ views: [ViewCreator]) -> Self {
-        self.onInTheScene {
-            $0.viewController.toolbarItems = views.map { view in
+            $0.viewController.toolbarItems = contents().zip.map { view in
                 UIBarButtonItem(customView: UICHostingView(view: view))
             }
         }
@@ -193,10 +185,10 @@ public extension ViewCreator {
         }
     }
 
-    func navigation(leftButtons contents: @escaping () -> [ViewCreator]) -> Self {
+    func navigation(@UICViewBuilder leftButtons contents: @escaping () -> ViewCreator) -> Self {
         return self.onInTheScene {
             $0.navigationItem
-                .setLeftBarButtonItems(contents().map { view in
+                .setLeftBarButtonItems(contents().zip.map { view in
                     .init(customView: UICHostingView(view: view))
                 }, animated: false)
         }
@@ -211,10 +203,10 @@ public extension ViewCreator {
         }
     }
 
-    func navigation(rightButtons contents: @escaping () -> [ViewCreator]) -> Self {
+    func navigation(@UICViewBuilder rightButtons contents: @escaping () -> ViewCreator) -> Self {
         return self.onInTheScene {
             $0.navigationItem
-                .setRightBarButtonItems(contents().map { view in
+                .setRightBarButtonItems(contents().zip.map { view in
                     .init(customView: UICHostingView(view: view))
                 }, animated: false)
         }

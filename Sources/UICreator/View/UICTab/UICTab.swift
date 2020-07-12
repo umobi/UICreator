@@ -24,6 +24,13 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
+@_functionBuilder
+public struct UICTabItemBuilder {
+    static public func buildBlock(_ segments: UICTabItem...) -> UICTabItem {
+        UICTabItem(segments)
+    }
+}
+
 public protocol UICTabExtendable {
     func makeTabController(_ viewControllers: [UIViewController]) -> UITabBarController
 }
@@ -31,8 +38,8 @@ public protocol UICTabExtendable {
 open class UICTab: UIViewControllerCreator {
     public typealias ViewController = UITabBarController
 
-    public init(_ contents: @escaping () -> [UICTabItem]) {
-        let viewControllers: [UIViewController] = contents().map {
+    public init(@UICTabItemBuilder _ contents: @escaping () -> UICTabItem) {
+        let viewControllers: [UIViewController] = contents().zip.map {
             let controller = UICHostingController(content: $0.content)
             controller.tabBarItem = $0.tabItem
             return controller

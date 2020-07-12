@@ -28,9 +28,9 @@ extension UICCollectionView: ListSupport {}
 public extension UICCollection {
     convenience init(
         layout: Layout,
-        _ contents: @escaping () -> [ViewCreator]) {
-
-        self.init(layout: layout, ListManager(contents: contents()))
+        @UICViewBuilder _ contents: @escaping () -> ViewCreator) {
+        
+        self.init(layout: layout, ListManager(contents: contents().zip))
     }
 
     private convenience init(layout: Layout, _ manager: ListManager) {

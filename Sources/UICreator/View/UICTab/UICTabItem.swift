@@ -32,6 +32,28 @@ public struct UICTabItem {
     let tag: Int
     let content: () -> ViewCreator
 
+    private let collection: [UICTabItem]?
+
+    internal var zip: [UICTabItem] {
+        if let collection = self.collection {
+            return collection
+        }
+
+        return [self]
+    }
+
+    init(_ collection: [UICTabItem]) {
+        self.collection = collection
+        self.title = nil
+        self.content = {
+            fatalError()
+        }
+        self.image = nil
+        self.selectedImage = nil
+        self.tabSystem = nil
+        self.tag = 0
+    }
+
     public init(content: @escaping () -> ViewCreator) {
         self.title = nil
         self.content = content
@@ -39,6 +61,7 @@ public struct UICTabItem {
         self.selectedImage = nil
         self.tabSystem = nil
         self.tag = 0
+        self.collection = nil
     }
 
     public init(title: String, content: @escaping () -> ViewCreator) {
@@ -48,6 +71,7 @@ public struct UICTabItem {
         self.selectedImage = nil
         self.tabSystem = nil
         self.tag = 0
+        self.collection = nil
     }
 
     public init(image: UIImage, content: @escaping () -> ViewCreator) {
@@ -57,6 +81,7 @@ public struct UICTabItem {
         self.selectedImage = nil
         self.tabSystem = nil
         self.tag = 0
+        self.collection = nil
     }
 
     public func title(_ title: String?) -> Self {
@@ -96,6 +121,7 @@ public struct UICTabItem {
         self.tabSystem = editable.tabSystem
         self.tag = editable.tag
         self.content = original.content
+        self.collection = nil
     }
 
     private func edit(_ edit: @escaping (Editable) -> Void) -> Self {
