@@ -67,6 +67,13 @@ public class SegmentedControl: UISegmentedControl {
     }
 }
 
+@_functionBuilder
+public struct SegmentBuilder {
+    static public func buildBlock(_ segments: Segment...) -> Segment {
+        Segment(collection: segments)
+    }
+}
+
 public class Segment {
     public enum Content {
         case image(UIImage)
@@ -80,9 +87,24 @@ public class Segment {
     private var width: CGFloat?
     private var onSelected: ((UIView) -> Void)?
     private var isSelected: Bool = false
+    private let collection: [Segment]?
+
+    var zip: [Segment] {
+        if let collection = self.collection {
+            return collection
+        }
+
+        return [self]
+    }
+
+    fileprivate init(collection: [Segment]) {
+        self.collection = collection
+        self.content = .empty
+    }
 
     public init(content: Content) {
         self.content = content
+        self.collection = nil
     }
 
     public func isEnabled(_ flag: Bool) -> Self {
@@ -147,12 +169,12 @@ public class Segment {
 public class UICSegmented: UIViewCreator, Control {
     public typealias View = SegmentedControl
 
-    public init(_ segments: @escaping () -> [Segment]) {
+    public init(@SegmentBuilder _ segments: @escaping () -> Segment) {
         self.loadView { [unowned self] in
             View.init(builder: self)
         }
         .onNotRendered { [unowned self] _ in
-            self.addSegments(segments())
+            self.addSegments(segments().zip)
         }
     }
 

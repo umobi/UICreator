@@ -94,31 +94,31 @@ public class SpacerView: UIView, UICManagerContentView {
             return
         }
 
-        Constraintable.update(
+        Constraintable.update {
             view.cbuild
                 .top
                 .equalTo(self)
                 .update()
-                .constant(self.margin.top),
+                .constant(self.margin.top)
 
             view.cbuild
                 .bottom
                 .equalTo(self)
                 .update()
-                .constant(self.margin.bottom),
+                .constant(self.margin.bottom)
 
             view.cbuild
                 .trailing
                 .equalTo(self)
                 .update()
-                .constant(self.margin.trailing),
+                .constant(self.margin.trailing)
 
             view.cbuild
                 .leading
                 .equalTo(self)
                 .update()
                 .constant(self.margin.leading)
-        )
+        }
     }
 
     public func addContent(_ view: UIView) {

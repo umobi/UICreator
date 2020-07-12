@@ -58,8 +58,8 @@ public extension UICPage {
 
     func pages(
         direction: UIPageViewController.NavigationDirection,
-        _ contents: @escaping () -> [ViewCreator]) -> Self {
-        let contents: [UICHostingController] = contents().map { content in
+        @UICViewBuilder  _ contents: @escaping () -> ViewCreator) -> Self {
+        let contents: [UICHostingController] = contents().zip.map { content in
             self.tree.append(content)
 
             return UICHostingController(view: content)

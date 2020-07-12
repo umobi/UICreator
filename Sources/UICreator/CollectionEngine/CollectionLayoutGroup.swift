@@ -44,35 +44,35 @@ public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCol
     convenience public init(
         vertical: CollectionLayoutSizeConstraint,
         horizontal: CollectionLayoutSizeConstraint,
-        _ contents: @escaping () -> [UICCollectionLayoutElement]) {
+        @UICCollectionLayoutBuilder _ contents: @escaping () -> UICCollectionLayoutElement) {
 
-        self.init(vertical, horizontal, contents)
+        self.init(vertical, horizontal, contents().zip)
     }
 
     convenience public init(
         horizontal: CollectionLayoutSizeConstraint,
-        _ contents: @escaping () -> [UICCollectionLayoutElement]) {
+        @UICCollectionLayoutBuilder _ contents: @escaping () -> UICCollectionLayoutElement) {
 
-        self.init(nil, horizontal, contents)
+        self.init(nil, horizontal, contents().zip)
     }
 
     convenience public init(
         vertical: CollectionLayoutSizeConstraint,
-        _ contents: @escaping () -> [UICCollectionLayoutElement]) {
+        @UICCollectionLayoutBuilder _ contents: @escaping () -> UICCollectionLayoutElement) {
 
-        self.init(vertical, nil, contents)
+        self.init(vertical, nil, contents().zip)
     }
 
-    convenience public init(_ contents: @escaping () -> [UICCollectionLayoutElement]) {
-        self.init(nil, nil, contents)
+    convenience public init(@UICCollectionLayoutBuilder _ contents: @escaping () -> UICCollectionLayoutElement) {
+        self.init(nil, nil, contents().zip)
     }
 
-    private init(
+    internal init(
         _ vertical: CollectionLayoutSizeConstraint?,
         _ horizontal: CollectionLayoutSizeConstraint?,
-        _ contents: @escaping () -> [UICCollectionLayoutElement]) {
+        _ contents: [UICCollectionLayoutElement]) {
 
-        self.contents = contents()
+        self.contents = contents
         self.vertical = vertical
         self.horizontal = horizontal
 

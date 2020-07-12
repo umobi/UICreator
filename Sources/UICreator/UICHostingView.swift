@@ -68,6 +68,11 @@ public class UICHostingView: UIView {
         self.add(priority: .required, view)
     }
 
+    public override func sizeToFit() {
+        self.loadView()
+        super.sizeToFit()
+    }
+
     override public init(frame: CGRect) {
         Fatal.Builder("init(frame:) not implemented").die()
     }

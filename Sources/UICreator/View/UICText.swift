@@ -278,19 +278,19 @@ public extension UIViewCreator where View: UITextField {
             (view as? View)?.leftViewMode = mode
 
             var needsToAddConstraints = true
-            host.onAppear { [weak view] in
+            host.onAppear { [weak view] hostView in
                 guard needsToAddConstraints, let view = view else {
                     return
                 }
 
-                Constraintable.activate(
-                    $0.cbuild
+                Constraintable.activate {
+                    hostView.cbuild
                         .centerY
-                        .equalTo(view.cbuild.centerY),
+                        .equalTo(view.cbuild.centerY)
 
-                    $0.cbuild
+                    hostView.cbuild
                         .leading
-                )
+                }
 
                 needsToAddConstraints = false
             }
@@ -310,19 +310,19 @@ public extension UIViewCreator where View: UITextField {
             (view as? View)?.rightViewMode = mode
 
             var needsToAddConstraints = true
-            host.onAppear { [weak view] in
+            host.onAppear { [weak view] hostView in
                 guard needsToAddConstraints, let view = view else {
                     return
                 }
 
-                Constraintable.activate(
-                    $0.cbuild
+                Constraintable.activate {
+                    hostView.cbuild
                         .centerY
-                        .equalTo(view.cbuild.centerY),
+                        .equalTo(view.cbuild.centerY)
 
-                    $0.cbuild
+                    hostView.cbuild
                         .trailing
-                )
+                }
 
                 needsToAddConstraints = false
             }
@@ -417,6 +417,7 @@ public extension TextKeyboard where View: UITextField {
 
         return self.onRendered {
            ($0 as? View)?.inputView = UICHostingView(view: content)
+            ($0 as? View)?.inputView?.sizeToFit()
         }
     }
 
@@ -426,6 +427,7 @@ public extension TextKeyboard where View: UITextField {
 
         return self.onRendered {
             ($0 as? View)?.inputAccessoryView = UICHostingView(view: content)
+            ($0 as? View)?.inputAccessoryView?.sizeToFit()
         }
     }
 

@@ -85,17 +85,17 @@ public class BlurView: UIView {
         CBSubview(blurEffectView.contentView).addSubview(vibrancyEffectView)
         vibrancyEffectView.translatesAutoresizingMaskIntoConstraints = false
 
-        Constraintable.activate(
+        Constraintable.activate {
             vibrancyEffectView.cbuild
                 .edges
-        )
+        }
 
         CBSubview(self).addSubview(blurEffectView)
 
-        Constraintable.activate(
+        Constraintable.activate {
             blurEffectView.cbuild
                 .edges
-        )
+        }
 
         return blurEffectView
     }

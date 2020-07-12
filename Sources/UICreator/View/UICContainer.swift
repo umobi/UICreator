@@ -38,10 +38,10 @@ public class ControllerView<ViewController: UIViewController>: UIView {
         parentView.addChild(viewController)
         CBSubview(self).addSubview(viewController.view)
 
-        Constraintable.activate(
+        Constraintable.activate {
             viewController.view.cbuild
                 .edges
-        )
+        }
 
         viewController.didMove(toParent: parentView)
     }

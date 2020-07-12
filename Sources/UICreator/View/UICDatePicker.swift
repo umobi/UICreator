@@ -73,7 +73,11 @@ public class UICDatePicker: UIViewCreator, Control {
 
     public init(calendar: Calendar? = nil) {
         self.loadView { [unowned self] in
-            return View.init(builder: self)
+            let view = View.init(builder: self)
+            if #available(iOS 13.4, *) {
+                view.preferredDatePickerStyle = .wheels
+            }
+            return view
         }
         .onNotRendered {
             ($0 as? View)?.calendar = calendar ?? .current
@@ -82,6 +86,12 @@ public class UICDatePicker: UIViewCreator, Control {
 }
 
 public extension UIViewCreator where View: UIDatePicker {
+    @available(iOS 13.4, *)
+    func preferredStyle(_ style: UIDatePickerStyle) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.preferredDatePickerStyle = style
+        }
+    }
 
     func date(_ date: Date) -> Self {
         self.onInTheScene {

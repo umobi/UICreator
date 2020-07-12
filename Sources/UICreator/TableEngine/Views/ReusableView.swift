@@ -119,7 +119,7 @@ extension ReusableView {
 
                 switch collectionView {
                 case is TableCellType:
-                    self.updateTableViewBatching(
+                    Self.updateTableViewBatching(
                         listView: collectionView,
                         reusableView: reusableView,
                         view: $0
@@ -145,7 +145,7 @@ extension ReusableView {
         self.addConstraints(hostedView, axis)
     }
 
-    func updateTableViewBatching(
+    static func updateTableViewBatching(
         listView: UIView,
         reusableView: UIView & ReusableView,
         view: UIView) {
@@ -188,39 +188,39 @@ extension ReusableView {
         UIView.CBSubview(self.contentView).addSubview(hostedView)
         switch axis {
         case .center:
-            Constraintable.activate(
+            Constraintable.activate {
                 hostedView.cbuild
                     .center
                     .equalTo(self.contentView)
                     .priority(.init(500))
-            )
+            }
 
         case .horizontal:
-            Constraintable.activate(
+            Constraintable.activate {
                 hostedView.cbuild
                     .centerY
                     .equalTo(self.contentView.cbuild.centerY)
-                    .priority(.init(500)),
+                    .priority(.init(500))
 
                 hostedView.cbuild
                     .leading
                     .trailing
                     .equalTo(self.contentView)
                     .priority(.init(500))
-            )
+            }
         case .vertical:
-            Constraintable.activate(
+            Constraintable.activate {
                 hostedView.cbuild
                     .centerX
                     .equalTo(self.contentView.cbuild.centerX)
-                    .priority(.init(500)),
+                    .priority(.init(500))
 
                 hostedView.cbuild
                     .top
                     .bottom
                     .equalTo(self.contentView)
                     .priority(.init(500))
-            )
+            }
         }
     }
 

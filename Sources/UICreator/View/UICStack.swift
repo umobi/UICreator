@@ -70,8 +70,8 @@ public class StackView: UIStackView {
 public class UICStack: UIViewCreator {
     public typealias View = StackView
 
-    private func prepare(axis: NSLayoutConstraint.Axis, spacing: CGFloat, _ content: @escaping () -> [ViewCreator]) {
-        let content = content()
+    private func prepare(axis: NSLayoutConstraint.Axis, spacing: CGFloat, @UICViewBuilder _ content: @escaping () -> ViewCreator) {
+        let content = content().zip
         content.forEach {
             self.tree.append($0)
         }
@@ -97,16 +97,16 @@ public class UICStack: UIViewCreator {
     public init(
         axis: NSLayoutConstraint.Axis,
         spacing: CGFloat = 0,
-        _ contents: @escaping () -> [ViewCreator]) {
+        @UICViewBuilder _ contents: @escaping () -> ViewCreator) {
         self.prepare(axis: axis, spacing: spacing, contents)
     }
 }
 
-public func UICHStack(spacing: CGFloat = 0, _ contents: @escaping () -> [ViewCreator]) -> UICStack {
+public func UICHStack(spacing: CGFloat = 0, @UICViewBuilder _ contents: @escaping () -> ViewCreator) -> UICStack {
     return .init(axis: .horizontal, spacing: spacing, contents)
 }
 
-public func UICVStack(spacing: CGFloat = 0, _ contents: @escaping () -> [ViewCreator]) -> UICStack {
+public func UICVStack(spacing: CGFloat = 0, @UICViewBuilder _ contents: @escaping () -> ViewCreator) -> UICStack {
     return .init(axis: .vertical, spacing: spacing, contents)
 }
 

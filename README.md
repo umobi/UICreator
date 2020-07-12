@@ -93,16 +93,16 @@ Go check this repository [UICreator Examples](https://github.com/brennobemoura/U
 	
 		var body: ViewCreator {
 			UICSpacer(vertical: 5) {
-				UICHStack {[
+				UICHStack {
 					UICImage(image: self.landmark.image)
 						.aspectRatio()
 						.height(equalTo: 50)
 						.content(mode: .scaleAspectFill)
-						.clipsToBounds(true),
+						.clipsToBounds(true)
 						
-					UICLabel(self.landmark.name),
+					UICLabel(self.landmark.name)
 					UICSpacer()
-				]}
+				}
 				.spacing(15)
 			}
 		}

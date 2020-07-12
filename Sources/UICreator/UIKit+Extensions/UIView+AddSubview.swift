@@ -37,10 +37,10 @@ internal extension UIView {
                 .init(751))
         }()
 
-        Constraintable.activate(
+        Constraintable.activate {
             view.cbuild
                 .edges
                 .priority(priority)
-        )
+        }
     }
 }

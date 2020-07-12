@@ -72,8 +72,8 @@ public class ZStackView: UIView {
 public class UICZStack: UIViewCreator {
     public typealias View = ZStackView
 
-    public init(_ contents: @escaping () -> [ViewCreator]) {
-        let contents = contents()
+    public init(@UICViewBuilder _ contents: @escaping () -> ViewCreator) {
+        let contents = contents().zip
         contents.forEach {
             self.tree.append($0)
         }
