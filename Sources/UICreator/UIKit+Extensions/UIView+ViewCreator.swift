@@ -176,13 +176,10 @@ public extension ViewCreator {
 }
 
 public extension ViewCreator {
+    @available(iOS 13.0, tvOS 13.0, *)
     func transform3d(_ transform3d: CATransform3D) -> Self {
         self.onRendered {
-            if #available(iOS 12.0, tvOS 12.0, *) {
-                $0.transform3D = transform3d
-            } else {
-                $0.layer.transform = transform3d
-            }
+            $0.transform3D = transform3d
         }
     }
 
