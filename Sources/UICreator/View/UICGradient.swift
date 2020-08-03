@@ -58,6 +58,10 @@ public class GradientView: UIView {
     }
 
     private func setupGradientLayer() {
+        if !(self.layer.sublayers ?? []).contains(where: { $0 === self.gradientLayer }) {
+            self.layer.addSublayer(self.gradientLayer)
+        }
+
         gradientLayer.frame = bounds
 
         gradientLayer.locations = self.locations
