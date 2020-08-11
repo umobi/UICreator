@@ -142,7 +142,7 @@ open class UICNavigation: UIViewControllerCreator, NavigationRepresentable {
 public extension ViewCreator {
 
     private var presentable: UIViewController! {
-        guard let viewController = self.uiView.window?.rootViewController else {
+        guard let viewController = self.uiView?.window?.rootViewController else {
             return nil
         }
 

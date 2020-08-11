@@ -35,7 +35,7 @@ public protocol UICViewControllerRepresentable: ViewControllerRepresentable {
 
 internal extension ViewControllerRepresentable {
     var wrapper: UIView! {
-        return self.uiView.superview
+        self.uiView?.superview
     }
 }
 
@@ -64,10 +64,10 @@ public extension UICViewControllerRepresentable {
 public extension UICViewControllerRepresentable {
 
     var uiViewController: ViewController! {
-        return (self as ViewCreator).uiView.next as? ViewController
+        (self as ViewCreator).uiView?.next as? ViewController
     }
 
     var wrapper: UIView! {
-        return self.uiView.superview
+        self.uiView?.superview
     }
 }
