@@ -155,7 +155,7 @@ public extension ViewCreator {
 
     #if os(iOS)
     func navigation(backButton item: @escaping () -> ViewCreator) -> Self {
-        return self.onInTheScene {
+        self.onInTheScene {
             $0.navigationItem.backBarButtonItem = .init(
                 title: "",
                 style: .plain,

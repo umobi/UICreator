@@ -400,6 +400,7 @@ public extension UIViewCreator where View: UIScrollView {
         }
     }
 
+    @available(iOS 11.1, tvOS 11.1, *)
     func verticalScrollIndicatorInsets(_ relay: Relay<UIEdgeInsets>) -> Self {
         self.onInTheScene {
             weak var view = $0 as? View
@@ -410,6 +411,7 @@ public extension UIViewCreator where View: UIScrollView {
         }
     }
 
+    @available(iOS 11.1, tvOS 11.1, *)
     func horizontalScrollIndicatorInsets(_ relay: Relay<UIEdgeInsets>) -> Self {
         self.onInTheScene {
             weak var view = $0 as? View
