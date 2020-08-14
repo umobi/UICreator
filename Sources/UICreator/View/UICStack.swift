@@ -228,3 +228,15 @@ extension UICStack: SupportForEach {
         }
     }
 }
+
+public extension UIViewCreator where View: UIStackView {
+    func axis(_ relay: Relay<NSLayoutConstraint.Axis>) -> Self {
+        self.onNotRendered {
+            weak var view = $0 as? View
+
+            relay.sync {
+                view?.axis = $0
+            }
+        }
+    }
+}
