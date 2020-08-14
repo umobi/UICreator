@@ -44,13 +44,13 @@ Object | Status | Description
 ----|----|-----
 Value | ✅ | Store value inside view. Using the `$` it will turn into a `Relay` object.
 Relay | 🟡 | It is used to update view property with `sync(_:)` or `next(_:)`. There are other special properties like `bind(to:)`, `map(_:)` and `flatMap(_:)`. It is available some operations with booleans, like `self.$isEnabled && self.$isEmpty`, resulting in Relay<Bool>. It needs more methods to be more flexible.
-Property | 🟡 | Allow the view to change behavior depending on value of UIView. Accessing with `$` will return a `Relay`. Check [953b493](https://github.com/umobi/UICreator/commits/develop)
+Property | 🟡 | Allow the view to change behavior depending on value of UIView. Accessing with `$` will return a `Relay`. It needs to be configurated by calling `dynamicProperty(_:)` on any view inside the body.
 	
 ## UIKit Wrappers
 
 Object | Status | Description
 ----|----|----
-UICOutlet | ✅ | As a way to store the reference of a view inside ViewCreator, it allow the View to directly manipulate the UIKit object outside the declarative structure, specially if it is necessarly to set specific constraints to the objects.
+UICOutlet | ✅ | As a way to store the reference of a view inside ViewCreator. Configurated by calling the `as(_:)` method on the view inside the body getter.
 
 ## Imperative Methods
 
