@@ -23,11 +23,12 @@
 import Foundation
 import UIKit
 
+@frozen
 public struct UICPresent {
     let presentingStyle: UIModalPresentationStyle
     let transitionStyle: UIModalTransitionStyle
     let fromView: ViewCreator
-    let toView: ViewCreator?
+    let toView: (() -> ViewCreator)?
     let onCompletion: (() -> Void)?
     let animated: Bool
 
@@ -84,9 +85,7 @@ public struct UICPresent {
     }
 
     func present() {
-        let viewController = UICHostingController {
-            self.toView!
-        }
+        let viewController = UICHostingController(content: self.toView!)
 
         viewController.modalPresentationStyle = self.presentingStyle
         viewController.modalTransitionStyle = self.transitionStyle
@@ -94,16 +93,27 @@ public struct UICPresent {
         self.fromView.present(animated: self.animated, onCompletion: self.onCompletion, viewController)
     }
 
+    func recycle(viewController: UIViewController) {
+        viewController.modalPresentationStyle = self.presentingStyle
+        viewController.modalTransitionStyle = self.transitionStyle
+    }
+
+    public func to(_ content: @escaping () -> ViewCreator) -> Self {
+        self.edit {
+            $0.toView = content
+        }
+    }
+
     public func present(content: @escaping () -> ViewCreator) {
         self.edit {
-            $0.toView = content()
+            $0.toView = content
         }.present()
     }
 
     private class Editable {
         var presentingStyle: UIModalPresentationStyle
         var transitionStyle: UIModalTransitionStyle
-        var toView: ViewCreator?
+        var toView: (() -> ViewCreator)?
         var onCompletion: (() -> Void)?
         var animated: Bool
 

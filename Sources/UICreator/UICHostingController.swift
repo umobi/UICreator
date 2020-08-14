@@ -34,6 +34,24 @@ public class UICHostingController: UIViewController {
             .die()
     }
 
+    private var dismissHandler: (() -> Void)? = nil
+
+    func onDismiss(_ handler: @escaping () -> Void) {
+        let oldHandler = self.dismissHandler
+        self.dismissHandler = {
+            oldHandler?()
+            handler()
+        }
+    }
+
+    override public func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        if self.isBeingDismissed {
+            self.dismissHandler?()
+        }
+    }
+
     #if os(iOS)
     public var statusBarStyle: UIStatusBarStyle? = nil {
         didSet {
