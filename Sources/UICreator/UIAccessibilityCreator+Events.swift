@@ -91,6 +91,7 @@ public extension UIAccessibilityCreator where View: UIView {
         }
     }
 
+    @available(*, deprecated, message: "Use Property(\\.accessibilityInvertColors)")
     func onInvertColorsChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.invertColorsStatusDidChangeNotification) { _ in
             self.manager.onNotRendered {
@@ -107,6 +108,7 @@ public extension UIAccessibilityCreator where View: UIView {
         }
     }
 
+    @available(*, deprecated, message: "Use Property(\\.accessibilityGrayscaleEnabled)")
     func onGrayScaleChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.grayscaleStatusDidChangeNotification) { _ in
             self.manager.onNotRendered {
@@ -115,6 +117,7 @@ public extension UIAccessibilityCreator where View: UIView {
         }
     }
 
+    @available(*, deprecated, message: "Use Property(\\.accessibilityReduceTransparency)")
     func onReduceTransparencyChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.reduceTransparencyStatusDidChangeNotification) { _ in
             self.manager.onNotRendered {
@@ -123,6 +126,7 @@ public extension UIAccessibilityCreator where View: UIView {
         }
     }
 
+    @available(*, deprecated, message: "Use Property(\\.accessibilityReduceMotion)")
     func onReduceMotionChanged(_ handler: @escaping (UIView) -> Void) -> Self {
         self.onNotification(UIAccessibility.reduceMotionStatusDidChangeNotification) { _ in
             self.manager.onNotRendered {
