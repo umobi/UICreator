@@ -388,3 +388,35 @@ public extension UIViewCreator where View: UIScrollView {
         }
     }
 }
+
+public extension UIViewCreator where View: UIScrollView {
+    func contentInsets(_ relay: Relay<UIEdgeInsets>) -> Self {
+        self.onInTheScene {
+            weak var view = $0 as? View
+
+            relay.sync {
+                view?.contentInset = $0
+            }
+        }
+    }
+
+    func verticalScrollIndicatorInsets(_ relay: Relay<UIEdgeInsets>) -> Self {
+        self.onInTheScene {
+            weak var view = $0 as? View
+
+            relay.sync {
+                view?.verticalScrollIndicatorInsets = $0
+            }
+        }
+    }
+
+    func horizontalScrollIndicatorInsets(_ relay: Relay<UIEdgeInsets>) -> Self {
+        self.onInTheScene {
+            weak var view = $0 as? View
+
+            relay.sync {
+                view?.horizontalScrollIndicatorInsets = $0
+            }
+        }
+    }
+}
