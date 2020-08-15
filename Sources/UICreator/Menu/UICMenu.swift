@@ -174,21 +174,6 @@ public extension ViewCreator {
     }
 }
 
-private var kContentMenuDelegate = 0
-@available(iOS 13, *)
-extension UIContextMenuInteraction {
-    var menuDelegate: UICMenu.Delegate? {
-        get { objc_getAssociatedObject(self, &kContentMenuDelegate) as? UICMenu.Delegate }
-        set { objc_setAssociatedObject(self, &kContentMenuDelegate, newValue, .OBJC_ASSOCIATION_RETAIN) }
-    }
-
-    static func interaction(_ uicDelegate: UICMenu.Delegate) -> UIContextMenuInteraction {
-        let interaction = UIContextMenuInteraction(delegate: uicDelegate)
-        interaction.menuDelegate = uicDelegate
-        return interaction
-    }
-}
-
 extension UICMenu {
     @available(iOS 13, *)
     var uiMenu: UIMenu {
@@ -205,34 +190,5 @@ extension UICMenu {
             options: .init(self.options.map { $0.uiOptions }),
             children: self.children.map { $0.uiMenuElement }
         )
-    }
-}
-
-extension UICMenu {
-    @available(iOS 13, *)
-    class Delegate: NSObject, UIContextMenuInteractionDelegate {
-        let menu: UICMenu
-
-        init(_ menu: UICMenu) {
-            self.menu = menu
-        }
-
-        func contextMenuInteraction(
-            _ interaction: UIContextMenuInteraction,
-            configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-
-            return UIContextMenuConfiguration(
-                identifier: nil,
-                previewProvider: {
-                    guard let provider = self.menu.provider else {
-                        return nil
-                    }
-
-                    return { UICHostingController(content: provider )}
-                }(),
-                actionProvider: { [weak self] _ in
-                    self?.menu.uiMenu
-                })
-          }
     }
 }
