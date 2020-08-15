@@ -155,7 +155,12 @@ private extension UIView {
 }
 
 private extension ViewCreator {
-    func dynamicPresent(_ relay: Relay<Bool>, animated flag: Bool = true, content: @escaping () -> ViewCreator, viewControllerBuilder: ((UIViewController) -> Void)?) -> Self {
+    func dynamicPresent(
+        _ relay: Relay<Bool>,
+        animated flag: Bool = true,
+        content: @escaping () -> ViewCreator,
+        viewControllerBuilder: ((UIViewController) -> Void)?) -> Self {
+
         self.onInTheScene {
             weak var view = $0
             weak var presentingView: UIViewController?

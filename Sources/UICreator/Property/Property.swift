@@ -45,17 +45,19 @@ public struct Property<Key> {
 
 private extension Property {
     static func notification(_ notificationName: NSNotification.Name, _ view: UIView, handler: @escaping (UIView) -> Void) {
-        NotificationCenter.default.addObserver(
-            forName: notificationName,
-            object: nil,
-            queue: nil,
-            using: { [weak view] _ in
-                guard let view = view else {
-                    return
-                }
+        view.accessibilityObservable.append(
+            NotificationCenter.default.addObserver(
+                forName: notificationName,
+                object: nil,
+                queue: nil,
+                using: { [weak view] _ in
+                    guard let view = view else {
+                        return
+                    }
 
-                handler(view)
-            }
+                    handler(view)
+                }
+            )
         )
     }
 }
@@ -105,6 +107,16 @@ internal extension Property {
                     self.value = PropertyKey($0)[keyPath: self.keyPath]
                 })
 
+        case \PropertyKey.applicationState:
+            UIApplication.stateNotifications.forEach {
+                Self.notification(
+                    $0,
+                    view,
+                    handler: {
+                        self.value = PropertyKey($0)[keyPath: self.keyPath]
+                    })
+            }
+
         default:
             view.onTrait {
                 self.value = PropertyKey($0)[keyPath: self.keyPath]
@@ -115,6 +127,7 @@ internal extension Property {
     }
 }
 
+//swiftlint:disable function_parameter_count identifier_name
 public extension ViewCreator {
     func dynamicProperty<P0>(_ p0: Property<P0>) -> Self {
         self.onNotRendered {

@@ -70,7 +70,11 @@ public class StackView: UIStackView {
 public class UICStack: UIViewCreator {
     public typealias View = StackView
 
-    private func prepare(axis: NSLayoutConstraint.Axis, spacing: CGFloat, @UICViewBuilder _ content: @escaping () -> ViewCreator) {
+    private func prepare(
+        axis: NSLayoutConstraint.Axis,
+        spacing: CGFloat,
+        @UICViewBuilder _ content: @escaping () -> ViewCreator) {
+
         let content = content().zip
         content.forEach {
             self.tree.append($0)

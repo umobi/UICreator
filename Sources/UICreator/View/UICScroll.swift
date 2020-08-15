@@ -24,6 +24,7 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
+//swiftlint:disable file_length
 public extension ScrollView {
     enum Axis {
         case vertical

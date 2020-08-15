@@ -26,11 +26,13 @@ import UIKit
 public class UIViewWrapper {
     private let wrap: ViewCreator
 
-    /// UIViewWrapper gets the UIView inside the ViewCreator to expose the view directly used for imperative methods.
+    /// UIViewWrapper gets the UIView inside the ViewCreator to expose the view directly
+    /// used for imperative methods.
     public init(_ wrap: ViewCreator) {
         self.wrap = wrap
     }
-    /// Constructing the UIViewWrapper with the view reference allows to make sure that view is related to some ViewCreator.
+    /// Constructing the UIViewWrapper with the view reference allows to make sure that view
+    /// is related to some ViewCreator.
     public convenience init?(_ view: UIView) {
         guard let creator = view.viewCreator else {
             return nil

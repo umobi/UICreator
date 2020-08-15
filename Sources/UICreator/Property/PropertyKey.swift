@@ -71,6 +71,10 @@ public struct PropertyKey {
         UIAccessibility.isReduceMotionEnabled
     }
 
+    public var applicationState: UIApplication.State {
+        UIApplication.shared.applicationState
+    }
+
     public var layoutDirection: UITraitEnvironmentLayoutDirection {
         self.uiView?.traitCollection.layoutDirection ?? .unspecified
     }

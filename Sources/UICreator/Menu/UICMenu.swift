@@ -24,6 +24,7 @@ import Foundation
 import UIKit
 
 public struct UICMenu: UICMenuElement {
+    //swiftlint:disable identifier_name
     let id: ObjectIdentifier?
     let children: [UICMenuElement]
     let title: String?
@@ -75,6 +76,7 @@ public struct UICMenu: UICMenuElement {
 
 private extension UICMenu {
     class Editable {
+        //swiftlint:disable identifier_name
         var id: ObjectIdentifier?
         var children: [UICMenuElement]
         var title: String?
@@ -100,6 +102,7 @@ private extension UICMenu {
 }
 
 extension UICMenu {
+    //swiftlint:disable identifier_name
     func id(_ id: ObjectIdentifier) -> Self {
         self.edit {
             $0.id = id

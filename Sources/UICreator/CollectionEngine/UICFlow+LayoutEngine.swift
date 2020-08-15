@@ -51,7 +51,8 @@ internal extension UICCollectionLayoutElement {
 
 @_functionBuilder
 public struct UICCollectionLayoutSectionBuilder {
-    static public func buildBlock(_ segments: UICCollectionLayoutSectionElement...) -> UICCollectionLayoutSectionElement {
+    static public func buildBlock(
+        _ segments: UICCollectionLayoutSectionElement...) -> UICCollectionLayoutSectionElement {
         CombinedLayoutSections(children: segments)
     }
 }
@@ -164,7 +165,10 @@ public class UICCollectionLayoutSection: UICCollectionLayoutSectionElement {
     let footer: UICCollectionLayoutFooter?
     let numberOfSections: Int?
 
-    internal required init(numberOfSections: Int? = nil,_  contents: [UICCollectionLayoutSectionElement]) {
+    internal required init(
+        numberOfSections: Int? = nil,
+        _  contents: [UICCollectionLayoutSectionElement]) {
+
         if contents.contains(where: { $0 is UICCollectionLayoutSection }) {
             Fatal.recursiveSections.die()
         }
@@ -186,7 +190,10 @@ public class UICCollectionLayoutSection: UICCollectionLayoutSectionElement {
         self.footer = contents.first(where: { $0 is UICCollectionLayoutFooter }) as? UICCollectionLayoutFooter
     }
 
-    public convenience init(numberOfSections: Int? = nil, @UICCollectionLayoutSectionBuilder _ contents: @escaping () -> UICCollectionLayoutSectionElement) {
+    public convenience init(
+        numberOfSections: Int? = nil,
+        @UICCollectionLayoutSectionBuilder _ contents: @escaping () -> UICCollectionLayoutSectionElement) {
+
         self.init(numberOfSections: numberOfSections, contents().zip)
     }
 

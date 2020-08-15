@@ -34,7 +34,7 @@ public class UICHostingController: UIViewController {
             .die()
     }
 
-    private var dismissHandler: (() -> Void)? = nil
+    private var dismissHandler: (() -> Void)?
 
     func onDismiss(_ handler: @escaping () -> Void) {
         let oldHandler = self.dismissHandler
