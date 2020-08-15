@@ -27,6 +27,7 @@ public protocol UICMenuElement {
 
 }
 
+#if os(iOS)
 extension UICMenuElement {
     @available(iOS 13, *)
     var uiMenuElement: UIMenuElement {
@@ -40,3 +41,4 @@ extension UICMenuElement {
         }
     }
 }
+#endif

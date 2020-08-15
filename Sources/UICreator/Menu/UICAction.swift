@@ -147,7 +147,7 @@ public extension UICAction {
 }
 
 extension UICAction.Attributes {
-    @available(iOS 13, *)
+    @available(iOS 13, tvOS 13, *)
     var uiAttributes: UIAction.Attributes {
         switch self {
         case .destructive:
@@ -161,7 +161,7 @@ extension UICAction.Attributes {
 }
 
 extension UICAction.State {
-    @available(iOS 13, *)
+    @available(iOS 13, tvOS 13, *)
     var uiState: UIAction.State {
         switch self {
         case .on:
@@ -174,6 +174,7 @@ extension UICAction.State {
     }
 }
 
+#if os(iOS)
 extension UICAction {
     @available(iOS 13, *)
     var uiAction: UIAction {
@@ -196,3 +197,4 @@ extension UICAction {
         )
     }
 }
+#endif

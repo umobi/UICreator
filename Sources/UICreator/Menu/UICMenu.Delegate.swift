@@ -23,6 +23,7 @@
 import Foundation
 import UIKit
 
+#if os(iOS)
 private var kContentMenuDelegate = 0
 @available(iOS 13, *)
 extension UIContextMenuInteraction {
@@ -70,3 +71,4 @@ extension UICMenu {
         }
     }
 }
+#endif

@@ -151,7 +151,7 @@ public extension UICMenu {
 }
 
 extension UICMenu.Options {
-    @available(iOS 13, *)
+    @available(iOS 13, tvOS 13, *)
     var uiOptions: UIMenu.Options {
         switch self {
         case .destructive:
@@ -162,10 +162,10 @@ extension UICMenu.Options {
     }
 }
 
+#if os(iOS)
 public extension ViewCreator {
-
     @available(iOS 13, *)
-    func menu(_ content: @escaping () -> UICMenu) -> Self {
+    func contextMenu(_ content: @escaping () -> UICMenu) -> Self {
         self.onInTheScene {
             $0.addInteraction(UIContextMenuInteraction.interaction(
                 UICMenu.Delegate(content())
@@ -173,7 +173,9 @@ public extension ViewCreator {
         }
     }
 }
+#endif
 
+#if os(iOS)
 extension UICMenu {
     @available(iOS 13, *)
     var uiMenu: UIMenu {
@@ -192,3 +194,4 @@ extension UICMenu {
         )
     }
 }
+#endif
