@@ -29,7 +29,7 @@ public extension UICCollection {
     convenience init(
         layout: Layout,
         @UICViewBuilder _ contents: @escaping () -> ViewCreator) {
-        
+
         self.init(layout: layout, ListManager(contents: contents().zip))
     }
 

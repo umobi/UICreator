@@ -26,6 +26,7 @@ import UIKit
 public struct UICAction: UICMenuElement {
     let title: String?
     let image: UIImage?
+    //swiftlint:disable identifier_name
     let id: ObjectIdentifier?
     let attributes: Set<Attributes>
     let state: State
@@ -105,6 +106,7 @@ private extension UICAction {
 }
 
 extension UICAction {
+    //swiftlint:disable identifier_name
     func id(_ id: ObjectIdentifier) -> Self {
         self.edit {
             $0.id = id
@@ -182,6 +184,7 @@ extension UICAction {
             title: self.title ?? "",
             image: self.image,
             identifier: {
+                //swiftlint:disable identifier_name
                 guard let id = self.id else {
                     return nil
                 }

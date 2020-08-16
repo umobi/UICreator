@@ -63,8 +63,11 @@ extension UICollectionView {
 }
 
 public extension UICCollection {
-    func layoutMaker(@UICCollectionLayoutSectionBuilder content: @escaping () -> UICCollectionLayoutSectionElement) -> Self {
-        return self.onInTheScene {
+    func layoutMaker(
+        @UICCollectionLayoutSectionBuilder content:
+            @escaping () -> UICCollectionLayoutSectionElement) -> Self {
+
+        self.onInTheScene {
             ($0 as? View)?.layoutManagerCallback = content
             ($0 as? View)?.invalidateLayoutMaker()
         }

@@ -44,7 +44,12 @@ public struct Property<Key> {
 }
 
 private extension Property {
-    static func notification(_ notificationName: NSNotification.Name, _ view: UIView, handler: @escaping (UIView) -> Void) {
+    static func notification(
+        _ notificationName: NSNotification.Name,
+        _ view: UIView,
+        handler: @escaping (UIView) -> Void) {
+
+        //swiftlint:disable discarded_notification_center_observer
         view.accessibilityObservable.append(
             NotificationCenter.default.addObserver(
                 forName: notificationName,
@@ -63,6 +68,7 @@ private extension Property {
 }
 
 internal extension Property {
+    //swiftlint:disable function_body_length
     func assign(_ view: UIView) {
         switch self.keyPath {
         case \PropertyKey.accessibilityInvertColors:

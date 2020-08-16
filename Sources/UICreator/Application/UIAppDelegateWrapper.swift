@@ -27,16 +27,17 @@ import UIKit
 var customAppDelegate: UIApplicationDelegate?
 
 @propertyWrapper
-public struct UIApplicationDelegateWrapper<ApplicationDelegate> where ApplicationDelegate: UIApplicationDelegate & NSObject {
+public struct UIApplicationDelegateWrapper<ApplicationDelegate>
+where ApplicationDelegate: UIApplicationDelegate & NSObject {
 
     public init() {
         guard customAppDelegate == nil else {
             fatalError()
         }
-        
+
         customAppDelegate = ApplicationDelegate()
     }
-    
+
     public var wrappedValue: ApplicationDelegate {
         fatalError()
     }

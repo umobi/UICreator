@@ -27,7 +27,10 @@ import UIKit
 public protocol ViewScene {}
 
 public extension ViewScene {
-    func dynamicProperty<Value>(_ property: Property<Value>,_ handler: @escaping (Value) -> Void) -> Self where Value: Equatable {
+    func dynamicProperty<Value>(
+        _ property: Property<Value>,
+        _ handler: @escaping (Value) -> Void) -> Self where Value: Equatable {
+
         guard let window = UIApplication.shared.keyWindow else {
             return self
         }

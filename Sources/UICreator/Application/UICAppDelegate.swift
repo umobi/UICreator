@@ -26,12 +26,18 @@ import UIKit
 #if swift(>=5.3)
 private var globalApp: UICApp?
 
+//swiftlint:disable colon
 internal class UICAppDelegate: NSObject, UIApplicationDelegate {
     var window: UIWindow?
 
+    //swiftlint:disable weak_delegate
     private var appDelegate: UIApplicationDelegate?
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions:
+            [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+
         self.appDelegate = customAppDelegate
         customAppDelegate = nil
 

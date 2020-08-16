@@ -66,7 +66,10 @@ extension UICMenu {
                 })
           }
 
-        func contextMenuInteraction(_ interaction: UIContextMenuInteraction, willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionCommitAnimating) {
+        func contextMenuInteraction(
+            _ interaction: UIContextMenuInteraction,
+            willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
+            animator: UIContextMenuInteractionCommitAnimating) {
             // TODO: - Move to provider
         }
     }
