@@ -78,4 +78,8 @@ public struct PropertyKey {
     public var layoutDirection: UITraitEnvironmentLayoutDirection {
         self.uiView?.traitCollection.layoutDirection ?? .unspecified
     }
+
+    public var openURL: URLCaller {
+        .init()
+    }
 }

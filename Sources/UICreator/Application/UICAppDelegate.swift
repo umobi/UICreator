@@ -30,6 +30,8 @@ private var globalApp: UICApp?
 internal class UICAppDelegate: NSObject, UIApplicationDelegate {
     var window: UIWindow?
 
+    var recivedURL: URL?
+
     //swiftlint:disable weak_delegate
     private lazy var appDelegate: UIApplicationDelegate? = {
         let appDelegate = customAppDelegate
@@ -72,7 +74,51 @@ internal class UICAppDelegate: NSObject, UIApplicationDelegate {
             return super.responds(to: aSelector)
         }
 
+        if aSelector == #selector(self.application(_:open:options:)) {
+            return super.responds(to: aSelector)
+        }
+
         return self.appDelegate?.responds(to: aSelector) ?? false
+    }
+}
+
+private extension UICAppDelegate {
+    @discardableResult
+    func postURL(_ url: URL) -> Bool {
+        self.recivedURL = url
+
+        NotificationCenter.default.post(
+            name: UICAppDelegate.kOpenURLNotificationName,
+            object: nil,
+            userInfo: ["url": url]
+        )
+
+        return true
+    }
+}
+
+@available(iOS 13, tvOS 13, *)
+extension UICAppDelegate {
+    func application(
+        _ application: UIApplication,
+        didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
+
+        self.strongDelegate.application!(
+            application,
+            didDiscardSceneSessions: sceneSessions
+        )
+    }
+
+    func application(
+        _ application: UIApplication,
+        configurationForConnecting connectingSceneSession: UISceneSession,
+        options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+
+        self.strongDelegate.application!(
+            application,
+            configurationForConnecting: connectingSceneSession,
+            options: options
+        )
     }
 }
 
@@ -90,16 +136,21 @@ extension UICAppDelegate {
 }
 
 extension UICAppDelegate {
+    static var kOpenURLNotificationName: Notification.Name {
+        .init("UICAppDelegate.openURL")
+    }
+}
+
+extension UICAppDelegate {
     func application(
         _ app: UIApplication,
         open url: URL,
         options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-
-        self.strongDelegate.application!(
+        (self.appDelegate?.application?(
             app,
             open: url,
             options: options
-        )
+        ) ?? false) || self.postURL(url)
     }
 
     @available(*, deprecated, message: "deprecated in iOS 9")

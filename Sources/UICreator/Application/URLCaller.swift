@@ -23,25 +23,14 @@
 import Foundation
 import UIKit
 
-class NotificationManager {
-    private var observers: [NSObjectProtocol] = []
+public struct URLCaller {
+    init() {}
 
-    func append(_ object: NSObjectProtocol) {
-        self.observers.append(object)
+    public func callAsFunction(_ url: URL) {
+        UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
 
-    deinit {
-        self.observers.forEach(NotificationCenter.default.removeObserver)
-    }
-}
-
-private var kNotificationObservable = 0
-internal extension UIView {
-    var notificationObservable: NotificationManager {
-        OBJCSet(
-            self,
-            &kNotificationObservable,
-            orLoad: NotificationManager.init
-        )
+    public func callAsFunction(_ url: URL,_ handler: @escaping (Bool) -> Void) {
+        UIApplication.shared.open(url, options: [:], completionHandler: handler)
     }
 }

@@ -50,7 +50,7 @@ private extension Property {
         handler: @escaping (UIView) -> Void) {
 
         //swiftlint:disable discarded_notification_center_observer
-        view.accessibilityObservable.append(
+        view.notificationObservable.append(
             NotificationCenter.default.addObserver(
                 forName: notificationName,
                 object: nil,
@@ -122,6 +122,8 @@ internal extension Property {
                         self.value = PropertyKey($0)[keyPath: self.keyPath]
                     })
             }
+        case \PropertyKey.openURL:
+            break
 
         default:
             view.onTrait {
@@ -132,6 +134,38 @@ internal extension Property {
         self.value = PropertyKey(view)[keyPath: self.keyPath]
     }
 }
+
+#if swift(>=5.3)
+public extension ViewCreator {
+    func openURL(_ urlHandler: @escaping (URL) -> Void) -> Self {
+        guard UIApplication.shared.delegate is UICAppDelegate else {
+            Fatal.Builder("openURL(_:) is only available for apps that are implemented with UICApp").warning()
+            return self
+        }
+
+        return self.onNotRendered {
+            if let url = (UIApplication.shared.delegate as? UICAppDelegate)?.recivedURL {
+                urlHandler(url)
+            }
+
+            $0.notificationObservable.append(
+                NotificationCenter.default.addObserver(
+                    forName: UICAppDelegate.kOpenURLNotificationName,
+                    object: nil,
+                    queue: nil,
+                    using: {
+                        guard let url = $0.userInfo?["url"] as? URL else {
+                            return
+                        }
+
+                        urlHandler(url)
+                    }
+                )
+            )
+        }
+    }
+}
+#endif
 
 //swiftlint:disable function_parameter_count identifier_name
 public extension ViewCreator {
