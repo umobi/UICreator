@@ -153,6 +153,7 @@ extension UICAppDelegate {
         ) ?? false) || self.postURL(url)
     }
 
+    #if os(iOS)
     @available(*, deprecated, message: "deprecated in iOS 9")
     func application(_ application: UIApplication, handleOpen url: URL) -> Bool {
         self.strongDelegate.application!(
@@ -175,6 +176,7 @@ extension UICAppDelegate {
             annotation: annotation
         )
     }
+    #endif
 }
 
 extension UICAppDelegate {
@@ -243,6 +245,7 @@ extension UICAppDelegate {
     }
 }
 
+#if os(iOS)
 extension UICAppDelegate {
     func application(_ application: UIApplication, didChangeStatusBarFrame oldStatusBarFrame: CGRect) {
         self.strongDelegate.application!(application, didChangeStatusBarFrame: oldStatusBarFrame)
@@ -270,6 +273,7 @@ extension UICAppDelegate {
         )
     }
 }
+#endif
 
 extension UICAppDelegate {
     func application(
@@ -304,6 +308,7 @@ extension UICAppDelegate {
         )
     }
 
+    #if os(iOS)
     @available(*, deprecated, message: "deprecated in iOS 10")
     func application(
         _ application: UIApplication,
@@ -325,6 +330,7 @@ extension UICAppDelegate {
             didRegister: notificationSettings
         )
     }
+    #endif
 
     @available(*, deprecated, message: "deprecated in iOS 10")
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any]) {
@@ -406,6 +412,8 @@ extension UICAppDelegate {
     }
 }
 
+
+#if os(iOS)
 extension UICAppDelegate {
     @available(*, deprecated, message: "deprecated in iOS 10")
     func application(
@@ -471,6 +479,7 @@ extension UICAppDelegate {
         )
     }
 }
+#endif
 
 extension UICAppDelegate {
     func application(
@@ -509,6 +518,7 @@ extension UICAppDelegate {
 }
 
 extension UICAppDelegate {
+    @available(iOS 10.0, tvOS 11.0, *)
     func application(
         _ application: UIApplication,
         performFetchWithCompletionHandler
@@ -533,6 +543,7 @@ extension UICAppDelegate {
     }
 }
 
+#if os(iOS)
 extension UICAppDelegate {
     func application(
         _ application: UIApplication,
@@ -546,8 +557,10 @@ extension UICAppDelegate {
         )
     }
 }
+#endif
 
 extension UICAppDelegate {
+    #if os(iOS)
     func application(
         _ application: UIApplication,
         supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
@@ -556,6 +569,7 @@ extension UICAppDelegate {
             supportedInterfaceOrientationsFor: window
         )
     }
+    #endif
 
     func application(
         _ application: UIApplication,

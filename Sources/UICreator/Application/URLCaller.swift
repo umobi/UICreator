@@ -27,10 +27,21 @@ public struct URLCaller {
     init() {}
 
     public func callAsFunction(_ url: URL) {
-        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        UIApplication.shared.open(
+            url,
+            options: [:],
+            completionHandler: nil
+        )
     }
 
-    public func callAsFunction(_ url: URL,_ handler: @escaping (Bool) -> Void) {
-        UIApplication.shared.open(url, options: [:], completionHandler: handler)
+    public func callAsFunction(
+        _ url: URL,
+        _ handler: @escaping (Bool) -> Void) {
+
+        UIApplication.shared.open(
+            url,
+            options: [:],
+            completionHandler: handler
+        )
     }
 }
