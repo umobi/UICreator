@@ -40,18 +40,4 @@ public extension ViewScene {
         return self
     }
 }
-
-private extension Relay where Value: Equatable {
-    func distinctSync(_ handler: @escaping (Value) -> Void) {
-        var actual = self.wrappedValue
-        handler(actual)
-
-        self.sync {
-            if $0 != actual {
-                actual = $0
-                handler($0)
-            }
-        }
-    }
-}
 #endif

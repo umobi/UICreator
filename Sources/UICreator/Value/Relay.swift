@@ -46,7 +46,7 @@ public struct Relay<Value> {
 
                 var value: Value!
 
-                container.reference.reactive.requestValueGetter(handler: { (requestedValue: Value) in
+                container.reference?.reactive.requestValueGetter(handler: { (requestedValue: Value) in
                     value = requestedValue
                     dispatchGroup.leave()
                 })
@@ -61,7 +61,7 @@ public struct Relay<Value> {
             case .constant:
                 return
             case .weak(let container):
-                container.reference.reactive.requestValueSetter(newValue)
+                container.reference?.reactive.requestValueSetter(newValue)
             }
         }
     }
@@ -73,7 +73,7 @@ public struct Relay<Value> {
         case .constant(let value):
             handler(value)
         case .weak(let container):
-            container.reference.reactive.valueDidChange(handler: handler)
+            container.reference?.reactive.valueDidChange(handler: handler)
         }
     }
 
@@ -81,7 +81,7 @@ public struct Relay<Value> {
         self.next(handler)
 
         if case .weak(let container) = self.storage {
-            container.reference.reactive.requestValueGetter(handler: handler)
+            container.reference?.reactive.requestValueGetter(handler: handler)
         }
     }
 
@@ -122,6 +122,20 @@ public extension Relay {
         }
 
         return value.projectedValue
+    }
+}
+
+public extension Relay where Value: Equatable {
+    func distinctSync(_ handler: @escaping (Value) -> Void) {
+        var actual = self.wrappedValue
+        handler(actual)
+
+        self.sync {
+            if $0 != actual {
+                actual = $0
+                handler($0)
+            }
+        }
     }
 }
 

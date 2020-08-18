@@ -412,7 +412,6 @@ extension UICAppDelegate {
     }
 }
 
-
 #if os(iOS)
 extension UICAppDelegate {
     @available(*, deprecated, message: "deprecated in iOS 10")

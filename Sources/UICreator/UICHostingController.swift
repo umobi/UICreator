@@ -34,22 +34,27 @@ public class UICHostingController: UIViewController {
             .die()
     }
 
-    private var dismissHandler: (() -> Void)?
+    private var disappearHandler: ((UIViewController) -> Void)?
+
+    func onDisappear(_ handler: @escaping (UIViewController) -> Void) {
+        let oldHandler = self.disappearHandler
+        self.disappearHandler = {
+            oldHandler?($0)
+            handler($0)
+        }
+    }
 
     func onDismiss(_ handler: @escaping () -> Void) {
-        let oldHandler = self.dismissHandler
-        self.dismissHandler = {
-            oldHandler?()
-            handler()
+        self.onDisappear {
+            if $0.isBeingDismissed {
+                handler()
+            }
         }
     }
 
     override public func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-
-        if self.isBeingDismissed {
-            self.dismissHandler?()
-        }
+        self.disappearHandler?(self)
     }
 
     #if os(iOS)
