@@ -43,7 +43,14 @@ UICollectionView | UICCollection | ❌ | It list view using `UICRow`, `UICHeader
 Object | Status | Description
 ----|----|-----
 Value | ✅ | Store value inside view. Using the `$` it will turn into a `Relay` object.
-Relay | 🟡 | It is used to update view property with `sync(_:)` or `next(_:)`. There are other special properties like `bind(to:)`, `map(_:)`. It needs more methods to be more flexible.
+Relay | 🟡 | It is used to update view property with `sync(_:)` or `next(_:)`. There are other special properties like `bind(to:)`, `map(_:)` and `flatMap(_:)`. It is available some operations with booleans, like `self.$isEnabled && self.$isEmpty`, resulting in Relay<Bool>. It needs more methods to be more flexible.
+Property | 🟡 | Allow the view to change behavior depending on value of UIView. Accessing with `$` will return a `Relay`. It needs to be configurated by calling `dynamicProperty(_:)` on any view inside the body.
+	
+## UIKit Wrappers
+
+Object | Status | Description
+----|----|----
+UICOutlet | ✅ | As a way to store the reference of a view inside ViewCreator. Configurated by calling the `as(_:)` method on the view inside the body getter.
 
 ## Imperative Methods
 
@@ -85,28 +92,28 @@ Go check this repository [UICreator Examples](https://github.com/brennobemoura/U
 
     import UICreator
     class LandmarkRow: UICView {
-		let landmark: Landmark
+        let landmark: Landmark
 		
-		init(landmark: Landmark) {
-			self.landmark = landmark
-		}
+        init(landmark: Landmark) {
+            self.landmark = landmark
+        }
 	
-		var body: ViewCreator {
-			UICSpacer(vertical: 5) {
-				UICHStack {
-					UICImage(image: self.landmark.image)
-						.aspectRatio()
-						.height(equalTo: 50)
-						.content(mode: .scaleAspectFill)
-						.clipsToBounds(true)
+        var body: ViewCreator {
+            UICSpacer(vertical: 5) {
+                UICHStack {
+                    UICImage(image: self.landmark.image)
+                        .aspectRatio()
+                        .height(equalTo: 50)
+                        .content(mode: .scaleAspectFill)
+                        .clipsToBounds(true)
 						
-					UICLabel(self.landmark.name)
-					UICSpacer()
-				}
-				.spacing(15)
-			}
-		}
-	}
+                    UICLabel(self.landmark.name)
+                    UICSpacer()
+                }
+                .spacing(15)
+            }
+        }
+    }
 
 ## Author
 

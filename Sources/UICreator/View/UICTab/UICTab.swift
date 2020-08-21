@@ -159,7 +159,7 @@ public extension UICTab {
 
 public extension ViewCreator {
     var tabBarItem: UITabBarItem? {
-        get { self.uiView.tabBarItem }
+        get { self.uiView?.tabBarItem }
         set { self.uiView.viewController.tabBarItem = newValue }
     }
 }

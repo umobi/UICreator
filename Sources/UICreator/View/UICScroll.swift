@@ -24,6 +24,7 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
+//swiftlint:disable file_length
 public extension ScrollView {
     enum Axis {
         case vertical
@@ -385,6 +386,40 @@ public extension UIViewCreator where View: UIScrollView {
     func scroll(indicatorInsets: UIEdgeInsets) -> Self {
         self.onInTheScene {
             ($0 as? View)?.scrollIndicatorInsets = indicatorInsets
+        }
+    }
+}
+
+public extension UIViewCreator where View: UIScrollView {
+    func contentInsets(_ relay: Relay<UIEdgeInsets>) -> Self {
+        self.onInTheScene {
+            weak var view = $0 as? View
+
+            relay.sync {
+                view?.contentInset = $0
+            }
+        }
+    }
+
+    @available(iOS 11.1, tvOS 11.1, *)
+    func verticalScrollIndicatorInsets(_ relay: Relay<UIEdgeInsets>) -> Self {
+        self.onInTheScene {
+            weak var view = $0 as? View
+
+            relay.sync {
+                view?.verticalScrollIndicatorInsets = $0
+            }
+        }
+    }
+
+    @available(iOS 11.1, tvOS 11.1, *)
+    func horizontalScrollIndicatorInsets(_ relay: Relay<UIEdgeInsets>) -> Self {
+        self.onInTheScene {
+            weak var view = $0 as? View
+
+            relay.sync {
+                view?.horizontalScrollIndicatorInsets = $0
+            }
         }
     }
 }

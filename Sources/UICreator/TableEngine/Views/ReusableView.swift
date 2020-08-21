@@ -118,6 +118,7 @@ extension ReusableView {
                 }
 
                 switch collectionView {
+                //swiftlint:disable colon
                 case is TableCellType:
                     Self.updateTableViewBatching(
                         listView: collectionView,

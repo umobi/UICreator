@@ -70,7 +70,11 @@ public class StackView: UIStackView {
 public class UICStack: UIViewCreator {
     public typealias View = StackView
 
-    private func prepare(axis: NSLayoutConstraint.Axis, spacing: CGFloat, @UICViewBuilder _ content: @escaping () -> ViewCreator) {
+    private func prepare(
+        axis: NSLayoutConstraint.Axis,
+        spacing: CGFloat,
+        @UICViewBuilder _ content: @escaping () -> ViewCreator) {
+
         let content = content().zip
         content.forEach {
             self.tree.append($0)
@@ -224,6 +228,18 @@ extension UICStack: SupportForEach {
 
                 firstView = views.first?.uiView
                 lastView = views.last?.uiView
+            }
+        }
+    }
+}
+
+public extension UIViewCreator where View: UIStackView {
+    func axis(_ relay: Relay<NSLayoutConstraint.Axis>) -> Self {
+        self.onNotRendered {
+            weak var view = $0 as? View
+
+            relay.sync {
+                view?.axis = $0
             }
         }
     }

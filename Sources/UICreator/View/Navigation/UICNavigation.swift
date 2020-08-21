@@ -139,10 +139,9 @@ open class UICNavigation: UIViewControllerCreator, NavigationRepresentable {
     }
 }
 
-public extension ViewCreator {
-
-    private var presentable: UIViewController! {
-        guard let viewController = self.uiView.window?.rootViewController else {
+private extension UIView {
+    var presentable: UIViewController! {
+        guard let viewController = self.window?.rootViewController else {
             return nil
         }
 
@@ -152,6 +151,56 @@ public extension ViewCreator {
         )
         .reversed()
         .first
+    }
+}
+
+private extension ViewCreator {
+    func dynamicPresent(
+        _ relay: Relay<Bool>,
+        animated flag: Bool = true,
+        content: @escaping () -> ViewCreator,
+        viewControllerBuilder: ((UIViewController) -> Void)?) -> Self {
+
+        self.onInTheScene {
+            weak var view = $0
+            weak var presentingView: UIViewController?
+
+            relay.sync {
+                if $0 {
+                    guard presentingView == nil else {
+                        return
+                    }
+
+                    guard let presentable = view?.viewCreator?.presentable else {
+                        relay.wrappedValue = false
+                        return
+                    }
+
+                    let aboutToPresent = UICHostingController(content: content)
+                    aboutToPresent.onDismiss {
+                        relay.wrappedValue = false
+                    }
+
+                    viewControllerBuilder?(aboutToPresent)
+
+                    presentable.present(aboutToPresent, animated: flag, completion: nil)
+                    presentingView = aboutToPresent
+                } else {
+                    guard let presentedView = presentingView else {
+                        return
+                    }
+
+                    presentedView.dismiss(animated: flag, completion: nil)
+                }
+            }
+        }
+    }
+}
+
+public extension ViewCreator {
+
+    private var presentable: UIViewController! {
+        self.uiView?.presentable
     }
 
     @discardableResult
@@ -167,8 +216,27 @@ public extension ViewCreator {
         return self
     }
 
+    func present(_ relay: Relay<Bool>, content: @escaping () -> ViewCreator) -> Self {
+        self.dynamicPresent(
+            relay,
+            content: content,
+            viewControllerBuilder: nil
+        )
+    }
+
     var presentMaker: UICPresent {
         .init(fromView: self)
+    }
+
+    func presentMaker(_ relay: Relay<Bool>, maker: @escaping (UICPresent) -> UICPresent) -> Self {
+        let maker = maker(.init(fromView: self))
+
+        return self.dynamicPresent(
+            relay,
+            animated: maker.animated,
+            content: maker.toView!,
+            viewControllerBuilder: maker.recycle(viewController:)
+        )
     }
 
     @discardableResult
@@ -184,6 +252,16 @@ public extension ViewCreator {
         viewController.modalPresentationStyle = .overFullScreen
         self.presentable?.present(viewController, animated: animated, completion: onCompletion)
         return self
+    }
+
+    func presentModal(_ relay: Relay<Bool>, content: @escaping () -> ViewCreator) -> Self {
+        self.dynamicPresent(
+            relay,
+            content: content,
+            viewControllerBuilder: {
+                $0.modalPresentationStyle = .overFullScreen
+            }
+        )
     }
 
     @discardableResult

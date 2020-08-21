@@ -23,49 +23,25 @@
 import Foundation
 import UIKit
 
-public protocol ViewRepresentable: ViewCreator {
-    func privateMakeUIView() -> UIView
-}
+class NotificationManager {
+    private var observers: [NSObjectProtocol] = []
 
-public protocol UICViewRepresentable: UIViewCreator, ViewRepresentable {
-    func makeUIView() -> View
-    func updateView(_ view: View)
-}
+    func append(_ object: NSObjectProtocol) {
+        self.observers.append(object)
+    }
 
-internal extension ViewRepresentable {
-    var wrapper: UIView! {
-        self.uiView?.superview
+    deinit {
+        self.observers.forEach(NotificationCenter.default.removeObserver)
     }
 }
 
-public extension UICViewRepresentable {
-    func privateMakeUIView() -> UIView {
-        if let view = self.uiView {
-            return view
-        }
-
-        self.loadView { [unowned self] in
-            let view = self.makeUIView()
-            view.updateBuilder(self)
-            return view
-        }.onInTheScene { [weak self] in
-            guard let view = $0 as? View else {
-                fatalError()
-            }
-            self?.updateView(view)
-        }
-
-        return Adaptor(.view(self)).releaseUIView()
-    }
-}
-
-public extension UICViewRepresentable {
-
-    var uiView: View! {
-        return (self as ViewCreator).uiView as? View
-    }
-
-    var wrapper: UIView! {
-        self.uiView?.superview
+private var kNotificationObservable = 0
+internal extension UIView {
+    var notificationObservable: NotificationManager {
+        OBJCSet(
+            self,
+            &kNotificationObservable,
+            orLoad: NotificationManager.init
+        )
     }
 }

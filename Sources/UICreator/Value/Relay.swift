@@ -25,41 +25,64 @@ import Foundation
 @propertyWrapper
 //@dynamicMemberLookup
 public struct Relay<Value> {
-    private weak var reference: ReactiveItemReference!
+    private var storage: Storage
 
     init(_ reference: ReactiveItemReference) {
-        self.reference = reference
+        self.storage = .weak(.init(reference: reference))
+    }
+
+    fileprivate init(_ value: Value) {
+        self.storage = .constant(value)
     }
 
     public var wrappedValue: Value {
         get {
-            let dispatchGroup = DispatchGroup()
-            dispatchGroup.enter()
+            switch self.storage {
+            case .constant(let value):
+                return value
+            case .weak(let container):
+                let dispatchGroup = DispatchGroup()
+                dispatchGroup.enter()
 
-            var value: Value!
+                var value: Value!
 
-            self.reference.reactive.requestValueGetter(handler: { (requestedValue: Value) in
-                value = requestedValue
-                dispatchGroup.leave()
-            })
+                container.reference?.reactive.requestValueGetter(handler: { (requestedValue: Value) in
+                    value = requestedValue
+                    dispatchGroup.leave()
+                })
 
-            dispatchGroup.wait()
-            return value
+                dispatchGroup.wait()
+                return value
+            }
         }
         nonmutating
-        set { self.reference.reactive.requestValueSetter(newValue) }
+        set {
+            switch self.storage {
+            case .constant:
+                return
+            case .weak(let container):
+                container.reference?.reactive.requestValueSetter(newValue)
+            }
+        }
     }
 
     public var projectedValue: Relay<Value> { self }
 
     public func next(_ handler: @escaping (Value) -> Void) {
-        self.reference.reactive.valueDidChange(handler: handler)
+        switch self.storage {
+        case .constant(let value):
+            handler(value)
+        case .weak(let container):
+            container.reference?.reactive.valueDidChange(handler: handler)
+        }
     }
 
     public func sync(_ handler: @escaping (Value) -> Void) {
         self.next(handler)
 
-        self.reference.reactive.requestValueGetter(handler: handler)
+        if case .weak(let container) = self.storage {
+            container.reference?.reactive.requestValueGetter(handler: handler)
+        }
     }
 
     public func map<Other>(_ handler: @escaping (Value) -> Other) -> Relay<Other> {
@@ -69,6 +92,61 @@ public struct Relay<Value> {
         }
 
         return value.projectedValue
+    }
+}
+
+public extension Relay {
+    static func constant(_ value: Value) -> Relay<Value> {
+        .init(value)
+    }
+}
+
+public extension Relay {
+    private class FlatMapToken {}
+
+    func flatMap<Other>(_ flatHandler: @escaping (Value) -> Relay<Other>) -> Relay<Other> {
+        let value = UICreator.Value(wrappedValue: flatHandler(self.wrappedValue).wrappedValue)
+        var token = FlatMapToken()
+
+        self.sync {
+            token = .init()
+            weak var token = token
+
+            flatHandler($0).sync {
+                guard token != nil else {
+                    return
+                }
+
+                value.wrappedValue = $0
+            }
+        }
+
+        return value.projectedValue
+    }
+}
+
+public extension Relay where Value: Equatable {
+    func distinctSync(_ handler: @escaping (Value) -> Void) {
+        var actual = self.wrappedValue
+        handler(actual)
+
+        self.sync {
+            if $0 != actual {
+                actual = $0
+                handler($0)
+            }
+        }
+    }
+}
+
+private extension Relay {
+    struct WeakContainer {
+        weak var reference: ReactiveItemReference!
+    }
+
+    enum Storage {
+        case constant(Value)
+        case weak(WeakContainer)
     }
 }
 

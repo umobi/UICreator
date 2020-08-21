@@ -178,3 +178,25 @@ public extension UIViewCreator where View: UILabel {
         }
     }
 }
+
+public extension UIViewCreator where View: UILabel {
+    func textColor(_ relay: Relay<UIColor>) -> Self {
+        self.onNotRendered {
+            weak var view = $0 as? View
+            relay.sync {
+                view?.textColor = $0
+            }
+        }
+    }
+}
+
+public extension UIViewCreator where View: UILabel {
+    func font(_ relay: Relay<UIFont>) -> Self {
+        self.onNotRendered {
+            weak var view = $0 as? View
+            relay.sync {
+                view?.font = $0
+            }
+        }
+    }
+}

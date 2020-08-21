@@ -37,19 +37,19 @@ public extension UIView {
 
 internal extension ViewCreator {
     var viewController: UIViewController! {
-        return self.uiView.viewController
+        self.uiView?.viewController
     }
 }
 
 public extension ViewCreator {
     var navigation: NavigationRepresentable? {
-        return self.uiView.viewController.navigationController?.view.navigation
+        self.uiView?.viewController.navigationController?.view.navigation
     }
 }
 
 public extension UIView {
     var navigation: NavigationRepresentable? {
-        return sequence(first: self, next: { $0?.superview }).first(where: {
+        sequence(first: self, next: { $0?.superview }).first(where: {
             $0?.viewCreator is NavigationRepresentable
         })??.viewCreator as? NavigationRepresentable
     }
@@ -155,7 +155,7 @@ public extension ViewCreator {
 
     #if os(iOS)
     func navigation(backButton item: @escaping () -> ViewCreator) -> Self {
-        return self.onInTheScene {
+        self.onInTheScene {
             $0.navigationItem.backBarButtonItem = .init(
                 title: "",
                 style: .plain,

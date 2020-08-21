@@ -89,20 +89,3 @@ extension RootView: RenderWillMoveToSuperviewState {
         self.didCommitNotRenderedHandler = nil
     }
 }
-
-/**
- The root is the base view creator class for some of the view creators.
- You shouldn’t use this directly, instead, check `UICView` or `UICViewRepresentable`.
-
- Root support some of the protocols that is used in some of representable of
- view controllers like the protocol `ViewControllerAppearStates`.
- */
-open class Root: ViewCreator {
-    public typealias View = RootView
-
-    public init() {
-        self.loadView { [unowned self] in
-            return View.init(builder: self)
-        }
-    }
-}

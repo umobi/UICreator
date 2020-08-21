@@ -23,49 +23,22 @@
 import Foundation
 import UIKit
 
-public protocol ViewRepresentable: ViewCreator {
-    func privateMakeUIView() -> UIView
+public protocol UICMenuElement {
+
 }
 
-public protocol UICViewRepresentable: UIViewCreator, ViewRepresentable {
-    func makeUIView() -> View
-    func updateView(_ view: View)
-}
-
-internal extension ViewRepresentable {
-    var wrapper: UIView! {
-        self.uiView?.superview
-    }
-}
-
-public extension UICViewRepresentable {
-    func privateMakeUIView() -> UIView {
-        if let view = self.uiView {
-            return view
+#if os(iOS)
+extension UICMenuElement {
+    @available(iOS 13, *)
+    var uiMenuElement: UIMenuElement {
+        switch self {
+        case let action as UICAction:
+            return action.uiAction
+        case let menu as UICMenu:
+            return menu.uiMenu
+        default:
+            fatalError()
         }
-
-        self.loadView { [unowned self] in
-            let view = self.makeUIView()
-            view.updateBuilder(self)
-            return view
-        }.onInTheScene { [weak self] in
-            guard let view = $0 as? View else {
-                fatalError()
-            }
-            self?.updateView(view)
-        }
-
-        return Adaptor(.view(self)).releaseUIView()
     }
 }
-
-public extension UICViewRepresentable {
-
-    var uiView: View! {
-        return (self as ViewCreator).uiView as? View
-    }
-
-    var wrapper: UIView! {
-        self.uiView?.superview
-    }
-}
+#endif

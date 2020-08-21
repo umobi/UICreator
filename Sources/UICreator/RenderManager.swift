@@ -41,13 +41,15 @@ protocol RenderLayoutSubviewsState {
 
 struct RenderManager {
     private(set) weak var manager: ViewCreator!
+    private(set) weak var uiView: UIView!
 
-    init?(_ view: UIView?) {
-        guard let manager = view?.viewCreator else {
+    init?(_ uiView: UIView?) {
+        guard let manager = uiView?.viewCreator else {
             return nil
         }
 
         self.manager = manager
+        self.uiView = uiView
     }
 }
 
@@ -77,7 +79,7 @@ extension UIView {
 
 extension RenderManager {
     func checkSupercreator(_ superview: UIView? = nil) {
-        let superview = superview ?? self.manager.uiView.superview
+        let superview = superview ?? self.uiView.superview
         guard let supercreator = superview?.viewCreator ?? superview?.superCreator else {
             return
         }
@@ -96,7 +98,7 @@ extension RenderManager {
 
         self.checkSupercreator(newSuperview)
 
-        if let override = self.manager.uiView as? RenderWillMoveToSuperviewState {
+        if let override = self.uiView as? RenderWillMoveToSuperviewState {
             override.render_willMoveToSuperview()
             return
         }
@@ -105,13 +107,13 @@ extension RenderManager {
     }
 
     func didMoveToSuperview() {
-        guard self.manager.uiView.superview != nil else {
+        guard self.uiView.superview != nil else {
             return
         }
 
         self.checkSupercreator()
 
-        if let override = self.manager.uiView as? RenderDidMoveToSuperviewState {
+        if let override = self.uiView as? RenderDidMoveToSuperviewState {
             override.render_didMoveToSuperview()
             return
         }
@@ -120,7 +122,7 @@ extension RenderManager {
     }
 
     func didMoveToWindow() {
-        guard self.manager.uiView.window != nil else {
+        guard self.uiView.window != nil else {
             if let root = self.manager.root {
                 root.tree.supertree?.remove(root)
             }
@@ -130,25 +132,25 @@ extension RenderManager {
 
         self.checkSupercreator()
 
-        if let override = self.manager.uiView as? RenderDidMoveToWindowState {
+        if let override = self.uiView as? RenderDidMoveToWindowState {
             override.render_didMoveToWindow()
-            self.frame(manager.uiView.frame)
+            self.frame(self.uiView.frame)
             return
         }
 
         manager.render.commit(.inTheScene)
-        self.frame(manager.uiView.frame)
+        self.frame(self.uiView.frame)
     }
 
     func layoutSubviews() {
-        if let override = self.manager.uiView as? RenderLayoutSubviewsState {
+        if let override = self.uiView as? RenderLayoutSubviewsState {
             override.render_layoutSubviews()
-            self.frame(manager.uiView.frame)
+            self.frame(self.uiView.frame)
             return
         }
 
         self.manager.commitLayout()
-        self.frame(manager.uiView.frame)
+        self.frame(self.uiView.frame)
     }
 
     func traitDidChange() {
@@ -156,7 +158,7 @@ extension RenderManager {
     }
 
     func frame(_ rect: CGRect) {
-        guard manager.uiView.window != nil, !manager.uiView.isHidden else {
+        guard self.uiView.window != nil, !self.uiView.isHidden else {
             return
         }
 
@@ -173,6 +175,6 @@ extension RenderManager {
             return
         }
 
-        self.frame(manager.uiView.frame)
+        self.frame(self.uiView.frame)
     }
 }

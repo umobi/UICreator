@@ -23,49 +23,21 @@
 import Foundation
 import UIKit
 
-public protocol ViewRepresentable: ViewCreator {
-    func privateMakeUIView() -> UIView
-}
+#if swift(>=5.3)
+public protocol ViewScene {}
 
-public protocol UICViewRepresentable: UIViewCreator, ViewRepresentable {
-    func makeUIView() -> View
-    func updateView(_ view: View)
-}
+public extension ViewScene {
+    func dynamicProperty<Value>(
+        _ property: Property<Value>,
+        _ handler: @escaping (Value) -> Void) -> Self where Value: Equatable {
 
-internal extension ViewRepresentable {
-    var wrapper: UIView! {
-        self.uiView?.superview
-    }
-}
-
-public extension UICViewRepresentable {
-    func privateMakeUIView() -> UIView {
-        if let view = self.uiView {
-            return view
+        guard let window = UIApplication.shared.keyWindow else {
+            return self
         }
 
-        self.loadView { [unowned self] in
-            let view = self.makeUIView()
-            view.updateBuilder(self)
-            return view
-        }.onInTheScene { [weak self] in
-            guard let view = $0 as? View else {
-                fatalError()
-            }
-            self?.updateView(view)
-        }
-
-        return Adaptor(.view(self)).releaseUIView()
+        property.assign(window)
+        property.projectedValue.distinctSync(handler)
+        return self
     }
 }
-
-public extension UICViewRepresentable {
-
-    var uiView: View! {
-        return (self as ViewCreator).uiView as? View
-    }
-
-    var wrapper: UIView! {
-        self.uiView?.superview
-    }
-}
+#endif

@@ -25,10 +25,14 @@ import UIKit
 
 public class UIViewWrapper {
     private let wrap: ViewCreator
+
+    /// UIViewWrapper gets the UIView inside the ViewCreator to expose the view directly
+    /// used for imperative methods.
     public init(_ wrap: ViewCreator) {
         self.wrap = wrap
     }
-
+    /// Constructing the UIViewWrapper with the view reference allows to make sure that view
+    /// is related to some ViewCreator.
     public convenience init?(_ view: UIView) {
         guard let creator = view.viewCreator else {
             return nil
@@ -42,11 +46,13 @@ public class UIViewWrapper {
         return self.wrap.uiView
     }
 
-    /// This changes the keeper reference to UIView
+    /// This will release the UIView changing the reference to weak
+    @available(*, deprecated, message: "Use UICHostingController(content:)")
     public func releaseUIView() -> UIView! {
         return self.wrap.releaseUIView()
     }
 
+    /// Use this to get the safe view to append constraints.
     public var safe: UIView! {
         if let maker = self.wrap as? ViewRepresentable {
             return maker.wrapper

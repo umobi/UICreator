@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'UICreator'
-  s.version          = '1.0.2'
+  s.version          = '1.1.0'
   s.summary          = 'UICreator use declarative programming to create view interface using UIKit by Apple'
   s.homepage         = 'https://github.com/umobi/UICreator'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
