@@ -119,7 +119,7 @@ public class UICNavigationLink: ViewCreator {
 
 private extension UIViewController {
     var isBeingPoped: Bool {
-        self.navigationController?.viewControllers.contains(self) ?? true
+        !(self.navigationController?.viewControllers.contains(self) ?? false)
     }
 
     var beforeNavigationView: UIViewController? {
