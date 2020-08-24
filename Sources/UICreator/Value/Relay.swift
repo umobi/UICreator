@@ -86,12 +86,17 @@ public struct Relay<Value> {
     }
 
     public func map<Other>(_ handler: @escaping (Value) -> Other) -> Relay<Other> {
-        let value = UICreator.Value<Other>(wrappedValue: handler(self.wrappedValue))
-        self.next {
-            value.wrappedValue = handler($0)
-        }
+        switch self.storage {
+        case .constant(let value):
+            return .constant(handler(value))
+        case .weak:
+            let value = UICreator.Value<Other>(wrappedValue: handler(self.wrappedValue))
+            self.next {
+                value.wrappedValue = handler($0)
+            }
 
-        return value.projectedValue
+            return value.projectedValue
+        }
     }
 }
 
