@@ -67,6 +67,7 @@ public extension ViewCreator {
     func cornerRadius(_ radius: CGFloat) -> Self {
         return self.onNotRendered {
             $0.layer.cornerRadius = radius
+            $0.clipsToBounds = true
         }
     }
 

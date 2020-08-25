@@ -67,11 +67,11 @@ public class PlaceholderView: UIView {
     }
 }
 
-public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
+public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator where Value: Collection {
     let viewType: ViewCreator.Type
 
-    let relay: Relay<[Value]>
-    let content: (Value) -> ViewCreator
+    let relay: Relay<Value>
+    let content: (Value.Element) -> ViewCreator
     private var syncLoad: ((UIView) -> Void)?
 
     private func startObservation() {
@@ -85,7 +85,7 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
         })
     }
 
-    public init(_ relay: Relay<[Value]>, content: @escaping (Value) -> View) {
+    private init(private relay: Relay<Value>, content: @escaping (Value.Element) -> View) {
         self.relay = relay
         self.content = content
         self.viewType = View.self
@@ -103,8 +103,12 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator {
         }
     }
 
-    public convenience init(_ value: [Value], content: @escaping (Value) -> View) {
-        self.init(.constant(value), content: content)
+    public convenience init(_ relay: Relay<Value>, content: @escaping (Value.Element) -> View) {
+        self.init(private: relay, content: content)
+    }
+
+    public convenience init(_ value: Value, content: @escaping (Value.Element) -> View) {
+        self.init(private: .constant(value), content: content)
     }
 
     func load() {

@@ -84,6 +84,17 @@ public class UICButton: UIViewCreator, Control {
             ($0 as? View)?.setTitle(title, for: .normal)
         }
     }
+
+    public init(content: @escaping () -> ViewCreator) {
+        let content = content()
+        self.tree.append(content)
+
+        self.loadView {
+            View(builder: self)
+        }.onNotRendered {
+            $0.add(content.releaseUIView())
+        }
+    }
 }
 
 public extension UIViewCreator where View: UIButton {
