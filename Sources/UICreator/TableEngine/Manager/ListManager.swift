@@ -27,13 +27,6 @@ class ListManager: ListCollectionManager, ListContentSectionRestore {
     var sections: [SectionManager] = []
     weak var list: ListSupport!
 
-    private var identifierCount: Int = 0
-    private func nextIdentifier() -> Int {
-        let next = identifierCount
-        identifierCount += 1
-        return next
-    }
-
     convenience init(contents: [ViewCreator]) {
         self.init(contents)
         self.sections.forEach {
