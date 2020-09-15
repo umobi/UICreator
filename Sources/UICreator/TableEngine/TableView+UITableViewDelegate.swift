@@ -140,11 +140,13 @@ extension UICTableView {
 extension UICTableView {
 
     public func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
-        tableView.heightForHeader(in: section) ?? tableView.estimatedSectionHeaderHeight
+        let height = tableView.heightForHeader(in: section) ?? tableView.estimatedSectionHeaderHeight
+        return height <= .zero ? .ulpOfOne : height
     }
 
     public func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection section: Int) -> CGFloat {
-        tableView.heightForFooter(in: section) ?? tableView.estimatedSectionFooterHeight
+        let height = tableView.heightForFooter(in: section) ?? tableView.estimatedSectionFooterHeight
+        return height <= .zero ? .ulpOfOne : height
     }
 
     public func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
