@@ -30,12 +30,12 @@ var customAppDelegate: UIApplicationDelegate?
 public struct UIApplicationDelegateWrapper<ApplicationDelegate>
 where ApplicationDelegate: UIApplicationDelegate & NSObject {
 
-    public init() {
+    public init(_ type: ApplicationDelegate.Type) {
         guard customAppDelegate == nil else {
             fatalError()
         }
 
-        customAppDelegate = ApplicationDelegate()
+        customAppDelegate = type.init()
     }
 
     public var wrappedValue: ApplicationDelegate {
