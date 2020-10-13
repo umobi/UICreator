@@ -31,7 +31,9 @@ internal class UICAppDelegate: NSObject, UIApplicationDelegate {
     var window: UIWindow?
 
     var recivedURL: URL?
+    #if os(iOS)
     var recivedShortcut: UIApplicationShortcutItem?
+    #endif
 
     //swiftlint:disable weak_delegate
     private lazy var appDelegate: UIApplicationDelegate? = {
@@ -71,9 +73,11 @@ internal class UICAppDelegate: NSObject, UIApplicationDelegate {
             self.postURL(url)
         }
 
+        #if os(iOS)
         if let shortcut = launchOptions?[.shortcutItem] as? UIApplicationShortcutItem {
             self.postShortchut(shortcut)
         }
+        #endif
 
         window.makeKeyAndVisible()
 
@@ -89,9 +93,11 @@ internal class UICAppDelegate: NSObject, UIApplicationDelegate {
             return super.responds(to: aSelector)
         }
 
+        #if os(iOS)
         if aSelector == #selector(self.application(_:performActionFor:completionHandler:)) {
             return super.responds(to: aSelector)
         }
+        #endif
 
         return self.appDelegate?.responds(to: aSelector) ?? false
     }
@@ -111,6 +117,7 @@ private extension UICAppDelegate {
         return true
     }
 
+    #if os(iOS)
     func postShortchut(_ shortcut: UIApplicationShortcutItem) {
         self.recivedShortcut = shortcut
 
@@ -120,6 +127,7 @@ private extension UICAppDelegate {
             userInfo: ["shortcut": shortcut]
         )
     }
+    #endif
 }
 
 @available(iOS 13, tvOS 13, *)

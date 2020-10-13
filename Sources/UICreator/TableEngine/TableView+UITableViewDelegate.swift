@@ -140,8 +140,8 @@ extension UICTableView {
     }
 }
 
-private extension Numeric {
-    func ifZeroOrLower(_ constant: Self) -> Self where Self: Comparable {
+private extension Numeric where Self: Comparable {
+    func ifZeroOrLower(_ constant: Self) -> Self {
         self <= .zero ? constant : self
     }
 }

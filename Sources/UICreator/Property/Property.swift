@@ -165,6 +165,7 @@ public extension ViewCreator {
         }
     }
 
+    #if os(iOS)
     func performShortcut(_ shortcutHandler: @escaping (UIApplicationShortcutItem) -> Void) -> Self {
         guard UIApplication.shared.delegate is UICAppDelegate else {
             Fatal.Builder("openURL(_:) is only available for apps that are implemented with UICApp").warning()
@@ -193,6 +194,7 @@ public extension ViewCreator {
             )
         }
     }
+    #endif
 }
 #endif
 

@@ -191,7 +191,7 @@ private extension UIView {
         UIView.recursiveToBottom(
             in: self,
             guard: {
-                $0.appearState != .appeared
+                $0.appearState != .appeared && $0.window != nil
             }, do: {
                 $0.appearState = .appeared
                 $0.commitAppear()
@@ -202,7 +202,7 @@ private extension UIView {
         UIView.recursiveToBottom(
             in: self,
             guard: {
-                $0.appearState == .appeared
+                $0.appearState == .appeared || $0.window == nil
             }, do: {
                 $0.appearState = .disappeared
                 $0.commitDisappear()
