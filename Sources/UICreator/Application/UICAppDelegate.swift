@@ -31,6 +31,7 @@ internal class UICAppDelegate: NSObject, UIApplicationDelegate {
     var window: UIWindow?
 
     var recivedURL: URL?
+    var recivedShortcut: UIApplicationShortcutItem?
 
     //swiftlint:disable weak_delegate
     private lazy var appDelegate: UIApplicationDelegate? = {
@@ -58,12 +59,22 @@ internal class UICAppDelegate: NSObject, UIApplicationDelegate {
 
         let window = UIWindow(frame: UIScreen.main.bounds)
         self.window = window
+        window.makeKey()
 
         guard let windowGroup = app.body as? UICWindowGroup else {
             return false
         }
 
         window.rootViewController = UICHostingController(content: windowGroup.content)
+
+        if let url = launchOptions?[.url] as? URL {
+            self.postURL(url)
+        }
+
+        if let shortcut = launchOptions?[.shortcutItem] as? UIApplicationShortcutItem {
+            self.postShortchut(shortcut)
+        }
+
         window.makeKeyAndVisible()
 
         return self.appDelegate?.application?(application, didFinishLaunchingWithOptions: launchOptions) ?? true
@@ -75,6 +86,10 @@ internal class UICAppDelegate: NSObject, UIApplicationDelegate {
         }
 
         if aSelector == #selector(self.application(_:open:options:)) {
+            return super.responds(to: aSelector)
+        }
+
+        if aSelector == #selector(self.application(_:performActionFor:completionHandler:)) {
             return super.responds(to: aSelector)
         }
 
@@ -94,6 +109,16 @@ private extension UICAppDelegate {
         )
 
         return true
+    }
+
+    func postShortchut(_ shortcut: UIApplicationShortcutItem) {
+        self.recivedShortcut = shortcut
+
+        NotificationCenter.default.post(
+            name: UICAppDelegate.kPerformShortcutNotificationName,
+            object: nil,
+            userInfo: ["shortcut": shortcut]
+        )
     }
 }
 
@@ -138,6 +163,10 @@ extension UICAppDelegate {
 extension UICAppDelegate {
     static var kOpenURLNotificationName: Notification.Name {
         .init("UICAppDelegate.openURL")
+    }
+
+    static var kPerformShortcutNotificationName: Notification.Name {
+        .init("UICAppDelegate.performShortcut")
     }
 }
 
@@ -548,6 +577,8 @@ extension UICAppDelegate {
         _ application: UIApplication,
         performActionFor shortcutItem: UIApplicationShortcutItem,
         completionHandler: @escaping (Bool) -> Void) {
+
+        self.postShortchut(shortcutItem)
 
         self.appDelegate?.application?(
             application,
