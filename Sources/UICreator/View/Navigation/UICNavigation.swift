@@ -277,7 +277,7 @@ public extension ViewCreator {
 
 public extension UIView {
     var navigationItem: UINavigationItem! {
-        return ViewControllerSearch(
+        ViewControllerSearch(
             self,
             searchFor: UINavigationController.self
         ).viewNearFromSearch?.navigationItem
@@ -292,21 +292,18 @@ struct ViewControllerSearch<ViewController: UIViewController> {
     }
 
     var viewNearFromSearch: UIViewController? {
-        let responders = sequence(
-            first: self.view! as UIResponder,
-            next: { $0.next }
-        )
+        guard let viewController = self.view.viewController else {
+            return nil
+        }
 
-        var viewNearFromNavigation: UIViewController?
+        var viewNearFromNavigation: UIViewController? = viewController
 
-        for responder in responders {
-            if responder is ViewController {
+        for viewController in sequence(first: viewController, next: { $0.parent }) {
+            if viewController is ViewController {
                 return viewNearFromNavigation
             }
 
-            if let viewController = responder as? UIViewController {
-                viewNearFromNavigation = viewController
-            }
+            viewNearFromNavigation = viewController
         }
 
         return viewNearFromNavigation
