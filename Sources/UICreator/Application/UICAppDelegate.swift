@@ -85,6 +85,10 @@ internal class UICAppDelegate: NSObject, UIApplicationDelegate {
     }
 
     override func responds(to aSelector: Selector!) -> Bool {
+        if aSelector == #selector(getter: self.window) {
+            return super.responds(to: aSelector)
+        }
+
         if aSelector == #selector(self.application(_:didFinishLaunchingWithOptions:)) {
             return super.responds(to: aSelector)
         }
