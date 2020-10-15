@@ -172,7 +172,6 @@ public extension ViewCreator {
             return self
         }
 
-
         return self.onNotRendered {
             if let shortcut = (UIApplication.shared.delegate as? UICAppDelegate)?.recivedShortcut {
                 shortcutHandler(shortcut)

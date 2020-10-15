@@ -135,7 +135,10 @@ public extension Relay {
         self.flatMap { _ in otherRelay }
     }
 
-    func withLatest<Other, Result>(_ otherRelay: Relay<Other>,_ map: @escaping (Value, Other) -> Result) -> Relay<Result> {
+    func withLatest<Other, Result>(
+        _ otherRelay: Relay<Other>,
+        _ map: @escaping (Value, Other) -> Result) -> Relay<Result> {
+
         self.flatMap {
             let value = $0
             return otherRelay.map {

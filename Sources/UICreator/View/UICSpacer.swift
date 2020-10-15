@@ -24,6 +24,7 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
+//swiftlint:disable file_length
 public class SpacerView: UIView, UICManagerContentView {
     private weak var view: UIView?
     private(set) var margin: Edges
@@ -354,7 +355,8 @@ public extension ViewCreator {
         self.padding(constant, .all)
     }
 
-    func padding(_ constant: CGFloat,_ edges: PaddingEdges) -> UICSpacer {
+    //swiftlint:disable function_body_length
+    func padding(_ constant: CGFloat, _ edges: PaddingEdges) -> UICSpacer {
         if let spacer = self as? UICSpacer {
             return spacer.onNotRendered {
                 ($0 as? SpacerView)?.updatePaddingEdges(constant, edges)

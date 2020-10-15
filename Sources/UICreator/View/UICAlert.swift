@@ -27,20 +27,28 @@ public struct UICAlert {
     private let title: String
     private let message: String?
     private let style: UIAlertController.Style
-    private let action: [(String, UIAlertAction.Style, ((UIViewController?) -> Void)?)]
+    private let action: [Action]
 
     public init(_ title: String) {
         self.title = title
         self.message = nil
         self.style = .alert
-        self.action = [("Cancelar", .cancel, { $0?.dismiss(animated: true, completion: nil) })]
+        self.action = [.init(
+            "Cancelar",
+            .cancel,
+            handler: { $0?.dismiss(animated: true, completion: nil) }
+        )]
     }
 
     public init(style: UIAlertController.Style) {
         self.title = ""
         self.message = nil
         self.style = style
-        self.action = [("Cancelar", .cancel, { $0?.dismiss(animated: true, completion: nil) })]
+        self.action = [.init(
+            "Cancelar",
+            .cancel,
+            handler: { $0?.dismiss(animated: true, completion: nil) }
+        )]
     }
 
     private init(_ original: UICAlert, editable: Editable) {
@@ -74,7 +82,10 @@ public struct UICAlert {
         }
     }
 
-    public func cancelButton(_ title: String,_ handler: @escaping (UIViewController?) -> Void) -> Self {
+    public func cancelButton(
+        _ title: String,
+        _ handler: @escaping (UIViewController?) -> Void) -> Self {
+
         self.edit {
             $0.addAction(title, style: .cancel, handler)
         }
@@ -86,7 +97,10 @@ public struct UICAlert {
         }
     }
 
-    public func otherButton(_ title: String,_ handler: @escaping (UIViewController?) -> Void) -> Self {
+    public func otherButton(
+        _ title: String,
+        _ handler: @escaping (UIViewController?) -> Void) -> Self {
+
         self.edit {
             $0.addAction(title, style: .default, handler)
         }
@@ -98,7 +112,10 @@ public struct UICAlert {
         }
     }
 
-    public func destructiveButton(_ title: String,_ handler: @escaping (UIViewController?) -> Void) -> Self {
+    public func destructiveButton(
+        _ title: String,
+        _ handler: @escaping (UIViewController?) -> Void) -> Self {
+
         self.edit {
             $0.addAction(title, style: .destructive, handler)
         }
@@ -114,7 +131,7 @@ public struct UICAlert {
         var title: String
         var message: String?
         var style: UIAlertController.Style
-        fileprivate var action: [(String, UIAlertAction.Style, ((UIViewController?) -> Void)?)]
+        fileprivate var action: [Action]
 
         init(_ original: UICAlert) {
             self.title = original.title
@@ -123,23 +140,35 @@ public struct UICAlert {
             self.action = original.action
         }
 
-        func addAction(_ title: String, style: UIAlertAction.Style,_ handler: @escaping (UIViewController?) -> Void) {
+        func addAction(
+            _ title: String,
+            style: UIAlertAction.Style,
+            _ handler: @escaping (UIViewController?) -> Void) {
+
             if style != .default {
-                self.action = self.action.filter { $0.1 != style }
+                self.action = self.action.filter { $0.style != style }
             }
 
-            self.action.append((title, style, {
-                handler($0)
-                $0?.dismiss(animated: true, completion: nil)
-            }))
+            self.action.append(.init(
+                title,
+                style,
+                handler: {
+                    handler($0)
+                    $0?.dismiss(animated: true, completion: nil)
+                }
+            ))
         }
 
         func addAction(_ title: String, style: UIAlertAction.Style) {
             if style != .default {
-                self.action = self.action.filter { $0.1 != style }
+                self.action = self.action.filter { $0.style != style }
             }
 
-            self.action.append((title, style, { $0?.dismiss(animated: true, completion: nil) }))
+            self.action.append(.init(
+                title,
+                style,
+                handler: { $0?.dismiss(animated: true, completion: nil) }
+            ))
         }
     }
 
@@ -153,9 +182,9 @@ public struct UICAlert {
         self.action.forEach { payload in
             alert.addAction(
                 .init(
-                    title: payload.0,
-                    style: payload.1,
-                    handler: { [weak alert] _ in payload.2?(alert) }
+                    title: payload.title,
+                    style: payload.style,
+                    handler: { [weak alert] _ in payload.handler?(alert) }
                 )
             )
         }
@@ -193,7 +222,7 @@ private class ListenerView: UIView {
 }
 
 public extension ViewCreator {
-    func alert(_ isPresenting: Relay<Bool>,_ handler: @escaping () -> UICAlert) -> Self {
+    func alert(_ isPresenting: Relay<Bool>, _ handler: @escaping () -> UICAlert) -> Self {
         self.onInTheScene {
             weak var view = $0
             weak var alertView: UIViewController?
@@ -245,6 +274,24 @@ public extension ViewCreator {
                     completion: nil
                 )
             }
+        }
+    }
+}
+
+private extension UICAlert {
+    struct Action {
+        let title: String
+        let style: UIAlertAction.Style
+        let handler: ((UIViewController?) -> Void)?
+
+        internal init(
+            _ title: String,
+            _ style: UIAlertAction.Style,
+            handler: ((UIViewController?) -> Void)?) {
+
+            self.title = title
+            self.style = style
+            self.handler = handler
         }
     }
 }
