@@ -27,7 +27,12 @@ public typealias UICFlow = UICCollection<UICollectionViewFlowLayout>
 
 public extension UICFlow {
     convenience init(@UICViewBuilder contents: @escaping () -> ViewCreator) {
-        self.init(layout: .init(), contents)
+        self.init(layout: {
+            let layout = Layout()
+            layout.minimumLineSpacing = .zero
+            layout.minimumInteritemSpacing = .zero
+            return layout
+        }(), contents)
     }
 }
 

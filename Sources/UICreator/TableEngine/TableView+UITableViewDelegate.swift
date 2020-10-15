@@ -125,30 +125,42 @@ extension UICTableView: UITableViewDelegate {
 
 extension UICTableView {
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        tableView.heightForHeader(in: section) ?? tableView.sectionHeaderHeight
+        (tableView.heightForHeader(in: section) ?? .zero)
+            .ifZeroOrLower(.ulpOfOne)
     }
 
     public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        tableView.heightForFooter(in: section) ?? tableView.sectionFooterHeight
+        (tableView.heightForFooter(in: section) ?? .zero)
+            .ifZero(.ulpOfOne)
     }
 
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        tableView.heightForRow(at: indexPath) ?? tableView.rowHeight
+        (tableView.heightForRow(at: indexPath) ?? .zero)
+            .ifZeroOrLower(.zero)
+    }
+}
+
+private extension Numeric where Self: Comparable {
+    func ifZeroOrLower(_ constant: Self) -> Self {
+        self <= .zero ? constant : self
     }
 }
 
 extension UICTableView {
 
     public func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
-        tableView.heightForHeader(in: section) ?? tableView.estimatedSectionHeaderHeight
+        (tableView.heightForHeader(in: section) ?? .zero)
+            .ifZeroOrLower(.ulpOfOne)
     }
 
     public func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection section: Int) -> CGFloat {
-        tableView.heightForFooter(in: section) ?? tableView.estimatedSectionFooterHeight
+        (tableView.heightForFooter(in: section) ?? .zero)
+            .ifZero(.ulpOfOne)
     }
 
     public func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        tableView.heightForRow(at: indexPath) ?? tableView.estimatedRowHeight
+        (tableView.heightForRow(at: indexPath) ?? .zero)
+            .ifZeroOrLower(.zero)
     }
 }
 

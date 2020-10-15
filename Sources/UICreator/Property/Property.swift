@@ -164,6 +164,36 @@ public extension ViewCreator {
             )
         }
     }
+
+    #if os(iOS)
+    func performShortcut(_ shortcutHandler: @escaping (UIApplicationShortcutItem) -> Void) -> Self {
+        guard UIApplication.shared.delegate is UICAppDelegate else {
+            Fatal.Builder("openURL(_:) is only available for apps that are implemented with UICApp").warning()
+            return self
+        }
+
+        return self.onNotRendered {
+            if let shortcut = (UIApplication.shared.delegate as? UICAppDelegate)?.recivedShortcut {
+                shortcutHandler(shortcut)
+            }
+
+            $0.notificationObservable.append(
+                NotificationCenter.default.addObserver(
+                    forName: UICAppDelegate.kPerformShortcutNotificationName,
+                    object: nil,
+                    queue: nil,
+                    using: {
+                        guard let shortcut = $0.userInfo?["shortcut"] as? UIApplicationShortcutItem else {
+                            return
+                        }
+
+                        shortcutHandler(shortcut)
+                    }
+                )
+            )
+        }
+    }
+    #endif
 }
 #endif
 

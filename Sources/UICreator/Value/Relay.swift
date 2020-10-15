@@ -86,12 +86,17 @@ public struct Relay<Value> {
     }
 
     public func map<Other>(_ handler: @escaping (Value) -> Other) -> Relay<Other> {
-        let value = UICreator.Value<Other>(wrappedValue: handler(self.wrappedValue))
-        self.next {
-            value.wrappedValue = handler($0)
-        }
+        switch self.storage {
+        case .constant(let value):
+            return .constant(handler(value))
+        case .weak:
+            let value = UICreator.Value<Other>(wrappedValue: handler(self.wrappedValue))
+            self.next {
+                value.wrappedValue = handler($0)
+            }
 
-        return value.projectedValue
+            return value.projectedValue
+        }
     }
 }
 
@@ -125,6 +130,24 @@ public extension Relay {
     }
 }
 
+public extension Relay {
+    func withLatest<Other>(_ otherRelay: Relay<Other>) -> Relay<Other> {
+        self.flatMap { _ in otherRelay }
+    }
+
+    func withLatest<Other, Result>(
+        _ otherRelay: Relay<Other>,
+        _ map: @escaping (Value, Other) -> Result) -> Relay<Result> {
+
+        self.flatMap {
+            let value = $0
+            return otherRelay.map {
+                map(value, $0)
+            }
+        }
+    }
+}
+
 public extension Relay where Value: Equatable {
     func distinctSync(_ handler: @escaping (Value) -> Void) {
         var actual = self.wrappedValue
@@ -147,51 +170,6 @@ private extension Relay {
     enum Storage {
         case constant(Value)
         case weak(WeakContainer)
-    }
-}
-
-//extension Relay where Value: OptionalType {
-//    public subscript<T>(dynamicMember keyPath: KeyPath<Value.Wrapped, Optional<T>>) -> Relay<Optional<T>> {
-//        return self.map {
-//            $0.value?[keyPath: keyPath]
-//        }
-//    }
-//}
-
-public extension Relay {
-    @available(*, deprecated, message: "no substitute")
-    func connect(to relay: Relay<Value>) {
-        relay.sync {
-            self.wrappedValue = $0
-        }
-    }
-}
-
-public extension Relay {
-    @available(*, deprecated, message: "no substitute")
-    // swiftlint:disable line_length
-    func bind<Object, ObjectValue>(_ keyPath: KeyPath<Object, ObjectValue>) -> Relay<ObjectValue?> where Value == Object? {
-        return self.map {
-            guard let object = $0 else {
-                return nil
-            }
-
-            return object[keyPath: keyPath]
-        }
-    }
-
-    @available(*, deprecated, message: "no substitute")
-    func bind<ObjectValue>(_ keyPath: KeyPath<Value, ObjectValue>) -> Relay<ObjectValue?> {
-        return self.map {
-            $0[keyPath: keyPath]
-        }
-    }
-
-    @available(*, deprecated, message: "no substitute")
-    func bind<ObjectValue>(_ keyPath: KeyPath<Value, ObjectValue>) -> Relay<ObjectValue> {
-        return self.map {
-            $0[keyPath: keyPath]
-        }
     }
 }
 

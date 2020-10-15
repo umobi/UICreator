@@ -24,9 +24,10 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
+//swiftlint:disable file_length
 public class SpacerView: UIView, UICManagerContentView {
     private weak var view: UIView?
-    let margin: Edges
+    private(set) var margin: Edges
 
     public required init(_ view: UIView!, margin: Edges) {
         self.margin = margin
@@ -87,6 +88,19 @@ public class SpacerView: UIView, UICManagerContentView {
     override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         RenderManager(self)?.traitDidChange()
+    }
+
+    private func setMargin(_ margin: Edges) {
+        guard self.view != nil else {
+            return
+        }
+
+        self.margin = margin
+        self.layout()
+    }
+
+    func updateMargin(_ updateHandler: (Edges) -> Edges) {
+        self.setMargin(updateHandler(self.margin))
     }
 
     private func layout() {
@@ -157,6 +171,42 @@ public extension SpacerView {
 
         public static var zero: Edges {
             return .init(top: 0, bottom: 0, leading: 0, trailing: 0)
+        }
+
+        func top(_ constant: CGFloat) -> Self {
+            .init(
+                top: constant,
+                bottom: self.bottom,
+                leading: self.leading,
+                trailing: self.trailing
+            )
+        }
+
+        func bottom(_ constant: CGFloat) -> Self {
+            .init(
+                top: self.top,
+                bottom: constant,
+                leading: self.leading,
+                trailing: self.trailing
+            )
+        }
+
+        func leading(_ constant: CGFloat) -> Self {
+            .init(
+                top: self.top,
+                bottom: self.bottom,
+                leading: constant,
+                trailing: self.trailing
+            )
+        }
+
+        func trailing(_ constant: CGFloat) -> Self {
+            .init(
+                top: self.top,
+                bottom: self.bottom,
+                leading: self.leading,
+                trailing: constant
+            )
         }
     }
 }
@@ -256,5 +306,108 @@ public extension UICSpacer {
 
     convenience init(content: @escaping () -> ViewCreator) {
         self.init(margin: .init(spacing: 0), content: content)
+    }
+}
+
+public enum PaddingEdges {
+    case top
+    case bottom
+    case left
+    case right
+    case all
+    case horizontal
+    case vertical
+}
+
+private extension SpacerView {
+    func updatePaddingEdges(_ constant: CGFloat, _ edges: PaddingEdges) {
+        self.updateMargin {
+            switch edges {
+            case .all:
+                return $0.top(constant)
+                    .bottom(constant)
+                    .leading(constant)
+                    .trailing(constant)
+
+            case .vertical:
+                return $0.top(constant)
+                    .bottom(constant)
+
+            case .horizontal:
+                return $0.leading(constant)
+                    .trailing(constant)
+
+            case .top:
+                return $0.top(constant)
+            case .bottom:
+                return $0.bottom(constant)
+            case .left:
+                return $0.leading(constant)
+            case .right:
+                return $0.trailing(constant)
+            }
+        }
+    }
+}
+
+public extension ViewCreator {
+    func padding(_ constant: CGFloat) -> UICSpacer {
+        self.padding(constant, .all)
+    }
+
+    //swiftlint:disable function_body_length
+    func padding(_ constant: CGFloat, _ edges: PaddingEdges) -> UICSpacer {
+        if let spacer = self as? UICSpacer {
+            return spacer.onNotRendered {
+                ($0 as? SpacerView)?.updatePaddingEdges(constant, edges)
+            }
+        }
+
+        switch edges {
+        case .all:
+            return UICSpacer(spacing: constant) {
+                self
+            }
+        case .vertical:
+            return UICSpacer(vertical: constant) {
+                self
+            }
+        case .horizontal:
+            return UICSpacer(horizontal: constant) {
+                self
+            }
+        case .top:
+            return UICSpacer(
+                top: constant,
+                bottom: .zero,
+                leading: .zero,
+                trailing: .zero,
+                content: { self }
+            )
+        case .bottom:
+            return UICSpacer(
+                top: .zero,
+                bottom: constant,
+                leading: .zero,
+                trailing: .zero,
+                content: { self }
+            )
+        case .left:
+            return UICSpacer(
+                top: .zero,
+                bottom: .zero,
+                leading: constant,
+                trailing: .zero,
+                content: { self }
+            )
+        case .right:
+            return UICSpacer(
+                top: .zero,
+                bottom: .zero,
+                leading: .zero,
+                trailing: constant,
+                content: { self }
+            )
+        }
     }
 }
