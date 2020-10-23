@@ -30,11 +30,11 @@ public struct NavigationRepresentable {
 func OBJCSet<Object>(
     _ index: Any,
     _ key: UnsafeRawPointer,
-    policity: MemoryPolicity = .strong,
+    policity: objc_AssociationPolicy,
     orLoad: @escaping () -> Object) -> Object {
-    guard let object = swift_getAssociatedObject(index, key) as? Object else {
+    guard let object = objc_getAssociatedObject(index, key) as? Object else {
         let object = orLoad()
-        swift_setAssociatedObject(index, key, object, policity)
+        objc_setAssociatedObject(index, key, object, policity)
         return object
     }
 

@@ -27,8 +27,8 @@ import ConstraintBuilder
 private var kQueueViewControllers = 0
 extension UIPageViewController {
     var queuedViewControllers: [UIViewController]! {
-        get { swift_getAssociatedObject(self, &kQueueViewControllers) as? [UIViewController] }
-        set { swift_setAssociatedObject(self, &kQueueViewControllers, newValue, .strong) }
+        get { objc_getAssociatedObject(self, &kQueueViewControllers) as? [UIViewController] }
+        set { objc_setAssociatedObject(self, &kQueueViewControllers, newValue, .OBJC_ASSOCIATION_COPY) }
     }
 
     public func updateViewControllers(

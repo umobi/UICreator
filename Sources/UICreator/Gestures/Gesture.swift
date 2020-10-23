@@ -83,7 +83,7 @@ public extension Gesture {
 private var kGestureWrapper: UInt = 0
 internal extension Gesture {
     var gestureWrapper: Mutable<GestureMemory> {
-        OBJCSet(self, &kGestureWrapper) {
+        OBJCSet(self, &kGestureWrapper, policity: .OBJC_ASSOCIATION_RETAIN) {
             .init(value: .init())
         }
     }
@@ -92,7 +92,7 @@ internal extension Gesture {
 private var kGestureDelegate: UInt = 0
 internal extension UIGesture {
     var gestureDelegate: GestureDelegate<Gesture> {
-        OBJCSet(self, &kGestureDelegate, policity: .strong) {
+        OBJCSet(self, &kGestureDelegate, policity: .OBJC_ASSOCIATION_RETAIN) {
             let delegate = GestureDelegate<Gesture>()
             self.uiGesture.delegate = delegate
             return delegate

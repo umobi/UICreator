@@ -30,8 +30,8 @@ private var kVibrancyEffectStyle: UInt = 0
 @available(iOS 13, *)
 public extension BlurView {
     fileprivate(set) var vibrancyEffect: UIVibrancyEffectStyle! {
-        get { return swift_getAssociatedObject(self, &kVibrancyEffectStyle) as? UIVibrancyEffectStyle }
-        set { swift_setAssociatedObject(self, &kVibrancyEffectStyle, newValue, .strong) }
+        get { return objc_getAssociatedObject(self, &kVibrancyEffectStyle) as? UIVibrancyEffectStyle }
+        set { objc_setAssociatedObject(self, &kVibrancyEffectStyle, newValue, .OBJC_ASSOCIATION_COPY) }
     }
 }
 #endif

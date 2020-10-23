@@ -244,6 +244,7 @@ extension UITableView {
         OBJCSet(
             self,
             &kTableSizeManager,
+            policity: .OBJC_ASSOCIATION_RETAIN,
             orLoad: {
                 .init()
             }

@@ -36,7 +36,7 @@ protocol ForEachCreator: ViewCreator {
 private var kManager: UInt = 0
 extension ForEachCreator {
     private var managerMutable: Mutable<MemorySwitch> {
-        OBJCSet(self, &kManager) {
+        OBJCSet(self, &kManager, policity: .OBJC_ASSOCIATION_RETAIN) {
             .init(value: .nil)
         }
     }

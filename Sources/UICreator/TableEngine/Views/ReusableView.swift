@@ -35,13 +35,13 @@ private var kReusableUpdateBatch = 0
 
 private extension UIView {
     var reusableAxis: ReusableViewAxis? {
-        get { swift_getAssociatedObject(self, &kReusableAxis) as? ReusableViewAxis }
-        set { swift_setAssociatedObject(self, &kReusableAxis, newValue, .strong) }
+        get { objc_getAssociatedObject(self, &kReusableAxis) as? ReusableViewAxis }
+        set { objc_setAssociatedObject(self, &kReusableAxis, newValue, .OBJC_ASSOCIATION_COPY) }
     }
 
     var reusableUpdateBatch: ((UIView) -> Void)? {
-        get { swift_getAssociatedObject(self, &kReusableUpdateBatch) as? (UIView) -> Void }
-        set { swift_setAssociatedObject(self, &kReusableUpdateBatch, newValue, .strong) }
+        get { objc_getAssociatedObject(self, &kReusableUpdateBatch) as? (UIView) -> Void }
+        set { objc_setAssociatedObject(self, &kReusableUpdateBatch, newValue, .OBJC_ASSOCIATION_COPY) }
     }
 }
 
@@ -64,7 +64,7 @@ struct ReusableObject {
 private var kHostedView: UInt = 0
 extension ReusableView {
     private var mutableReusableObject: Mutable<ReusableObject?> {
-        OBJCSet(self, &kHostedView) {
+        OBJCSet(self, &kHostedView, policity: .OBJC_ASSOCIATION_RETAIN) {
             .init(value: nil)
         }
     }
@@ -330,6 +330,7 @@ extension UITableView {
         OBJCSet(
             self,
             &kTableViewCallbackIsPending,
+            policity: .OBJC_ASSOCIATION_RETAIN,
             orLoad: { .init(value: false) }
         )
     }

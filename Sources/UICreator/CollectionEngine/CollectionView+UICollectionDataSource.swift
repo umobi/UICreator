@@ -26,8 +26,8 @@ import UIKit
 private var kCollectionViewCellLayoutHandler = 0
 private extension UIView {
     private var collectionLayoutHandler: ((UIView) -> Void)? {
-        get { swift_getAssociatedObject(self, &kCollectionViewCellLayoutHandler) as? ((UIView) -> Void) }
-        set { swift_setAssociatedObject(self, &kCollectionViewCellLayoutHandler, newValue, .strong) }
+        get { objc_getAssociatedObject(self, &kCollectionViewCellLayoutHandler) as? ((UIView) -> Void) }
+        set { objc_setAssociatedObject(self, &kCollectionViewCellLayoutHandler, newValue, .OBJC_ASSOCIATION_COPY) }
     }
 
     @discardableResult

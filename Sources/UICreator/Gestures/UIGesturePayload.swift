@@ -34,7 +34,7 @@ internal extension UIGestureRecognizer {
         OBJCSet(
             self,
             &kUIGesturePayload,
-            policity: .strong,
+            policity: .OBJC_ASSOCIATION_COPY,
             orLoad: UIGesturePayload.init
         )
     }

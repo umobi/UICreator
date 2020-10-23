@@ -26,7 +26,7 @@ import UIKit
 private var kControlMutable: UInt = 0
 internal extension UIControl {
     var controlMemory: Mutable<ControlPayload> {
-        OBJCSet(self, &kControlMutable) {
+        OBJCSet(self, &kControlMutable, policity: .OBJC_ASSOCIATION_RETAIN) {
             .init(value: .init())
         }
     }

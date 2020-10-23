@@ -37,13 +37,13 @@ private var kViewDidLoad: UInt = 0
 
 private extension UICView {
     var didViewLoadMutable: Mutable<Bool> {
-        OBJCSet(self, &kViewDidLoad) {
+        OBJCSet(self, &kViewDidLoad, policity: .OBJC_ASSOCIATION_RETAIN) {
             .init(value: false)
         }
     }
 
     var didConfiguredViewMutable: Mutable<Bool> {
-        OBJCSet(self, &kTemplateViewDidConfiguredView) {
+        OBJCSet(self, &kTemplateViewDidConfiguredView, policity: .OBJC_ASSOCIATION_RETAIN) {
             .init(value: false)
         }
     }

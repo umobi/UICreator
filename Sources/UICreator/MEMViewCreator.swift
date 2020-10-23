@@ -68,7 +68,7 @@ extension MEMViewCreator {
 private var kMEMViewCreator: UInt = 0
 extension ViewCreator {
     private var storedMemory: MEMViewCreator {
-        OBJCSet(self, &kMEMViewCreator, policity: .strong) {
+        OBJCSet(self, &kMEMViewCreator, policity: .OBJC_ASSOCIATION_COPY) {
             .init(self)
         }
     }

@@ -41,6 +41,7 @@ internal extension UIView {
         OBJCSet(
             self,
             &kNotificationObservable,
+            policity: .OBJC_ASSOCIATION_RETAIN,
             orLoad: NotificationManager.init
         )
     }
