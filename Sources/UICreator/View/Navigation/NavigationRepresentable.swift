@@ -23,60 +23,46 @@
 import Foundation
 import UIKit
 
-public protocol NavigationRepresentable: ViewControllerCreator {
-
-    @discardableResult
-    func push(animated: Bool, content: @escaping () -> ViewCreator) -> Self
-
-    @discardableResult
-    func push(animated: Bool, _ viewController: UIViewController) -> Self
-
-    @discardableResult
-    func pop(animated: Bool) -> Self
-
-    @discardableResult
-    func popToRoot(animated: Bool) -> Self
-
-    @discardableResult
-    func popTo(view: ViewCreator, animated: Bool) -> Self
+public struct NavigationRepresentable {
+    weak var viewCreator: ViewCreator!
 }
 
 func OBJCSet<Object>(
     _ index: Any,
     _ key: UnsafeRawPointer,
-    policity: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN,
+    policity: MemoryPolicity = .strong,
     orLoad: @escaping () -> Object) -> Object {
-    guard let object = objc_getAssociatedObject(index, key) as? Object else {
+    guard let object = swift_getAssociatedObject(index, key) as? Object else {
         let object = orLoad()
-        objc_setAssociatedObject(index, key, object, policity)
+        swift_setAssociatedObject(index, key, object, policity)
         return object
     }
 
     return object
 }
 
-public struct NavigationModifier {
-    private weak var navigationRepresentable: NavigationRepresentable!
-
-    public init(_ navigationRepresentable: NavigationRepresentable) {
-        self.navigationRepresentable = navigationRepresentable
-    }
-
-    public var navigationController: UINavigationController! {
-        return self.navigationRepresentable.navigationController
-    }
-}
+//public struct NavigationModifier {
+//    private weak var navigationRepresentable: NavigationRepresentable!
+//
+//    public init(_ navigationRepresentable: NavigationRepresentable) {
+//        self.navigationRepresentable = navigationRepresentable
+//    }
+//
+//    public var navigationController: UINavigationController! {
+//        return self.navigationRepresentable.navigationController
+//    }
+//}
 
 public extension NavigationRepresentable {
     var navigationController: UINavigationController! {
-        self.weakViewControllerAdaptor?.adaptedViewController as? UINavigationController
+        ViewControllerSearch(self.viewCreator.uiView, searchFor: UINavigationController.self).viewNearFromSearch as? UINavigationController
     }
 }
 
 public extension NavigationRepresentable {
 
     var navigationBar: UINavigationBar {
-        return self.navigationController.navigationBar
+        self.navigationController.navigationBar
     }
 
     @discardableResult

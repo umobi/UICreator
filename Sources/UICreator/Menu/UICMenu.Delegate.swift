@@ -28,8 +28,8 @@ private var kContentMenuDelegate = 0
 @available(iOS 13, *)
 extension UIContextMenuInteraction {
     var menuDelegate: UICMenu.Delegate? {
-        get { objc_getAssociatedObject(self, &kContentMenuDelegate) as? UICMenu.Delegate }
-        set { objc_setAssociatedObject(self, &kContentMenuDelegate, newValue, .OBJC_ASSOCIATION_RETAIN) }
+        get { swift_getAssociatedObject(self, &kContentMenuDelegate) as? UICMenu.Delegate }
+        set { swift_setAssociatedObject(self, &kContentMenuDelegate, newValue, .strong) }
     }
 
     static func interaction(_ uicDelegate: UICMenu.Delegate) -> UIContextMenuInteraction {

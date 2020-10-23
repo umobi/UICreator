@@ -27,8 +27,7 @@ public class Tap: UIGesture {
     public typealias Gesture = UITapGestureRecognizer
 
     public required init(target view: UIView!) {
-        self.setGesture(Gesture.init(target: view))
-        self.uiGesture.parent = self
+        GestureUIGestureSwitch.switch(self, Gesture.init(target: view))
     }
 }
 
@@ -54,7 +53,7 @@ public extension ViewCreator {
     }
 
     func onTap(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onTapMaker {
+        self.onTapMaker {
             $0.onRecognized {
                 handler($0.view!)
             }

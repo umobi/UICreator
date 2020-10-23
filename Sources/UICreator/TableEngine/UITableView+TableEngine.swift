@@ -42,7 +42,7 @@ private var kTableLoadManager: UInt = 0
 
 extension UITableView {
     var loadManager: TableLoadManager {
-        OBJCSet(self, &kTableLoadManager, policity: .OBJC_ASSOCIATION_COPY) {
+        OBJCSet(self, &kTableLoadManager, policity: .strong) {
             .init()
         }
     }

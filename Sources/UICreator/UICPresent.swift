@@ -27,7 +27,7 @@ import UIKit
 public struct UICPresent {
     let presentingStyle: UIModalPresentationStyle
     let transitionStyle: UIModalTransitionStyle
-    let fromView: ViewCreator
+    weak var fromView: ViewCreator?
     let toView: (() -> ViewCreator)?
     let onCompletion: (() -> Void)?
     let animated: Bool
@@ -90,7 +90,7 @@ public struct UICPresent {
         viewController.modalPresentationStyle = self.presentingStyle
         viewController.modalTransitionStyle = self.transitionStyle
 
-        self.fromView.present(animated: self.animated, onCompletion: self.onCompletion, viewController)
+        self.fromView?.present(animated: self.animated, onCompletion: self.onCompletion, viewController)
     }
 
     func recycle(viewController: UIViewController) {

@@ -33,20 +33,20 @@ public protocol ViewRender: UIView {
 internal extension ViewRender {
     private(set) var viewCreator: ViewCreator? {
         get { self.opaqueViewCreator.object as? ViewCreator }
-        set { self.setCreator(newValue, storeType: self.superview == nil ? .weak : .strong) }
+        set { ViewCreatorUIViewSwitcher.switch(newValue, self) }
     }
 
-    func setCreator(_ newValue: ViewCreator?, storeType: MemoryStoreType = .weak) {
-        guard let newValue = newValue else {
-            self.opaqueViewCreator = .nil
+    static func set(_ uiView: UIView, _ viewCreator: ViewCreator?, _ storeType: MemoryStoreType) {
+        guard let viewCreator = viewCreator else {
+            uiView.opaqueViewCreator = .nil
             return
         }
 
         switch storeType {
         case .weak:
-            self.opaqueViewCreator = .weak(newValue)
+            uiView.opaqueViewCreator = .weak(viewCreator)
         case .strong:
-            self.opaqueViewCreator = .strong(newValue)
+            uiView.opaqueViewCreator = .strong(viewCreator)
         }
     }
 

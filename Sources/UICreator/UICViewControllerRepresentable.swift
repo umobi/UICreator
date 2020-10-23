@@ -27,8 +27,7 @@ public protocol ViewControllerRepresentable: ViewCreator {
     func privateMakeUIView() -> UIView
 }
 
-public protocol UICViewControllerRepresentable: ViewControllerRepresentable {
-    associatedtype ViewController: UIViewController
+public protocol UICViewControllerRepresentable: ViewControllerRepresentable, UIViewControllerCreator {
     func makeUIViewController() -> ViewController
     func updateViewController(_ viewController: ViewController)
 }

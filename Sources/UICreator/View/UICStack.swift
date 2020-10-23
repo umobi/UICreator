@@ -142,61 +142,6 @@ public extension UIViewCreator where View: UIStackView {
 }
 
 extension UICStack: SupportForEach {
-    private func newViewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
-        self.onRendered { [sequence, weak placeholderView] in
-            weak var firstView: UIView? = placeholderView
-            weak var lastView: UIView? = placeholderView
-
-            weak var view = $0 as? View
-            sequence.map {
-                $0.map { $0() }
-            }.sync { views in
-                let startIndex = view?.arrangedSubviews.enumerated().first(where: {
-                    $0.element == firstView
-                })?.offset ?? 0
-                let endIndex = view?.arrangedSubviews.enumerated().first(where: {
-                    $0.element == lastView
-                })?.offset ?? 0
-
-                if firstView != nil {
-                    if (startIndex + views.count) <= endIndex {
-                        view?.arrangedSubviews[(startIndex + views.count)...endIndex].forEach {
-                            $0.removeFromSuperview()
-                        }
-                    }
-                }
-
-                views.enumerated().forEach { newView in
-                    guard
-                        newView.offset <= endIndex - startIndex,
-                        let viewCreator = view?
-                            .arrangedSubviews[startIndex..<(view?.arrangedSubviews ?? []).count]
-                            .enumerated()
-                            .first(where: { $0.offset == newView.offset })?
-                            .element.viewCreator
-                    else {
-                        UIView.CBSubview(view)?.insertArrangedSubview(
-                            newView.element.releaseUIView(),
-                            at: startIndex + newView.offset
-                        )
-                        return
-                    }
-
-                    if !ReplacementTree(viewCreator).replace(with: newView.element) {
-                        (view?.arrangedSubviews ?? [])[startIndex + newView.offset].removeFromSuperview()
-                        UIView.CBSubview(view)?.insertArrangedSubview(
-                            newView.element.releaseUIView(), at:
-                            startIndex + newView.offset
-                        )
-                    }
-                }
-
-                firstView = views.first?.uiView
-                lastView = views.last?.uiView
-            }
-        }
-    }
-
     func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
         self.onRendered { [sequence, weak placeholderView] in
             weak var firstView: UIView? = placeholderView

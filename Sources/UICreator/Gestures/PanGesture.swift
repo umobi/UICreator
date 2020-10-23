@@ -27,8 +27,7 @@ public class Pan: UIGesture {
     public typealias Gesture = UIPanGestureRecognizer
 
     public required init(target view: UIView!) {
-        self.setGesture(Gesture.init(target: view))
-        self.uiGesture.parent = self
+        GestureUIGestureSwitch.switch(self, Gesture.init(target: view))
     }
 }
 

@@ -35,13 +35,13 @@ private var kReusableUpdateBatch = 0
 
 private extension UIView {
     var reusableAxis: ReusableViewAxis? {
-        get { objc_getAssociatedObject(self, &kReusableAxis) as? ReusableViewAxis }
-        set { objc_setAssociatedObject(self, &kReusableAxis, newValue, .OBJC_ASSOCIATION_COPY) }
+        get { swift_getAssociatedObject(self, &kReusableAxis) as? ReusableViewAxis }
+        set { swift_setAssociatedObject(self, &kReusableAxis, newValue, .strong) }
     }
 
     var reusableUpdateBatch: ((UIView) -> Void)? {
-        get { objc_getAssociatedObject(self, &kReusableUpdateBatch) as? (UIView) -> Void }
-        set { objc_setAssociatedObject(self, &kReusableUpdateBatch, newValue, .OBJC_ASSOCIATION_COPY) }
+        get { swift_getAssociatedObject(self, &kReusableUpdateBatch) as? (UIView) -> Void }
+        set { swift_setAssociatedObject(self, &kReusableUpdateBatch, newValue, .strong) }
     }
 }
 

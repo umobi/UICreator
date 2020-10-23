@@ -34,6 +34,9 @@ struct GestureMemory: MutableEditable {
     let possible: Handler?
     let ended: Handler?
     let anyOther: Handler?
+    
+    let gesture: Mutable<MemorySwitch>
+    let isReleased: Mutable<Bool>
 
     init() {
         self.began = nil
@@ -44,6 +47,8 @@ struct GestureMemory: MutableEditable {
         self.possible = nil
         self.ended = nil
         self.anyOther = nil
+        self.gesture = .init(value: .nil)
+        self.isReleased = .init(value: false)
     }
 
     init(_ original: GestureMemory, editable: Editable) {
@@ -55,6 +60,8 @@ struct GestureMemory: MutableEditable {
         self.possible = editable.possible
         self.ended = editable.ended
         self.anyOther = editable.anyOther
+        self.gesture = original.gesture
+        self.isReleased = original.isReleased
     }
 
     func edit(_ edit: @escaping (Editable) -> Void) -> GestureMemory {

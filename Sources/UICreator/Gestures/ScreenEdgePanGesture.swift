@@ -28,8 +28,7 @@ public class ScreenEdgePan: UIGesture {
     public typealias Gesture = UIScreenEdgePanGestureRecognizer
 
     public required init(target view: UIView!) {
-        self.setGesture(Gesture.init(target: view))
-        self.uiGesture.parent = self
+        GestureUIGestureSwitch.switch(self, Gesture.init(target: view))
     }
 }
 

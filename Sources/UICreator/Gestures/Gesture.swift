@@ -41,32 +41,41 @@ public extension UIGesture {
     }
 }
 
-private var kGestureMutable: UInt = 0
+struct GestureUIGestureSwitch {
+    static func `switch`(_ gesture: Gesture?, _ uiGesture: UIGestureRecognizer?) {
+        if let gesture = gesture {
+            guard let uiGesture = uiGesture else {
+                gesture.gestureWrapper.value.gesture.value = .nil
+                return
+            }
+
+            if gesture.gestureWrapper.value.isReleased.value {
+                gesture.gestureWrapper.value.gesture.value = .weak(uiGesture)
+                UIGestureRecognizer.set(uiGesture, gesture, weak: false)
+                return
+            }
+
+            gesture.gestureWrapper.value.gesture.value = .strong(uiGesture)
+            UIGestureRecognizer.set(uiGesture, gesture, weak: true)
+            return
+        }
+
+        if let uiGesture = uiGesture {
+            UIGestureRecognizer.set(uiGesture, nil, weak: true)
+            return
+        }
+    }
+}
+
 public extension Gesture {
-    private var gestureMutable: Mutable<MemorySwitch> {
-        OBJCSet(self, &kGestureMutable) {
-            .init(value: .nil)
-        }
-    }
-
-    private(set) var uiGesture: UIGestureRecognizer! {
-        get { self.gestureMutable.value.castedObject() }
-        set { setGesture(newValue, storeType: newValue?.view?.superview != nil ? .weak : .strong) }
-    }
-
-    internal func setGesture(_ uiGesture: UIGestureRecognizer, storeType: MemoryStoreType = .strong) {
-        switch storeType {
-        case .weak:
-            self.gestureMutable.value = .weak(uiGesture)
-        case .strong:
-            self.gestureMutable.value = .strong(uiGesture)
-        }
+    var uiGesture: UIGestureRecognizer! {
+        self.gestureWrapper.value.gesture.value.castedObject()
     }
 
     internal func releaseGesture() -> UIGestureRecognizer! {
         let gesture: UIGestureRecognizer! = self.uiGesture
-        self.setGesture(gesture, storeType: .weak)
-        gesture.releaseParent()
+        self.gestureWrapper.value.isReleased.value = true
+        GestureUIGestureSwitch.switch(self, gesture)
         return gesture
     }
 }
@@ -83,7 +92,7 @@ internal extension Gesture {
 private var kGestureDelegate: UInt = 0
 internal extension UIGesture {
     var gestureDelegate: GestureDelegate<Gesture> {
-        OBJCSet(self, &kGestureDelegate, policity: .OBJC_ASSOCIATION_RETAIN) {
+        OBJCSet(self, &kGestureDelegate, policity: .strong) {
             let delegate = GestureDelegate<Gesture>()
             self.uiGesture.delegate = delegate
             return delegate

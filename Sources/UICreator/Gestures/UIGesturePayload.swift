@@ -30,24 +30,17 @@ struct UIGesturePayload {
 
 private var kUIGesturePayload: UInt = 0
 internal extension UIGestureRecognizer {
-    var mutable: UIGesturePayload {
-        OBJCSet(self, &kUIGesturePayload, policity: .OBJC_ASSOCIATION_COPY) {
-            .init()
-        }
+    private var mutable: UIGesturePayload {
+        OBJCSet(
+            self,
+            &kUIGesturePayload,
+            policity: .strong,
+            orLoad: UIGesturePayload.init
+        )
     }
 
     var parent: Gesture? {
-        get {
-            self.mutable.gestureObject.value.object as? Gesture
-        }
-        set {
-            guard let newValue = newValue else {
-                self.mutable.gestureObject.value = .nil
-                return
-            }
-
-            self.mutable.gestureObject.value = .weak(newValue)
-        }
+        self.mutable.gestureObject.value.object as? Gesture
     }
 
     var targetView: UIView? {
@@ -62,12 +55,18 @@ internal extension UIGestureRecognizer {
         }
     }
 
-    func releaseParent() {
-        guard let parent = self.parent else {
+    static func set(_ uiGesture: UIGestureRecognizer, _ gesture: Gesture?, weak: Bool) {
+        guard let gesture = gesture else {
+            uiGesture.mutable.gestureObject.value = .nil
             return
         }
 
-        self.mutable.gestureObject.value = .strong(parent)
+        if weak {
+            uiGesture.mutable.gestureObject.value = .weak(gesture)
+            return
+        }
+
+        uiGesture.mutable.gestureObject.value = .strong(gesture)
     }
 
     convenience init(target view: UIView!) {

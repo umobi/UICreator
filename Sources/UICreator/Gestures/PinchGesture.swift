@@ -29,8 +29,7 @@ public class Pinch: UIGesture {
     public typealias Gesture = UIPinchGestureRecognizer
 
     public required init(target view: UIView!) {
-        self.setGesture(Gesture.init(target: view))
-        self.uiGesture.parent = self
+        GestureUIGestureSwitch.switch(self, Gesture.init(target: view))
     }
 }
 

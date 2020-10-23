@@ -29,6 +29,7 @@ private struct MEMViewCreator {
     let tree: Mutable<Tree>
     let render: Render
     let viewMethods: ViewMethods
+    let isReleased: Mutable<Bool> = .init(value: false)
 
     init(_ manager: ViewCreator) {
         self.tree = .init(value: .init(manager))
@@ -67,7 +68,7 @@ extension MEMViewCreator {
 private var kMEMViewCreator: UInt = 0
 extension ViewCreator {
     private var storedMemory: MEMViewCreator {
-        OBJCSet(self, &kMEMViewCreator, policity: .OBJC_ASSOCIATION_COPY) {
+        OBJCSet(self, &kMEMViewCreator, policity: .strong) {
             .init(self)
         }
     }
@@ -106,9 +107,41 @@ extension ViewCreator {
         self.storedMemory.render
     }
 
+    fileprivate var isReleased: Bool {
+        get { self.storedMemory.isReleased.value }
+        set { self.storedMemory.isReleased.value = newValue }
+    }
+
     var tree: Tree {
         get { self.storedMemory.tree.value }
         set { self.storedMemory.tree.value = newValue }
+    }
+}
+
+struct ViewCreatorUIViewSwitcher {
+    static func `switch`(_ viewCreator: ViewCreator?, _ uiView: UIView?) {
+        if let viewCreator = viewCreator {
+            guard let uiView = uiView else {
+                viewCreator.viewObject = .nil
+                return
+            }
+
+            if viewCreator.isReleased {
+                viewCreator.viewObject = .weak(uiView)
+                UIView.set(uiView, viewCreator, .strong)
+                return
+            }
+
+
+            viewCreator.viewObject = .strong(uiView)
+            UIView.set(uiView, viewCreator, .weak)
+            return
+        }
+
+        if let uiView = uiView {
+            UIView.set(uiView, nil, .weak)
+            return
+        }
     }
 }
 
@@ -125,15 +158,6 @@ extension ViewCreator {
         self.uiView != nil
     }
 
-    func setView(_ uiView: UIView, asWeak: Bool = false) {
-        if asWeak {
-            self.viewObject = .weak(uiView)
-            return
-        }
-
-        self.viewObject = .strong(uiView)
-    }
-
     private func loadViewIfNeeded() -> UIView! {
         if self.isViewLoaded {
             return self.uiView
@@ -141,8 +165,8 @@ extension ViewCreator {
 
         let loadView: UIView! = {
             if let loadHandler = self.loadViewHandler {
-                let view = loadHandler()
                 self.loadViewHandler = nil
+                let view = loadHandler()
                 return view
             }
 
@@ -162,7 +186,7 @@ extension ViewCreator {
         }()
 
         if loadView.viewCreator === self {
-            self.setView(loadView, asWeak: true)
+            ViewCreatorUIViewSwitcher.switch(self, loadView)
         }
 
         return loadView
@@ -170,11 +194,13 @@ extension ViewCreator {
 
     func releaseUIView() -> UIView! {
         let uiView: UIView! = self.loadViewIfNeeded()
+        self.isReleased = true
+
         guard uiView.viewCreator === self else {
             return uiView
         }
-        uiView.setCreator(self, storeType: .strong)
-        self.setView(uiView, asWeak: true)
+        
+        ViewCreatorUIViewSwitcher.switch(self, uiView)
         return uiView
     }
 }

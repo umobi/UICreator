@@ -32,7 +32,7 @@ struct MEMCollectionPayload {
 private var kMEMCollectionPayload: UInt = 0
 extension UICollectionView {
     private var collectionPayload: MEMCollectionPayload {
-        OBJCSet(self, &kMEMCollectionPayload, policity: .OBJC_ASSOCIATION_COPY) {
+        OBJCSet(self, &kMEMCollectionPayload, policity: .strong) {
             .init()
         }
     }

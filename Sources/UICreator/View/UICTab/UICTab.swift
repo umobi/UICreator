@@ -31,128 +31,124 @@ public struct UICTabItemBuilder {
     }
 }
 
-public protocol UICTabExtendable {
-    func makeTabController(_ viewControllers: [UIViewController]) -> UITabBarController
-}
-
-open class UICTab: UIViewControllerCreator {
-    public typealias ViewController = UITabBarController
-
-    public init(@UICTabItemBuilder _ contents: @escaping () -> UICTabItem) {
+public extension UITabBarController {
+    func setViewControllers(@UICTabItemBuilder _ contents: @escaping () -> UICTabItem) {
         let viewControllers: [UIViewController] = contents().zip.map {
             let controller = UICHostingController(content: $0.content)
             controller.tabBarItem = $0.tabItem
             return controller
         }
 
-        if let extendable = self as? UICTabExtendable {
-            self.setViewController(extendable.makeTabController(viewControllers))
-            return
+        self.viewControllers = viewControllers
+    }
+}
+
+public class UICTab: UIViewControllerCreator {
+    public typealias ViewController = UITabBarController
+
+    public init(@UICTabItemBuilder _ contents: @escaping () -> UICTabItem) {
+        self.loadView {
+            ControllerView<UITabBarController>(builder: self)
         }
-
-        self.setViewController({
-            let tabController = UITabBarController()
-            tabController.viewControllers = viewControllers
-            return tabController
-        }())
+        .onInTheScene {
+            ($0 as? ControllerView<UITabBarController>)?.contain(viewController: {
+                let tabController = UITabBarController()
+                tabController.setViewControllers(contents)
+                return tabController
+            }())
+        }
     }
 }
 
-public extension UICTab {
-    var tabController: UITabBarController! {
-        (self.uiView as? View)?.adaptedViewController as? ViewController
-    }
-}
-
-public extension UICTab {
+public extension UIViewControllerCreator where ViewController: UITabBarController {
     func tabBar(backgroundImage image: UIImage?) -> Self {
-        self.onRendered { [unowned self] _ in
-            self.tabController.tabBar.backgroundImage = image
+        self.onInTheScene { [unowned self] _ in
+            self.wrappedViewController.tabBar.backgroundImage = image
         }
     }
 
     #if os(iOS)
     func tabBar(barStyle style: UIBarStyle) -> Self {
-        self.onRendered { [unowned self] _ in
-            self.tabController.tabBar.barStyle = style
+        self.onInTheScene { [unowned self] _ in
+            self.wrappedViewController.tabBar.barStyle = style
         }
     }
     #endif
 
     func tabBar(barTintColor tintColor: UIColor?) -> Self {
-        self.onRendered { [unowned self] _ in
-            self.tabController.tabBar.barTintColor = tintColor
+        self.onInTheScene { [unowned self] _ in
+            self.wrappedViewController.tabBar.barTintColor = tintColor
         }
     }
 
     func tabBar(isTranslucent flag: Bool) -> Self {
-        self.onRendered { [unowned self] _ in
-            self.tabController.tabBar.isTranslucent = flag
+        self.onInTheScene { [unowned self] _ in
+            self.wrappedViewController.tabBar.isTranslucent = flag
         }
     }
 
     #if os(iOS)
     func tabBar(itemPositioning position: UITabBar.ItemPositioning) -> Self {
-        self.onRendered { [unowned self] _ in
-            self.tabController.tabBar.itemPositioning = position
+        self.onInTheScene { [unowned self] _ in
+            self.wrappedViewController.tabBar.itemPositioning = position
         }
     }
     #endif
 
     func tabBar(itemSpacing spacing: CGFloat) -> Self {
-        self.onRendered { [unowned self] _ in
-            self.tabController.tabBar.itemSpacing = spacing
+        self.onInTheScene { [unowned self] _ in
+            self.wrappedViewController.tabBar.itemSpacing = spacing
         }
     }
 
     func tabBar(itemWidth width: CGFloat) -> Self {
-        self.onRendered { [unowned self] _ in
-            self.tabController.tabBar.itemWidth = width
+        self.onInTheScene { [unowned self] _ in
+            self.wrappedViewController.tabBar.itemWidth = width
         }
     }
 
     func tabBar(selectedItem firstHandler: @escaping (UITabBarItem) -> Bool) -> Self {
-        self.onRendered { [unowned self] _ in
-            self.tabController.tabBar.selectedItem = self.tabController.tabBar.items?.first(where: {
+        self.onInTheScene { [unowned self] _ in
+            self.wrappedViewController.tabBar.selectedItem = self.wrappedViewController.tabBar.items?.first(where: {
                 firstHandler($0)
             })
         }
     }
 
     func tabBar(selectionIndicatorImage image: UIImage?) -> Self {
-        self.onRendered { [unowned self] _ in
-            self.tabController.tabBar.selectionIndicatorImage = image
+        self.onInTheScene { [unowned self] _ in
+            self.wrappedViewController.tabBar.selectionIndicatorImage = image
         }
     }
 
     func tabBar(shadowImage image: UIImage?) -> Self {
-        self.onRendered { [unowned self] _ in
-            self.tabController.tabBar.shadowImage = image
+        self.onInTheScene { [unowned self] _ in
+            self.wrappedViewController.tabBar.shadowImage = image
         }
     }
 
     @available(iOS 13.0, tvOS 13, *)
     func tabBar(standardAppearance: UITabBarAppearance) -> Self {
-        self.onRendered { [unowned self] _ in
-            self.tabController.tabBar.standardAppearance = standardAppearance
+        self.onInTheScene { [unowned self] _ in
+            self.wrappedViewController.tabBar.standardAppearance = standardAppearance
         }
     }
 
     func tabBar(tintColor color: UIColor?) -> Self {
-        self.onRendered { [unowned self] _ in
-            self.tabController.tabBar.tintColor = color
+        self.onInTheScene { [unowned self] _ in
+            self.wrappedViewController.tabBar.tintColor = color
         }
     }
 
     func tabBar(unselectedItemTintColor color: UIColor?) -> Self {
-        self.onRendered { [unowned self] _ in
-            self.tabController.tabBar.unselectedItemTintColor = color
+        self.onInTheScene { [unowned self] _ in
+            self.wrappedViewController.tabBar.unselectedItemTintColor = color
         }
     }
 
     func tabBar(isHidden flag: Bool) -> Self {
         self.onInTheScene { [unowned self] _ in
-            self.tabController.tabBar.isHidden = flag
+            self.wrappedViewController.tabBar.isHidden = flag
         }
     }
 }
@@ -272,10 +268,10 @@ public extension ViewCreator {
     }
 }
 
-public extension UICTab {
+public extension UIViewControllerCreator where ViewController: UITabBarController {
     func selectedItem(_ selected: Relay<Int>) -> Self {
         self.onInTheScene { [weak self] _ in
-            weak var viewController = self?.tabController
+            weak var viewController = self?.wrappedViewController
             selected.sync {
                 viewController?.selectedIndex($0)
             }
@@ -284,7 +280,7 @@ public extension UICTab {
 
     func selectedItem<Enum: RawRepresentable>(_ selected: Relay<Enum>) -> Self where Enum.RawValue == Int {
         self.onInTheScene { [weak self] _ in
-            weak var viewController = self?.tabController
+            weak var viewController = self?.wrappedViewController
             selected.sync {
                 viewController?.selectedIndex($0.rawValue)
             }

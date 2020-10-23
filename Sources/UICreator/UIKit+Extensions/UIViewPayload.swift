@@ -78,7 +78,7 @@ struct UIViewMethods: MutableEditable {
 private var kViewPayload: UInt = 0
 extension UIView {
     private var payload: UIViewPayload {
-        OBJCSet(self, &kViewPayload, policity: .OBJC_ASSOCIATION_COPY) {
+        OBJCSet(self, &kViewPayload, policity: .strong) {
             .init()
         }
     }
