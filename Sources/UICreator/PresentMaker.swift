@@ -24,6 +24,85 @@ import Foundation
 import UIKit
 
 @frozen
+public struct PresentMaker {
+    let viewToPresent: () -> ViewCreator
+    let onCompletion: (() -> Void)?
+    let animated: Bool
+    let presentingStyle: UIModalPresentationStyle
+    let transitionStyle: UIModalTransitionStyle
+
+    init(_ content: @escaping () -> ViewCreator) {
+        self.viewToPresent = content
+        self.onCompletion = nil
+        if #available(iOS 13, tvOS 13, *) {
+            self.presentingStyle = .automatic
+        } else {
+            self.presentingStyle = .currentContext
+        }
+        self.transitionStyle = .coverVertical
+        self.animated = true
+    }
+
+    private init(_ original: PresentMaker, editable: Editable) {
+        self.viewToPresent = original.viewToPresent
+        self.presentingStyle = editable.presentingStyle
+        self.transitionStyle = editable.transitionStyle
+        self.onCompletion = editable.onCompletion
+        self.animated = editable.animated
+    }
+
+    private func edit(_ edit: @escaping (Editable) -> Void) -> Self {
+        let editable = Editable(self)
+        edit(editable)
+        return .init(self, editable: editable)
+    }
+
+    public func presentingStyle(_ style: UIModalPresentationStyle) -> Self {
+        self.edit {
+            $0.presentingStyle = style
+        }
+    }
+
+    public func transitionStyle(_ style: UIModalTransitionStyle) -> Self {
+        self.edit {
+            $0.transitionStyle = style
+        }
+    }
+
+    public func onCompletion(_ handler: @escaping () -> Void) -> Self {
+        self.edit {
+            $0.onCompletion = handler
+        }
+    }
+
+    public func animated(_ flag: Bool) -> Self {
+        self.edit {
+            $0.animated = flag
+        }
+    }
+
+    func setViewController(_ viewController: UIViewController) {
+        viewController.modalPresentationStyle = self.presentingStyle
+        viewController.modalTransitionStyle = self.transitionStyle
+    }
+
+    private class Editable {
+        var presentingStyle: UIModalPresentationStyle
+        var transitionStyle: UIModalTransitionStyle
+        var onCompletion: (() -> Void)?
+        var animated: Bool
+
+        init(_ present: PresentMaker) {
+            self.presentingStyle = present.presentingStyle
+            self.transitionStyle = present.transitionStyle
+            self.onCompletion = present.onCompletion
+            self.animated = present.animated
+        }
+    }
+}
+
+@available(*, deprecated, renamed: "PresentMaker")
+@frozen
 public struct UICPresent {
     let presentingStyle: UIModalPresentationStyle
     let transitionStyle: UIModalTransitionStyle

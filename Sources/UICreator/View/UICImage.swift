@@ -78,12 +78,12 @@ public class ImageView: UIImageView {
 public class UICImage: UIViewCreator {
     public typealias View = ImageView
 
-    public init(mode: View.ContentMode = .scaleToFill) {
+    public init(contentMode: ContentMode) {
         self.loadView { [unowned self] in
             return View.init(builder: self)
         }
         .onNotRendered {
-            ($0 as? View)?.contentMode = mode
+            ($0 as? View)?.contentMode = contentMode.uiContentMode
         }
     }
 
@@ -135,9 +135,9 @@ public extension UIViewCreator where View: UIImageView {
         }
     }
 
-    func content(mode: View.ContentMode) -> Self {
+    func contentMode(_ contentMode: ContentMode) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.contentMode = mode
+            ($0 as? View)?.contentMode = contentMode.uiContentMode
         }
     }
 
@@ -148,7 +148,7 @@ public extension UIViewCreator where View: UIImageView {
     }
 
     func rendering(mode: UIImage.RenderingMode) -> Self {
-        return self.onRendered {
+        self.onRendered {
             ($0 as? View)?.image = ($0 as? View)?.image?.withRenderingMode(mode)
         }
     }

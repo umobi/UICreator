@@ -51,6 +51,24 @@ public struct PropertyKey {
         self.uiView?.traitCollection.accessibilityContrast ?? .unspecified
     }
 
+    public var colorScheme: ColorScheme {
+        if #available(iOS 12, tvOS 12, *) {
+            return .uiTraitCollection(self.uiView?.traitCollection ?? {
+                if #available(iOS 13, tvOS 13, *) {
+                    return .current
+                }
+
+                return .init(userInterfaceStyle: .light)
+            }())
+        }
+
+        guard let traitCollection = self.uiView?.traitCollection else {
+            return .light
+        }
+
+        return .uiTraitCollection(traitCollection)
+    }
+
     public var accessibilityInvertColors: Bool {
         UIAccessibility.isInvertColorsEnabled
     }

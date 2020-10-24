@@ -182,10 +182,19 @@ public extension BlurView {
 public class UICBlur: UIViewCreator {
     public typealias View = BlurView
 
-    public init(blur: UIBlurEffect.Style = .regular) {
-        self.blur(style: blur)
+    public init(_ style: UIBlurEffect.Style) {
+        self.blurStyle(style)
             .loadView { [unowned self] in
                 let view = View.init(blur: blur)
+                view.updateBuilder(self)
+                return view
+            }
+    }
+
+    public init(_ dynamicStyle: Relay<UIBlurEffect.Style>) {
+        self.blurStyle(dynamicStyle)
+            .loadView { [unowned self] in
+                let view = View.init(blur: dynamicStyle.wrappedValue)
                 view.updateBuilder(self)
                 return view
             }
@@ -193,9 +202,19 @@ public class UICBlur: UIViewCreator {
 }
 
 public extension UIViewCreator where View: UICBlur.View {
-    func blur(style: UIBlurEffect.Style) -> Self {
-        return self.onRendered {
+    func blurStyle(_ style: UIBlurEffect.Style) -> Self {
+        self.onRendered {
             ($0 as? View)?.apply(blurEffect: style)
+        }
+    }
+
+    func blurStyle(_ dynamicStyle: Relay<UIBlurEffect.Style>) -> Self {
+        self.onRendered {
+            weak var view = $0 as? View
+
+            dynamicStyle.sync {
+                view?.apply(blurEffect: $0)
+            }
         }
     }
 }
@@ -203,9 +222,19 @@ public extension UIViewCreator where View: UICBlur.View {
 #if os(iOS)
 @available(iOS 13, *)
 public extension UIViewCreator where View: UICBlur.View {
-    func vibrancy(effect: UIVibrancyEffectStyle) -> Self {
-        return self.onRendered {
+    func vibrancyEffect(_ effect: UIVibrancyEffectStyle) -> Self {
+        self.onRendered {
             ($0 as? View)?.apply(vibrancyEffect: effect)
+        }
+    }
+
+    func vibrancyEffect(_ dynamicEffect: Relay<UIVibrancyEffectStyle>) -> Self {
+        self.onRendered {
+            weak var view = $0 as? View
+
+            dynamicEffect.sync {
+                view?.apply(vibrancyEffect: $0)
+            }
         }
     }
 }

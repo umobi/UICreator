@@ -149,6 +149,18 @@ public extension ViewCreator {
         )
     }
 
+    func presentMaker(_ relay: Relay<Bool>,_ presentMaker: @escaping () -> PresentMaker) -> Self {
+        let presentMaker = presentMaker()
+
+        return self.dynamicPresent(
+            relay,
+            animated: presentMaker.animated,
+            content: presentMaker.viewToPresent,
+            viewControllerBuilder: presentMaker.setViewController(_:)
+        )
+    }
+
+    @available(*, deprecated, renamed: "presentMaker")
     func presentMaker(_ relay: Relay<Bool>, maker: @escaping (UICPresent) -> UICPresent) -> Self {
         let maker = maker(.init(fromView: self))
 
