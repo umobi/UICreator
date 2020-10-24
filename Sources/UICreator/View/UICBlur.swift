@@ -185,7 +185,7 @@ public class UICBlur: UIViewCreator {
     public init(_ style: UIBlurEffect.Style) {
         self.blurStyle(style)
             .loadView { [unowned self] in
-                let view = View.init(blur: blur)
+                let view = View.init(blur: style)
                 view.updateBuilder(self)
                 return view
             }

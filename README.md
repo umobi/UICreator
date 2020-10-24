@@ -104,7 +104,7 @@ Go check this repository [UICreator Examples](https://github.com/brennobemoura/U
                     UICImage(image: self.landmark.image)
                         .aspectRatio()
                         .height(equalTo: 50)
-                        .content(mode: .scaleAspectFill)
+                        .contentMode(.fill)
                         .clipsToBounds(true)
 						
                     UICLabel(self.landmark.name)

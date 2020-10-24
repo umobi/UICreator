@@ -49,28 +49,6 @@ public extension ViewCreator {
         }
     }
 
-    func borderColor(_ color: UIColor?) -> Self {
-        return self.onNotRendered {
-            $0.layer.borderColor = color?.cgColor
-            $0.onTrait {
-                $0.layer.borderColor = color?.cgColor
-            }
-        }
-    }
-
-    func borderWidth(_ width: CGFloat) -> Self {
-        return self.onNotRendered {
-            $0.layer.borderWidth = width
-        }
-    }
-
-    func cornerRadius(_ radius: CGFloat) -> Self {
-        return self.onNotRendered {
-            $0.layer.cornerRadius = radius
-            $0.clipsToBounds = true
-        }
-    }
-
     func alpha(_ constant: CGFloat) -> Self {
         return self.onNotRendered {
             $0.alpha = constant
@@ -201,9 +179,8 @@ public extension ViewCreator {
 }
 
 public extension UIViewCreator {
-    func accessibily(_ handler: @escaping (UIAccessibilityCreator<Self>) -> UIAccessibilityCreator<Self>) -> Self {
-        _ = handler(.init(self))
-        return self
+    func accessibily(_ handler: @escaping () -> UIAccessibilityCreator<Self>) -> Self {
+        handler().viewCreator(self)
     }
 }
 
@@ -413,29 +390,6 @@ public extension ViewCreator {
             weak var view = view
             color.sync {
                 view?.backgroundColor = $0
-            }
-        }
-    }
-
-    func borderColor(_ color: Relay<UIColor>) -> Self {
-
-        return self.onNotRendered { view in
-            weak var view = view
-            color.sync {
-                view?.layer.borderColor = $0.cgColor
-            }
-
-            view?.onTrait {
-                $0.layer.borderColor = color.wrappedValue.cgColor
-            }
-        }
-    }
-
-    func borderWidth(_ constant: Relay<CGFloat>) -> Self {
-        self.onNotRendered { view in
-            weak var view = view
-            constant.sync {
-                view?.layer.borderWidth = $0
             }
         }
     }

@@ -160,6 +160,42 @@ public class UICRounder: UIViewCreator {
     }
 }
 
+public extension UIViewCreator where View: RounderView {
+    func borderColor(_ color: UIColor) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.border(color: color)
+        }
+    }
+
+    func borderColor(_ dynamicColor: Relay<UIColor>) -> Self {
+        self.onNotRendered {
+            weak var view = $0 as? View
+
+            dynamicColor.sync {
+                view?.border(color: $0)
+            }
+        }
+    }
+}
+
+public extension UIViewCreator where View: RounderView {
+    func borderWidth(_ width: CGFloat) -> Self {
+        self.onNotRendered {
+            ($0 as? View)?.border(width: width)
+        }
+    }
+
+    func borderWidth(_ dynamicWidth: Relay<CGFloat>) -> Self {
+        self.onNotRendered {
+            weak var view = $0 as? View
+
+            dynamicWidth.sync {
+                view?.border(width: $0)
+            }
+        }
+    }
+}
+
 public func UICCircle(content: @escaping () -> ViewCreator) -> UICRounder {
     return .init(radius: 0.5, content: content)
 }

@@ -31,7 +31,7 @@ public struct PresentMaker {
     let presentingStyle: UIModalPresentationStyle
     let transitionStyle: UIModalTransitionStyle
 
-    init(_ content: @escaping () -> ViewCreator) {
+    public init(_ content: @escaping () -> ViewCreator) {
         self.viewToPresent = content
         self.onCompletion = nil
         if #available(iOS 13, tvOS 13, *) {
