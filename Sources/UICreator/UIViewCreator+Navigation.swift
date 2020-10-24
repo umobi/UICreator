@@ -43,15 +43,13 @@ internal extension ViewCreator {
 
 public extension ViewCreator {
     var navigation: NavigationRepresentable? {
-        self.uiView?.viewController.navigationController?.view.navigation
+        NavigationRepresentable(viewCreator: self)
     }
 }
 
 public extension UIView {
     var navigation: NavigationRepresentable? {
-        sequence(first: self, next: { $0?.superview }).first(where: {
-            $0?.viewCreator is NavigationRepresentable
-        })??.viewCreator as? NavigationRepresentable
+        NavigationRepresentable(viewCreator: self.viewCreator)
     }
 }
 

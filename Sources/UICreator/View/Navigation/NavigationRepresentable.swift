@@ -41,21 +41,9 @@ func OBJCSet<Object>(
     return object
 }
 
-//public struct NavigationModifier {
-//    private weak var navigationRepresentable: NavigationRepresentable!
-//
-//    public init(_ navigationRepresentable: NavigationRepresentable) {
-//        self.navigationRepresentable = navigationRepresentable
-//    }
-//
-//    public var navigationController: UINavigationController! {
-//        return self.navigationRepresentable.navigationController
-//    }
-//}
-
 public extension NavigationRepresentable {
     var navigationController: UINavigationController! {
-        ViewControllerSearch(self.viewCreator.uiView, searchFor: UINavigationController.self).viewNearFromSearch as? UINavigationController
+        self.viewCreator.uiView?.viewController.navigationController
     }
 }
 
