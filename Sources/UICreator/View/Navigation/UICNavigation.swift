@@ -198,10 +198,18 @@ public extension ViewCreator {
 
 public extension UIView {
     var navigationItem: UINavigationItem! {
-        ViewControllerSearch(
-            self,
-            searchFor: UINavigationController.self
-        ).viewNearFromSearch?.navigationItem
+        guard
+            let viewController = ViewControllerSearch(
+                self,
+                searchFor: UINavigationController.self
+            ).viewNearFromSearch
+        else { return nil }
+
+        if let navigationController = viewController as? UINavigationController {
+            return navigationController.visibleViewController?.navigationItem
+        }
+
+        return viewController.navigationItem
     }
 }
 

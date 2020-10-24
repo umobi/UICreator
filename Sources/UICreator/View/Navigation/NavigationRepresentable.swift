@@ -43,7 +43,18 @@ func OBJCSet<Object>(
 
 public extension NavigationRepresentable {
     var navigationController: UINavigationController! {
-        self.viewCreator.uiView?.viewController.navigationController
+        guard
+            let viewController = ViewControllerSearch(
+                self.viewCreator.uiView,
+                searchFor: UINavigationController.self
+            ).viewNearFromSearch
+        else { return nil }
+
+        if let navigationController = viewController as? UINavigationController {
+            return navigationController
+        }
+
+        return viewController.navigationController
     }
 }
 
