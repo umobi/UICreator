@@ -22,89 +22,69 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
-public class UICList: UIViewCreator {
+public struct UICList: UIViewCreator {
     public typealias View = UITableView
 
-    public init(style: UITableView.Style) {
-        self.loadView { [unowned self] in
-            let view = UICTableView.init(frame: .zero, style: style)
-            view.updateBuilder(self)
-            return view
-        }
+    let style: UITableView.Style
+    let contents: () -> ViewCreator
+
+    public init(
+        _ style: UITableView.Style,
+        @UICViewBuilder contents: @escaping () -> ViewCreator) {
+
+        self.style = style
+        self.contents = contents
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+        
+        return UICTableView(_self.style)
+            .dynamicData(_self.contents)
+            .onNotRendered {
+                #if os(iOS)
+                ($0 as? View)?.separatorStyle = .none
+                #endif
+            }
     }
 }
 
 public extension UIViewCreator where View: UITableView {
 
-    func row(height: CGFloat) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.rowHeight = height
-        }
-    }
-
-    func row(estimatedHeight: CGFloat) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.estimatedRowHeight = estimatedHeight
-        }
-    }
-
-    func header(height: CGFloat) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.sectionHeaderHeight = height
-        }
-    }
-
-    func header(estimatedHeight: CGFloat) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.estimatedSectionHeaderHeight = estimatedHeight
-        }
-    }
-
-    func footer(height: CGFloat) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.sectionFooterHeight = height
-        }
-    }
-
-    func footer(estimatedHeight: CGFloat) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.estimatedSectionFooterHeight = estimatedHeight
-        }
-    }
-
-    func allowsMultipleSelection(_ flag: Bool) -> Self {
+    func allowsMultipleSelection(_ flag: Bool) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.allowsMultipleSelection = flag
         }
     }
 
-    func allowsSelection(_ flag: Bool) -> Self {
+    func allowsSelection(_ flag: Bool) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.allowsSelection = flag
         }
     }
 
-    func allowsSelectionDuringEditing(_ flag: Bool) -> Self {
+    func allowsSelectionDuringEditing(_ flag: Bool) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.allowsSelectionDuringEditing = flag
         }
     }
 
-    func allowsMultipleSelectionDuringEditing(_ flag: Bool) -> Self {
+    func allowsMultipleSelectionDuringEditing(_ flag: Bool) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.allowsMultipleSelectionDuringEditing = flag
         }
     }
 
     @available(iOS 11.0, tvOS 11.0, *)
-    func insetsContentViews(toSafeArea flag: Bool) -> Self {
+    func insetsContentViews(toSafeArea flag: Bool) -> UICModifiedView<View> {
         self.onInTheScene {
             ($0 as? View)?.insetsContentViewsToSafeArea = flag
         }
     }
 
-    func background(_ content: @escaping () -> ViewCreator) -> Self {
+    func background(_ content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.onInTheScene { tableView in
             weak var tableView = tableView
 
@@ -121,39 +101,39 @@ public extension UIViewCreator where View: UITableView {
     }
 
     #if os(iOS)
-    func separator(effect: UIVisualEffect) -> Self {
+    func separatorEffect(_ effect: UIVisualEffect) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.separatorEffect = effect
         }
     }
 
-    func separator(color: UIColor?) -> Self {
+    func separatorColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.separatorColor = color
         }
     }
 
-    func separator(style: UITableViewCell.SeparatorStyle) -> Self {
+    func separatorStyle(_ style: UITableViewCell.SeparatorStyle) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.separatorStyle = style
         }
     }
     #endif
 
-    func separator(insets: UIEdgeInsets) -> Self {
+    func separatorInsets(_ insets: UIEdgeInsets) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.separatorInset = insets
         }
     }
 
     @available(iOS 11.0, tvOS 11.0, *)
-    func separator(insetReference: UITableView.SeparatorInsetReference) -> Self {
+    func separatorInsetReference(_ insetReference: UITableView.SeparatorInsetReference) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.separatorInsetReference = insetReference
         }
     }
 
-    func header(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> Self {
+    func header(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.onInTheScene { tableView in
             weak var tableView = tableView
 
@@ -168,7 +148,7 @@ public extension UIViewCreator where View: UITableView {
         }
     }
 
-    func footer(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> Self {
+    func footer(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.onInTheScene { tableView in
             weak var tableView = tableView
 
@@ -185,7 +165,7 @@ public extension UIViewCreator where View: UITableView {
 }
 
 public extension UIViewCreator where View: UITableView {
-    func accessoryType(_ type: UITableViewCell.AccessoryType) -> Self {
+    func accessoryType(_ type: UITableViewCell.AccessoryType) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.appendCellHandler {
                 $0.accessoryType = type
@@ -198,75 +178,79 @@ public extension UIViewCreator where View: UITableView {
     func deleteRows(
         with animation: UITableView.RowAnimation,
         _ value: Relay<[IndexPath]>,
-        onCompletion: @escaping ([IndexPath]) -> Void) -> Self {
+        completion completionHandler: @escaping ([IndexPath]) -> Void) -> UICModifiedView<View> {
 
-        value.next { [weak self] indexPaths in
-            guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
-                UICList.Fatal.deleteRows(indexPaths).warning()
-                return
+        self.onInTheScene {
+            weak var tableView: View! = $0 as? View
+
+            value.next { indexPaths in
+                guard let manager = tableView.manager as? ListManager else {
+                    UICList.Fatal.deleteRows(indexPaths).warning()
+                    return
+                }
+
+                tableView.manager = ListManager.Delete(manager)
+                    .disableIndexPaths(indexPaths)
+
+                if #available(iOS 11, tvOS 11, *) {
+                    tableView.performBatchUpdates({
+                        tableView.deleteRows(at: indexPaths, with: animation)
+                    }, completion: { didEnd in
+                        if didEnd {
+                            tableView.manager = manager
+                            completionHandler(indexPaths)
+                        }
+                    })
+                    return
+                }
+
+                tableView.beginUpdates()
+                tableView.deleteRows(at: indexPaths, with: animation)
+                tableView.endUpdates()
+
+                tableView.manager = manager
+                completionHandler(indexPaths)
             }
-
-            (self?.uiView as? View)?.manager = ListManager.Delete(manager)
-                .disableIndexPaths(indexPaths)
-
-            if #available(iOS 11, tvOS 11, *) {
-                (self?.uiView as? View)?.performBatchUpdates({
-                    (self?.uiView as? View)?.deleteRows(at: indexPaths, with: animation)
-                }, completion: { didEnd in
-                    if didEnd {
-                        (self?.uiView as? View)?.manager = manager
-                        onCompletion(indexPaths)
-                    }
-                })
-                return
-            }
-
-            (self?.uiView as? View)?.beginUpdates()
-            (self?.uiView as? View)?.deleteRows(at: indexPaths, with: animation)
-            (self?.uiView as? View)?.endUpdates()
-
-            (self?.uiView as? View)?.manager = manager
-            onCompletion(indexPaths)
         }
-
-        return self
     }
 
     func deleteSections(
         with animation: UITableView.RowAnimation,
         _ value: Relay<[Int]>,
-        onCompletion: @escaping ([Int]) -> Void) -> Self {
+        completion completionHandler: @escaping ([Int]) -> Void) -> UICModifiedView<View> {
 
-        value.next { [weak self] sections in
-            guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
-                UICList.Fatal.deleteSections(sections).warning()
-                return
+        self.onInTheScene {
+            weak var tableView: View! = $0 as? View
+
+            value.next { sections in
+                guard let manager = tableView.manager as? ListManager else {
+                    UICList.Fatal.deleteSections(sections).warning()
+                    return
+                }
+
+                tableView.manager = ListManager.Delete(manager)
+                    .disableSections(sections)
+
+                if #available(iOS 11, tvOS 11, *) {
+                    tableView.performBatchUpdates({
+                        tableView.deleteSections(.init(sections), with: animation)
+                    }, completion: { didEnd in
+                        if didEnd {
+                            tableView.manager = manager
+                            completionHandler(sections)
+                        }
+                    })
+                    return
+                }
+
+                tableView.beginUpdates()
+                tableView.deleteSections(.init(sections), with: animation)
+                tableView.endUpdates()
+
+                tableView.manager = manager
+                completionHandler(sections)
             }
-
-            (self?.uiView as? View)?.manager = ListManager.Delete(manager)
-                .disableSections(sections)
-
-            if #available(iOS 11, tvOS 11, *) {
-                (self?.uiView as? View)?.performBatchUpdates({
-                    (self?.uiView as? View)?.deleteSections(.init(sections), with: animation)
-                }, completion: { didEnd in
-                    if didEnd {
-                        (self?.uiView as? View)?.manager = manager
-                        onCompletion(sections)
-                    }
-                })
-                return
-            }
-
-            (self?.uiView as? View)?.beginUpdates()
-            (self?.uiView as? View)?.deleteSections(.init(sections), with: animation)
-            (self?.uiView as? View)?.endUpdates()
-
-            (self?.uiView as? View)?.manager = manager
-            onCompletion(sections)
         }
-
-        return self
     }
 }
 
@@ -275,81 +259,86 @@ public extension UIViewCreator where View: UITableView {
     func insertRows(
         with animation: UITableView.RowAnimation,
         _ value: Relay<[IndexPath]>,
-        perform: @escaping ([IndexPath]) -> Void) -> Self {
+        perform: @escaping ([IndexPath]) -> Void) -> UICModifiedView<View> {
 
-        value.next { [weak self] indexPaths in
-            guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
-                UICList.Fatal.insertRows(indexPaths).warning()
-                return
+        self.onInTheScene {
+            weak var tableView: View! = $0 as? View
+
+            value.next { indexPaths in
+                guard let manager = tableView.manager as? ListManager else {
+                    UICList.Fatal.insertRows(indexPaths).warning()
+                    return
+                }
+
+                tableView.manager = ListManager.Append(manager)
+                perform(indexPaths)
+
+                if #available(iOS 11, tvOS 11, *) {
+                    tableView.performBatchUpdates({
+                        tableView.insertRows(at: indexPaths, with: animation)
+                    }, completion: { didEnd in
+                        if didEnd {
+                            tableView.manager = manager
+                        }
+                    })
+                    return
+                }
+
+                tableView.beginUpdates()
+                tableView.insertRows(at: indexPaths, with: animation)
+                tableView.endUpdates()
+
+                tableView.manager = manager
             }
-
-            (self?.uiView as? View)?.manager = ListManager.Append(manager)
-            perform(indexPaths)
-
-            if #available(iOS 11, tvOS 11, *) {
-                (self?.uiView as? View)?.performBatchUpdates({
-                    (self?.uiView as? View)?.insertRows(at: indexPaths, with: animation)
-                }, completion: { didEnd in
-                    if didEnd {
-                        (self?.uiView as? View)?.manager = manager
-                    }
-                })
-                return
-            }
-
-            (self?.uiView as? View)?.beginUpdates()
-            (self?.uiView as? View)?.insertRows(at: indexPaths, with: animation)
-            (self?.uiView as? View)?.endUpdates()
-
-            (self?.uiView as? View)?.manager = manager
         }
-
-        return self
     }
 
     func insertSections(
         with animation: UITableView.RowAnimation,
         _ value: Relay<[Int]>,
-        perform: @escaping ([Int]) -> Void) -> Self {
+        perform: @escaping ([Int]) -> Void) -> UICModifiedView<View> {
 
-        value.next { [weak self] sections in
-            guard let manager = (self?.uiView as? View)?.manager as? ListManager else {
-                UICList.Fatal.insertSections(sections).warning()
-                return
-            }
+        self.onInTheScene {
+            weak var tableView: View! = $0 as? View
 
-            (self?.uiView as? View)?.manager = ListManager.Append(manager)
-            perform(sections)
+            value.next { sections in
+                guard let manager = tableView.manager as? ListManager else {
+                    UICList.Fatal.insertSections(sections).warning()
+                    return
+                }
 
-            if #available(iOS 11, tvOS 11, *) {
-                (self?.uiView as? View)?.performBatchUpdates({
-                    (self?.uiView as? View)?.insertSections(.init(sections), with: animation)
-                }, completion: { didEnd in
-                    if didEnd {
-                        (self?.uiView as? View)?.manager = manager
-                        if let listSupport = self?.uiView as? ListSupport {
-                            listSupport.setNeedsReloadData()
-                            return
+                tableView.manager = ListManager.Append(manager)
+                perform(sections)
+
+                if #available(iOS 11, tvOS 11, *) {
+                    tableView.performBatchUpdates({
+                        tableView.insertSections(.init(sections), with: animation)
+                    }, completion: { didEnd in
+                        if didEnd {
+                            tableView.manager = manager
+                            if let listSupport = tableView as? ListSupport {
+                                listSupport.setNeedsReloadData()
+                                return
+                            }
+                            tableView.reloadData()
                         }
-                        (self?.uiView as? View)?.reloadData()
-                    }
-                })
-                return
-            }
+                    })
+                    return
+                }
 
-            (self?.uiView as? View)?.beginUpdates()
-            (self?.uiView as? View)?.insertSections(.init(sections), with: animation)
-            (self?.uiView as? View)?.endUpdates()
+                tableView.beginUpdates()
+                tableView.insertSections(.init(sections), with: animation)
+                tableView.endUpdates()
 
-            (self?.uiView as? View)?.manager = manager
-            if let listSupport = self?.uiView as? ListSupport {
-                listSupport.setNeedsReloadData()
-                return
+                tableView.manager = manager
+                if let listSupport = tableView as? ListSupport {
+                    listSupport.setNeedsReloadData()
+                    return
+                }
+
+                tableView.reloadData()
             }
-            (self?.uiView as? View)?.reloadData()
         }
-
-        return self
     }
 }
 

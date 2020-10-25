@@ -23,27 +23,28 @@
 import Foundation
 import UIKit
 
-public class Swipe: UIGesture {
+public struct Swipe: UIGestureCreator {
     public typealias Gesture = UISwipeGestureRecognizer
 
-    public required init(target view: UIView!) {
-        GestureUIGestureSwitch.switch(self, Gesture.init(target: view))
+    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        Gesture()
     }
 }
 
 public extension UIViewCreator {
 
-    func onSwipeMaker(_ swipeConfigurator: @escaping (Swipe) -> Swipe) -> UICModifiedView<View> {
+    func onSwipeMaker<Swipe>(_ swipeConfigurator: @escaping () -> Swipe) -> UICModifiedView<View> where Swipe: UIGestureCreator, Swipe.Gesture: UISwipeGestureRecognizer {
         self.onNotRendered {
-            swipeConfigurator(Swipe(target: $0)).add()
+            swipeConfigurator().add($0)
         }
     }
 
     func onSwipe(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
-        return self.onSwipeMaker {
-            $0.onRecognized {
-                handler($0.view!)
-            }
+        self.onSwipeMaker {
+            Swipe()
+                .onRecognized {
+                    handler($0.view!)
+                }
         }
     }
 }

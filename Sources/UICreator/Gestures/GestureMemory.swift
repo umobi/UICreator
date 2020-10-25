@@ -34,6 +34,8 @@ extension UIGestureRecognizer {
         @MutableBox var possibleHandler: ((UIGestureRecognizer) -> Void)?
         @MutableBox var endedHandler: ((UIGestureRecognizer) -> Void)?
         @MutableBox var anyOtherHandler: ((UIGestureRecognizer) -> Void)?
+
+        fileprivate let delegate = GestureDelegate()
     }
 
     var memory: Memory {
@@ -43,6 +45,12 @@ extension UIGestureRecognizer {
             policity: .OBJC_ASSOCIATION_COPY,
             orLoad: Memory.init
         )
+    }
+}
+
+extension UIGestureRecognizer {
+    var gestureDelegate: GestureDelegate {
+        self.memory.delegate
     }
 }
 
@@ -113,7 +121,7 @@ public extension UIGestureRecognizer {
 }
 
 internal extension UIGestureRecognizer {
-    func commit(_ sender: UIGestureRecognizer) {
+    @objc func commit(_ sender: UIGestureRecognizer) {
         let memory = sender.memory
         switch sender.state {
         case .possible:

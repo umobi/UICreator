@@ -25,20 +25,15 @@ import UIKit
 
 extension UICTableView: ListSupport {}
 
-public extension UICList {
-    convenience init(style: UITableView.Style, @UICViewBuilder  _ contents: @escaping () -> ViewCreator) {
-        self.init(style: style, ListManager(contents: contents().zip))
-    }
+public extension UITableView {
+    private typealias TableView = UITableView & UITableViewDataSource & UITableViewDelegate & ListSupport
 
-    private convenience init(style: UITableView.Style, _ manager: ListManager) {
-        self.init(style: style)
-
-        self.onNotRendered { [manager] in
-            let tableView: UICTableView! = $0 as? UICTableView
-            #if os(iOS)
-            tableView.separatorStyle = .none
-            #endif
-
+    @discardableResult
+    func dynamicData(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> Self {
+        self.onNotRendered {
+            let manager = ListManager(contents: contents().zip)
+            let tableView: TableView! = $0 as? TableView
+            
             manager.rowsIdentifier.forEach { [unowned tableView] in
                 tableView?.register(TableViewCell.self, forCellReuseIdentifier: $0)
             }

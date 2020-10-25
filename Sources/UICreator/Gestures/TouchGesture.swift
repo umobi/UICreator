@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public class TouchGesture: UIGestureRecognizer {
+public class TouchGestureRecognizer: UIGestureRecognizer {
     public var numberOfTouchedRequired: Int = 1
     private var _numberOfTouches: Int = 0
     private var lastDateTouched: Date?
@@ -80,40 +80,43 @@ public class TouchGesture: UIGestureRecognizer {
     }
 }
 
-public class Touch: UIGesture {
-    public typealias Gesture = TouchGesture
+public struct Touch: UIGestureCreator {
+    public typealias Gesture = TouchGestureRecognizer
 
-    public required init(target view: UIView!) {
-        GestureUIGestureSwitch.switch(self, Gesture.init(target: view))
+    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        Gesture()
     }
 }
 
-public extension UIGesture where Gesture: TouchGesture {
-    #if os(iOS)
-    func number(ofTouchesRequired number: Int) -> Self {
-        self.uiGesture.numberOfTouchedRequired = number
-        return self
+#if os(iOS)
+public extension UIGestureCreator where Gesture: TouchGestureRecognizer {
+    func number(ofTouchesRequired number: Int) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.numberOfTouchedRequired = number
+        }
     }
 
-    func cancelWhenTouchMoves(_ flag: Bool) -> Self {
-        self.uiGesture.cancelWhenTouchMoves = flag
-        return self
+    func cancelWhenTouchMoves(_ flag: Bool) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.cancelWhenTouchMoves = flag
+        }
     }
-    #endif
 }
+#endif
 
 public extension UIViewCreator {
-    func onTouchMaker(_ touchConfigurator: @escaping (Touch) -> Touch) -> UICModifiedView<View> {
+    func onTouchMaker<Touch>(_ touchConfigurator: @escaping () -> Touch) -> UICModifiedView<View> where Touch: UIGestureCreator, Touch.Gesture: TouchGestureRecognizer {
         self.onNotRendered {
-            touchConfigurator(Touch(target: $0)).add()
+            touchConfigurator().add($0)
         }
     }
 
     func onTouch(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
         self.onTouchMaker {
-            $0.onRecognized {
-                handler($0.view!)
-            }
+            Touch()
+                .onRecognized {
+                    handler($0.view!)
+                }
         }
     }
 }

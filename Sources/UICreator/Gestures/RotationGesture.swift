@@ -24,27 +24,28 @@ import Foundation
 import UIKit
 
 #if os(iOS)
-public class Rotation: UIGesture {
+public struct Rotation: UIGestureCreator {
     public typealias Gesture = UIRotationGestureRecognizer
 
-    public required init(target view: UIView!) {
-        GestureUIGestureSwitch.switch(self, Gesture.init(target: view))
+    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        Gesture()
     }
 }
 
 public extension UIViewCreator {
 
-    func onRotationMaker(_ rotationConfigurator: @escaping (Rotation) -> Rotation) -> UICModifiedView<View> {
+    func onRotationMaker<Rotation>(_ rotationConfigurator: @escaping () -> Rotation) -> UICModifiedView<View> where Rotation: UIGestureCreator, Rotation.Gesture: UIRotationGestureRecognizer {
         self.onNotRendered {
-            rotationConfigurator(Rotation(target: $0)).add()
+            rotationConfigurator().add($0)
         }
     }
 
     func onRotation(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
         self.onRotationMaker {
-            $0.onRecognized {
-                handler($0.view!)
-            }
+            Rotation()
+                .onRecognized {
+                    handler($0.view!)
+                }
         }
     }
 }

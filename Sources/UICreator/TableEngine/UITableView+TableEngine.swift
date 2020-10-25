@@ -26,39 +26,45 @@ import UIKit
 extension UITableView {
     struct WeakCell {
         private(set) weak var view: ReusableView!
+
         init(_ view: ReusableView) {
             self.view = view
         }
     }
 }
 
-struct TableLoadManager {
-    let reusableCells: Mutable<[UITableView.WeakCell]> = .init(value: [])
-    let manager: Mutable<ListCollectionManager?> = .init(value: nil)
-    let cellHandler: Mutable<((UITableViewCell) -> Void)?> = .init(value: nil)
+extension UITableView {
+    struct Memory {
+        @MutableBox var reusableCells: [WeakCell] = []
+        @MutableBox var manager: ListCollectionManager?
+        @MutableBox var cellHandler: ((UITableViewCell) -> Void)?
+    }
 }
 
-private var kTableLoadManager: UInt = 0
+private var kTableMemory: UInt = 0
 
 extension UITableView {
-    var loadManager: TableLoadManager {
-        OBJCSet(self, &kTableLoadManager, policity: .OBJC_ASSOCIATION_COPY) {
-            .init()
-        }
+    var memory: Memory {
+        OBJCSet(
+            self,
+            &kTableMemory,
+            policity: .OBJC_ASSOCIATION_COPY,
+            orLoad: Memory.init
+        )
     }
 }
 
 extension UITableView {
     var manager: ListCollectionManager? {
-        get { self.loadManager.manager.value }
-        set { self.loadManager.manager.value = newValue }
+        get { self.memory.manager }
+        set { self.memory.manager = newValue }
     }
 }
 
 extension UITableView {
     private var reusableCells: [WeakCell] {
-        get { self.loadManager.reusableCells.value }
-        set { self.loadManager.reusableCells.value = newValue }
+        get { self.memory.reusableCells }
+        set { self.memory.reusableCells = newValue }
     }
 
     func appendReusable(cell: ReusableView) {

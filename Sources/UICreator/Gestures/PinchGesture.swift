@@ -25,27 +25,28 @@ import UIKit
 
 #if os(iOS)
 
-public class Pinch: UIGesture {
+public struct Pinch: UIGestureCreator {
     public typealias Gesture = UIPinchGestureRecognizer
 
-    public required init(target view: UIView!) {
-        GestureUIGestureSwitch.switch(self, Gesture.init(target: view))
+    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        Gesture()
     }
 }
 
 public extension UIViewCreator {
 
-    func onPinchMaker(_ pinchConfigurator: @escaping (Pinch) -> Pinch) -> UICModifiedView<View> {
+    func onPinchMaker<Pinch>(_ pinchConfigurator: @escaping () -> Pinch) -> UICModifiedView<View> where Pinch: UIGestureCreator, Pinch.Gesture: UIPinchGestureRecognizer {
         self.onNotRendered {
-            pinchConfigurator(Pinch(target: $0)).add()
+            pinchConfigurator().add($0)
         }
     }
 
     func onPinch(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
         self.onPinchMaker {
-            $0.onRecognized {
-                handler($0.view!)
-            }
+            Pinch()
+                .onRecognized {
+                    handler($0.view!)
+                }
         }
     }
 }

@@ -99,17 +99,6 @@ public extension UICGestureRepresentable {
     }
 }
 
-private var kGestureDelegate: UInt = 0
-internal extension UIGestureRecognizer {
-    var gestureDelegate: GestureDelegate {
-        OBJCSet(self, &kGestureDelegate, policity: .OBJC_ASSOCIATION_RETAIN) {
-            let delegate = GestureDelegate()
-            self.delegate = delegate
-            return delegate
-        }
-    }
-}
-
 public extension UIGestureCreator {
     func `as`(_ outlet: UICOutlet<Gesture>) -> UICModifiedGesture<Gesture> {
         self.onModify {

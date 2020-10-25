@@ -23,40 +23,44 @@
 import Foundation
 import UIKit
 
-public class Tap: UIGesture {
+@frozen
+public struct Tap: UIGestureCreator {
     public typealias Gesture = UITapGestureRecognizer
 
-    public required init(target view: UIView!) {
-        GestureUIGestureSwitch.switch(self, Gesture.init(target: view))
+    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        Gesture()
     }
 }
 
-public extension UIGesture where Gesture: UITapGestureRecognizer {
-    func number(ofTapsRequired number: Int) -> Self {
-        self.uiGesture?.numberOfTapsRequired = number
-        return self
+public extension UIGestureCreator where Gesture: UITapGestureRecognizer {
+    func number(ofTapsRequired number: Int) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.numberOfTapsRequired = number
+        }
     }
 
     #if os(iOS)
-    func number(ofTouchesRequired number: Int) -> Self {
-        self.uiGesture?.numberOfTouchesRequired = number
-        return self
+    func number(ofTouchesRequired number: Int) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.numberOfTouchesRequired = number
+        }
     }
     #endif
 }
 
 public extension UIViewCreator {
-    func onTapMaker(_ tapConfigurator: @escaping (Tap) -> Tap) -> UICModifiedView<View> {
+    func onTapMaker<Tap>(_ tapConfigurator: @escaping () -> Tap) -> UICModifiedView<View> where Tap: UIGestureCreator, Tap.Gesture: UITapGestureRecognizer {
         self.onNotRendered {
-            tapConfigurator(Tap(target: $0)).add()
+            tapConfigurator().add($0)
         }
     }
 
     func onTap(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
         self.onTapMaker {
-            $0.onRecognized {
-                handler($0.view!)
-            }
+            Tap()
+                .onRecognized {
+                    handler($0.view!)
+                }
         }
     }
 }

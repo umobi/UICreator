@@ -24,26 +24,27 @@ import Foundation
 import UIKit
 
 #if os(iOS)
-public class ScreenEdgePan: UIGesture {
+public struct ScreenEdgePan: UIGestureCreator {
     public typealias Gesture = UIScreenEdgePanGestureRecognizer
 
-    public required init(target view: UIView!) {
-        GestureUIGestureSwitch.switch(self, Gesture.init(target: view))
+    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        Gesture()
     }
 }
 
 public extension UIViewCreator {
-    func onScreenEdgePanMaker(_ screenEdgePanConfigurator: @escaping (ScreenEdgePan) -> ScreenEdgePan) -> UICModifiedView<View> {
+    func onScreenEdgePanMaker<ScreenEdgePan>(_ screenEdgePanConfigurator: @escaping () -> ScreenEdgePan) -> UICModifiedView<View> where ScreenEdgePan: UIGestureCreator, ScreenEdgePan.Gesture: UIScreenEdgePanGestureRecognizer {
         self.onNotRendered {
-            screenEdgePanConfigurator(ScreenEdgePan(target: $0)).add()
+            screenEdgePanConfigurator().add($0)
         }
     }
 
     func onScreenEdgePan(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
         self.onScreenEdgePanMaker {
-            $0.onRecognized {
-                handler($0.view!)
-            }
+            ScreenEdgePan()
+                .onRecognized {
+                    handler($0.view!)
+                }
         }
     }
 }

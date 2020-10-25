@@ -22,9 +22,23 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 #if os(iOS)
 public class SwitchView: UISwitch {
+
+    init() {
+        super.init(frame: .zero)
+        self.makeSelfImplemented()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override public init(frame: CGRect) {
+        fatalError("init(frame:) has not been implemented")
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -68,86 +82,65 @@ public class SwitchView: UISwitch {
     }
 }
 
-public class UICSwitch: UIViewCreator, Control {
+public struct UICSwitch: UIViewCreator {
     public typealias View = SwitchView
 
+    @Relay private var isOn: Bool
+
     public init(isOn: Bool) {
-        self.loadView { [unowned self] in
-            let view = View.init(builder: self)
-            return view
-        }
-        .onNotRendered {
-            ($0 as? View)?.isOn = isOn
-        }
+        self._isOn = .constant(isOn)
+    }
+
+    public init(isOn: Relay<Bool>) {
+        self._isOn = isOn
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return View()
+            .onEvent(.valueChanged) {
+                _self.isOn = ($0 as? View)?.isOn ?? false
+            }
+            .onNotRendered {
+                weak var view = $0 as? View
+
+                _self.$isOn.distinctSync {
+                    view?.isOn = $0
+                }
+            }
     }
 }
 
 public extension UIViewCreator where View: UISwitch {
 
-    func isOn(_ flag: Bool) -> Self {
+    func isOn(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.isOn = flag
         }
     }
 
-    func offImage(_ image: UIImage?) -> Self {
+    func offImage(_ image: UIImage?) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.offImage = image
         }
     }
 
-    func onImage(_ image: UIImage?) -> Self {
+    func onImage(_ image: UIImage?) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.onImage = image
         }
     }
 
-    func onTintColor(_ color: UIColor?) -> Self {
+    func onTintColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.onTintColor = color
         }
     }
 
-    func thumbTintColor(_ color: UIColor?) -> Self {
+    func thumbTintColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.thumbTintColor = color
-        }
-    }
-}
-
-public extension UIViewCreator where Self: Control, View: UISwitch {
-    func onValueChanged(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onEvent(.valueChanged, handler)
-    }
-}
-
-public extension UICSwitch {
-    convenience init(isOn: Relay<Bool>) {
-        self.init(isOn: isOn.wrappedValue)
-
-        var isLocked = false
-
-        _ = self.onNotRendered {
-            weak var view = $0 as? View
-
-            isOn.sync {
-                guard !isLocked else {
-                    return
-                }
-
-                isLocked = true
-                view?.setOn($0, animated: true)
-                isLocked = false
-            }
-        }
-        .onValueChanged {
-            guard !isLocked else {
-                return
-            }
-
-            isLocked = true
-            isOn.wrappedValue = ($0 as? View)?.isOn ?? false
-            isLocked = false
         }
     }
 }

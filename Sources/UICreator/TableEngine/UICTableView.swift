@@ -25,6 +25,15 @@ import UIKit
 
 internal class UICTableView: UITableView {
 
+    init(_ style: Style) {
+        super.init(frame: .zero, style: style)
+        self.makeSelfImplemented()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     override open var isHidden: Bool {
         get { super.isHidden }
         set {
@@ -77,8 +86,8 @@ internal class UICTableView: UITableView {
 
 extension UITableView {
     private var tableViewCellHandler: ((UITableViewCell) -> Void)? {
-        get { self.loadManager.cellHandler.value }
-        set { self.loadManager.cellHandler.value = newValue }
+        get { self.memory.cellHandler }
+        set { self.memory.cellHandler = newValue }
     }
 
     @discardableResult

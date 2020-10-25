@@ -25,20 +25,19 @@ import UIKit
 import ConstraintBuilder
 
 //swiftlint:disable file_length
-public class SpacerView: UIView, UICManagerContentView {
+public class SpacerView: UIView {
     private weak var view: UIView?
-    private(set) var margin: Edges
-
-    public required init(_ view: UIView!, margin: Edges) {
-        self.margin = margin
-        super.init(frame: .zero)
-
-        self.addContent(view)
+    private(set) var margin: Edges {
+        didSet {
+            if self.margin != oldValue {
+                self.layout()
+            }
+        }
     }
 
-    public required init(margin: Edges) {
-        self.margin = margin
+    init() {
         super.init(frame: .zero)
+        self.makeSelfImplemented()
     }
 
     public override init(frame: CGRect) {
@@ -47,6 +46,11 @@ public class SpacerView: UIView, UICManagerContentView {
 
     required init?(coder: NSCoder) {
         Fatal.Builder("init(coder:) has not been implemented").die()
+    }
+
+    @discardableResult
+    func setMargin(_ margin: Edges) -> Self {
+        self.margin = margin
     }
 
     override open var isHidden: Bool {
@@ -90,19 +94,6 @@ public class SpacerView: UIView, UICManagerContentView {
         self.renderManager.traitDidChange()
     }
 
-    private func setMargin(_ margin: Edges) {
-        guard self.view != nil else {
-            return
-        }
-
-        self.margin = margin
-        self.layout()
-    }
-
-    func updateMargin(_ updateHandler: (Edges) -> Edges) {
-        self.setMargin(updateHandler(self.margin))
-    }
-
     private func layout() {
         guard let view = self.view else {
             return
@@ -135,10 +126,12 @@ public class SpacerView: UIView, UICManagerContentView {
         }
     }
 
-    public func addContent(_ view: UIView) {
+    @discardableResult
+    public func addContent(_ view: UIView) -> Self {
         self.view = view
         CBSubview(self).addSubview(view)
         self.layout()
+        return self
     }
 
     public func reloadContentLayout() {
@@ -151,7 +144,7 @@ public class SpacerView: UIView, UICManagerContentView {
 }
 
 public extension SpacerView {
-    struct Edges {
+    struct Edges: Equatable {
         public let top, bottom, leading, trailing: CGFloat
 
         public init(top: CGFloat, bottom: CGFloat, leading: CGFloat, trailing: CGFloat) {
@@ -170,7 +163,14 @@ public extension SpacerView {
         }
 
         public static var zero: Edges {
-            return .init(top: 0, bottom: 0, leading: 0, trailing: 0)
+            .init(top: 0, bottom: 0, leading: 0, trailing: 0)
+        }
+
+        public static func ==(rhs: Edges, lhs: Edges) -> Bool {
+            rhs.top == lhs.top
+                && rhs.leading == lhs.leading
+                && rhs.trailing == lhs.trailing
+                && rhs.bottom == lhs.bottom
         }
 
         func top(_ constant: CGFloat) -> Self {
@@ -211,66 +211,63 @@ public extension SpacerView {
     }
 }
 
-public class UICSpacer: UIViewCreator {
+public struct UICSpacer: UIViewCreator {
     public typealias View = SpacerView
 
-    public required init(margin: View.Edges, content: @escaping () -> ViewCreator) {
-        let content = content()
-        self.tree.append(content)
+    @MutableBox var margin: View.Edges = .zero
+    let content: () -> ViewCreator
 
-        self.loadView { [unowned self] in
-            let view = View(margin: margin)
-            view.updateBuilder(self)
-            return view
-        }
-        .onNotRendered {
-            ($0 as? View)?.addContent(content.releaseUIView())
-        }
+    public init(margin: View.Edges, content: @escaping () -> ViewCreator) {
+        self.margin = margin
     }
-}
 
-public class UICEmpty: ViewCreator {
-    public init() {
-        self.loadView { [unowned self] in
-            UIView(builder: self)
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        if _self.margin == .zero {
+            return _self.content().releaseUIView()
         }
+
+        return SpacerView()
+            .addContent(_self.content().releaseUIView())
+            .setMargin(_self.margin)
     }
 }
 
 public extension UICSpacer {
-    convenience init(vertical: CGFloat, horizontal: CGFloat) {
+    init(vertical: CGFloat, horizontal: CGFloat) {
         self.init(margin: .init(vertical: vertical, horizontal: horizontal)) {
-            UICEmpty()
+            EmptyView()
         }
     }
 
-    convenience init(vertical: CGFloat) {
+    init(vertical: CGFloat) {
         self.init(margin: .init(vertical: vertical, horizontal: 0)) {
-            UICEmpty()
+            EmptyView()
         }
     }
 
-    convenience init(horizontal: CGFloat) {
+    init(horizontal: CGFloat) {
         self.init(margin: .init(vertical: 0, horizontal: horizontal)) {
-            UICEmpty()
+            EmptyView()
         }
     }
 
-    convenience init() {
+    init() {
         self.init(margin: .init(spacing: 0)) {
-            UICEmpty()
+            EmptyView()
         }
     }
 
-    convenience init(spacing: CGFloat) {
+    init(spacing: CGFloat) {
         self.init(margin: .init(spacing: spacing)) {
-            UICEmpty()
+            EmptyView()
         }
     }
 }
 
 public extension UICSpacer {
-    convenience init(
+    init(
         top: CGFloat,
         bottom: CGFloat,
         leading: CGFloat,
@@ -288,23 +285,23 @@ public extension UICSpacer {
         )
     }
 
-    convenience init(vertical: CGFloat, horizontal: CGFloat, content: @escaping () -> ViewCreator) {
+    init(vertical: CGFloat, horizontal: CGFloat, content: @escaping () -> ViewCreator) {
         self.init(margin: .init(vertical: vertical, horizontal: horizontal), content: content)
     }
 
-    convenience init(vertical: CGFloat, content: @escaping () -> ViewCreator) {
+    init(vertical: CGFloat, content: @escaping () -> ViewCreator) {
         self.init(margin: .init(vertical: vertical, horizontal: 0), content: content)
     }
 
-    convenience init(horizontal: CGFloat, content: @escaping () -> ViewCreator) {
+    init(horizontal: CGFloat, content: @escaping () -> ViewCreator) {
         self.init(margin: .init(vertical: 0, horizontal: horizontal), content: content)
     }
 
-    convenience init(spacing: CGFloat, content: @escaping () -> ViewCreator) {
+    init(spacing: CGFloat, content: @escaping () -> ViewCreator) {
         self.init(margin: .init(spacing: spacing), content: content)
     }
 
-    convenience init(content: @escaping () -> ViewCreator) {
+    init(content: @escaping () -> ViewCreator) {
         self.init(margin: .init(spacing: 0), content: content)
     }
 }
@@ -321,7 +318,7 @@ public enum PaddingEdges {
 
 private extension SpacerView {
     func updatePaddingEdges(_ constant: CGFloat, _ edges: PaddingEdges) {
-        self.updateMargin {
+        self.setMargin({
             switch edges {
             case .all:
                 return $0.top(constant)
@@ -346,68 +343,76 @@ private extension SpacerView {
             case .right:
                 return $0.trailing(constant)
             }
-        }
+        }(self.margin))
     }
 }
 
-public extension ViewCreator {
+public extension UIViewCreator {
     func padding(_ constant: CGFloat) -> UICSpacer {
         self.padding(constant, .all)
     }
 
     //swiftlint:disable function_body_length
-    func padding(_ constant: CGFloat, _ edges: PaddingEdges) -> UICSpacer {
+    func padding(_ constant: CGFloat, _ edges: PaddingEdges) -> UICModifiedView<SpacerView> {
         if let spacer = self as? UICSpacer {
             return spacer.onNotRendered {
                 ($0 as? SpacerView)?.updatePaddingEdges(constant, edges)
             }
         }
 
-        switch edges {
-        case .all:
-            return UICSpacer(spacing: constant) {
-                self
+        return UICModifiedView {
+            switch edges {
+            case .all:
+                return UICSpacer(spacing: constant) {
+                    self
+                }.releaseOperationCastedView()
+
+            case .vertical:
+                return UICSpacer(vertical: constant) {
+                    self
+                }.releaseOperationCastedView()
+
+            case .horizontal:
+                return UICSpacer(horizontal: constant) {
+                    self
+                }.releaseOperationCastedView()
+
+            case .top:
+                return UICSpacer(
+                    top: constant,
+                    bottom: .zero,
+                    leading: .zero,
+                    trailing: .zero,
+                    content: { self }
+                ).releaseOperationCastedView()
+
+            case .bottom:
+                return UICSpacer(
+                    top: .zero,
+                    bottom: constant,
+                    leading: .zero,
+                    trailing: .zero,
+                    content: { self }
+                ).releaseOperationCastedView()
+
+            case .left:
+                return UICSpacer(
+                    top: .zero,
+                    bottom: .zero,
+                    leading: constant,
+                    trailing: .zero,
+                    content: { self }
+                ).releaseOperationCastedView()
+
+            case .right:
+                return UICSpacer(
+                    top: .zero,
+                    bottom: .zero,
+                    leading: .zero,
+                    trailing: constant,
+                    content: { self }
+                ).releaseOperationCastedView()
             }
-        case .vertical:
-            return UICSpacer(vertical: constant) {
-                self
-            }
-        case .horizontal:
-            return UICSpacer(horizontal: constant) {
-                self
-            }
-        case .top:
-            return UICSpacer(
-                top: constant,
-                bottom: .zero,
-                leading: .zero,
-                trailing: .zero,
-                content: { self }
-            )
-        case .bottom:
-            return UICSpacer(
-                top: .zero,
-                bottom: constant,
-                leading: .zero,
-                trailing: .zero,
-                content: { self }
-            )
-        case .left:
-            return UICSpacer(
-                top: .zero,
-                bottom: .zero,
-                leading: constant,
-                trailing: .zero,
-                content: { self }
-            )
-        case .right:
-            return UICSpacer(
-                top: .zero,
-                bottom: .zero,
-                leading: .zero,
-                trailing: constant,
-                content: { self }
-            )
         }
     }
 }
