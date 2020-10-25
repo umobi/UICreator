@@ -102,58 +102,6 @@ extension CBView {
     }
 }
 
-protocol UIViewRender: UIView {
-
-}
-
-extension UIView: UIViewRender {}
-
-extension UIViewRender {
-
-    var opaqueViewCreator: MemorySwitch {
-        get { fatalError() }
-        set { fatalError() }
-    }
-
-    var appearState: Appear.State {
-        get { fatalError() }
-        set { fatalError() }
-    }
-
-    var appearHandler: UIHandler<UIView>? {
-        get { fatalError() }
-        set { fatalError() }
-    }
-
-    var disappearHandler: UIHandler<UIView>? {
-        get { fatalError() }
-        set { fatalError() }
-    }
-
-    var layoutHandler: UIHandler<UIView>? {
-        get { fatalError() }
-        set { fatalError() }
-    }
-
-    var traitHandler: UIHandler<UIView>? {
-        get { fatalError() }
-        set { fatalError() }
-    }
-
-    var viewCreator: ViewCreator! {
-        fatalError()
-    }
-
-    init(builder: ViewCreator) {
-        self.init()
-        fatalError()
-    }
-
-    func updateBuilder(_ viewCreator: ViewCreator) {
-        fatalError()
-    }
-}
-
 extension CBView {
 
     @discardableResult

@@ -45,15 +45,6 @@ private extension UIView {
     }
 }
 
-private extension ViewCreator {
-    @discardableResult
-    func onCellLayout(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.onNotRendered {
-            $0.onCellLayout(handler)
-        }
-    }
-}
-
 extension UICCollectionView: UICollectionViewDataSource {
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
         self.manager?.numberOfSections ?? 0

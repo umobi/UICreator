@@ -29,7 +29,7 @@ protocol UICViewControllerRepresentable: UICViewControllerCreator {
 }
 
 extension UICViewControllerRepresentable {
-    static func makeUIView(_ viewCreator: _ViewCreator) -> UIView {
+    static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
         let _self = viewCreator as! Self
 
         return UICControllerAdapt {

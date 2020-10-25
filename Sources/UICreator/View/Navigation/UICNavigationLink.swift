@@ -21,99 +21,85 @@
 //
 
 import Foundation
+import ConstraintBuilder
 import UIKit
 
-private class NavigationLinkView: UIView {
-    override open var isHidden: Bool {
-        get { super.isHidden }
-        set {
-            super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
+public struct UICNavigationLink: ViewCreator {
+    @Relay var isPushing: Bool
+
+    let destination: () -> ViewCreator
+    let content: () -> ViewCreator
+
+    public init(
+        _ isPushing: Relay<Bool>,
+        destination: @escaping () -> ViewCreator,
+        content: @escaping () -> ViewCreator) {
+
+        self._isPushing = isPushing
+        self.destination = destination
+        self.content = content
+    }
+
+    public init(
+        destination: @escaping () -> ViewCreator,
+        content: @escaping () -> ViewCreator) {
+
+        let value = Value(wrappedValue: false)
+
+        self._isPushing = value.projectedValue
+        self.destination = destination
+        self.content = {
+            AnyView(content())
+                .onTap { _ in
+                    value.wrappedValue = true
+                }
         }
     }
 
-    override open var frame: CGRect {
-        get { super.frame }
-        set {
-            super.frame = newValue
-            RenderManager(self)?.frame(newValue)
-        }
-    }
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
 
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
-    }
+        return AnyView(_self.content())
+            .onInTheScene {
+                weak var navigationController = $0.viewController.navigationController
+                weak var pushingView: UIViewController?
 
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
-    }
+                _self.$isPushing.distinctSync {
+                    if $0 {
+                        guard
+                            let navigationController = navigationController,
+                            pushingView == nil
+                        else { return }
 
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        RenderManager(self)?.didMoveToWindow()
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        RenderManager(self)?.layoutSubviews()
-    }
-
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        RenderManager(self)?.traitDidChange()
-    }
-}
-
-public class UICNavigationLink: ViewCreator {
-
-    public init(_ relay: Relay<Bool>, destination: @escaping () -> ViewCreator, content: @escaping () -> ViewCreator) {
-        self.loadView {
-            NavigationLinkView(builder: self)
-        }
-        .onNotRendered {
-            $0.add(priority: .required, content().releaseUIView())
-        }
-        .onInTheScene {
-            weak var navigationController = $0.viewController.navigationController
-            weak var pushingView: UIViewController?
-
-            relay.distinctSync {
-                if $0 {
-                    guard
-                        let navigationController = navigationController,
-                        pushingView == nil
-                    else { return }
-
-                    let viewController = UICHostingController(content: destination)
-                    pushingView = viewController
-                    viewController.onDisappear {
-                        if $0.isBeingPoped {
-                            relay.wrappedValue = false
+                        let viewController = UICHostingController(content: _self.destination)
+                        pushingView = viewController
+                        viewController.onDisappear {
+                            if $0.isBeingPoped {
+                                _self.isPushing = false
+                            }
                         }
+
+                        navigationController.pushViewController(
+                            viewController,
+                            animated: true
+                        )
+
+                    } else {
+                        guard
+                            let pushedView = pushingView,
+                            let beforeView = pushedView.beforeNavigationView
+                        else { return }
+
+                        pushingView = nil
+
+                        pushedView.navigationController?.popToViewController(
+                            beforeView,
+                            animated: true
+                        )
                     }
-
-                    navigationController.pushViewController(
-                        viewController,
-                        animated: true
-                    )
-
-                } else {
-                    guard
-                        let pushedView = pushingView,
-                        let beforeView = pushedView.beforeNavigationView
-                    else { return }
-
-                    pushingView = nil
-
-                    pushedView.navigationController?.popToViewController(
-                        beforeView,
-                        animated: true
-                    )
                 }
             }
-        }
+            .releaseUIView()
     }
 }
 

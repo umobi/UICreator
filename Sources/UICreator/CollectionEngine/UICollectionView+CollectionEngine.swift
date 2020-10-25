@@ -23,37 +23,42 @@
 import Foundation
 import UIKit
 
-struct MEMCollectionPayload {
-    let manager: Mutable<ListCollectionManager?> = .init(value: nil)
-    let layoutManager: Mutable<UICCollectionLayoutManager?> = .init(value: nil)
-    let layoutManagerCallback: Mutable<(() -> UICCollectionLayoutSectionElement)?> = .init(value: nil)
-}
-
 private var kMEMCollectionPayload: UInt = 0
-extension UICollectionView {
-    private var collectionPayload: MEMCollectionPayload {
-        OBJCSet(self, &kMEMCollectionPayload, policity: .OBJC_ASSOCIATION_COPY) {
-            .init()
-        }
+private extension UICollectionView {
+    struct Memory {
+        @MutableBox var manager: ListCollectionManager?
+        @MutableBox var layoutManager: UICCollectionLayoutManager?
+        @MutableBox var layoutManagerHandler: (() -> UICCollectionLayoutSectionElement)?
     }
 
+    var memory: Memory {
+        OBJCSet(
+            self,
+            &kMEMCollectionPayload,
+            policity: .OBJC_ASSOCIATION_COPY,
+            orLoad: Memory.init
+        )
+    }
+}
+
+extension UICollectionView {
     var manager: ListCollectionManager? {
-        get { self.collectionPayload.manager.value }
-        set { self.collectionPayload.manager.value = newValue }
+        get { self.memory.manager }
+        set { self.memory.manager = newValue }
     }
 
     var layoutManager: UICCollectionLayoutManager? {
-        get { self.collectionPayload.layoutManager.value }
-        set { self.collectionPayload.layoutManager.value = newValue }
+        get { self.memory.layoutManager }
+        set { self.memory.layoutManager = newValue }
     }
 
-    fileprivate var layoutManagerCallback: (() -> UICCollectionLayoutSectionElement)? {
-        get { self.collectionPayload.layoutManagerCallback.value }
-        set { self.collectionPayload.layoutManagerCallback.value = newValue }
+    fileprivate var layoutManagerHandler: (() -> UICCollectionLayoutSectionElement)? {
+        get { self.memory.layoutManagerHandler }
+        set { self.memory.layoutManagerHandler = newValue }
     }
 
     func invalidateLayoutMaker() {
-        guard let content = self.layoutManagerCallback else {
+        guard let content = self.layoutManagerHandler else {
             return
         }
 
@@ -62,13 +67,13 @@ extension UICollectionView {
     }
 }
 
-public extension UICCollection {
+public extension UIViewCreator where View: UICollectionView {
     func layoutMaker(
         @UICCollectionLayoutSectionBuilder content:
-            @escaping () -> UICCollectionLayoutSectionElement) -> Self {
+            @escaping () -> UICCollectionLayoutSectionElement) -> UICModifiedView<View> {
 
         self.onInTheScene {
-            ($0 as? View)?.layoutManagerCallback = content
+            ($0 as? View)?.layoutManagerHandler = content
             ($0 as? View)?.invalidateLayoutMaker()
         }
     }

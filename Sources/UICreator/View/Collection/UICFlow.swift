@@ -22,143 +22,219 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
-public typealias UICFlow = UICCollection<UICollectionViewFlowLayout>
+internal class FlowCollection: UICollectionView {
+    init() {
+        let flowLayout = UICollectionViewFlowLayout()
+        flowLayout.minimumLineSpacing = .zero
+        flowLayout.minimumInteritemSpacing = .zero
+        super.init(frame: .zero, collectionViewLayout: flowLayout)
+        self.makeSelfImplemented()
+    }
 
-public extension UICFlow {
-    convenience init(@UICViewBuilder contents: @escaping () -> ViewCreator) {
-        self.init(layout: {
-            let layout = Layout()
-            layout.minimumLineSpacing = .zero
-            layout.minimumInteritemSpacing = .zero
-            return layout
-        }(), contents)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override init(frame: CGRect, collectionViewLayout: UICollectionViewLayout) {
+        fatalError("init(frame:, collectionViewLayout:) has not been implemented")
+    }
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            self.renderManager.isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            self.renderManager.frame(newValue)
+        }
+    }
+
+    override public func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        self.renderManager.willMove(toSuperview: newSuperview)
+    }
+
+    override public func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        self.renderManager.didMoveToSuperview()
+    }
+
+    override public func didMoveToWindow() {
+        super.didMoveToWindow()
+        self.renderManager.didMoveToWindow()
+    }
+
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        self.renderManager.layoutSubviews()
+    }
+
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        self.renderManager.traitDidChange()
+    }
+
+    override open func reloadData() {
+        super.reloadData()
+        self.invalidateLayoutMaker()
     }
 }
 
-public extension UICFlow {
-    func line(minimumSpacing: CGFloat) -> Self {
-        return self.onRendered { _ in
-            self.dynamicCollectionViewLayout.minimumLineSpacing = minimumSpacing
+public struct UICFlow: UIViewCreator, CollectionLayout {
+    public typealias Layout = UICollectionViewFlowLayout
+    public typealias View = UICollectionView
+
+    let contents: () -> ViewCreator
+
+    init(@UICViewBuilder contents: @escaping () -> ViewCreator) {
+        self.contents = contents
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        FlowCollection()
+            .dynamicData((viewCreator as! Self).contents)
+    }
+}
+
+public extension UIViewCreator where Self: CollectionLayout, Layout: UICollectionViewFlowLayout {
+    func line(minimumSpacing: CGFloat) -> UICModifiedView<View> {
+        self.onRendered {
+            (($0 as? View)?.collectionViewLayout as? Layout)?.minimumLineSpacing = minimumSpacing
         }
     }
 
-    func interItem(minimumSpacing: CGFloat) -> Self {
-        return self.onRendered { _ in
-            self.dynamicCollectionViewLayout.minimumInteritemSpacing = minimumSpacing
+    func interItem(minimumSpacing: CGFloat) -> UICModifiedView<View> {
+        self.onRendered {
+            (($0 as? View)?.collectionViewLayout as? Layout)?.minimumInteritemSpacing = minimumSpacing
         }
     }
 
-    func item(size: CGSize) -> Self {
-        return self.onRendered { _ in
-            self.dynamicCollectionViewLayout.itemSize = size
+    func item(size: CGSize) -> UICModifiedView<View> {
+        self.onRendered {
+            (($0 as? View)?.collectionViewLayout as? Layout)?.itemSize = size
         }
     }
 
-    func item(relativeHeight height: CGFloat) -> Self {
-        return self.onLayout {
-            let itemSize = self.dynamicCollectionViewLayout.itemSize
-            self.dynamicCollectionViewLayout.itemSize = .init(
+    func item(relativeHeight height: CGFloat) -> UICModifiedView<View> {
+        self.onLayout {
+            let collectionLayout: Layout! = ($0 as? View)?.collectionViewLayout as? Layout
+
+            let itemSize = collectionLayout.itemSize
+            collectionLayout.itemSize = .init(
                 width: itemSize.width,
                 height: $0.bounds.height * height
             )
         }
     }
 
-    func item(relativeWidth width: CGFloat) -> Self {
-        return self.onLayout {
-            let itemSize = self.dynamicCollectionViewLayout.itemSize
-            self.dynamicCollectionViewLayout.itemSize = .init(
+    func item(relativeWidth width: CGFloat) -> UICModifiedView<View> {
+        self.onLayout {
+            let collectionLayout: Layout! = ($0 as? View)?.collectionViewLayout as? Layout
+
+            let itemSize = collectionLayout.itemSize
+            collectionLayout.itemSize = .init(
                 width: $0.bounds.width * width,
                 height: itemSize.height
             )
         }
     }
 
-    func item(height: CGFloat) -> Self {
-        return self.onLayout { _ in
-            let itemSize = self.dynamicCollectionViewLayout.itemSize
-            self.dynamicCollectionViewLayout.itemSize = .init(
+    func item(height: CGFloat) -> UICModifiedView<View> {
+        self.onLayout {
+            let collectionLayout: Layout! = ($0 as? View)?.collectionViewLayout as? Layout
+
+            let itemSize = collectionLayout.itemSize
+            collectionLayout.itemSize = .init(
                 width: itemSize.width,
                 height: height
             )
         }
     }
 
-    func item(width: CGFloat) -> Self {
-        return self.onLayout { _ in
-            let itemSize = self.dynamicCollectionViewLayout.itemSize
-            self.dynamicCollectionViewLayout.itemSize = .init(
+    func item(width: CGFloat) -> UICModifiedView<View> {
+        self.onLayout {
+            let collectionLayout: Layout! = ($0 as? View)?.collectionViewLayout as? Layout
+
+            let itemSize = collectionLayout.itemSize
+            collectionLayout.itemSize = .init(
                 width: width,
                 height: itemSize.height
             )
         }
     }
 
-    func item(aspectRatioHeight constant: CGFloat) -> Self {
-        return self.onLayout {
-            self.dynamicCollectionViewLayout.itemSize = .init(
+    func item(aspectRatioHeight constant: CGFloat) -> UICModifiedView<View> {
+        self.onLayout {
+            (($0 as? View)?.collectionViewLayout as? Layout)?.itemSize = .init(
                 width: $0.bounds.height * constant,
                 height: $0.bounds.height
             )
         }
     }
 
-    func item(aspectRatioWidth constant: CGFloat) -> Self {
-        return self.onLayout {
-            self.dynamicCollectionViewLayout.itemSize = .init(
+    func item(aspectRatioWidth constant: CGFloat) -> UICModifiedView<View> {
+        self.onLayout {
+            (($0 as? View)?.collectionViewLayout as? Layout)?.itemSize = .init(
                 width: $0.bounds.width,
                 height: $0.bounds.width * constant
             )
         }
     }
 
-    func item(estimatedSize: CGSize) -> Self {
-        return self.onRendered { _ in
-            self.dynamicCollectionViewLayout.estimatedItemSize = estimatedSize
+    func item(estimatedSize: CGSize) -> UICModifiedView<View> {
+        self.onRendered {
+            (($0 as? View)?.collectionViewLayout as? Layout)?.estimatedItemSize = estimatedSize
         }
     }
 
-    func scroll(direction: UICollectionView.ScrollDirection) -> Self {
-        return self.onRendered { _ in
-            self.dynamicCollectionViewLayout.scrollDirection = direction
+    func scroll(direction: UICollectionView.ScrollDirection) -> UICModifiedView<View> {
+        self.onRendered {
+            (($0 as? View)?.collectionViewLayout as? Layout)?.scrollDirection = direction
         }
     }
 
-    func header(referenceSize size: CGSize) -> Self {
-        return self.onRendered { _ in
-            self.dynamicCollectionViewLayout.headerReferenceSize = size
+    func header(referenceSize size: CGSize) -> UICModifiedView<View> {
+        self.onRendered {
+            (($0 as? View)?.collectionViewLayout as? Layout)?.headerReferenceSize = size
         }
     }
 
-    func footer(referenceSize size: CGSize) -> Self {
-        return self.onRendered { _ in
-            self.dynamicCollectionViewLayout.footerReferenceSize = size
+    func footer(referenceSize size: CGSize) -> UICModifiedView<View> {
+        self.onRendered {
+            (($0 as? View)?.collectionViewLayout as? Layout)?.footerReferenceSize = size
         }
     }
 
-    func section(inset: UIEdgeInsets) -> Self {
-        return self.onRendered { _ in
-            self.dynamicCollectionViewLayout.sectionInset = inset
+    func section(inset: UIEdgeInsets) -> UICModifiedView<View> {
+        self.onRendered {
+            (($0 as? View)?.collectionViewLayout as? Layout)?.sectionInset = inset
         }
     }
 
     @available(iOS 11.0, tvOS 11.0, *)
-    func section(insetReference: Layout.SectionInsetReference) -> Self {
-        return self.onRendered { _ in
-            self.dynamicCollectionViewLayout.sectionInsetReference = insetReference
+    func section(insetReference: Layout.SectionInsetReference) -> UICModifiedView<View> {
+        self.onRendered {
+            (($0 as? View)?.collectionViewLayout as? Layout)?.sectionInsetReference = insetReference
         }
     }
 
-    func section(headersPinToVisibleBounds flag: Bool) -> Self {
-        return self.onRendered { _ in
-            self.dynamicCollectionViewLayout.sectionHeadersPinToVisibleBounds = flag
+    func section(headersPinToVisibleBounds flag: Bool) -> UICModifiedView<View> {
+        self.onRendered {
+            (($0 as? View)?.collectionViewLayout as? Layout)?.sectionHeadersPinToVisibleBounds = flag
         }
     }
 
-    func section(footersPinToVisibleBounds flag: Bool) -> Self {
-        return self.onRendered { _ in
-            self.dynamicCollectionViewLayout.sectionFootersPinToVisibleBounds = flag
+    func section(footersPinToVisibleBounds flag: Bool) -> UICModifiedView<View> {
+        self.onRendered {
+            (($0 as? View)?.collectionViewLayout as? Layout)?.sectionFootersPinToVisibleBounds = flag
         }
     }
 }

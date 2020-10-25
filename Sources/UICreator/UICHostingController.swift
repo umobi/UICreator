@@ -10,30 +10,22 @@ import UIKit
 import ConstraintBuilder
 
 public class UICHostingController: UIViewController {
-    private let viewCreator: _ViewCreator
+    private let viewCreator: ViewCreator
+
+    public init(content: @escaping () -> ViewCreator) {
+        self.viewCreator = content()
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    public init(rootView: ViewCreator) {
+        self.viewCreator = rootView
+        super.init(nibName: nil, bundle: nil)
+    }
 
     public init() {
         UICreator.Fatal
             .Builder("init() has not been implemented")
             .die()
-    }
-
-    public init(content: @escaping () -> ViewCreator) {
-        fatalError()
-    }
-
-    public init(content: @escaping () -> _ViewCreator) {
-        self.viewCreator = content()
-        super.init(nibName: nil, bundle: nil)
-    }
-
-    public init(rootView: _ViewCreator) {
-        self.viewCreator = rootView
-        super.init(nibName: nil, bundle: nil)
-    }
-
-    public init(view: ViewCreator) {
-        fatalError()
     }
 
     required public init?(coder: NSCoder) {

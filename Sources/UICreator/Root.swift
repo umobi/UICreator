@@ -38,14 +38,14 @@ public class RootView: UIView, ViewCreatorNoLayoutConstraints {
 
     override open func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
+        self.renderManager.willMove(toSuperview: newSuperview)
     }
 
     override open var isHidden: Bool {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
+            self.renderManager.isHidden(newValue)
         }
     }
 
@@ -53,28 +53,28 @@ public class RootView: UIView, ViewCreatorNoLayoutConstraints {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self)?.frame(newValue)
+            self.renderManager.frame(newValue)
         }
     }
 
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
+        self.renderManager.didMoveToSuperview()
     }
 
     override open func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self)?.didMoveToWindow()
+        self.renderManager.didMoveToWindow()
     }
 
     override open func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self)?.layoutSubviews()
+        self.renderManager.layoutSubviews()
     }
 
     override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        RenderManager(self)?.traitDidChange()
+        self.renderManager.traitDidChange()
     }
 }
 

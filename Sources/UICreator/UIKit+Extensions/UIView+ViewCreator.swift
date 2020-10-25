@@ -24,86 +24,86 @@ import Foundation
 import UIKit
 
 // swiftlint:disable file_length
-public extension ViewCreator {
-    func backgroundColor(_ color: UIColor?) -> Self {
-        return self.onNotRendered {
+public extension UIViewCreator {
+    func backgroundColor(_ color: UIColor?) -> UICModifiedView<View> {
+        self.onNotRendered {
             $0.backgroundColor = color
         }
     }
 
-    func tintColor(_ color: UIColor?) -> Self {
+    func tintColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.tintColor = color
         }
     }
 
-    func contentScaleFactor(_ scale: CGFloat) -> Self {
+    func contentScaleFactor(_ scale: CGFloat) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.contentScaleFactor = scale
         }
     }
 
-    func zIndex(_ zIndex: CGFloat) -> Self {
+    func zIndex(_ zIndex: CGFloat) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.layer.zPosition = zIndex
         }
     }
 
-    func alpha(_ constant: CGFloat) -> Self {
-        return self.onNotRendered {
+    func alpha(_ constant: CGFloat) -> UICModifiedView<View> {
+        self.onNotRendered {
             $0.alpha = constant
         }
     }
 
-    func `as`<UIElement: UIView>(_ reference: UICOutlet<UIElement>) -> Self {
-        return self.onNotRendered { [reference] in
+    func `as`<UIElement: UIView>(_ reference: UICOutlet<UIElement>) -> UICModifiedView<View> {
+        self.onNotRendered { [reference] in
             reference.ref($0 as? UIElement)
         }
     }
 }
 
-public extension ViewCreator {
-    func shadowRadius(_ radius: CGFloat) -> Self {
-        return self.onNotRendered {
+public extension UIViewCreator {
+    func shadowRadius(_ radius: CGFloat) -> UICModifiedView<View> {
+        self.onNotRendered {
             $0.layer.shadowRadius = radius
         }
     }
 
-    func shadowOffset(_ offset: CGSize) -> Self {
-        return self.onNotRendered {
+    func shadowOffset(_ offset: CGSize) -> UICModifiedView<View> {
+        self.onNotRendered {
             $0.layer.shadowOffset = offset
         }
     }
 
     // swiftlint:disable identifier_name
-    func shadowOffset(x: CGFloat) -> Self {
-        return self.onNotRendered {
+    func shadowOffset(x: CGFloat) -> UICModifiedView<View> {
+        self.onNotRendered {
             $0.layer.shadowOffset = .init(width: x, height: 0)
         }
     }
 
     // swiftlint:disable identifier_name
-    func shadowOffset(y: CGFloat) -> Self {
-        return self.onNotRendered {
+    func shadowOffset(y: CGFloat) -> UICModifiedView<View> {
+        self.onNotRendered {
             $0.layer.shadowOffset = .init(width: 0, height: y)
         }
     }
 
     // swiftlint:disable identifier_name
-    func shadowOffset(x: CGFloat, y: CGFloat) -> Self {
-        return self.onNotRendered {
+    func shadowOffset(x: CGFloat, y: CGFloat) -> UICModifiedView<View> {
+        self.onNotRendered {
             $0.layer.shadowOffset = .init(width: x, height: y)
         }
     }
 
-    func shadowOcupacity(_ alpha: CGFloat) -> Self {
-        return self.onNotRendered {
+    func shadowOcupacity(_ alpha: CGFloat) -> UICModifiedView<View> {
+        self.onNotRendered {
             $0.layer.shadowOpacity = Float(alpha)
         }
     }
 
-    func shadowColor(_ color: UIColor?) -> Self {
-        return self.onNotRendered {
+    func shadowColor(_ color: UIColor?) -> UICModifiedView<View> {
+        self.onNotRendered {
             $0.layer.shadowColor = color?.cgColor
             $0.onTrait {
                 $0.layer.shadowColor = color?.cgColor
@@ -111,42 +111,42 @@ public extension ViewCreator {
         }
     }
 
-    func clipsToBounds(_ flag: Bool) -> Self {
-        return self.onInTheScene {
+    func clipsToBounds(_ flag: Bool) -> UICModifiedView<View> {
+        self.onInTheScene {
             $0.clipsToBounds = flag
         }
     }
 
-    func isOpaque(_ flag: Bool) -> Self {
-        return self.onInTheScene {
+    func isOpaque(_ flag: Bool) -> UICModifiedView<View> {
+        self.onInTheScene {
             $0.isOpaque = flag
         }
     }
 
-    func isHidden(_ flag: Bool) -> Self {
-        return self.onInTheScene {
+    func isHidden(_ flag: Bool) -> UICModifiedView<View> {
+        self.onInTheScene {
             $0.isHidden = flag
         }
     }
 
-    func isUserInteractionEnabled(_ flag: Bool) -> Self {
-        return self.onInTheScene {
+    func isUserInteractionEnabled(_ flag: Bool) -> UICModifiedView<View> {
+        self.onInTheScene {
             $0.isUserInteractionEnabled = flag
         }
     }
 
     #if os(iOS)
-    func isExclusiveTouch(_ flag: Bool) -> Self {
-        return self.onInTheScene {
+    func isExclusiveTouch(_ flag: Bool) -> UICModifiedView<View> {
+        self.onInTheScene {
             $0.isExclusiveTouch = flag
         }
     }
     #endif
 }
 
-public extension ViewCreator {
+public extension UIViewCreator {
     #if os(iOS)
-    func statusBar(_ appearanceStyle: UIStatusBarStyle) -> Self {
+    func statusBar(_ appearanceStyle: UIStatusBarStyle) -> UICModifiedView<View> {
         self.onInTheScene {
             ($0.viewController as? UICHostingController)?.statusBarStyle = appearanceStyle
         }
@@ -154,24 +154,24 @@ public extension ViewCreator {
     #endif
 }
 
-public extension ViewCreator {
+public extension UIViewCreator {
     @available(iOS 13.0, tvOS 13.0, *)
-    func transform3d(_ transform3d: CATransform3D) -> Self {
+    func transform3d(_ transform3d: CATransform3D) -> UICModifiedView<View> {
         self.onRendered {
             $0.transform3D = transform3d
         }
     }
 
-    func transform(_ transform: CGAffineTransform) -> Self {
+    func transform(_ transform: CGAffineTransform) -> UICModifiedView<View> {
         self.onRendered {
             $0.transform = transform
         }
     }
 }
 
-public extension ViewCreator {
+public extension UIViewCreator {
     @available(iOS 13, tvOS 13, *)
-    func userInterfaceStyle(_ style: UIUserInterfaceStyle) -> Self {
+    func userInterfaceStyle(_ style: UIUserInterfaceStyle) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.overrideUserInterfaceStyle = style
         }
@@ -179,19 +179,19 @@ public extension ViewCreator {
 }
 
 public extension UIViewCreator {
-    func accessibily(_ handler: @escaping () -> UIAccessibilityCreator<Self>) -> Self {
+    func accessibily(_ handler: @escaping () -> UIAccessibilityCreator<Self>) -> UICModifiedView<View> {
         handler().viewCreator(self)
     }
 }
 
-public extension ViewCreator {
+public extension UIViewCreator {
     /**
         Use this function to move the view inside superview
         If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
      */
     @discardableResult
     // swiftlint:disable identifier_name
-    func frame(x: CGFloat) -> Self {
+    func frame(x: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
             let frame = $0.frame
             $0.frame = .init(x: x, y: frame.origin.y, width: frame.width, height: frame.height)
@@ -204,7 +204,7 @@ public extension ViewCreator {
      */
     // swiftlint:disable identifier_name
     @discardableResult
-    func frame(y: CGFloat) -> Self {
+    func frame(y: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
             let frame = $0.frame
             $0.frame = .init(x: frame.origin.x, y: y, width: frame.width, height: frame.height)
@@ -216,7 +216,7 @@ public extension ViewCreator {
         If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
      */
     @discardableResult
-    func frame(height: CGFloat) -> Self {
+    func frame(height: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
             let frame = $0.frame
             $0.frame = .init(x: frame.origin.x, y: frame.origin.y, width: frame.width, height: height)
@@ -228,7 +228,7 @@ public extension ViewCreator {
         If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
      */
     @discardableResult
-    func frame(width: CGFloat) -> Self {
+    func frame(width: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
             let frame = $0.frame
             $0.frame = .init(x: frame.origin.x, y: frame.origin.y, width: width, height: frame.height)
@@ -236,14 +236,14 @@ public extension ViewCreator {
     }
 }
 
-public extension ViewCreator {
+public extension UIViewCreator {
 
     /**
         Use this function to move the view inside superview
         If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
      */
     @discardableResult
-    func frame(insetByX xInset: CGFloat) -> Self {
+    func frame(insetByX xInset: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
             let frame = $0.frame
             $0.frame = frame.insetBy(dx: xInset, dy: 0)
@@ -255,7 +255,7 @@ public extension ViewCreator {
         If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
      */
     @discardableResult
-    func frame(insetByY yInset: CGFloat) -> Self {
+    func frame(insetByY yInset: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
             let frame = $0.frame
             $0.frame = frame.insetBy(dx: 0, dy: yInset)
@@ -263,14 +263,14 @@ public extension ViewCreator {
     }
 }
 
-public extension ViewCreator {
+public extension UIViewCreator {
 
     /**
         Use this function to move the view inside superview
         If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
      */
     @discardableResult
-    func frame(offsetByX xOffset: CGFloat) -> Self {
+    func frame(offsetByX xOffset: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
             let frame = $0.frame
             $0.frame = frame.offsetBy(dx: xOffset, dy: 0)
@@ -282,7 +282,7 @@ public extension ViewCreator {
         If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
      */
     @discardableResult
-    func frame(offsetByY yOffset: CGFloat) -> Self {
+    func frame(offsetByY yOffset: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
             let frame = $0.frame
             $0.frame = frame.offsetBy(dx: 0, dy: yOffset)
@@ -290,102 +290,139 @@ public extension ViewCreator {
     }
 }
 
-public extension ViewCreator {
+public extension UIViewCreator {
     /// Set frame to UIView
-    func frame(_ frame: CGRect) -> Self {
+    func frame(_ frame: CGRect) -> UICModifiedView<View> {
         self.onRendered {
             $0.frame = frame
         }
     }
 }
 
-public extension ViewCreator {
+public extension UIViewCreator {
     @discardableResult
     func animate(
+        _ isAnimating: Relay<Bool>,
         _ duration: TimeInterval,
-        animations: @escaping (UIView) -> Void) -> Self {
+        animations: @escaping (UIView) -> Void) -> UICModifiedView<View> {
 
-        UIView.animate(withDuration: duration, animations: {
-            animations(self.uiView)
-            self.uiView.setNeedsLayout()
-        }, completion: nil)
+        self.onInTheScene {
+            weak var view = $0
 
-        return self
+            isAnimating.sync {
+                guard $0, let view = view else {
+                    return
+                }
+
+                UIView.animate(withDuration: duration, animations: {
+                    animations(view)
+                    view.setNeedsLayout()
+                }, completion: nil)
+            }
+        }
     }
 
     @discardableResult
     func animate(
+        _ isAnimating: Relay<Bool>,
         _ duration: TimeInterval,
         animations: @escaping (UIView) -> Void,
-        completion: @escaping (Bool) -> Void) -> Self {
+        completion: @escaping (Bool) -> Void) -> UICModifiedView<View> {
 
-        UIView.animate(withDuration: duration, animations: {
-            animations(self.uiView)
-            self.uiView.setNeedsLayout()
-        }, completion: completion)
+        self.onInTheScene {
+            weak var view = $0
 
-        return self
+            isAnimating.sync {
+                guard $0, let view = view else {
+                    return
+                }
+
+                UIView.animate(withDuration: duration, animations: {
+                    animations(view)
+                    view.setNeedsLayout()
+                }, completion: completion)
+            }
+        }
     }
 
     @discardableResult
     func animate(
+        _ isAnimating: Relay<Bool>,
         _ duration: TimeInterval,
         delay: TimeInterval,
         options: UIView.AnimationOptions,
         animations: @escaping (UIView) -> Void,
-        completion: ((Bool) -> Void)? = nil) -> Self {
+        completion: ((Bool) -> Void)? = nil) -> UICModifiedView<View> {
 
-        UIView.animate(
-            withDuration: duration,
-            delay: delay,
-            options: options,
-            animations: {
-                animations(self.uiView)
-                self.uiView.setNeedsLayout()
-            },
-            completion: completion
-        )
-        return self
+        self.onInTheScene {
+            weak var view = $0
+
+            isAnimating.sync {
+                guard $0, let view = view else {
+                    return
+                }
+
+                UIView.animate(
+                    withDuration: duration,
+                    delay: delay,
+                    options: options,
+                    animations: {
+                        animations(view)
+                        view.setNeedsLayout()
+                    },
+                    completion: completion
+                )
+            }
+        }
     }
 
     @discardableResult
     func animateWithKeyframes(
+        _ isAnimating: Relay<Bool>,
         _ duration: TimeInterval,
         delay: TimeInterval = 0,
         options: UIView.KeyframeAnimationOptions = [],
         animations animationsSequence: UIView.CreatorKeyframeSequence,
-        completion: ((Bool) -> Void)? = nil) -> Self {
+        completion: ((Bool) -> Void)? = nil) -> UICModifiedView<View> {
 
-        UIView.animateKeyframes(
-            withDuration: duration,
-            delay: delay,
-            options: options,
-            animations: {
-                animationsSequence.sequence.forEach { keyframe in
-                    UIView.addKeyframe(
-                        withRelativeStartTime: keyframe.startTime,
-                        relativeDuration: keyframe.duration,
-                        animations: {
-                            keyframe.animations(self.uiView)
-                        })
+        self.onInTheScene {
+            weak var view = $0
+
+            isAnimating.sync {
+                guard $0, let view = view else {
+                    return
                 }
-            },
-            completion: completion
-        )
-        return self
+
+                UIView.animateKeyframes(
+                    withDuration: duration,
+                    delay: delay,
+                    options: options,
+                    animations: {
+                        animationsSequence.sequence.forEach { keyframe in
+                            UIView.addKeyframe(
+                                withRelativeStartTime: keyframe.startTime,
+                                relativeDuration: keyframe.duration,
+                                animations: {
+                                    keyframe.animations(view)
+                                })
+                        }
+                    },
+                    completion: completion)
+            }
+        }
     }
 }
 
-public extension ViewCreator {
-    func addLayer(_ handler: @escaping (UIView) -> CALayer) -> Self {
+public extension UIViewCreator {
+    func addLayer(_ handler: @escaping (UIView) -> CALayer) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.layer.addSublayer(handler($0))
         }
     }
 }
 
-public extension ViewCreator {
-    func backgroundColor(_ color: Relay<UIColor>) -> Self {
+public extension UIViewCreator {
+    func backgroundColor(_ color: Relay<UIColor>) -> UICModifiedView<View> {
         self.onNotRendered { view in
             weak var view = view
             color.sync {
@@ -395,8 +432,8 @@ public extension ViewCreator {
     }
 }
 
-public extension ViewCreator {
-    func isUserInteractionEnabled(_ value: Relay<Bool>) -> Self {
+public extension UIViewCreator {
+    func isUserInteractionEnabled(_ value: Relay<Bool>) -> UICModifiedView<View> {
         self.onInTheScene {
             weak var view = $0
             value.sync {
@@ -406,8 +443,8 @@ public extension ViewCreator {
     }
 }
 
-public extension ViewCreator {
-    func isHidden(_ isHidden: Relay<Bool>) -> Self {
+public extension UIViewCreator {
+    func isHidden(_ isHidden: Relay<Bool>) -> UICModifiedView<View> {
         self.onNotRendered { view in
             weak var weakView = view
             isHidden.sync {
@@ -416,7 +453,7 @@ public extension ViewCreator {
         }
     }
 
-    func tintColor(_ tintColor: Relay<UIColor>) -> Self {
+    func tintColor(_ tintColor: Relay<UIColor>) -> UICModifiedView<View> {
         self.onNotRendered { view in
             weak var weakView = view
             tintColor.sync {

@@ -21,46 +21,57 @@
 //
 
 import Foundation
+import ConstraintBuilder
 
 @_functionBuilder
 public struct UICViewBuilder {
     static public func buildBlock(_ segments: ViewCreator...) -> ViewCreator {
-        CombinedViews(children: segments)
+        Combined(segments)
     }
 
     static public func buildEither(first: ViewCreator) -> ViewCreator {
-        return first
+        first
     }
 
     static public func buildEither(second: ViewCreator) -> ViewCreator {
-        return second
+        second
     }
 
     static public func buildIf(_ view: ViewCreator?) -> ViewCreator {
-        view ?? EmptyViewResult()
+        view ?? Empty()
     }
 }
 
-internal class CombinedViews: ViewCreator {
-    let children: [ViewCreator]
+private extension UICViewBuilder {
+    struct Combined: ViewCreator {
+        let children: [ViewCreator]
 
-    init(children: [ViewCreator]) {
-        self.children = children
+        init(_ children: [ViewCreator]) {
+            self.children = children
+        }
+
+        static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+            fatalError()
+        }
     }
 }
 
-internal class EmptyViewResult: ViewCreator {
-
+private extension UICViewBuilder {
+    struct Empty: ViewCreator {
+        static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+            fatalError()
+        }
+    }
 }
 
 internal extension ViewCreator {
     var zip: [ViewCreator] {
         switch self {
-        case let views as CombinedViews:
+        case let views as UICViewBuilder.Combined:
             return views.children.filter {
-                !($0 is EmptyViewResult)
+                !($0 is UICViewBuilder.Empty)
             }.reduce([]) { $0 + $1.zip }
-        case is EmptyViewResult:
+        case is UICViewBuilder.Empty:
             return []
         default:
             return [self]

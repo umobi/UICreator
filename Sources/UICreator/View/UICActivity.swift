@@ -22,14 +22,32 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 public class ActivityIndicatorView: UIActivityIndicatorView {
+
+    init() {
+        super.init(frame: .zero)
+        self.makeSelfImplemented()
+    }
+
+    public override init(style: UIActivityIndicatorView.Style) {
+        fatalError("init(style:) has not been implemented")
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    public override init(frame: CGRect) {
+        fatalError("init(frame:) has not been implemented")
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
+            self.renderManager.isHidden(newValue)
         }
     }
 
@@ -37,57 +55,63 @@ public class ActivityIndicatorView: UIActivityIndicatorView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self)?.frame(newValue)
+            self.renderManager.frame(newValue)
         }
     }
 
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
+        self.renderManager.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
+        self.renderManager.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self)?.didMoveToWindow()
+        self.renderManager.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self)?.layoutSubviews()
+        self.renderManager.layoutSubviews()
     }
 
     override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        RenderManager(self)?.traitDidChange()
+        self.renderManager.traitDidChange()
     }
 }
 
-public class UICActivity: UIViewCreator {
+public struct UICActivity: UIViewCreator {
     public typealias View = ActivityIndicatorView
 
-    public init(style: View.Style) {
-        self.loadView { [unowned self] in
-            View.init(builder: self)
-        }.onNotRendered {
-            ($0 as? View)?.style = style
+    private let style: View.Style
+
+    public init(_ style: View.Style) {
+        self.style = style
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return View().onNotRendered {
+            ($0 as? View)?.style = _self.style
         }
     }
 }
 
 public extension UIViewCreator where View: UIActivityIndicatorView {
 
-    func color(_ color: UIColor) -> Self {
+    func color(_ color: UIColor) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.color = color
         }
     }
 
-    func hidesWhenStopped(_ flag: Bool) -> Self {
+    func hidesWhenStopped(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.hidesWhenStopped = flag
         }
@@ -95,7 +119,7 @@ public extension UIViewCreator where View: UIActivityIndicatorView {
 }
 
 public extension UIViewCreator where View: UIActivityIndicatorView {
-    func isLoading(_ isLoading: Relay<Bool>) -> Self {
+    func isLoading(_ isLoading: Relay<Bool>) -> UICModifiedView<View> {
         self.onNotRendered { view in
             weak var view = view
             isLoading.sync {
@@ -111,7 +135,7 @@ public extension UIViewCreator where View: UIActivityIndicatorView {
 }
 
 public extension UIViewCreator where View: UIActivityIndicatorView {
-    func color(_ color: Relay<UIColor>) -> Self {
+    func color(_ color: Relay<UIColor>) -> UICModifiedView<View> {
         self.onNotRendered { view in
             weak var view = view
             color.sync {

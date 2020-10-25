@@ -40,7 +40,7 @@ class _EmptyView: UIView {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
+            self.renderManager.isHidden(newValue)
         }
     }
 
@@ -48,33 +48,33 @@ class _EmptyView: UIView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self)?.frame(newValue)
+            self.renderManager.frame(newValue)
         }
     }
 
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
+        self.renderManager.willMove(toSuperview: newSuperview)
     }
 
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
+        self.renderManager.didMoveToSuperview()
     }
 
     override open func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self)?.didMoveToWindow()
+        self.renderManager.didMoveToWindow()
     }
 
     override open func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self)?.layoutSubviews()
+        self.renderManager.layoutSubviews()
     }
 
     override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        RenderManager(self)?.traitDidChange()
+        self.renderManager.traitDidChange()
     }
 }
 
@@ -89,6 +89,7 @@ public struct EmptyView: UIViewCreator {
 }
 
 public struct UICForEach<Content, Value>: ViewCreator, ForEachCreator where Content: UIViewCreator, Value: Collection {
+    @MutableBox var view: Reference<UIView> = .nil
     @MutableBox var syncLoad: (() -> Void)?
     let viewType: ViewCreator.Type
 
@@ -97,9 +98,9 @@ public struct UICForEach<Content, Value>: ViewCreator, ForEachCreator where Cont
 
     private func startObservation() {
         let content = self.content
-        self.manager?.viewsDidChange(placeholderView: self.uiView, self.relay.map {
+        self.manager?.viewsDidChange(placeholderView: self.view.value, self.relay.map {
             $0.map { element in
-                return {
+                {
                     content(element)
                 }
             }
@@ -124,6 +125,15 @@ public struct UICForEach<Content, Value>: ViewCreator, ForEachCreator where Cont
     func load() {
         let syncLoad = self.syncLoad
         self.syncLoad = nil
+
+        self.view = {
+            if let view = self.view.value {
+                return .weak(view)
+            }
+
+            return .strong(Self.makeUIView(self))
+        }()
+
         syncLoad?()
     }
 
@@ -135,7 +145,8 @@ public struct UICForEach<Content, Value>: ViewCreator, ForEachCreator where Cont
         EmptyView()
             .height(equalTo: 0, priority: .defaultHigh)
             .width(equalTo: 0, priority: .defaultHigh)
-            .onNotRendered { _ in
+            .onNotRendered {
+                (viewCreator as! Self).view = .weak($0)
                 (viewCreator as! Self).load()
             }
             .releaseUIView()

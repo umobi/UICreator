@@ -22,24 +22,32 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 public protocol CollectionLayout: UIViewCreator where View: UICollectionView {
     associatedtype Layout: UICollectionViewLayout
 }
 
-public extension CollectionLayout {
-    var dynamicCollectionViewLayout: Layout! {
-        (self.uiView as? View)?.collectionViewLayout as? Layout
-    }
-}
-
 internal class UICCollectionView: UICollectionView {
+
+    init(_ layout: UICollectionViewLayout) {
+        super.init(frame: .zero, collectionViewLayout: layout)
+        self.makeSelfImplemented()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override init(frame: CGRect, collectionViewLayout: UICollectionViewLayout) {
+        fatalError("init(frame:, collectionViewLayout:) has not been implemented")
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
+            self.renderManager.isHidden(newValue)
         }
     }
 
@@ -47,33 +55,33 @@ internal class UICCollectionView: UICollectionView {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self)?.frame(newValue)
+            self.renderManager.frame(newValue)
         }
     }
 
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
+        self.renderManager.willMove(toSuperview: newSuperview)
     }
 
     override public func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
+        self.renderManager.didMoveToSuperview()
     }
 
     override public func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self)?.didMoveToWindow()
+        self.renderManager.didMoveToWindow()
     }
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self)?.layoutSubviews()
+        self.renderManager.layoutSubviews()
     }
 
     override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        RenderManager(self)?.traitDidChange()
+        self.renderManager.traitDidChange()
     }
 
     override open func reloadData() {
@@ -82,63 +90,43 @@ internal class UICCollectionView: UICollectionView {
     }
 }
 
-public class UICCollection<Layout>: UIViewCreator, CollectionLayout where Layout: UICollectionViewLayout {
+public struct UICCollection<Layout>: UIViewCreator, CollectionLayout where Layout: UICollectionViewLayout {
     public typealias View = UICollectionView
 
+    private let layout: Layout
+
     public init(layout: Layout) {
-        self.loadView { [unowned self] in
-            let view = UICCollectionView(frame: .zero, collectionViewLayout: layout)
-            view.updateBuilder(self)
-            return view
-        }
+        self.layout = layout
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return UICCollectionView(_self.layout)
     }
 }
 
 public extension UIViewCreator where View: UICollectionView {
-    func addCell(for identifier: String, _ cellClass: AnyClass?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.register(cellClass, forCellWithReuseIdentifier: identifier)
-        }
-    }
-
-    func addCell(for identifier: String, _ uiNib: UINib?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.register(uiNib, forCellWithReuseIdentifier: identifier)
-        }
-    }
-
-    func addSupplementary(for identifier: String, viewOfKind kind: String, _ cellClass: AnyClass?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.register(cellClass, forSupplementaryViewOfKind: kind, withReuseIdentifier: identifier)
-        }
-    }
-
-    func addSupplementary(for identifier: String, viewOfKind kind: String, _ uiNib: UINib?) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.register(uiNib, forSupplementaryViewOfKind: kind, withReuseIdentifier: identifier)
-        }
-    }
-
-    func allowsMultipleSelection(_ flag: Bool) -> Self {
+    func allowsMultipleSelection(_ flag: Bool) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.allowsMultipleSelection = flag
         }
     }
 
-    func allowsSelection(_ flag: Bool) -> Self {
+    func allowsSelection(_ flag: Bool) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.allowsSelection = flag
         }
     }
 
-    func background<Background: ViewCreator>(_ content: @escaping () -> Background) -> Self {
+    func background<Background: ViewCreator>(_ content: @escaping () -> Background) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.backgroundView = ViewAdaptor(content().releaseUIView())
         }
     }
 
     #if os(iOS)
-    func isPaged(_ flag: Bool) -> Self {
+    func isPaged(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.isPagingEnabled = flag
         }

@@ -29,6 +29,7 @@ public protocol ViewCreatorNoLayoutConstraints {}
 enum Reference<Value> where Value: NSObject {
     case weak(Weak)
     case strong(Strong)
+    case `nil`
 
     var value: Value! {
         switch self {
@@ -36,6 +37,8 @@ enum Reference<Value> where Value: NSObject {
             return weak.value
         case .strong(let strong):
             return strong.value
+        case .nil:
+            return nil
         }
     }
 
@@ -139,14 +142,14 @@ class ViewAdaptor: UIView, ViewCreatorNoLayoutConstraints {
     }
 }
 
-struct UICAdapt<View>: _UIViewCreator where View: UIView {
+struct UICAdapt<View>: UIViewCreator where View: UIView {
     private let viewHandler: () -> View
 
     init(_ viewHandler: @escaping () -> View) {
         self.viewHandler = viewHandler
     }
 
-    static func makeUIView(_ viewCreator: _ViewCreator) -> UIView {
+    static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
         ViewAdaptor((viewCreator as! Self).viewHandler())
     }
 }

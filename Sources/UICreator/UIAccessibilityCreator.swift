@@ -26,24 +26,26 @@ import UIKit
 public struct UIAccessibilityCreator<ViewCreator: UIViewCreator> {
     public typealias View = ViewCreator.View
 
-    private let modifierHandler: (ViewCreator) -> ViewCreator
+    private let modifierHandler: (UICModifiedView<View>) -> UICModifiedView<View>
 
     public init() {
         self.modifierHandler = { $0 }
     }
 
-    private init(_ original: UIAccessibilityCreator<ViewCreator>, modifier: @escaping (ViewCreator) -> ViewCreator) {
+    private init(_ original: UIAccessibilityCreator<ViewCreator>, modifier: @escaping (UICModifiedView<View>) -> UICModifiedView<View>) {
         self.modifierHandler = {
             modifier(original.modifierHandler($0))
         }
     }
 
-    public func modify(_ handler: @escaping (ViewCreator) -> ViewCreator) -> Self {
+    public func modify(_ handler: @escaping (UICModifiedView<View>) -> UICModifiedView<View>) -> Self {
         .init(self, modifier: handler)
     }
 
-    func viewCreator(_ viewCreator: ViewCreator) -> ViewCreator {
-        self.modifierHandler(viewCreator)
+    func viewCreator(_ viewCreator: ViewCreator) -> UICModifiedView<View> {
+        self.modifierHandler(UICModifiedView {
+            viewCreator.releaseOperationCastedView()
+        })
     }
 }
 

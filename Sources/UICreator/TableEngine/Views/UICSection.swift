@@ -20,17 +20,16 @@
 // THE SOFTWARE.
 //
 
-import Foundation
-import UIKit
+import ConstraintBuilder
 
-public class UICSection: ViewCreator {
-    public let content: [ViewCreator]
+public struct UICSection: ViewCreator {
+    public let contents: () -> ViewCreator
 
-    public convenience init(@UICViewBuilder _ contents: @escaping () -> ViewCreator) {
-        self.init(contents().zip)
+    public init(@UICViewBuilder _ contents: @escaping () -> ViewCreator) {
+        self.contents = contents
     }
 
-    internal init(_ content: [ViewCreator]) {
-        self.content = content
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        fatalError()
     }
 }

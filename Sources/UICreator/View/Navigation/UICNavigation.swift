@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-public protocol UICViewControllerCreator: _UIViewCreator where View == ViewControllerAdaptor<Self.ViewController> {
+public protocol UICViewControllerCreator: UIViewCreator where View == ViewControllerAdaptor<Self.ViewController> {
     associatedtype ViewController: UIViewController
 }
 
@@ -31,13 +31,13 @@ public struct UICNavigation: UICViewControllerCreator {
     public typealias ViewController = UINavigationController
     public typealias View = ViewControllerAdaptor<UINavigationController>
 
-    let content: () -> _ViewCreator
+    let content: () -> ViewCreator
 
-    public init(_ content: @escaping () -> _ViewCreator) {
+    public init(_ content: @escaping () -> ViewCreator) {
         self.content = content
     }
 
-    public static func makeUIView(_ viewCreator: _ViewCreator) -> UIView {
+    public static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
         UICControllerAdapt {
             UINavigationController(
                 rootViewController: UICHostingController(content: (viewCreator as! Self).content)
@@ -62,12 +62,12 @@ private extension UIView {
     }
 }
 
-private extension ViewCreator {
+private extension UIViewCreator {
     func dynamicPresent(
         _ relay: Relay<Bool>,
         animated flag: Bool = true,
         content: @escaping () -> ViewCreator,
-        viewControllerBuilder: ((UIViewController) -> Void)?) -> Self {
+        viewControllerBuilder: ((UIViewController) -> Void)?) -> UICModifiedView<View> {
 
         self.onInTheScene {
             weak var view = $0
@@ -79,7 +79,7 @@ private extension ViewCreator {
                         return
                     }
 
-                    guard let presentable = view?.viewCreator?.presentable else {
+                    guard let presentable = view?.presentable else {
                         relay.wrappedValue = false
                         return
                     }
@@ -105,26 +105,9 @@ private extension ViewCreator {
     }
 }
 
-public extension ViewCreator {
+public extension UIViewCreator {
 
-    private var presentable: UIViewController! {
-        self.uiView?.presentable
-    }
-
-    @discardableResult
-    func present(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> ViewCreator) -> Self {
-        let controller = UICHostingController(content: content)
-        self.presentable?.present(controller, animated: animated, completion: onCompletion)
-        return self
-    }
-
-    @discardableResult
-    func present(animated: Bool, onCompletion: (() -> Void)? = nil, _ viewController: UIViewController) -> Self {
-        self.presentable?.present(viewController, animated: animated, completion: onCompletion)
-        return self
-    }
-
-    func present(_ relay: Relay<Bool>, content: @escaping () -> ViewCreator) -> Self {
+    func present(_ relay: Relay<Bool>, content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.dynamicPresent(
             relay,
             content: content,
@@ -132,7 +115,7 @@ public extension ViewCreator {
         )
     }
 
-    func presentMaker(_ relay: Relay<Bool>,_ presentMaker: @escaping () -> PresentMaker) -> Self {
+    func presentMaker(_ relay: Relay<Bool>,_ presentMaker: @escaping () -> PresentMaker) -> UICModifiedView<View> {
         let presentMaker = presentMaker()
 
         return self.dynamicPresent(
@@ -143,51 +126,12 @@ public extension ViewCreator {
         )
     }
 
-    @available(*, deprecated, renamed: "presentMaker")
-    func presentMaker(_ relay: Relay<Bool>, maker: @escaping (UICPresent) -> UICPresent) -> Self {
-        let maker = maker(.init(fromView: self))
-
-        return self.dynamicPresent(
-            relay,
-            animated: maker.animated,
-            content: maker.toView!,
-            viewControllerBuilder: maker.recycle(viewController:)
-        )
-    }
-
-    @discardableResult
-    func presentModal(animated: Bool, onCompletion: (() -> Void)? = nil, content: @escaping () -> ViewCreator) -> Self {
-        let controller = UICHostingController(content: content)
-        controller.modalPresentationStyle = .overFullScreen
-        self.presentable?.present(controller, animated: animated, completion: onCompletion)
-        return self
-    }
-
-    @discardableResult
-    func presentModal(animated: Bool, onCompletion: (() -> Void)? = nil, _ viewController: UIViewController) -> Self {
-        viewController.modalPresentationStyle = .overFullScreen
-        self.presentable?.present(viewController, animated: animated, completion: onCompletion)
-        return self
-    }
-
-    func presentModal(_ relay: Relay<Bool>, content: @escaping () -> ViewCreator) -> Self {
-        self.dynamicPresent(
-            relay,
-            content: content,
-            viewControllerBuilder: {
-                $0.modalPresentationStyle = .overFullScreen
-            }
-        )
-    }
-
-    @discardableResult
-    func dismiss(animated: Bool, onCompletion: (() -> Void)? = nil) -> Self {
-        self.viewController?.dismiss(animated: animated, completion: onCompletion)
-        return self
-    }
-
-    var navigationItem: UINavigationItem! {
-        return self.uiView?.navigationItem
+    func presentModal(_ relay: Relay<Bool>, content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
+        self.presentMaker(relay) {
+            PresentMaker(content)
+                .animated(true)
+                .presentingStyle(.overFullScreen)
+        }
     }
 }
 

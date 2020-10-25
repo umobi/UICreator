@@ -221,8 +221,8 @@ private class ListenerView: UIView {
     }
 }
 
-public extension ViewCreator {
-    func alert(_ isPresenting: Relay<Bool>, _ handler: @escaping () -> UICAlert) -> Self {
+public extension UIViewCreator {
+    func alert(_ isPresenting: Relay<Bool>, _ handler: @escaping () -> UICAlert) -> UICModifiedView<View> {
         self.onInTheScene {
             weak var view = $0
             weak var alertView: UIViewController?

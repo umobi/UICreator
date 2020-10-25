@@ -89,3 +89,9 @@ extension Render {
         }
     }
 }
+
+extension CBView {
+    var renderManager: Render.Manager {
+        .init(self)
+    }
+}

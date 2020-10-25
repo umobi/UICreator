@@ -25,19 +25,14 @@ import UIKit
 
 extension UICCollectionView: ListSupport {}
 
-public extension UICCollection {
-    convenience init(
-        layout: Layout,
-        @UICViewBuilder _ contents: @escaping () -> ViewCreator) {
+public extension UICollectionView {
+    private typealias CollectionView = UICollectionView & UICollectionViewDataSource & UICollectionViewDelegate & ListSupport
 
-        self.init(layout: layout, ListManager(contents: contents().zip))
-    }
-
-    private convenience init(layout: Layout, _ manager: ListManager) {
-        self.init(layout: layout)
-
-        self.onNotRendered { [manager] in
-            let collectionView: UICCollectionView! = $0 as? UICCollectionView
+    @discardableResult
+    func dynamicData(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> Self {
+        self.onNotRendered {
+            let manager = ListManager(contents: contents().zip)
+            let collectionView: CollectionView! = $0 as? CollectionView
 
             manager.rowsIdentifier.forEach {
                 collectionView.register(
