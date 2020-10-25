@@ -112,7 +112,7 @@ public extension UIViewCreator where View: UITableView {
                 .onAdd {
                     (tableView as? View)?.backgroundView = $0
                 }.addSubview(
-                    UICHostingView(content: content)
+                    ViewAdaptor(content().releaseUIView())
                 )
                 .height(.required)
                 .width(.required)
@@ -161,7 +161,7 @@ public extension UIViewCreator where View: UITableView {
                 .onAdd {
                     (tableView as? View)?.tableHeaderView = $0
                 }.addSubview(
-                    UICHostingView(content: content)
+                    ViewAdaptor(content().releaseUIView())
                 )
                 .width(.required)
                 .watch(in: tableView)
@@ -176,7 +176,7 @@ public extension UIViewCreator where View: UITableView {
                 .onAdd {
                     (tableView as? View)?.tableFooterView = $0
                 }.addSubview(
-                    UICHostingView(content: content)
+                    ViewAdaptor(content().releaseUIView())
                 )
                 .width(.required)
                 .watch(in: tableView)

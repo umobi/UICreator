@@ -34,18 +34,18 @@ public class Hover: UIGesture {
     }
 }
 
-public extension ViewCreator {
+public extension UIViewCreator {
 
     @available(iOS 13.0, *)
-    func onHoverMaker(_ hoverConfigurator: @escaping (Hover) -> Hover) -> Self {
+    func onHoverMaker(_ hoverConfigurator: @escaping (Hover) -> Hover) -> UICModifiedView<View> {
         self.onNotRendered {
             hoverConfigurator(Hover(target: $0)).add()
         }
     }
 
     @available(iOS 13.0, *)
-    func onHover(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onHoverMaker {
+    func onHover(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onHoverMaker {
             $0.onRecognized {
                 handler($0.view!)
             }

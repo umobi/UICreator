@@ -20,43 +20,16 @@
 // THE SOFTWARE.
 //
 
-import Foundation
 import UIKit
 
-public class Tap: UIGesture {
-    public typealias Gesture = UITapGestureRecognizer
+public struct UICModifiedView<View>: UIViewCreator where View: UIView {
+    let viewLoader: () -> View
 
-    public required init(target view: UIView!) {
-        GestureUIGestureSwitch.switch(self, Gesture.init(target: view))
-    }
-}
-
-public extension UIGesture where Gesture: UITapGestureRecognizer {
-    func number(ofTapsRequired number: Int) -> Self {
-        self.uiGesture?.numberOfTapsRequired = number
-        return self
+    init(_ viewLoader: @escaping () -> View) {
+        self.viewLoader = viewLoader
     }
 
-    #if os(iOS)
-    func number(ofTouchesRequired number: Int) -> Self {
-        self.uiGesture?.numberOfTouchesRequired = number
-        return self
-    }
-    #endif
-}
-
-public extension UIViewCreator {
-    func onTapMaker(_ tapConfigurator: @escaping (Tap) -> Tap) -> UICModifiedView<View> {
-        self.onNotRendered {
-            tapConfigurator(Tap(target: $0)).add()
-        }
-    }
-
-    func onTap(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
-        self.onTapMaker {
-            $0.onRecognized {
-                handler($0.view!)
-            }
-        }
+    public static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
+        (viewCreator as! Self).viewLoader()
     }
 }

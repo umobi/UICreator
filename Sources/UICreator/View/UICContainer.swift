@@ -24,6 +24,93 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
+public class ViewControllerAdaptor<ViewController>: UIView, ViewCreatorNoLayoutConstraints where ViewController: CBViewController {
+    private var adaptedViewController: Reference<ViewController>
+
+    init(_ viewController: ViewController) {
+        self.adaptedViewController = .strong(viewController)
+        super.init(frame: .zero)
+        self.makeSelfImplemented()
+    }
+
+    override init(frame: CGRect) {
+        fatalError("init(frame:) has not been implemented")
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override open func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
+        self.renderManager.willMove(toSuperview: newSuperview)
+    }
+
+    override open var isHidden: Bool {
+        get { super.isHidden }
+        set {
+            super.isHidden = newValue
+            self.renderManager.isHidden(newValue)
+        }
+    }
+
+    override open var frame: CGRect {
+        get { super.frame }
+        set {
+            super.frame = newValue
+            self.renderManager.frame(newValue)
+        }
+    }
+
+    override open func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        self.renderManager.didMoveToSuperview()
+    }
+
+    override open func didMoveToWindow() {
+        super.didMoveToWindow()
+
+        if !self.adaptedViewController.isWeak {
+            let viewController = self.adaptedViewController.value!
+            self.adaptedViewController = .weak(viewController)
+
+            self.viewController.addChild(viewController)
+            self.add(priority: .required, viewController.view)
+            viewController.didMove(toParent: self.viewController)
+        }
+
+        self.renderManager.didMoveToWindow()
+    }
+
+    override open func layoutSubviews() {
+        super.layoutSubviews()
+        self.renderManager.layoutSubviews()
+    }
+
+    override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        self.renderManager.traitDidChange()
+    }
+
+    var dynamicViewController: ViewController {
+        self.adaptedViewController.value
+    }
+}
+
+public class UICControllerAdapt<ViewController>: UICViewControllerCreator where ViewController: UIViewController {
+    public typealias View = ViewControllerAdaptor<ViewController>
+
+    private let viewControllerHandler: () -> ViewController
+
+    public init(_ viewControllerHandler: @escaping () -> ViewController) {
+        self.viewControllerHandler = viewControllerHandler
+    }
+
+    static public func makeUIView(_ viewCreator: _ViewCreator) -> UIView {
+        ViewControllerAdaptor((viewCreator as! Self).viewControllerHandler())
+    }
+}
+
 public class ControllerView<ViewController: UIViewController>: UIView {
     weak var view: ViewController!
 

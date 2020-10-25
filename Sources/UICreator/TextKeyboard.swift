@@ -44,8 +44,8 @@ public protocol TextKeyboard: UIViewCreator {
     func smartInsertDeleteType(_ type: UITextSmartInsertDeleteType) -> Self
 
     func textContentType(_ type: UITextContentType) -> Self
-    func inputAccessoryView(content: @escaping () -> ViewCreator) -> Self
-    func inputView(content: @escaping () -> ViewCreator) -> Self
+    func inputAccessoryView(content: @escaping () -> _ViewCreator) -> Self
+    func inputView(content: @escaping () -> _ViewCreator) -> Self
     func inputDelegate(_ delegate: UITextInputDelegate) -> Self
 
     func typingAttributes(_ attributes: [NSAttributedString.Key: Any]?) -> Self

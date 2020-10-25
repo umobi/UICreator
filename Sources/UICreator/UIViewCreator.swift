@@ -22,7 +22,126 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 public protocol UIViewCreator: ViewCreator {
-    associatedtype View: UIView
+    associatedtype View: CBView
+
+
+    /**
+     This method should be used when it is necessarly to set a property to the view, but only the ones that don't
+     depend on view hierarchy. `onNotRendered(_:)` is executed on `willMoveToSuperview`.
+
+     - Parameters:
+        - handler: The commit handler that expose the UIView inside the ViewCreator.
+
+     - Returns: Returns a self reference to compose the declarative programming.
+     */
+    func onNotRendered(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View>
+
+    /**
+     This method should be used when the view is in the local hierarchy and it's needed to set
+     a property on that moment. `onRendered(_:)` is executed on `didMoveToSuperview(_:)`.
+
+     - Parameters:
+        - handler: The commit handler that expose the UIView inside the ViewCreator.
+
+     - Returns: Returns a self reference to compose the declarative programming.
+     */
+    func onRendered(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View>
+
+    /**
+     This method should be used when the view is in the window hierarchy, accessing view controllers
+     on hierarchy. `onInTheScene(_:)` is executed on `didMoveToWindow`.
+
+     - Parameters:
+        - handler: The commit handler that expose the UIView inside the ViewCreator.
+
+     - Returns: Returns a self reference to compose the declarative programming.
+     */
+    func onInTheScene(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View>
+
+    /**
+     This method calls the handler parameter when the UIView calls `layoutSubviews`.
+
+     - Parameters:
+        - handler: The commit handler that expose the UIView inside the ViewCreator.
+
+     - Returns: Returns a self reference to compose the declarative programming.
+     */
+    func onLayout(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View>
+
+    /**
+     This method calls the handler parameter when the UIView is hidden, moved from heirarchy or when the frame changes
+     to visible layout.
+
+     - Parameters:
+        - handler: The commit handler that expose the UIView inside the ViewCreator.
+
+     - Returns: Returns a self reference to compose the declarative programming.
+     */
+    func onAppear(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View>
+
+    /**
+     This method calls the handler parameter when the UIView is hidden, moved from heirarchy or when the frame changes
+     to invisible layout.
+
+     - Parameters:
+        - handler: The commit handler that expose the UIView inside the ViewCreator.
+
+     - Returns: Returns a self reference to compose the declarative programming.
+     */
+    func onDisappear(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View>
+}
+
+extension UIViewCreator {
+    func releaseOperationCastedView() -> View {
+        self.operationUIView().dynamicView as! View
+    }
+}
+
+public extension UIViewCreator {
+    func onNotRendered(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+        UICModifiedView {
+            self.releaseOperationCastedView()
+                .onNotRendered(handler)
+        }
+    }
+
+    func onRendered(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+        UICModifiedView {
+            self.releaseOperationCastedView()
+                .onRendered(handler)
+        }
+    }
+
+    func onInTheScene(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+        UICModifiedView {
+            self.releaseOperationCastedView()
+                .onInTheScene(handler)
+        }
+    }
+}
+
+public extension UIViewCreator {
+    func onLayout(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+        UICModifiedView {
+            self.releaseOperationCastedView()
+                .onLayout(handler)
+        }
+    }
+
+    func onAppear(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+        UICModifiedView {
+            self.releaseOperationCastedView()
+                .onAppear(handler)
+        }
+    }
+
+    func onDisappear(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+        UICModifiedView {
+            self.releaseOperationCastedView()
+                .onDisappear(handler)
+        }
+    }
 }

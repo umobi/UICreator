@@ -22,8 +22,19 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
-public class PlaceholderView: UIView {
+class _EmptyView: UIView {
+
+    init() {
+        super.init(frame: .zero)
+        self.makeSelfImplemented()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -67,12 +78,22 @@ public class PlaceholderView: UIView {
     }
 }
 
-public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator where Value: Collection {
+public struct EmptyView: UIViewCreator {
+    public typealias View = UIView
+
+    init() {}
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        _EmptyView()
+    }
+}
+
+public struct UICForEach<Content, Value>: ViewCreator, ForEachCreator where Content: UIViewCreator, Value: Collection {
+    @MutableBox var syncLoad: (() -> Void)?
     let viewType: ViewCreator.Type
 
     let relay: Relay<Value>
     let content: (Value.Element) -> ViewCreator
-    private var syncLoad: ((UIView) -> Void)?
 
     private func startObservation() {
         let content = self.content
@@ -85,39 +106,38 @@ public class UICForEach<Value, View: ViewCreator>: ViewCreator, ForEachCreator w
         })
     }
 
-    private init(private relay: Relay<Value>, content: @escaping (Value.Element) -> View) {
+    private init(private relay: Relay<Value>, content: @escaping (Value.Element) -> Content) {
         self.relay = relay
         self.content = content
-        self.viewType = View.self
-
-        self.loadView {
-            PlaceholderView(builder: self)
-        }
-        .height(equalTo: 0, priority: .defaultHigh)
-        .width(equalTo: 0, priority: .defaultHigh)
-        .onNotRendered { view in
-            (view.viewCreator as? Self)?.load()
-        }
-        .syncLoad = {
-            ($0.viewCreator as? Self)?.startObservation()
-        }
+        self.viewType = Content.self
+        self.syncLoad = self.startObservation
     }
 
-    public convenience init(_ relay: Relay<Value>, content: @escaping (Value.Element) -> View) {
+    public init(_ relay: Relay<Value>, content: @escaping (Value.Element) -> Content) {
         self.init(private: relay, content: content)
     }
 
-    public convenience init(_ value: Value, content: @escaping (Value.Element) -> View) {
+    public init(_ value: Value, content: @escaping (Value.Element) -> Content) {
         self.init(private: .constant(value), content: content)
     }
 
     func load() {
         let syncLoad = self.syncLoad
         self.syncLoad = nil
-        syncLoad?(self.releaseUIView())
+        syncLoad?()
     }
 
     var isLoaded: Bool {
         self.syncLoad == nil
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        EmptyView()
+            .height(equalTo: 0, priority: .defaultHigh)
+            .width(equalTo: 0, priority: .defaultHigh)
+            .onNotRendered { _ in
+                (viewCreator as! Self).load()
+            }
+            .releaseUIView()
     }
 }

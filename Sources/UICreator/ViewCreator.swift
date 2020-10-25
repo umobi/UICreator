@@ -22,97 +22,26 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
-public protocol ViewCreator: Opaque {
-    /**
-     This method should be used when it is necessarly to set a property to the view, but only the ones that don't
-     depend on view hierarchy. `onNotRendered(_:)` is executed on `willMoveToSuperview`.
+public protocol ViewCreator {
 
-     - Parameters:
-        - handler: The commit handler that expose the UIView inside the ViewCreator.
-
-     - Returns: Returns a self reference to compose the declarative programming.
-     */
-    @discardableResult
-    func onNotRendered(_ handler: @escaping (UIView) -> Void) -> Self
-
-    /**
-     This method should be used when the view is in the local hierarchy and it's needed to set
-     a property on that moment. `onRendered(_:)` is executed on `didMoveToSuperview(_:)`.
-
-     - Parameters:
-        - handler: The commit handler that expose the UIView inside the ViewCreator.
-
-     - Returns: Returns a self reference to compose the declarative programming.
-     */
-    @discardableResult
-    func onRendered(_ handler: @escaping (UIView) -> Void) -> Self
-
-    /**
-     This method should be used when the view is in the window hierarchy, accessing view controllers
-     on hierarchy. `onInTheScene(_:)` is executed on `didMoveToWindow`.
-
-     - Parameters:
-        - handler: The commit handler that expose the UIView inside the ViewCreator.
-
-     - Returns: Returns a self reference to compose the declarative programming.
-     */
-    @discardableResult
-    func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self
-
-    /**
-     This method calls the handler parameter when the UIView calls `layoutSubviews`.
-
-     - Parameters:
-        - handler: The commit handler that expose the UIView inside the ViewCreator.
-
-     - Returns: Returns a self reference to compose the declarative programming.
-     */
-    @discardableResult
-    func onLayout(_ handler: @escaping (UIView) -> Void) -> Self
-
-    /**
-     This method calls the handler parameter when the UIView is hidden, moved from heirarchy or when the frame changes
-     to visible layout.
-
-     - Parameters:
-        - handler: The commit handler that expose the UIView inside the ViewCreator.
-
-     - Returns: Returns a self reference to compose the declarative programming.
-     */
-    @discardableResult
-    func onAppear(_ handler: @escaping (UIView) -> Void) -> Self
-
-    /**
-     This method calls the handler parameter when the UIView is hidden, moved from heirarchy or when the frame changes
-     to invisible layout.
-
-     - Parameters:
-        - handler: The commit handler that expose the UIView inside the ViewCreator.
-
-     - Returns: Returns a self reference to compose the declarative programming.
-     */
-    @discardableResult
-    func onDisappear(_ handler: @escaping (UIView) -> Void) -> Self
+    static func makeUIView(_ viewCreator: ViewCreator) -> CBView
 }
 
-public extension ViewCreator {
-
-    @discardableResult
-    func onNotRendered(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.render.onNotRendered(handler)
-        return self
+extension ViewCreator {
+    func operationUIView() -> CBView {
+        Self.makeUIView(self)
+            .dynamicView
     }
 
-    @discardableResult
-    func onRendered(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.render.onRendered(handler)
-        return self
-    }
+    func releaseUIView() -> CBView {
+        {
+            if let viewAdaptor = $0.superview as? ViewAdaptor {
+                return viewAdaptor
+            }
 
-    @discardableResult
-    func onInTheScene(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.render.onInTheScene(handler)
-        return self
+            return $0
+        }(Self.makeUIView(self))
     }
 }

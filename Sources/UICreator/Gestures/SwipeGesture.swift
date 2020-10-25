@@ -31,15 +31,15 @@ public class Swipe: UIGesture {
     }
 }
 
-public extension ViewCreator {
+public extension UIViewCreator {
 
-    func onSwipeMaker(_ swipeConfigurator: @escaping (Swipe) -> Swipe) -> Self {
+    func onSwipeMaker(_ swipeConfigurator: @escaping (Swipe) -> Swipe) -> UICModifiedView<View> {
         self.onNotRendered {
             swipeConfigurator(Swipe(target: $0)).add()
         }
     }
 
-    func onSwipe(_ handler: @escaping (UIView) -> Void) -> Self {
+    func onSwipe(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
         return self.onSwipeMaker {
             $0.onRecognized {
                 handler($0.view!)

@@ -51,15 +51,15 @@ internal extension UIView {
     }
 }
 
-public extension ViewCreator {
+public extension UIViewCreator {
 
-    func onPanMaker(_ panConfigurator: @escaping (Pan) -> Pan) -> Self {
+    func onPanMaker(_ panConfigurator: @escaping (Pan) -> Pan) -> UICModifiedView<View> {
         self.onNotRendered {
             panConfigurator(Pan(target: $0)).add()
         }
     }
 
-    func onPan(_ handler: @escaping (UIView) -> Void) -> Self {
+    func onPan(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
         return self.onPanMaker {
             $0.onRecognized {
                 handler($0.view!)

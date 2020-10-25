@@ -133,7 +133,7 @@ public extension UIViewCreator where View: UICollectionView {
 
     func background<Background: ViewCreator>(_ content: @escaping () -> Background) -> Self {
         self.onNotRendered {
-            ($0 as? View)?.backgroundView = UICHostingView(view: content())
+            ($0 as? View)?.backgroundView = ViewAdaptor(content().releaseUIView())
         }
     }
 

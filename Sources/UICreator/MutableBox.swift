@@ -21,42 +21,26 @@
 //
 
 import Foundation
-import UIKit
 
-public class Tap: UIGesture {
-    public typealias Gesture = UITapGestureRecognizer
+@propertyWrapper
+struct MutableBox<Value> {
+    private class Box {
+        var value: Value
 
-    public required init(target view: UIView!) {
-        GestureUIGestureSwitch.switch(self, Gesture.init(target: view))
-    }
-}
-
-public extension UIGesture where Gesture: UITapGestureRecognizer {
-    func number(ofTapsRequired number: Int) -> Self {
-        self.uiGesture?.numberOfTapsRequired = number
-        return self
-    }
-
-    #if os(iOS)
-    func number(ofTouchesRequired number: Int) -> Self {
-        self.uiGesture?.numberOfTouchesRequired = number
-        return self
-    }
-    #endif
-}
-
-public extension UIViewCreator {
-    func onTapMaker(_ tapConfigurator: @escaping (Tap) -> Tap) -> UICModifiedView<View> {
-        self.onNotRendered {
-            tapConfigurator(Tap(target: $0)).add()
+        init(_ value: Value) {
+            self.value = value
         }
     }
 
-    func onTap(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
-        self.onTapMaker {
-            $0.onRecognized {
-                handler($0.view!)
-            }
-        }
+    private let box: Box
+
+    init(wrappedValue: Value) {
+        self.box = .init(wrappedValue)
+    }
+
+    var wrappedValue: Value {
+        get { self.box.value }
+        nonmutating
+        set { self.box.value = newValue }
     }
 }

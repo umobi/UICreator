@@ -22,45 +22,87 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 public protocol ViewCreatorNoLayoutConstraints {}
 
-class ViewAdaptor: UIView, ViewCreatorNoLayoutConstraints {
-    struct Weak<Object: NSObject> {
-        weak var object: Object!
-    }
+enum Reference<Value> where Value: NSObject {
+    case weak(Weak)
+    case strong(Strong)
 
-    enum Store {
-        case view(Weak<UIView>)
-        case viewController(Weak<UIViewController>)
-        case none
-
-        var uiView: UIView! {
-            switch self {
-            case .view(let weakObject):
-                return weakObject.object
-            case .viewController(let weakObject):
-                return weakObject.object?.view
-            case .none:
-                return nil
-            }
+    var value: Value! {
+        switch self {
+        case .weak(let weak):
+            return weak.value
+        case .strong(let strong):
+            return strong.value
         }
     }
 
-    var store: Store = .none
+    static func strong(_ element: Value) -> Reference<Value> {
+        .strong(.init(value: element))
+    }
+
+    static func weak(_ element: Value) -> Reference<Value> {
+        .weak(.init(value: element))
+    }
+}
+
+extension Reference {
+    struct Weak {
+        weak var value: Value!
+    }
+
+    struct Strong {
+        var value: Value
+    }
+
+    var isWeak: Bool {
+        if case .weak = self {
+            return true
+        }
+
+        return false
+    }
+}
+
+class ViewAdaptor: UIView, ViewCreatorNoLayoutConstraints {
+    var adaptedView: Reference<UIView>
+
+    init(_ view: UIView) {
+        self.adaptedView = .strong(view)
+        super.init(frame: .zero)
+        self.makeSelfImplemented()
+        self.adaptView()
+    }
+
+    override init(frame: CGRect) {
+        fatalError("init(frame:) has not been implemented")
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func adaptView() {
+        if !self.adaptedView.isWeak {
+            let view = self.adaptedView.value!
+            self.adaptedView = .weak(view)
+
+            self.add(priority: .required, view)
+        }
+    }
 
     override open func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
-        RenderManager(self)?.willMove(toSuperview: newSuperview)
-        RenderManager(self.store.uiView)?.willMove(toSuperview: self)
+        self.renderManager.willMove(toSuperview: newSuperview)
     }
 
     override open var isHidden: Bool {
         get { super.isHidden }
         set {
             super.isHidden = newValue
-            RenderManager(self)?.isHidden(newValue)
-            RenderManager(self.store.uiView)?.isHidden(newValue)
+            self.renderManager.isHidden(newValue)
         }
     }
 
@@ -68,87 +110,43 @@ class ViewAdaptor: UIView, ViewCreatorNoLayoutConstraints {
         get { super.frame }
         set {
             super.frame = newValue
-            RenderManager(self)?.frame(newValue)
-            RenderManager(self.store.uiView)?.frame(self.store.uiView.frame)
+            self.renderManager.frame(newValue)
         }
     }
 
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
-        RenderManager(self)?.didMoveToSuperview()
-        RenderManager(self.store.uiView)?.didMoveToSuperview()
+        self.renderManager.didMoveToSuperview()
     }
 
     override open func didMoveToWindow() {
         super.didMoveToWindow()
-        RenderManager(self)?.didMoveToWindow()
-        RenderManager(self.store.uiView)?.didMoveToWindow()
+        self.renderManager.didMoveToWindow()
     }
 
     override open func layoutSubviews() {
         super.layoutSubviews()
-        RenderManager(self)?.layoutSubviews()
-        RenderManager(self.store.uiView)?.layoutSubviews()
+        self.renderManager.layoutSubviews()
     }
 
     override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        RenderManager(self.store.uiView)?.traitDidChange()
+        self.renderManager.traitDidChange()
+    }
+
+    override var dynamicView: CBView {
+        self.adaptedView.value
     }
 }
 
-class Adaptor: ViewCreator {
-    public typealias View = ViewAdaptor
+struct UICAdapt<View>: _UIViewCreator where View: UIView {
+    private let viewHandler: () -> View
 
-    enum Adaptable {
-        case view(ViewCreator)
-        case viewController(ViewCreator)
-
-        var viewCreator: ViewCreator {
-            switch self {
-            case .view(let viewCreator):
-                return viewCreator
-            case .viewController(let viewCreator):
-                return viewCreator
-            }
-        }
+    init(_ viewHandler: @escaping () -> View) {
+        self.viewHandler = viewHandler
     }
 
-    init(_ adapt: Adaptable) {
-        let viewCreator = adapt.viewCreator
-        viewCreator.tree.supertree?.append(self)
-        viewCreator.tree.supertree?.remove(viewCreator)
-        self.tree.append(viewCreator)
-
-        switch adapt {
-        case .view:
-            let hostedView: UIView! = viewCreator.releaseUIView()
-
-            self.loadView {
-                View.init(builder: self)
-            }.onNotRendered {
-                ($0 as? View)?.store = .view(.init(object: hostedView))
-                ($0 as? View)?.add(priority: .required, hostedView)
-            }
-
-        case .viewController:
-            let hostedController: UIViewController! = viewCreator.releaseUIView().next as? UIViewController
-
-            self.loadView {
-                View.init(builder: self)
-            }.onNotRendered {
-                ($0 as? View)?.store = .viewController(.init(object: hostedController))
-            }.onInTheScene {
-                $0.viewController.addChild(hostedController)
-                $0.add(priority: .required, hostedController.view)
-                hostedController.didMove(toParent: $0.viewController)
-            }
-        }
-    }
-
-    func removeSubviews() {
-        self.uiView?.subviews.forEach {
-            $0.removeFromSuperview()
-        }
+    static func makeUIView(_ viewCreator: _ViewCreator) -> UIView {
+        ViewAdaptor((viewCreator as! Self).viewHandler())
     }
 }

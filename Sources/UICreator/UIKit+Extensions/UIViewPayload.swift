@@ -22,114 +22,143 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 extension NSObject: Opaque {}
 
-private struct UIViewPayload {
-    typealias AppearState = UIView.AppearState
-
-    let viewCreator: Mutable<MemorySwitch> = .init(value: .nil)
-    let appearState: Mutable<AppearState> = .init(value: .unset)
-
-    let viewMethods: Mutable<UIViewMethods> = .init(value: .init())
-}
-
-struct UIViewMethods: MutableEditable {
-    let appearHandler: UIHandler<UIView>?
-    let disappearHandler: UIHandler<UIView>?
-    let layoutHandler: UIHandler<UIView>?
-    let traitHandler: UIHandler<UIView>?
-
-    init() {
-        self.appearHandler = nil
-        self.disappearHandler = nil
-        self.layoutHandler = nil
-        self.traitHandler = nil
-    }
-
-    private init(_ original: UIViewMethods, editable: Editable) {
-        self.appearHandler = editable.appearHandler
-        self.disappearHandler = editable.disappearHandler
-        self.layoutHandler = editable.layoutHandler
-        self.traitHandler = editable.traitHandler
-    }
-
-    func edit(_ edit: @escaping (Editable) -> Void) -> Self {
-        let editable = Editable(self)
-        edit(editable)
-        return .init(self, editable: editable)
-    }
-
-    class Editable {
-        var appearHandler: UIHandler<UIView>?
-        var disappearHandler: UIHandler<UIView>?
-        var layoutHandler: UIHandler<UIView>?
-        var traitHandler: UIHandler<UIView>?
-
-        init(_ methods: UIViewMethods) {
-            self.appearHandler = methods.appearHandler
-            self.disappearHandler = methods.disappearHandler
-            self.layoutHandler = methods.layoutHandler
-            self.traitHandler = methods.traitHandler
-        }
-    }
-}
-
 private var kViewPayload: UInt = 0
-extension UIView {
-    private var payload: UIViewPayload {
-        OBJCSet(self, &kViewPayload, policity: .OBJC_ASSOCIATION_COPY) {
-            .init()
+private extension CBView {
+    struct Memory {
+        @MutableBox var render: _Render
+        @MutableBox var layout: Layout
+        @MutableBox var appear: Appear
+        @MutableBox var trait: Trait
+
+        @MutableBox var isSelfImplemented: Bool
+
+        init(_ view: UIView) {
+            self._render = .init(wrappedValue: .create(view))
+            self._layout = .init(wrappedValue: .create(view))
+            self._appear = .init(wrappedValue: .create(view))
+            self._trait = .init(wrappedValue: .create(view))
+
+            self._isSelfImplemented = .init(wrappedValue: false)
         }
     }
 
-    private var viewMethods: Mutable<UIViewMethods> {
-        self.payload.viewMethods
+    var memory: Memory {
+        OBJCSet(
+            self,
+            &kViewPayload,
+            policity: .OBJC_ASSOCIATION_COPY,
+            orLoad: { [unowned self] in .init(self) }
+        )
     }
+}
+
+extension CBView {
+    @objc var dynamicView: CBView {
+        return self
+    }
+
+    private var adaptorOrView: CBView! {
+        if self.superview is ViewAdaptor {
+            return self.superview
+        }
+
+        return self
+    }
+
+    var layoutSuperview: CBView? {
+        guard let superview = self.superview else {
+            return nil
+        }
+
+        return sequence(first: superview, next: { $0.adaptorOrView.superview })
+            .first(where: { !($0 is ViewCreatorNoLayoutConstraints)})
+    }
+}
+
+extension CBView {
+    var render: _Render {
+        self.memory.render
+    }
+
+    var layout: Layout {
+        self.memory.layout
+    }
+
+    var appear: Appear {
+        self.memory.appear
+    }
+
+    var trait: Trait {
+        self.memory.trait
+    }
+
+    var isSelfImplemented: Bool {
+        get { self.memory.isSelfImplemented }
+        set { self.memory.isSelfImplemented = newValue }
+    }
+}
+
+protocol UIViewRender: UIView {
+
+}
+
+extension UIView: UIViewRender {}
+
+extension UIViewRender {
 
     var opaqueViewCreator: MemorySwitch {
-        get { self.payload.viewCreator.value }
-        set { self.payload.viewCreator.value = newValue }
+        get { fatalError() }
+        set { fatalError() }
     }
 
-    var appearState: AppearState {
-        get { self.payload.appearState.value }
-        set { self.payload.appearState.value = newValue }
+    var appearState: Appear.State {
+        get { fatalError() }
+        set { fatalError() }
     }
 
     var appearHandler: UIHandler<UIView>? {
-        get { self.viewMethods.value.appearHandler }
-        set {
-            self.viewMethods.update {
-                $0.appearHandler = newValue
-            }
-        }
+        get { fatalError() }
+        set { fatalError() }
     }
 
     var disappearHandler: UIHandler<UIView>? {
-        get { self.viewMethods.value.disappearHandler }
-        set {
-            self.viewMethods.update {
-                $0.disappearHandler = newValue
-            }
-        }
+        get { fatalError() }
+        set { fatalError() }
     }
 
     var layoutHandler: UIHandler<UIView>? {
-        get { self.viewMethods.value.layoutHandler }
-        set {
-            self.viewMethods.update {
-                $0.layoutHandler = newValue
-            }
-        }
+        get { fatalError() }
+        set { fatalError() }
     }
 
     var traitHandler: UIHandler<UIView>? {
-        get { self.viewMethods.value.traitHandler }
-        set {
-            self.viewMethods.update {
-                $0.traitHandler = newValue
-            }
-        }
+        get { fatalError() }
+        set { fatalError() }
+    }
+
+    var viewCreator: ViewCreator! {
+        fatalError()
+    }
+
+    init(builder: ViewCreator) {
+        self.init()
+        fatalError()
+    }
+
+    func updateBuilder(_ viewCreator: ViewCreator) {
+        fatalError()
+    }
+}
+
+extension CBView {
+
+    @discardableResult
+    func makeSelfImplemented() -> Self {
+        self.isSelfImplemented = true
+        return self
     }
 }

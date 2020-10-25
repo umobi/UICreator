@@ -23,50 +23,21 @@
 import Foundation
 import UIKit
 
-public protocol ViewControllerRepresentable: ViewCreator {
-    func privateMakeUIView() -> UIView
-}
-
-public protocol UICViewControllerRepresentable: ViewControllerRepresentable, UIViewControllerCreator {
+protocol UICViewControllerRepresentable: UICViewControllerCreator {
     func makeUIViewController() -> ViewController
-    func updateViewController(_ viewController: ViewController)
+    func updateUIViewController(_ uiViewController: ViewController)
 }
 
-internal extension ViewControllerRepresentable {
-    var wrapper: UIView! {
-        self.uiView?.superview
-    }
-}
+extension UICViewControllerRepresentable {
+    static func makeUIView(_ viewCreator: _ViewCreator) -> UIView {
+        let _self = viewCreator as! Self
 
-public extension UICViewControllerRepresentable {
-    func privateMakeUIView() -> UIView {
-        if let view = self.uiView {
-            return view
+        return UICControllerAdapt {
+            _self.makeUIViewController()
         }
-
-        self.loadView { [unowned self] in
-            let view: UIView! = self.makeUIViewController().view
-            view.updateBuilder(self)
-            return view
-        }.onInTheScene {
-            guard let viewController = $0.viewController as? ViewController else {
-                return
-            }
-
-            self.updateViewController(viewController)
+        .onInTheScene {
+            _self.updateUIViewController(($0 as! View).dynamicViewController)
         }
-
-        return Adaptor(.viewController(self)).releaseUIView()
-    }
-}
-
-public extension UICViewControllerRepresentable {
-
-    var uiViewController: ViewController! {
-        (self as ViewCreator).uiView?.next as? ViewController
-    }
-
-    var wrapper: UIView! {
-        self.uiView?.superview
+        .releaseUIView()
     }
 }

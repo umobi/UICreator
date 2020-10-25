@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 
 public struct NavigationRepresentable {
-    weak var viewCreator: ViewCreator!
+    weak var view: UIView!
 }
 
 func OBJCSet<Object>(
@@ -45,7 +45,7 @@ public extension NavigationRepresentable {
     var navigationController: UINavigationController! {
         guard
             let viewController = ViewControllerSearch(
-                self.viewCreator.uiView,
+                self.view,
                 searchFor: UINavigationController.self
             ).viewNearFromSearch
         else { return nil }
@@ -103,24 +103,10 @@ public extension NavigationRepresentable {
 
 public extension UIView {
     func contains(_ viewCreator: ViewCreator) -> Bool {
-        return self.contains(where: {
-            $0 === viewCreator
-        })
+        fatalError()
     }
 
     func contains(where handler: @escaping (ViewCreator) -> Bool) -> Bool {
-        if let viewCreator = self.viewCreator, handler(viewCreator) {
-            return true
-        }
-
-        if let hostingController = self.next as? UICHostingController,
-            let hostingView = hostingController.view as? UICHostingView,
-            let viewCreator = hostingView.content.object as? ViewCreator {
-            return viewCreator.uiView.contains(where: handler)
-        }
-
-        return self.subviews.contains(where: {
-            $0.contains(where: handler)
-        })
+        fatalError()
     }
 }

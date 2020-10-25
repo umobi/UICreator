@@ -23,44 +23,27 @@
 import Foundation
 import UIKit
 
-public protocol UIViewControllerCreator: ViewCreator {
+public protocol UICViewControllerCreator: _UIViewCreator where View == ViewControllerAdaptor<Self.ViewController> {
     associatedtype ViewController: UIViewController
 }
 
-public extension UIViewControllerCreator {
-    var wrappedViewController: ViewController! {
-        if let controllerView = self.uiView as? ControllerView<UIViewController> {
-            return controllerView.view as? ViewController
-        }
-
-        if self is ViewControllerRepresentable {
-            return self.uiView.next as? ViewController
-        }
-
-        fatalError("Couldn't find view controller")
-    }
-}
-
-public extension UIViewControllerCreator {
-    func `as`(_ reference: UICOutlet<ViewController>) -> Self {
-        return self.onInTheScene { [weak self, reference] _ in
-            reference.ref(self?.wrappedViewController)
-        }
-    }
-}
-
-public class UICNavigation: UIViewControllerCreator {
-    private typealias View = ControllerView<UIViewController>
-    
+public struct UICNavigation: UICViewControllerCreator {
     public typealias ViewController = UINavigationController
+    public typealias View = ViewControllerAdaptor<UINavigationController>
 
-    public init(_ content: @escaping () -> ViewCreator) {
-        self.loadView {
-            View(builder: self)
+    let content: () -> _ViewCreator
+
+    public init(_ content: @escaping () -> _ViewCreator) {
+        self.content = content
+    }
+
+    public static func makeUIView(_ viewCreator: _ViewCreator) -> UIView {
+        UICControllerAdapt {
+            UINavigationController(
+                rootViewController: UICHostingController(content: (viewCreator as! Self).content)
+            )
         }
-        .onInTheScene {
-            ($0 as? View)?.contain(viewController: ViewController(rootViewController: UICHostingController(content: content)))
-        }
+        .releaseUIView()
     }
 }
 

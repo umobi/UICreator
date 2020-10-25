@@ -102,15 +102,15 @@ public extension UIGesture where Gesture: TouchGesture {
     #endif
 }
 
-public extension ViewCreator {
-    func onTouchMaker(_ touchConfigurator: @escaping (Touch) -> Touch) -> Self {
+public extension UIViewCreator {
+    func onTouchMaker(_ touchConfigurator: @escaping (Touch) -> Touch) -> UICModifiedView<View> {
         self.onNotRendered {
             touchConfigurator(Touch(target: $0)).add()
         }
     }
 
-    func onTouch(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onTouchMaker {
+    func onTouch(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onTouchMaker {
             $0.onRecognized {
                 handler($0.view!)
             }

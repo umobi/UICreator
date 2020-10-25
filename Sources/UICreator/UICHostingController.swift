@@ -10,7 +10,7 @@ import UIKit
 import ConstraintBuilder
 
 public class UICHostingController: UIViewController {
-    private var viewCreator: ViewCreator?
+    private let viewCreator: _ViewCreator
 
     public init() {
         UICreator.Fatal
@@ -19,13 +19,21 @@ public class UICHostingController: UIViewController {
     }
 
     public init(content: @escaping () -> ViewCreator) {
+        fatalError()
+    }
+
+    public init(content: @escaping () -> _ViewCreator) {
         self.viewCreator = content()
         super.init(nibName: nil, bundle: nil)
     }
 
-    public init(view: ViewCreator) {
-        self.viewCreator = view
+    public init(rootView: _ViewCreator) {
+        self.viewCreator = rootView
         super.init(nibName: nil, bundle: nil)
+    }
+
+    public init(view: ViewCreator) {
+        fatalError()
     }
 
     required public init?(coder: NSCoder) {
@@ -69,24 +77,8 @@ public class UICHostingController: UIViewController {
     }
     #endif
 
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-
-        guard let hostingView = self.view as? UICHostingView else {
-            return
-        }
-
-        hostingView.loadView()
-    }
-
     public override func loadView() {
-        guard let viewCreator = self.viewCreator else {
-            Fatal.noContentCreator.die()
-        }
-
-        self.viewCreator = nil
-
-        self.view = UICHostingView(view: viewCreator)
+        self.view = ViewAdaptor(self.viewCreator.releaseUIView())
     }
 
     @available(iOS 11.0, tvOS 11, *)

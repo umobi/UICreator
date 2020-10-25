@@ -22,41 +22,66 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
-public class Tap: UIGesture {
-    public typealias Gesture = UITapGestureRecognizer
+struct Trait {
+    private weak var view: CBView!
 
-    public required init(target view: UIView!) {
-        GestureUIGestureSwitch.switch(self, Gesture.init(target: view))
-    }
-}
+    @MutableBox fileprivate var traitHandler: ((CBView) -> Void)?
 
-public extension UIGesture where Gesture: UITapGestureRecognizer {
-    func number(ofTapsRequired number: Int) -> Self {
-        self.uiGesture?.numberOfTapsRequired = number
-        return self
+    private init(_ view: CBView) {
+        self.view = view
     }
 
-    #if os(iOS)
-    func number(ofTouchesRequired number: Int) -> Self {
-        self.uiGesture?.numberOfTouchesRequired = number
-        return self
+    static func create(_ view: CBView) -> Self {
+        .init(view)
     }
-    #endif
-}
 
-public extension UIViewCreator {
-    func onTapMaker(_ tapConfigurator: @escaping (Tap) -> Tap) -> UICModifiedView<View> {
-        self.onNotRendered {
-            tapConfigurator(Tap(target: $0)).add()
+    private func pop() {
+        self.traitHandler?(self.view)
+    }
+
+    func commit() {
+        guard self.view.isSelfImplemented else {
+            return
         }
-    }
 
-    func onTap(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
-        self.onTapMaker {
-            $0.onRecognized {
-                handler($0.view!)
+        ([self.view] + self.view.thatNeedsTrait())
+            .reversed()
+            .forEach {
+                $0.trait.pop()
             }
+    }
+}
+
+private extension CBView {
+    func thatNeedsTrait() -> [CBView] {
+        guard !self.isSelfImplemented else {
+            return []
         }
+
+        return [self] + self.subviews.reduce([]) {
+            $0 + $1.thatNeedsTrait()
+        }
+    }
+}
+
+private extension Trait {
+    func onTrait(_ handler: @escaping (CBView) -> Void) {
+        handler(self.view)
+
+        let oldHandler = self.traitHandler
+        self.traitHandler = {
+            oldHandler?($0)
+            handler($0)
+        }
+    }
+}
+
+public extension CBView {
+    @discardableResult
+    func onTrait(_ handler: @escaping (CBView) -> Void) -> Self {
+        self.trait.onTrait(handler)
+        return self
     }
 }

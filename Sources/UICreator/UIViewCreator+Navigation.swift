@@ -25,25 +25,13 @@ import UIKit
 
 public extension UIView {
     var viewController: UIViewController! {
-        return sequence(first: self as UIResponder, next: { $0.next }).first(where: {
+        sequence(first: self as UIResponder, next: { $0.next }).first(where: {
             $0 is UIViewController
         }) as? UIViewController
     }
 
     var navigationController: UINavigationController? {
         return self.viewController.navigationController
-    }
-}
-
-internal extension ViewCreator {
-    var viewController: UIViewController! {
-        self.uiView?.viewController
-    }
-}
-
-public extension ViewCreator {
-    var navigation: NavigationRepresentable? {
-        NavigationRepresentable(viewCreator: self)
     }
 }
 
@@ -58,7 +46,7 @@ public extension ViewCreator {
     func toolbar(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> Self {
         self.onInTheScene {
             $0.viewController.toolbarItems = contents().zip.map { view in
-                UIBarButtonItem(customView: UICHostingView(view: view))
+                UIBarButtonItem(customView: ViewAdaptor(view.releaseUIView()))
             }
         }
     }
@@ -131,7 +119,7 @@ public extension ViewCreator {
 
     func navigation(titleView content: @escaping () -> ViewCreator) -> Self {
         return self.onInTheScene {
-            $0.navigationItem.titleView = UICHostingView(content: content)
+            $0.navigationItem.titleView = ViewAdaptor(content().releaseUIView())
         }
     }
 
@@ -152,7 +140,7 @@ public extension ViewCreator {
     }
 
     #if os(iOS)
-    func navigation(backButton item: @escaping () -> ViewCreator) -> Self {
+    func navigation(backButton content: @escaping () -> ViewCreator) -> Self {
         self.onInTheScene {
             $0.navigationItem.backBarButtonItem = .init(
                 title: "",
@@ -167,17 +155,17 @@ public extension ViewCreator {
             }
 
             $0.navigationItem.setLeftBarButton(
-                .init(customView: UICHostingView(content: item)),
+                .init(customView: ViewAdaptor(content().releaseUIView())),
                 animated: false
             )
         }
     }
     #endif
 
-    func navigation(leftButton item: @escaping () -> ViewCreator) -> Self {
+    func navigation(leftButton content: @escaping () -> ViewCreator) -> Self {
         return self.onInTheScene {
             $0.navigationItem.setLeftBarButton(
-                .init(customView: UICHostingView(content: item)),
+                .init(customView: ViewAdaptor(content().releaseUIView())),
                 animated: false
             )
         }
@@ -187,15 +175,15 @@ public extension ViewCreator {
         return self.onInTheScene {
             $0.navigationItem
                 .setLeftBarButtonItems(contents().zip.map { view in
-                    .init(customView: UICHostingView(view: view))
+                    .init(customView: ViewAdaptor(view.releaseUIView()))
                 }, animated: false)
         }
     }
 
-    func navigation(rightButton item: @escaping () -> ViewCreator) -> Self {
+    func navigation(rightButton content: @escaping () -> ViewCreator) -> Self {
         return self.onInTheScene {
             $0.navigationItem.setRightBarButton(
-                .init(customView: UICHostingView(content: item)),
+                .init(customView: ViewAdaptor(content().releaseUIView())),
                 animated: false
             )
         }
@@ -205,7 +193,7 @@ public extension ViewCreator {
         return self.onInTheScene {
             $0.navigationItem
                 .setRightBarButtonItems(contents().zip.map { view in
-                    .init(customView: UICHostingView(view: view))
+                    .init(customView: ViewAdaptor(view.releaseUIView()))
                 }, animated: false)
         }
     }

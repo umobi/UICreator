@@ -23,45 +23,17 @@
 import Foundation
 import UIKit
 
-public class UIViewWrapper {
-    private let wrap: ViewCreator
+public struct UIViewWrapper {
+    weak var view: UIView!
 
-    /// UIViewWrapper gets the UIView inside the ViewCreator to expose the view directly
-    /// used for imperative methods.
-    public init(_ wrap: ViewCreator) {
-        self.wrap = wrap
-    }
     /// Constructing the UIViewWrapper with the view reference allows to make sure that view
     /// is related to some ViewCreator.
-    public convenience init?(_ view: UIView) {
-        guard let creator = view.viewCreator else {
-            return nil
-        }
-
-        self.init(creator)
-    }
-
-    /// This will retain view on viewCreator
-    public var uiView: UIView! {
-        return self.wrap.uiView
-    }
-
-    /// This will release the UIView changing the reference to weak
-    @available(*, deprecated, message: "Use UICHostingController(content:)")
-    public func releaseUIView() -> UIView! {
-        return self.wrap.releaseUIView()
+    public init(_ view: UIView) {
+        self.view = view
     }
 
     /// Use this to get the safe view to append constraints.
     public var safe: UIView! {
-        if let maker = self.wrap as? ViewRepresentable {
-            return maker.wrapper
-        }
-
-        if let maker = self.wrap as? ViewControllerRepresentable {
-            return maker.wrapper
-        }
-
-        return self.wrap.uiView
+        self.view.dynamicView
     }
 }

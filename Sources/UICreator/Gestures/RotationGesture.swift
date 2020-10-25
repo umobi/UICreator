@@ -32,16 +32,16 @@ public class Rotation: UIGesture {
     }
 }
 
-public extension ViewCreator {
+public extension UIViewCreator {
 
-    func onRotationMaker(_ rotationConfigurator: @escaping (Rotation) -> Rotation) -> Self {
+    func onRotationMaker(_ rotationConfigurator: @escaping (Rotation) -> Rotation) -> UICModifiedView<View> {
         self.onNotRendered {
             rotationConfigurator(Rotation(target: $0)).add()
         }
     }
 
-    func onRotation(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onRotationMaker {
+    func onRotation(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onRotationMaker {
             $0.onRecognized {
                 handler($0.view!)
             }

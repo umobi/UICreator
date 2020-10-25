@@ -33,16 +33,16 @@ public class Pinch: UIGesture {
     }
 }
 
-public extension ViewCreator {
+public extension UIViewCreator {
 
-    func onPinchMaker(_ pinchConfigurator: @escaping (Pinch) -> Pinch) -> Self {
+    func onPinchMaker(_ pinchConfigurator: @escaping (Pinch) -> Pinch) -> UICModifiedView<View> {
         self.onNotRendered {
             pinchConfigurator(Pinch(target: $0)).add()
         }
     }
 
-    func onPinch(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onPinchMaker {
+    func onPinch(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onPinchMaker {
             $0.onRecognized {
                 handler($0.view!)
             }

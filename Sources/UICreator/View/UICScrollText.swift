@@ -230,21 +230,15 @@ public extension TextKeyboard where View: UITextView {
         }
     }
 
-    func inputView(content: @escaping () -> ViewCreator) -> Self {
-        let content = content()
-        self.tree.append(content)
-
-        return self.onRendered {
-            ($0 as? View)?.inputView = UICHostingView(view: content)
+    func inputView(content: @escaping () -> _ViewCreator) -> Self {
+        self.onRendered {
+            ($0 as? View)?.inputView = ViewAdaptor(content().releaseUIView())
         }
     }
 
-    func inputAccessoryView(content: @escaping () -> ViewCreator) -> Self {
-        let content = content()
-        self.tree.append(content)
-
-        return self.onRendered {
-            ($0 as? View)?.inputAccessoryView = UICHostingView(view: content)
+    func inputAccessoryView(content: @escaping () -> _ViewCreator) -> Self {
+        self.onRendered {
+            ($0 as? View)?.inputAccessoryView = ViewAdaptor(content().releaseUIView())
         }
     }
 

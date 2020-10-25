@@ -7,9 +7,23 @@ final class UICreatorTests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
 //        XCTAssertEqual(UICreator().text, "Hello, World!")
+        print(UICNavigation {
+            Slider()
+        }.releaseUIView())
     }
 
     static var allTests = [
         ("testExample", testExample)
     ]
+}
+
+import UIKit
+struct Slider: UICViewRepresentable {
+    typealias View = UISlider
+
+    func makeUIView() -> UISlider {
+        UISlider()
+    }
+
+    func updateUIView(_ uiView: UISlider) {}
 }

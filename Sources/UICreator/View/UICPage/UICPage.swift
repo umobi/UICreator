@@ -24,70 +24,90 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICPage: UIViewControllerCreator {
-    private typealias View = ControllerView<UIViewController>
-
+public class UICPage: UICViewControllerCreator {
+    public typealias View = ViewControllerAdaptor<PageViewController>
     public typealias ViewController = PageViewController
+
+    let transitionStyle: UIPageViewController.TransitionStyle
+    let navigationOrientation: UIPageViewController.NavigationOrientation
+    let options: [UIPageViewController.OptionsKey: Any]?
 
     public init(
         transitionStyle: UIPageViewController.TransitionStyle,
         navigationOrientation: UIPageViewController.NavigationOrientation,
         options: [UIPageViewController.OptionsKey: Any]?) {
 
-        self.loadView {
-            ControllerView<ViewController>(builder: self)
-        }
-        .onInTheScene {
-            ($0 as? View)?.contain(viewController: {
+        self.transitionStyle = transitionStyle
+        self.navigationOrientation = navigationOrientation
+        self.options = options
+    }
+
+    public static func makeUIView(_ viewCreator: _ViewCreator) -> UIView {
+        let _self = viewCreator as! Self
+
+        return UICControllerAdapt {
+            {
                 let pageController = PageViewController(
-                    transitionStyle: transitionStyle,
-                    navigationOrientation: navigationOrientation,
-                    options: options
+                    transitionStyle: _self.transitionStyle,
+                    navigationOrientation: _self.navigationOrientation,
+                    options: _self.options
                 )
 
                 pageController.delegate = pageController
                 pageController.dataSource = pageController
 
                 return pageController
-            }())
+            }()
         }
+        .releaseUIView()
     }
 }
 
-public extension UIViewControllerCreator where ViewController: UIPageViewController {
+public extension UICViewControllerCreator where ViewController: UIPageViewController {
     func pages(
         direction: UIPageViewController.NavigationDirection,
-        @UICViewBuilder  _ contents: @escaping () -> ViewCreator) -> Self {
-        let contents: [UICHostingController] = contents().zip.map { content in
-            self.tree.append(content)
-
-            return UICHostingController(view: content)
-        }
-
-        return self.onInTheScene { [unowned self] _ in
-            self.wrappedViewController.updateViewControllers(contents, direction: direction, animated: false, completion: nil)
+        @UICViewBuilder  _ contents: @escaping () -> ViewCreator) -> UICModifiedView<View> {
+        self.onInTheScene {
+            ($0 as? View)?
+                .dynamicViewController
+                .updateViewControllers(
+                    {
+                        contents().zip.map {
+                            UICHostingController(view: $0)
+                        }
+                    }(),
+                    direction: direction,
+                    animated: false,
+                    completion: nil
+                )
         }
     }
 }
 
 public extension UICPage {
     #if os(iOS)
-    func spineLocation(_ handler: @escaping (UIInterfaceOrientation) -> UIPageViewController.SpineLocation) -> Self {
-        self.onInTheScene { [unowned self] _ in
-            self.wrappedViewController.spineLocationHandler = handler
+    func spineLocation(_ handler: @escaping (UIInterfaceOrientation) -> UIPageViewController.SpineLocation) -> UICModifiedView<View> {
+        self.onInTheScene {
+            ($0 as? View)?
+                .dynamicViewController
+                .spineLocationHandler = handler
         }
     }
     #endif
 
-    func onPageChanged(_ handler: @escaping (Int) -> Void) -> Self {
-        self.onInTheScene { [unowned self] _ in
-            self.wrappedViewController.onPageChangeHandler = handler
+    func onPageChanged(_ handler: @escaping (Int) -> Void) -> UICModifiedView<View> {
+        self.onInTheScene {
+            ($0 as? View)?
+                .dynamicViewController
+                .onPageChangeHandler = handler
         }
     }
 
-    func isInfinityScroll(_ flag: Bool) -> Self {
-        self.onInTheScene { [unowned self] _ in
-            self.wrappedViewController.isInfinityScroll = flag
+    func isInfinityScroll(_ flag: Bool) -> UICModifiedView<View> {
+        self.onInTheScene {
+            ($0 as? View)?
+                .dynamicViewController
+                .isInfinityScroll = flag
         }
     }
 }

@@ -23,66 +23,12 @@
 import Foundation
 import UIKit
 
-public protocol UICView: ViewCreator {
-    func viewDidLoad()
-    var body: ViewCreator { get }
+public protocol UICView: _UIViewCreator where View == UIView {
+    var body: _ViewCreator { get }
 }
 
 public extension UICView {
-    func viewDidLoad() {}
-}
-
-private var kTemplateViewDidConfiguredView: UInt = 0
-private var kViewDidLoad: UInt = 0
-
-private extension UICView {
-    var didViewLoadMutable: Mutable<Bool> {
-        OBJCSet(self, &kViewDidLoad, policity: .OBJC_ASSOCIATION_RETAIN) {
-            .init(value: false)
-        }
-    }
-
-    var didConfiguredViewMutable: Mutable<Bool> {
-        OBJCSet(self, &kTemplateViewDidConfiguredView, policity: .OBJC_ASSOCIATION_RETAIN) {
-            .init(value: false)
-        }
-    }
-}
-
-extension UICView {
-    private var didConfiguredView: Bool {
-        get { self.didConfiguredViewMutable.value }
-        set { self.didConfiguredViewMutable.value = newValue }
-    }
-
-    private(set) var didViewLoad: Bool {
-        get { self.didViewLoadMutable.value }
-        set { self.didViewLoadMutable.value = newValue }
-    }
-
-    func makeView() -> UIView {
-        guard !self.didConfiguredView else {
-            Fatal.Builder("UICView is trying to load a view that was already loaded").die()
-        }
-
-        self.didConfiguredView = true
-        let view = RootView(builder: self)
-        let body = self.body
-        self.tree.append(body)
-
-        self.onNotRendered {
-            $0.add(priority: .required, body.releaseUIView())
-        }.onNotRendered { [weak self] _ in
-            guard let self = self else {
-                Fatal.Builder("Property self already deallocated").die()
-            }
-
-            if !self.didViewLoad {
-                self.didViewLoad = true
-                self.viewDidLoad()
-            }
-        }
-
-        return view
+    static func makeUIView(_ viewCreator: _ViewCreator) -> UIView {
+        (viewCreator as! Self).body.releaseUIView()
     }
 }

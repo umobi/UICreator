@@ -269,67 +269,63 @@ public extension UIViewCreator where Self: Control, View: UITextField {
 }
 
 public extension UIViewCreator where View: UITextField {
-    func leftView(_ mode: UITextField.ViewMode = .always, content: @escaping () -> ViewCreator) -> Self {
-        let host = content()
-        self.tree.append(host)
-
-        return self.onRendered { view in
-            (view as? View)?.leftView = UICHostingView(view: host)
-            (view as? View)?.leftViewMode = mode
-
+    func leftView(_ mode: UITextField.ViewMode = .always, content: @escaping () -> _ViewCreator) -> Self {
+        self.onRendered { view in
             var needsToAddConstraints = true
-            host.onAppear { [weak view] hostView in
-                guard needsToAddConstraints, let view = view else {
-                    return
+
+            (view as? View)?.leftViewMode = mode
+            (view as? View)?.leftView = ViewAdaptor(content().releaseUIView())
+                .onAppear { viewAdaptor in
+                    guard needsToAddConstraints else {
+                        return
+                    }
+
+                    let viewAdaptor = viewAdaptor as! ViewAdaptor
+
+                    Constraintable.activate {
+                        viewAdaptor.cbuild
+                            .centerY
+                            .equalTo(view.cbuild.centerY)
+
+                        viewAdaptor.cbuild
+                            .leading
+                    }
+
+                    needsToAddConstraints = false
                 }
-
-                Constraintable.activate {
-                    hostView.cbuild
-                        .centerY
-                        .equalTo(view.cbuild.centerY)
-
-                    hostView.cbuild
-                        .leading
+                .onDisappear {
+                    needsToAddConstraints = $0.window == nil
                 }
-
-                needsToAddConstraints = false
-            }
-
-            host.onDisappear {
-                needsToAddConstraints = $0.window == nil
-            }
         }
     }
 
-    func rightView(_ mode: UITextField.ViewMode = .always, content: @escaping () -> ViewCreator) -> Self {
-        let host = content()
-        self.tree.append(host)
-
-        return self.onRendered { view in
-            (view as? View)?.rightView = UICHostingView(view: host)
-            (view as? View)?.rightViewMode = mode
-
+    func rightView(_ mode: UITextField.ViewMode = .always, content: @escaping () -> _ViewCreator) -> Self {
+        self.onRendered { view in
             var needsToAddConstraints = true
-            host.onAppear { [weak view] hostView in
-                guard needsToAddConstraints, let view = view else {
-                    return
+
+            (view as? View)?.rightViewMode = mode
+            (view as? View)?.rightView = ViewAdaptor(content().releaseUIView())
+                .onAppear { viewAdaptor in
+                    guard needsToAddConstraints else {
+                        return
+                    }
+
+                    let viewAdaptor = viewAdaptor as! ViewAdaptor
+
+                    Constraintable.activate {
+                        viewAdaptor.cbuild
+                            .centerY
+                            .equalTo(view.cbuild.centerY)
+
+                        viewAdaptor.cbuild
+                            .trailing
+                    }
+
+                    needsToAddConstraints = false
                 }
-
-                Constraintable.activate {
-                    hostView.cbuild
-                        .centerY
-                        .equalTo(view.cbuild.centerY)
-
-                    hostView.cbuild
-                        .trailing
+                .onDisappear {
+                    needsToAddConstraints = $0.window == nil
                 }
-
-                needsToAddConstraints = false
-            }
-
-            host.onDisappear {
-                needsToAddConstraints = $0.window == nil
-            }
         }
     }
 }
@@ -411,22 +407,16 @@ public extension TextKeyboard where View: UITextField {
         }
     }
 
-    func inputView(content: @escaping () -> ViewCreator) -> Self {
-        let content = content()
-        self.tree.append(content)
-
-        return self.onRendered {
-           ($0 as? View)?.inputView = UICHostingView(view: content)
+    func inputView(content: @escaping () -> _ViewCreator) -> Self {
+        self.onRendered {
+            ($0 as? View)?.inputView = ViewAdaptor(content().releaseUIView())
             ($0 as? View)?.inputView?.sizeToFit()
         }
     }
 
-    func inputAccessoryView(content: @escaping () -> ViewCreator) -> Self {
-        let content = content()
-        self.tree.append(content)
-
-        return self.onRendered {
-            ($0 as? View)?.inputAccessoryView = UICHostingView(view: content)
+    func inputAccessoryView(content: @escaping () -> _ViewCreator) -> Self {
+        self.onRendered {
+            ($0 as? View)?.inputAccessoryView = ViewAdaptor(content().releaseUIView())
             ($0 as? View)?.inputAccessoryView?.sizeToFit()
         }
     }

@@ -120,28 +120,7 @@ extension ViewCreator {
 
 struct ViewCreatorUIViewSwitcher {
     static func `switch`(_ viewCreator: ViewCreator?, _ uiView: UIView?) {
-        if let viewCreator = viewCreator {
-            guard let uiView = uiView else {
-                viewCreator.viewObject = .nil
-                return
-            }
-
-            if viewCreator.isReleased {
-                viewCreator.viewObject = .weak(uiView)
-                UIView.set(uiView, viewCreator, .strong)
-                return
-            }
-
-
-            viewCreator.viewObject = .strong(uiView)
-            UIView.set(uiView, viewCreator, .weak)
-            return
-        }
-
-        if let uiView = uiView {
-            UIView.set(uiView, nil, .weak)
-            return
-        }
+        fatalError()
     }
 }
 
@@ -168,18 +147,6 @@ extension ViewCreator {
                 self.loadViewHandler = nil
                 let view = loadHandler()
                 return view
-            }
-
-            if let viewMaker = self as? ViewRepresentable {
-                return viewMaker.privateMakeUIView()
-            }
-
-            if let viewMaker = self as? ViewControllerRepresentable {
-                return viewMaker.privateMakeUIView()
-            }
-
-            if let uicView = self as? UICView {
-                return uicView.makeView()
             }
 
             ViewCreatorFatal.alreadyLoadedView.die()
