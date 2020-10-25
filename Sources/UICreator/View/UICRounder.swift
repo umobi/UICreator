@@ -29,22 +29,20 @@ public protocol UICManagerContentView {
     func reloadContentLayout()
 }
 
-public class RounderView: UIView, UICManagerContentView {
+internal class RounderView: UIView, UICManagerContentView {
+
+    init() {
+        self.radius = .zero
+        super.init(frame: .zero)
+        self.makeSelfImplemented()
+    }
+
     public var radius: CGFloat {
         didSet {
-            self.reloadContentLayout()
+            if self.radius != oldValue {
+                self.reloadContentLayout()
+            }
         }
-    }
-
-    public required init(radius: CGFloat) {
-        self.radius = radius
-        super.init(frame: .zero)
-    }
-
-    public required init(_ view: UIView, radius: CGFloat) {
-        self.radius = radius
-        super.init(frame: .zero)
-        self.addContent(view)
     }
 
     public override init(frame: CGRect) {
@@ -98,7 +96,7 @@ public class RounderView: UIView, UICManagerContentView {
     }
 }
 
-public extension RounderView {
+extension RounderView {
 
     func addContent(_ view: UIView) {
         CBSubview(self).addSubview(view)
@@ -142,60 +140,70 @@ public extension RounderView {
     }
 }
 
-public class UICRounder: UIViewCreator {
-    public typealias View = RounderView
+public struct UICRounder: UIViewCreator {
+    public typealias View = UIView
+
+    @MutableBox var borderWidth: Relay<CGFloat> = .constant(.zero)
+    @MutableBox var borderColor: Relay<UIColor> = .constant(.clear)
+
+    let radius: CGFloat
+    let content: () -> ViewCreator
 
     public init(radius: CGFloat, content: @escaping () -> ViewCreator) {
-        let content = content()
-        self.tree.append(content)
+        self.radius = radius
+        self.content = content
+    }
 
-        self.loadView { [unowned self] in
-            let view = View.init(radius: radius)
-            view.updateBuilder(self)
-            return view
-        }
-        .onNotRendered {
-            ($0 as? View)?.addContent(content.releaseUIView())
-        }
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        guard
+            _self.radius != .zero
+                && _self.borderColor.wrappedValue != .clear
+                && _self.borderWidth.wrappedValue != .zero
+        else { return _self.content().releaseUIView() }
+
+        return RounderView()
+            .onNotRendered {
+                ($0 as? RounderView)?.radius = _self.radius
+            }
+            .onNotRendered {
+                ($0 as? RounderView)?.addContent(_self.content().releaseUIView())
+            }
+            .onNotRendered {
+                weak var view = $0 as? RounderView
+
+                _self.borderColor.sync {
+                    view?.border(color: $0)
+                }
+
+                _self.borderWidth.sync {
+                    view?.border(width: $0)
+                }
+            }
     }
 }
 
-public extension UIViewCreator where View: RounderView {
+public extension UICRounder {
     func borderColor(_ color: UIColor) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.border(color: color)
-        }
+        self.borderColor = .constant(color)
+        return self
     }
 
     func borderColor(_ dynamicColor: Relay<UIColor>) -> Self {
-        self.onNotRendered {
-            weak var view = $0 as? View
-
-            dynamicColor.sync {
-                view?.border(color: $0)
-            }
-        }
+        self.borderColor = dynamicColor
+        return self
     }
 }
 
-public extension UIViewCreator where View: RounderView {
+public extension UICRounder {
     func borderWidth(_ width: CGFloat) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.border(width: width)
-        }
+        self.borderWidth = .constant(width)
+        return self
     }
 
     func borderWidth(_ dynamicWidth: Relay<CGFloat>) -> Self {
-        self.onNotRendered {
-            weak var view = $0 as? View
-
-            dynamicWidth.sync {
-                view?.border(width: $0)
-            }
-        }
+        self.borderWidth = dynamicWidth
+        return self
     }
-}
-
-public func UICCircle(content: @escaping () -> ViewCreator) -> UICRounder {
-    return .init(radius: 0.5, content: content)
 }

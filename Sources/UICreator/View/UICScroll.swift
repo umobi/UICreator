@@ -26,10 +26,32 @@ import ConstraintBuilder
 
 //swiftlint:disable file_length
 public extension ScrollView {
-    enum Axis {
+    enum Axis: Equatable {
         case vertical
         case horizontal
         case auto(vertical: UILayoutPriority, horizontal: UILayoutPriority)
+
+        public static func ==(lhs: Axis, rhs: Axis) -> Bool {
+            switch lhs {
+            case .vertical:
+                if case .vertical = rhs {
+                    return true
+                }
+
+            case .horizontal:
+                if case .horizontal = rhs {
+                    return true
+                }
+
+            case .auto(let lhsVerticalPriority, let lhsHorizontalPriority):
+                if case .auto(let rhsVerticalPriority, let rhsHorizontalPriority) = rhs {
+                    return lhsVerticalPriority == rhsVerticalPriority
+                        && lhsHorizontalPriority == rhsHorizontalPriority
+                }
+            }
+
+            return false
+        }
     }
 
     enum Margin {
@@ -43,7 +65,9 @@ public class ScrollView: UIScrollView, UICManagerContentView {
     private weak var contentView: UIView!
     public var axis: Axis {
         didSet {
-            self.reloadContentLayout()
+            if self.axis != oldValue {
+                self.reloadContentLayout()
+            }
         }
     }
 
@@ -65,16 +89,10 @@ public class ScrollView: UIScrollView, UICManagerContentView {
         }
     }
 
-    public required init(_ view: UIView, axis: Axis = .vertical) {
+    init(_ axis: Axis) {
         self.axis = axis
         super.init(frame: .zero)
-
-        self.addContent(view)
-    }
-
-    public required init(axis: Axis = .vertical) {
-        self.axis = axis
-        super.init(frame: .zero)
+        self.makeSelfImplemented()
     }
 
     public func addContent(_ view: UIView) {
@@ -253,137 +271,142 @@ private extension ScrollView {
     }
 }
 
-public class UICScroll: UIViewCreator {
+public struct UICScroll: UIViewCreator {
     public typealias View = ScrollView
 
-    public init(axis: View.Axis = .vertical, content: @escaping () -> ViewCreator) {
-        let content = content()
-        self.tree.append(content)
+    @Relay var axis: View.Axis
+    let content: () -> ViewCreator
 
-        self.loadView { [unowned self] in
-            let view = View.init(axis: axis)
-            view.updateBuilder(self)
-            return view
-        }
-        .onNotRendered {
-            ($0 as? View)?.addContent(content.releaseUIView())
-        }
+    public init(
+        axis: Relay<View.Axis>,
+        content: @escaping () -> ViewCreator) {
+
+        self.content = content
+        self._axis = axis
     }
-}
 
-public func UICVScroll(_ content: @escaping () -> ViewCreator) -> UICScroll {
-    return .init(axis: .vertical, content: content)
-}
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
 
-public func UICHScroll(_ content: @escaping () -> ViewCreator) -> UICScroll {
-    return .init(axis: .horizontal, content: content)
+        return ScrollView(_self.axis)
+            .onNotRendered {
+                ($0 as? View)?.addContent(_self.content().releaseUIView())
+            }
+            .onNotRendered {
+                weak var view = $0 as? View
+
+                _self.$axis.sync {
+                    view?.axis = $0
+                }
+            }
+    }
 }
 
 public extension UIViewCreator where View: UIScrollView {
     @available(iOS 11.0, tvOS 11.0, *)
-    func insets(behavior: UIScrollView.ContentInsetAdjustmentBehavior) -> Self {
+    func insetsBehavior(_ behavior: UIScrollView.ContentInsetAdjustmentBehavior) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.contentInsetAdjustmentBehavior = behavior
         }
     }
 
-    func alwaysBounce(vertical flag: Bool) -> Self {
+    func alwaysBounceVertical(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.alwaysBounceVertical = flag
         }
     }
 
-    func alwaysBounce(horizontal flag: Bool) -> Self {
+    func alwaysBounceHorizontal(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.alwaysBounceHorizontal = flag
         }
     }
 
     @available(iOS 13, tvOS 13.0, *)
-    func automaticallyAdjustsScroll(indicatorInsets flag: Bool) -> Self {
+    func automaticallyAdjustsScroll(indicatorInsets flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.automaticallyAdjustsScrollIndicatorInsets = flag
         }
     }
 
-    func bounces(_ flag: Bool) -> Self {
+    func bounces(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.bounces = flag
         }
     }
 
-    func canCancelContentTouches(_ flag: Bool) -> Self {
+    func canCancelContentTouches(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.canCancelContentTouches = flag
         }
     }
 
-    func content(insets: UIEdgeInsets) -> Self {
+    func contentInsets(_ insets: UIEdgeInsets) -> UICModifiedView<View> {
         self.onInTheScene {
             ($0 as? View)?.contentInset = insets
         }
     }
 
-    func content(size: CGSize) -> Self {
+    func contentSize(_ size: CGSize) -> UICModifiedView<View> {
         self.onInTheScene {
             ($0 as? View)?.contentSize = size
         }
     }
 
     #if os(iOS)
-    func isPagingEnabled(_ flag: Bool) -> Self {
+    func isPagingEnabled(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.isPagingEnabled = flag
         }
     }
     #endif
 
-    func isDirectionalLockEnabled(_ flag: Bool) -> Self {
+    func isDirectionalLockEnabled(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.isDirectionalLockEnabled = flag
         }
     }
 
-    func isScrollEnabled(_ flag: Bool) -> Self {
+    func isScrollEnabled(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.isScrollEnabled = flag
         }
     }
 
-    func showsVerticalScrollIndicator(_ flag: Bool) -> Self {
+    func showsVerticalScrollIndicator(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.showsVerticalScrollIndicator = flag
         }
     }
 
-    func showsHorizontalScrollIndicator(_ flag: Bool) -> Self {
+    func showsHorizontalScrollIndicator(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.showsHorizontalScrollIndicator = flag
         }
     }
 
-    func indicator(style: View.IndicatorStyle) -> Self {
+    func indicator(style: View.IndicatorStyle) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.indicatorStyle = style
         }
     }
 
     @available(iOS 11.1, tvOS 11.1, *)
-    func verticalScroll(indicatorInsets: UIEdgeInsets) -> Self {
+    func verticalScroll(indicatorInsets: UIEdgeInsets) -> UICModifiedView<View> {
         self.onInTheScene {
             ($0 as? View)?.verticalScrollIndicatorInsets = indicatorInsets
         }
     }
 
     @available(iOS 11.1, tvOS 11.1, *)
-    func horizontalScroll(indicatorInsets: UIEdgeInsets) -> Self {
+    func horizontalScroll(indicatorInsets: UIEdgeInsets) -> UICModifiedView<View> {
         self.onInTheScene {
             ($0 as? View)?.horizontalScrollIndicatorInsets = indicatorInsets
         }
     }
 
     @available(*, deprecated, message: "use verticalScroll(indicatorInsets:) and horizontalScroll(indicatorInsets:)")
-    func scroll(indicatorInsets: UIEdgeInsets) -> Self {
+    func scroll(indicatorInsets: UIEdgeInsets) -> UICModifiedView<View> {
         self.onInTheScene {
             ($0 as? View)?.scrollIndicatorInsets = indicatorInsets
         }
@@ -391,7 +414,7 @@ public extension UIViewCreator where View: UIScrollView {
 }
 
 public extension UIViewCreator where View: UIScrollView {
-    func contentInsets(_ relay: Relay<UIEdgeInsets>) -> Self {
+    func contentInsets(_ relay: Relay<UIEdgeInsets>) -> UICModifiedView<View> {
         self.onInTheScene {
             weak var view = $0 as? View
 
@@ -402,7 +425,7 @@ public extension UIViewCreator where View: UIScrollView {
     }
 
     @available(iOS 11.1, tvOS 11.1, *)
-    func verticalScrollIndicatorInsets(_ relay: Relay<UIEdgeInsets>) -> Self {
+    func verticalScrollIndicatorInsets(_ relay: Relay<UIEdgeInsets>) -> UICModifiedView<View> {
         self.onInTheScene {
             weak var view = $0 as? View
 
@@ -413,7 +436,7 @@ public extension UIViewCreator where View: UIScrollView {
     }
 
     @available(iOS 11.1, tvOS 11.1, *)
-    func horizontalScrollIndicatorInsets(_ relay: Relay<UIEdgeInsets>) -> Self {
+    func horizontalScrollIndicatorInsets(_ relay: Relay<UIEdgeInsets>) -> UICModifiedView<View> {
         self.onInTheScene {
             weak var view = $0 as? View
 

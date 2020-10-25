@@ -25,9 +25,9 @@ import UIKit
 import ConstraintBuilder
 
 //swiftlint:disable file_length
-public class SpacerView: UIView {
+private class SpacerView: UIView {
     private weak var view: UIView?
-    private(set) var margin: Edges {
+    private(set) var margin: UICSpacer.Edges {
         didSet {
             if self.margin != oldValue {
                 self.layout()
@@ -49,7 +49,7 @@ public class SpacerView: UIView {
     }
 
     @discardableResult
-    func setMargin(_ margin: Edges) -> Self {
+    func setMargin(_ margin: UICSpacer.Edges) -> Self {
         self.margin = margin
     }
 
@@ -143,7 +143,7 @@ public class SpacerView: UIView {
     }
 }
 
-public extension SpacerView {
+public extension UICSpacer {
     struct Edges: Equatable {
         public let top, bottom, leading, trailing: CGFloat
 
@@ -212,12 +212,12 @@ public extension SpacerView {
 }
 
 public struct UICSpacer: UIViewCreator {
-    public typealias View = SpacerView
+    public typealias View = UIView
 
-    @MutableBox var margin: View.Edges = .zero
+    @MutableBox var margin: Edges = .zero
     let content: () -> ViewCreator
 
-    public init(margin: View.Edges, content: @escaping () -> ViewCreator) {
+    public init(margin: Edges, content: @escaping () -> ViewCreator) {
         self.margin = margin
     }
 
@@ -348,12 +348,12 @@ private extension SpacerView {
 }
 
 public extension UIViewCreator {
-    func padding(_ constant: CGFloat) -> UICSpacer {
+    func padding(_ constant: CGFloat) -> UICModifiedView<UIView> {
         self.padding(constant, .all)
     }
 
     //swiftlint:disable function_body_length
-    func padding(_ constant: CGFloat, _ edges: PaddingEdges) -> UICModifiedView<SpacerView> {
+    func padding(_ constant: CGFloat, _ edges: PaddingEdges) -> UICModifiedView<UIView> {
         if let spacer = self as? UICSpacer {
             return spacer.onNotRendered {
                 ($0 as? SpacerView)?.updatePaddingEdges(constant, edges)

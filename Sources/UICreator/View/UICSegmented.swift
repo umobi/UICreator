@@ -22,8 +22,22 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 public class SegmentedControl: UISegmentedControl {
+
+    init() {
+        super.init(frame: .zero)
+        self.makeSelfImplemented()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    public override init(frame: CGRect) {
+        fatalError("init(frame:) has not been implemented")
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -74,19 +88,20 @@ public struct SegmentBuilder {
     }
 }
 
-public class Segment {
+public struct Segment {
     public enum Content {
         case image(UIImage)
         case text(String)
         case empty
     }
 
+    @MutableBox var isEnabled: Bool = true
+    @MutableBox var contentOffset: CGSize?
+    @MutableBox var width: CGFloat?
+    @MutableBox var onSelected: ((UIView) -> Void)?
+    @MutableBox private var isSelected: Bool = false
+
     private let content: Content
-    private var isEnabled: Bool = true
-    private var contentOffset: CGSize?
-    private var width: CGFloat?
-    private var onSelected: ((UIView) -> Void)?
-    private var isSelected: Bool = false
     private let collection: [Segment]?
 
     var zip: [Segment] {
@@ -132,28 +147,28 @@ public class Segment {
         return self
     }
 
-    internal func apply(in segmented: UICSegmented, at index: Int) {
+    internal func apply(in segmented: UICModifiedView<SegmentedControl>, at index: Int) -> UICModifiedView<SegmentedControl> {
         switch self.content {
         case .image(let image):
-            _ = segmented.addSegment(image: image, at: index)
+            return segmented.addSegment(image: image, at: index)
         case .text(let text):
-            _ = segmented.addSegment(title: text, at: index)
+            return segmented.addSegment(title: text, at: index)
         case .empty:
-            _ = segmented.addSegment(title: nil, at: index)
+            return segmented.addSegment(title: nil, at: index)
         }
 
-        _ = segmented.isEnabled(self.isEnabled, at: index)
+        return segmented.isEnabled(self.isEnabled, at: index)
 
         if let contentOffset = self.contentOffset {
-            _ = segmented.contentOffset(contentOffset, at: index)
+            return segmented.contentOffset(contentOffset, at: index)
         }
 
         if let width = self.width {
-            _ = segmented.width(width, at: index)
+            return segmented.width(width, at: index)
         }
 
         if let onSelected = self.onSelected {
-            _ = segmented.onSelectedIndex {
+            return segmented.onSelectedIndex {
                 if $0 == index {
                     onSelected(segmented.releaseUIView())
                 }
@@ -161,32 +176,35 @@ public class Segment {
         }
 
         if self.isSelected {
-            _ = segmented.selectedSegment(at: index)
+            return segmented.selectedSegment(at: index)
         }
     }
 }
 
-public class UICSegmented: UIViewCreator, Control {
+public struct UICSegmented: UIViewCreator {
     public typealias View = SegmentedControl
 
+    let segments: () -> Segment
+
     public init(@SegmentBuilder _ segments: @escaping () -> Segment) {
-        self.loadView { [unowned self] in
-            View.init(builder: self)
-        }
-        .onNotRendered { [unowned self] _ in
-            self.addSegments(segments().zip)
-        }
+        self.segments = segments
     }
 
-    private func addSegments(_ segments: [Segment]) {
-        segments.enumerated().forEach {
-            $0.element.apply(in: self, at: $0.offset)
-        }
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return _self.segments()
+            .zip
+            .enumerated()
+            .reduce(UICModifiedView { SegmentedControl() }) {
+                $1.element.apply(in: $0, at: $1.offset)
+            }
+            .releaseUIView()
     }
 }
 
 public extension UIViewCreator where View: UISegmentedControl {
-    func addSegment(title: String?, at index: Int? = nil) -> Self {
+    func addSegment(title: String?, at index: Int? = nil) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.insertSegment(
                 withTitle: title,
@@ -195,7 +213,8 @@ public extension UIViewCreator where View: UISegmentedControl {
             )
         }
     }
-    func addSegment(image: UIImage?, at index: Int? = nil) -> Self {
+    
+    func addSegment(image: UIImage?, at index: Int? = nil) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.insertSegment(
                 with: image,
@@ -206,81 +225,81 @@ public extension UIViewCreator where View: UISegmentedControl {
     }
 
     @available(iOS 13, tvOS 13, *)
-    func selectedTintColor(_ tintColor: UIColor?) -> Self {
+    func selectedTintColor(_ tintColor: UIColor?) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.selectedSegmentTintColor = tintColor
         }
     }
 
-    func adjustSegmentByContentWidths(_ flag: Bool) -> Self {
+    func adjustSegmentByContentWidths(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.apportionsSegmentWidthsByContent = flag
         }
     }
 
-    func isEnabled(_ flag: Bool, at index: Int) -> Self {
+    func isEnabled(_ flag: Bool, at index: Int) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.setEnabled(flag, forSegmentAt: index)
         }
     }
 
-    func contentOffset(_ offset: CGSize, at index: Int) -> Self {
+    func contentOffset(_ offset: CGSize, at index: Int) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.setContentOffset(offset, forSegmentAt: index)
         }
     }
 
-    func width(_ constant: CGFloat, at index: Int) -> Self {
+    func width(_ constant: CGFloat, at index: Int) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.setWidth(constant, forSegmentAt: index)
         }
     }
 
-    func titleFont(_ font: UIFont, for state: UIControl.State = .normal) -> Self {
+    func titleFont(_ font: UIFont, for state: UIControl.State = .normal) -> UICModifiedView<View> {
         self.onNotRendered {
             let oldAttributes = ($0 as? View)?.titleTextAttributes(for: state) ?? [:]
             ($0 as? View)?.setTitleTextAttributes(oldAttributes.merging([.font: font]) { $1 }, for: state)
         }
     }
 
-    func titleColor(_ color: UIColor, for state: UIControl.State = .normal) -> Self {
+    func titleColor(_ color: UIColor, for state: UIControl.State = .normal) -> UICModifiedView<View> {
         self.onNotRendered {
             let oldAttributes = ($0 as? View)?.titleTextAttributes(for: state) ?? [:]
             ($0 as? View)?.setTitleTextAttributes(oldAttributes.merging([.foregroundColor: color]) { $1 }, for: state)
         }
     }
 
-    func titleAttributes(_ attributes: [NSAttributedString.Key: Any], for state: UIControl.State = .normal) -> Self {
+    func titleAttributes(_ attributes: [NSAttributedString.Key: Any], for state: UIControl.State = .normal) -> UICModifiedView<View> {
         self.onNotRendered {
             _ = ($0 as? View)?.setTitleTextAttributes(attributes, for: state)
         }
     }
 
-    func isMomentary(_ flag: Bool) -> Self {
+    func isMomentary(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.isMomentary = flag
         }
     }
 
-    func tintColor(_ tintColor: UIColor?) -> Self {
+    func tintColor(_ tintColor: UIColor?) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.tintColor = tintColor
         }
     }
 
-    func selectedSegment(at index: Int) -> Self {
+    func selectedSegment(at index: Int) -> UICModifiedView<View> {
         self.onInTheScene {
             ($0 as? View)?.selectedSegmentIndex = index
         }
     }
 }
 
-public extension Control where Self: UIViewCreator, View: UISegmentedControl {
-    func onValueChange(_ handler: @escaping (UIView) -> Void) -> Self {
+public extension UIViewCreator where View: UISegmentedControl {
+    func onValueChange(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
         self.onEvent(.valueChanged, handler)
     }
 
-    func onSelectedIndex(_ handler: @escaping (Int) -> Void) -> Self {
+    func onSelectedIndex(_ handler: @escaping (Int) -> Void) -> UICModifiedView<View> {
         self.onEvent(.valueChanged) { uiView in
             guard let selected = (uiView as? View)?.selectedSegmentIndex else {
                 return
