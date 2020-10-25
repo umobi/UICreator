@@ -24,12 +24,10 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-extension NSObject: Opaque {}
-
-private var kViewPayload: UInt = 0
+private var kViewMemory: UInt = 0
 private extension CBView {
     struct Memory {
-        @MutableBox var render: _Render
+        @MutableBox var render: Render
         @MutableBox var layout: Layout
         @MutableBox var appear: Appear
         @MutableBox var trait: Trait
@@ -49,7 +47,7 @@ private extension CBView {
     var memory: Memory {
         OBJCSet(
             self,
-            &kViewPayload,
+            &kViewMemory,
             policity: .OBJC_ASSOCIATION_COPY,
             orLoad: { [unowned self] in .init(self) }
         )
@@ -80,7 +78,7 @@ extension CBView {
 }
 
 extension CBView {
-    var render: _Render {
+    var render: Render {
         self.memory.render
     }
 

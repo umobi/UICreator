@@ -23,116 +23,58 @@
 import Foundation
 import UIKit
 
-private var kControlMutable: UInt = 0
-internal extension UIControl {
-    var controlMemory: Mutable<ControlPayload> {
-        OBJCSet(self, &kControlMutable, policity: .OBJC_ASSOCIATION_RETAIN) {
-            .init(value: .init())
-        }
-    }
-}
-
-extension Control {
+extension UIControl {
     // swiftlint:disable function_body_length cyclomatic_complexity
     public func removeEvent(_ event: UIControl.Event) {
-        self.onRendered {
-            guard let view = $0 as? UIControl else {
-                Fatal.Builder("UIView is not a UIControl").die()
-            }
+        self.removeTarget(self, action: nil, for: event)
+        switch event {
+        case .touchDown:
+            self.memory.touchDownHandler = nil
 
-            view.removeTarget($0, action: nil, for: event)
-            let control = view.controlMemory
+        case .touchDownRepeat:
+            self.memory.touchDownRepeatHandler = nil
+        case .touchDragInside:
+            self.memory.touchDragInsideHandler = nil
+        case .touchDragOutside:
+            self.memory.touchDragOutsideHandler = nil
+        case .touchDragEnter:
+            self.memory.touchDragEnterHandler = nil
+        case .touchDragExit:
+            self.memory.touchDragExitHandler = nil
+        case .touchUpInside:
+            self.memory.touchUpInsideHandler = nil
+        case .touchUpOutside:
+            self.memory.touchUpOutsideHandler = nil
+        case .touchCancel:
+            self.memory.touchCancelHandler = nil
 
-            switch event {
-            case .touchDown:
-                control.update {
-                    $0.touchDown = nil
-                }
-            case .touchDownRepeat:
-                control.update {
-                    $0.touchDownRepeat = nil
-                }
-            case .touchDragInside:
-                control.update {
-                    $0.touchDragInside = nil
-                }
-            case .touchDragOutside:
-                control.update {
-                    $0.touchDragOutside = nil
-                }
-            case .touchDragEnter:
-                control.update {
-                    $0.touchDragEnter = nil
-                }
-            case .touchDragExit:
-                control.update {
-                    $0.touchDragExit = nil
-                }
-            case .touchUpInside:
-                control.update {
-                    $0.touchUpInside = nil
-                }
-            case .touchUpOutside:
-                control.update {
-                    $0.touchUpOutside = nil
-                }
-            case .touchCancel:
-                control.update {
-                    $0.touchCancel = nil
-                }
+        case .valueChanged:
+            self.memory.valueChangedHandler = nil
+        case .primaryActionTriggered:
+            self.memory.primaryActionTriggeredHandler = nil
 
-            case .valueChanged:
-                control.update {
-                    $0.valueChanged = nil
-                }
-            case .primaryActionTriggered:
-                control.update {
-                    $0.primaryActionTriggered = nil
-                }
+        case .editingDidBegin:
+            self.memory.editingDidBeginHandler = nil
+        case .editingChanged:
+            self.memory.editingChangedHandler = nil
+        case .editingDidEnd:
+            self.memory.editingDidEndHandler = nil
+        case .editingDidEndOnExit:
+            self.memory.editingDidEndOnExitHandler = nil
 
-            case .editingDidBegin:
-                control.update {
-                    $0.editingDidBegin = nil
-                }
-            case .editingChanged:
-                control.update {
-                    $0.editingChanged = nil
-                }
-            case .editingDidEnd:
-                control.update {
-                    $0.editingDidEnd = nil
-                }
-            case .editingDidEndOnExit:
-                control.update {
-                    $0.editingDidEndOnExit = nil
-                }
+        case .allTouchEvents:
+            self.memory.allTouchEventsHandler = nil
+        case .allEditingEvents:
+            self.memory.allEditingEventsHandler = nil
+        case .applicationReserved:
+            self.memory.applicationReservedHandler = nil
+        case .systemReserved:
+            self.memory.systemReservedHandler = nil
+        case .allEvents:
+            self.memory.allEventsHandler = nil
 
-            case .allTouchEvents:
-                control.update {
-                    $0.allTouchEvents = nil
-                }
-            case .allEditingEvents:
-                control.update {
-                    $0.allEditingEvents = nil
-                }
-            case .applicationReserved:
-                control.update {
-                    $0.applicationReserved = nil
-                }
-            case .systemReserved:
-                control.update {
-                    $0.systemReserved = nil
-                }
-            case .allEvents:
-                control.update {
-                    $0.allEvents = nil
-                }
-
-            default:
-                control.update {
-                    $0.allEvents = nil
-                }
-            }
+        default:
+            self.memory.allEventsHandler = nil
         }
     }
 }

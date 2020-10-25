@@ -33,15 +33,17 @@ public class DashedView: UIView, UICManagerContentView {
 
     private var shape: CAShapeLayer!
 
-    public required init(_ view: UIView, dash pattern: [NSNumber]) {
-        self.dashPattern = pattern
+    init() {
         super.init(frame: .zero)
-        self.addContent(view)
+        self.makeSelfImplemented()
     }
 
-    public required init(dash pattern: [NSNumber]) {
-        self.dashPattern = pattern
-        super.init(frame: .zero)
+    required public init?(coder: NSCoder) {
+        Fatal.Builder("init(coder:) has not been implemented").die()
+    }
+
+    public override init(frame: CGRect) {
+        Fatal.Builder("init(frame:) has not been implemented").die()
     }
 
     public func addContent(_ view: UIView) {
@@ -61,10 +63,6 @@ public class DashedView: UIView, UICManagerContentView {
         self.shape.strokeColor = strokeColor.cgColor
         self.shape.lineWidth = self.lineWidth
         self.shape.lineDashPattern = self.dashPattern
-    }
-
-    required public init?(coder: NSCoder) {
-        Fatal.Builder("init(coder:) has not been implemented").die()
     }
 
     private func createShape() -> CAShapeLayer {
@@ -169,46 +167,66 @@ public extension DashedView {
     }
 }
 
-public class UICDashed: UIViewCreator {
+public struct UICDashed: UIViewCreator {
     public typealias View = DashedView
 
-    public init(color: UIColor, pattern: [NSNumber] = [2, 3], content: @escaping () -> ViewCreator) {
-        let content = content()
-        self.tree.append(content)
+    @Relay var color: UIColor
+    @Relay var width: CGFloat
+    @Relay var pattern: [NSNumber]
 
-        self.onNotRendered {
-            ($0 as? View)?.addContent(content.releaseUIView())
-        }
-        .dash(color: color)
-        .dash(lineWidth: 1)
-        .loadView { [unowned self] in
-            let view = View.init(dash: pattern)
-            view.updateBuilder(self)
-            return view
-        }
-    }
-}
+    let content: () -> ViewCreator
 
-extension UIViewCreator where View: DashedView {
+    public init(
+        color: UIColor,
+        width: CGFloat = 1,
+        pattern: [NSNumber] = [2, 3],
+        content: @escaping () -> ViewCreator) {
 
-    public func dash(color: UIColor) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.apply(strokeColor: color)
-                .refresh()
-        }
+        self.content = content
+        self._color = .constant(color)
+        self._width = .constant(width)
+        self._pattern = .constant(pattern)
     }
 
-    public func dash(lineWidth width: CGFloat) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.apply(lineWidth: width)
-                .refresh()
-        }
+    public init(
+        color: Relay<UIColor>,
+        width: Relay<CGFloat> = .constant(1),
+        pattern: Relay<[NSNumber]> = .constant([2, 3]),
+        content: @escaping () -> ViewCreator) {
+
+        self.content = content
+        self._color = color
+        self._width = width
+        self._pattern = pattern
     }
 
-    public func dash(pattern: [NSNumber]) -> Self {
-        self.onNotRendered {
-            _ = ($0 as? View)?.apply(dashPattern: pattern)
-                .refresh()
-        }
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return View()
+            .onNotRendered {
+                ($0 as? View)?.addContent(_self.content().releaseUIView())
+            }
+            .onNotRendered {
+                weak var view = $0 as? View
+
+                _self.$color.sync {
+                    view?.apply(strokeColor: $0)
+                }
+            }
+            .onNotRendered {
+                weak var view = $0 as? View
+
+                _self.$pattern.sync {
+                    view?.apply(dashPattern: $0)
+                }
+            }
+            .onNotRendered {
+                weak var view = $0 as? View
+
+                _self.$width.sync {
+                    view?.apply(lineWidth: $0)
+                }
+            }
     }
 }

@@ -23,314 +23,243 @@
 import Foundation
 import UIKit
 
-public protocol Gesture: Opaque {
-    init(target view: UIView!)
+public protocol GestureCreator {
+    static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer
 }
 
-public protocol UIGesture: Gesture {
+extension GestureCreator {
+    func releaseUIGesture() -> UIGestureRecognizer {
+        Self.makeUIGesture(self)
+    }
+}
+
+public extension GestureCreator {
+    func add(_ view: UIView) {
+        let gestureRecognizer = self.releaseUIGesture()
+        view.addGestureRecognizer(gestureRecognizer)
+        gestureRecognizer.addTarget(gestureRecognizer, action: #selector(gestureRecognizer.commit(_:)))
+    }
+}
+
+public protocol UIGestureCreator: GestureCreator {
     associatedtype Gesture: UIGestureRecognizer
+
+    func onModify(_ handler: @escaping (Gesture) -> Void) -> UICModifiedGesture<Gesture>
 }
 
-public extension UIGesture {
-    func add() {
-        self.uiGesture.targetView?.addGestureRecognizer(self.releaseGesture())
-    }
-
-    var uiGesture: Gesture! {
-        (self as UICreator.Gesture).uiGesture as? Gesture
-    }
-}
-
-struct GestureUIGestureSwitch {
-    static func `switch`(_ gesture: Gesture?, _ uiGesture: UIGestureRecognizer?) {
-        if let gesture = gesture {
-            guard let uiGesture = uiGesture else {
-                gesture.gestureWrapper.value.gesture.value = .nil
-                return
-            }
-
-            if gesture.gestureWrapper.value.isReleased.value {
-                gesture.gestureWrapper.value.gesture.value = .weak(uiGesture)
-                UIGestureRecognizer.set(uiGesture, gesture, weak: false)
-                return
-            }
-
-            gesture.gestureWrapper.value.gesture.value = .strong(uiGesture)
-            UIGestureRecognizer.set(uiGesture, gesture, weak: true)
-            return
-        }
-
-        if let uiGesture = uiGesture {
-            UIGestureRecognizer.set(uiGesture, nil, weak: true)
-            return
+public extension UIGestureCreator {
+    func onModify(_ handler: @escaping (Gesture) -> Void) -> UICModifiedGesture<Gesture> {
+        UICModifiedGesture {
+            let gesture = self.releaseCastedGesture()
+            handler(gesture)
+            return gesture
         }
     }
 }
 
-public extension Gesture {
-    var uiGesture: UIGestureRecognizer! {
-        self.gestureWrapper.value.gesture.value.castedObject()
-    }
-
-    internal func releaseGesture() -> UIGestureRecognizer! {
-        let gesture: UIGestureRecognizer! = self.uiGesture
-        self.gestureWrapper.value.isReleased.value = true
-        GestureUIGestureSwitch.switch(self, gesture)
-        return gesture
+extension UIGestureCreator {
+    func releaseCastedGesture() -> Gesture {
+        self.releaseUIGesture() as! Gesture
     }
 }
 
-private var kGestureWrapper: UInt = 0
-internal extension Gesture {
-    var gestureWrapper: Mutable<GestureMemory> {
-        OBJCSet(self, &kGestureWrapper, policity: .OBJC_ASSOCIATION_RETAIN) {
-            .init(value: .init())
-        }
+public struct UICModifiedGesture<Gesture>: UIGestureCreator where Gesture: UIGestureRecognizer {
+    let gestureLoader: () -> Gesture
+
+    init(_ gestureLoader: @escaping () -> Gesture) {
+        self.gestureLoader = gestureLoader
+    }
+
+    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        (gestureCreator as! Self).gestureLoader()
+    }
+}
+
+public struct AnyGesture: UIGestureCreator {
+    public typealias Gesture = UIGestureRecognizer
+
+    let gestureLoader: () -> Gesture
+
+    init(_ gestureLoader: @escaping () -> Gesture) {
+        self.gestureLoader = gestureLoader
+    }
+
+    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        (gestureCreator as! Self).gestureLoader()
+    }
+}
+
+public protocol UICGestureRepresentable: UIGestureCreator {
+    func makeUIGesture() -> Gesture
+}
+
+public extension UICGestureRepresentable {
+    static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        (gestureCreator as! Self).makeUIGesture()
     }
 }
 
 private var kGestureDelegate: UInt = 0
-internal extension UIGesture {
-    var gestureDelegate: GestureDelegate<Gesture> {
+internal extension UIGestureRecognizer {
+    var gestureDelegate: GestureDelegate {
         OBJCSet(self, &kGestureDelegate, policity: .OBJC_ASSOCIATION_RETAIN) {
-            let delegate = GestureDelegate<Gesture>()
-            self.uiGesture.delegate = delegate
+            let delegate = GestureDelegate()
+            self.delegate = delegate
             return delegate
         }
     }
 }
 
-public extension UIGesture {
-    func `as`<UIGesture: UIGestureRecognizer>(_ outlet: UICOutlet<UIGesture>) -> Self {
-        outlet.ref(self.uiGesture as? UIGesture)
-        return self
+public extension UIGestureCreator {
+    func `as`(_ outlet: UICOutlet<Gesture>) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            outlet.ref($0)
+        }
     }
 
-    func allowedPress(types pressTypes: Set<UIPress.PressType>) -> Self {
-        self.uiGesture.allowedPressTypes = pressTypes.map { NSNumber(value: $0.rawValue) }
-        return self
+    func allowedPress(types pressTypes: Set<UIPress.PressType>) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.allowedPressTypes = pressTypes.map { NSNumber(value: $0.rawValue) }
+        }
     }
 
-    func allowedTouch(types touchTypes: Set<UITouch.TouchType>) -> Self {
-        self.uiGesture.allowedTouchTypes = touchTypes.map { NSNumber(value: $0.rawValue) }
-        return self
+    func allowedTouch(types touchTypes: Set<UITouch.TouchType>) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.allowedTouchTypes = touchTypes.map { NSNumber(value: $0.rawValue) }
+        }
     }
 
-    func cancelsTouches(inView flag: Bool) -> Self {
-        self.uiGesture.cancelsTouchesInView = flag
-        return self
+    func cancelsTouches(inView flag: Bool) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.cancelsTouchesInView = flag
+        }
     }
 
-    func delaysTouches(atBegan flag: Bool) -> Self {
-        self.uiGesture.delaysTouchesEnded = flag
-        return self
+    func delaysTouches(atBegan flag: Bool) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.delaysTouchesEnded = flag
+        }
     }
 
-    func delaysTouches(atEnded flag: Bool) -> Self {
-        self.uiGesture.delaysTouchesEnded = flag
-        return self
+    func delaysTouches(atEnded flag: Bool) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.delaysTouchesEnded = flag
+        }
     }
 
-    func isEnabled(_ flag: Bool) -> Self {
-        self.uiGesture.isEnabled = flag
-        return self
+    func isEnabled(_ flag: Bool) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.isEnabled = flag
+        }
     }
 
     @available(iOS 11, tvOS 11.0, *)
-    func name(_ string: String?) -> Self {
-        self.uiGesture.name = string
-        return self
-    }
-
-    func requiredExclusive(touchType flag: Bool) -> Self {
-        self.uiGesture.requiresExclusiveTouchType = flag
-        return self
-    }
-}
-
-public extension UIGesture {
-    func onBegan(_ handler: @escaping (Gesture) -> Void) -> Self {
-        let old = self.gestureWrapper.value.began
-        self.gestureWrapper.update {
-            $0.began = .init {
-                guard let gesture = $0 as? Gesture else {
-                    return
-                }
-
-                old?.commit(in: $0)
-                handler(gesture)
-            }
+    func name(_ string: String?) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.name = string
         }
-        return self
     }
 
-    func onCancelled(_ handler: @escaping (Gesture) -> Void) -> Self {
-        let old = self.gestureWrapper.value.cancelled
-        self.gestureWrapper.update {
-            $0.cancelled = .init {
-                guard let gesture = $0 as? Gesture else {
-                    return
-                }
-
-                old?.commit(in: $0)
-                handler(gesture)
-            }
-        }
-        return self
-    }
-
-    func onChanged(_ handler: @escaping (Gesture) -> Void) -> Self {
-        let old = self.gestureWrapper.value.changed
-        self.gestureWrapper.update {
-            $0.changed = .init {
-                guard let gesture = $0 as? Gesture else {
-                    return
-                }
-
-                old?.commit(in: $0)
-                handler(gesture)
-            }
-        }
-        return self
-    }
-
-    func onFailed(_ handler: @escaping (Gesture) -> Void) -> Self {
-        let old = self.gestureWrapper.value.failed
-        self.gestureWrapper.update {
-            $0.failed = .init {
-                guard let gesture = $0 as? Gesture else {
-                    return
-                }
-
-                old?.commit(in: $0)
-                handler(gesture)
-            }
-        }
-        return self
-    }
-
-    func onRecognized(_ handler: @escaping (Gesture) -> Void) -> Self {
-        let old = self.gestureWrapper.value.recognized
-        self.gestureWrapper.update {
-            $0.recognized = .init {
-                guard let gesture = $0 as? Gesture else {
-                    return
-                }
-
-                old?.commit(in: $0)
-                handler(gesture)
-            }
-        }
-        return self
-    }
-
-    func onPossible(_ handler: @escaping (Gesture) -> Void) -> Self {
-        let old = self.gestureWrapper.value.possible
-        self.gestureWrapper.update {
-            $0.possible = .init {
-                guard let gesture = $0 as? Gesture else {
-                    return
-                }
-
-                old?.commit(in: $0)
-                handler(gesture)
-            }
-        }
-        return self
-    }
-
-    func onEnded(_ handler: @escaping (Gesture) -> Void) -> Self {
-        let old = self.gestureWrapper.value.ended
-        self.gestureWrapper.update {
-            $0.ended = .init {
-                guard let gesture = $0 as? Gesture else {
-                    return
-                }
-
-                old?.commit(in: $0)
-                handler(gesture)
-            }
-        }
-        return self
-    }
-
-    func onAnyOther(_ handler: @escaping (Gesture) -> Void) -> Self {
-        let old = self.gestureWrapper.value.anyOther
-        self.gestureWrapper.update {
-            $0.anyOther = .init {
-                guard let gesture = $0 as? Gesture else {
-                    return
-                }
-
-                old?.commit(in: $0)
-                handler(gesture)
-            }
-        }
-        return self
-    }
-}
-
-internal extension Gesture {
-    func commit(_ sender: UIGestureRecognizer) {
-        let payload = self.gestureWrapper.value
-        switch sender.state {
-        case .possible:
-            (payload.possible ?? payload.recognized)?.commit(in: sender)
-        case .began:
-            (payload.began ?? payload.recognized)?.commit(in: sender)
-        case .changed:
-            (payload.changed ?? payload.recognized)?.commit(in: sender)
-        case .ended:
-            (payload.ended ?? payload.recognized)?.commit(in: sender)
-        case .cancelled:
-            (payload.cancelled ?? payload.recognized)?.commit(in: sender)
-        case .failed:
-            (payload.failed ?? payload.recognized)?.commit(in: sender)
-        @unknown default:
-            payload.anyOther?.commit(in: sender)
+    func requiredExclusive(touchType flag: Bool) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.requiresExclusiveTouchType = flag
         }
     }
 }
 
-public extension UIGesture {
-    func onShouldBegin(_ handler: @escaping (Gesture) -> Bool) -> Self {
-        self.gestureDelegate.onShouldBegin(handler)
-        return self
+public extension UIGestureCreator {
+    func onBegan(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.onBegan(handler)
+        }
+    }
+
+    func onCancelled(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.onCancelled(handler)
+        }
+    }
+
+    func onChanged(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.onChanged(handler)
+        }
+    }
+
+    func onFailed(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.onFailed(handler)
+        }
+    }
+
+    func onRecognized(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.onRecognized(handler)
+        }
+    }
+
+    func onPossible(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.onPossible(handler)
+        }
+    }
+
+    func onEnded(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.onEnded(handler)
+        }
+    }
+
+    func onAnyOther(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.onAnyOther(handler)
+        }
+    }
+}
+
+public extension UIGestureCreator {
+    func onShouldBegin(_ handler: @escaping (UIGestureRecognizer) -> Bool) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.gestureDelegate.onShouldBegin(handler)
+        }
     }
 
     func onShouldRecognizeSimultaneouslyOtherGesture(
-        _ handler: @escaping (Gesture, UIGestureRecognizer) -> Bool) -> Self {
-
-        self.gestureDelegate.onShouldRecognizeSimultaneouslyOtherGesture(handler)
-        return self
+        _ handler: @escaping (UIGestureRecognizer, UIGestureRecognizer) -> Bool) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.gestureDelegate.onShouldRecognizeSimultaneouslyOtherGesture(handler)
+        }
     }
 
     func onShouldRequireFailureOfOtherGesture(
-        _ handler: @escaping (Gesture, UIGestureRecognizer) -> Bool) -> Self {
-
-        self.gestureDelegate.onShouldRequireFailureOfOtherGesture(handler)
-        return self
+        _ handler: @escaping (UIGestureRecognizer, UIGestureRecognizer) -> Bool) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.gestureDelegate.onShouldRequireFailureOfOtherGesture(handler)
+        }
     }
 
     func onShouldBeRequiredToFailByOtherGesture(
-        _ handler: @escaping (Gesture, UIGestureRecognizer) -> Bool) -> Self {
-
-        self.gestureDelegate.onShouldBeRequiredToFailByOtherGesture(handler)
-        return self
+        _ handler: @escaping (UIGestureRecognizer, UIGestureRecognizer) -> Bool) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.gestureDelegate.onShouldBeRequiredToFailByOtherGesture(handler)
+        }
     }
 
-    func onShouldReceiveTouch(_ handler: @escaping (Gesture, UITouch) -> Bool) -> Self {
-        self.gestureDelegate.onShouldReceiveTouch(handler)
-        return self
+    func onShouldReceiveTouch(_ handler: @escaping (UIGestureRecognizer, UITouch) -> Bool) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.gestureDelegate.onShouldReceiveTouch(handler)
+        }
     }
 
-    func onShouldReceivePress(_ handler: @escaping (Gesture, UIPress) -> Bool) -> Self {
-        self.gestureDelegate.onShouldReceivePress(handler)
-        return self
+    func onShouldReceivePress(_ handler: @escaping (UIGestureRecognizer, UIPress) -> Bool) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.gestureDelegate.onShouldReceivePress(handler)
+        }
     }
 
-    func onShouldReceiveEvent(_ handler: @escaping (Gesture, UIEvent) -> Bool) -> Self {
-        self.gestureDelegate.onShouldReceiveEvent(handler)
-        return self
+    func onShouldReceiveEvent(_ handler: @escaping (UIGestureRecognizer, UIEvent) -> Bool) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.gestureDelegate.onShouldReceiveEvent(handler)
+        }
     }
 }

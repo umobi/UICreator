@@ -22,11 +22,45 @@
 
 import Foundation
 
-/// `NSProtocol` is a helper for delegates and dataSources for view creator.
-/// Some of UIKit delegates requires the main object to be a `NSObject` and ViewCreator don't respect that.
-/// In case of using `NSProtocol` remember to always set manager as *weak* var.
-public protocol NSProtocol: NSObject {
-    associatedtype Manager
-    var manager: Manager! { get }
-    init(manager: Manager)
+enum Reference<Value> where Value: NSObject {
+    case weak(Weak)
+    case strong(Strong)
+    case `nil`
+
+    var value: Value! {
+        switch self {
+        case .weak(let weak):
+            return weak.value
+        case .strong(let strong):
+            return strong.value
+        case .nil:
+            return nil
+        }
+    }
+
+    static func strong(_ element: Value) -> Reference<Value> {
+        .strong(.init(value: element))
+    }
+
+    static func weak(_ element: Value) -> Reference<Value> {
+        .weak(.init(value: element))
+    }
+}
+
+extension Reference {
+    struct Weak {
+        weak var value: Value!
+    }
+
+    struct Strong {
+        var value: Value
+    }
+
+    var isWeak: Bool {
+        if case .weak = self {
+            return true
+        }
+
+        return false
+    }
 }

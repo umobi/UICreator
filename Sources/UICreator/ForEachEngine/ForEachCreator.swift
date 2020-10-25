@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-protocol SupportForEach: Opaque {
+protocol SupportForEach {
     func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>)
 }
 
@@ -31,25 +31,5 @@ protocol ForEachCreator: ViewCreator {
     var viewType: ViewCreator.Type { get }
     func load()
     var isLoaded: Bool { get }
-}
-
-private var kManager: UInt = 0
-extension ForEachCreator {
-    private var managerMutable: Mutable<MemorySwitch> {
-        OBJCSet(self, &kManager, policity: .OBJC_ASSOCIATION_RETAIN) {
-            .init(value: .nil)
-        }
-    }
-
-    var manager: SupportForEach? {
-        get { self.managerMutable.value.object as? SupportForEach }
-        set {
-            guard let newValue = newValue else {
-                self.managerMutable.value = .nil
-                return
-            }
-
-            self.managerMutable.value = .weak(newValue)
-        }
-    }
+    var manager: SupportForEach! { get nonmutating set }
 }

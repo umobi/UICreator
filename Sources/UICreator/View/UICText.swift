@@ -26,6 +26,20 @@ import ConstraintBuilder
 
 // swiftlint:disable file_length
 public class TextField: UITextField {
+
+    init() {
+        super.init(frame: .zero)
+        self.makeSelfImplemented()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    public override init(frame: CGRect) {
+        fatalError("init(frame:) has not been implemented")
+    }
+
     override public func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.renderManager.willMove(toSuperview: newSuperview)
@@ -68,59 +82,68 @@ public class TextField: UITextField {
     }
 }
 
-public class UICText: UIViewCreator, TextElement, TextKeyboard, Control {
+public struct UICTextField: UIViewCreator {
     public typealias View = TextField
 
-    required public init(_ text: String?) {
-        self.text(text)
-            .loadView { [unowned self] in
-                View.init(builder: self)
-            }
+    enum Init {
+        case text(String, Relay<String?>)
+        case attributedText(NSAttributedString, Relay<NSAttributedString?>)
     }
 
-    required public init(_ attributedText: NSAttributedString?) {
-        self.text(attributedText)
-            .loadView { [unowned self] in
-                View.init(builder: self)
-            }
+    let `init`: Init
 
+    public init(placeholder: String, _ dynamicText: Relay<String?>) {
+        self.`init` = .text(placeholder, dynamicText)
     }
 
-    required public init(placeholder text: String?) {
-        self.placeholder(text)
-            .loadView { [unowned self] in
-                View.init(builder: self)
-            }
+    public init(placeholder: NSAttributedString, _ dynamicAttributedText: Relay<NSAttributedString?>) {
+        self.`init` = .attributedText(placeholder, dynamicAttributedText)
     }
 
-    required public init(placeholder attributed: NSAttributedString?) {
-        self.placeholder(attributed)
-            .loadView { [unowned self] in
-                View.init(builder: self)
-            }
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        switch _self.`init` {
+        case .text(let placeholder, let dynamicText):
+            return View()
+                .onNotRendered {
+                    weak var view = $0 as? View
+                    view?.placeholder = placeholder
+
+                    dynamicText.distinctSync {
+                        view?.text = $0
+                    }
+                }
+                .onEvent(.editingChanged) {
+                    dynamicText.wrappedValue = ($0 as? View)?.text
+                }
+
+        case .attributedText(let placeholder, let dynamicAttributedText):
+            return View()
+                .onNotRendered {
+                    weak var view = $0 as? View
+                    view?.attributedPlaceholder = placeholder
+
+                    dynamicAttributedText.distinctSync {
+                        view?.attributedText = $0
+                    }
+                }
+                .onEvent(.editingChanged) {
+                    dynamicAttributedText.wrappedValue = ($0 as? View)?.attributedText
+                }
+        }
     }
 }
 
-public extension TextElement where View: UITextField {
-    func text(_ string: String?) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.text = string
-        }
-    }
+public extension UIViewCreator where View: UITextField {
 
-    func text(_ attributedText: NSAttributedString?) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.attributedText = attributedText
-        }
-    }
-
-    func textColor(_ color: UIColor?) -> Self {
+    func textColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.textColor = color
         }
     }
 
-    func placeholder(color: UIColor?) -> Self {
+    func placeholderColor(color: UIColor?) -> UICModifiedView<View> {
         self.onRendered {
             guard let label = $0 as? View else {
                 return
@@ -139,7 +162,7 @@ public extension TextElement where View: UITextField {
         }
     }
 
-    func placeholder(font: UIFont) -> Self {
+    func placeholderFont(_ font: UIFont) -> UICModifiedView<View> {
         self.onRendered {
             guard let label = $0 as? View else {
                 return
@@ -158,15 +181,15 @@ public extension TextElement where View: UITextField {
         }
     }
 
-    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> Self {
-        return self.onNotRendered {
+    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.font = font
             ($0 as? View)?.adjustsFontForContentSizeCategory = isDynamicTextSize
         }
     }
 
-    func text(scale: CGFloat) -> Self {
-        return self.onRendered {
+    func textScale(_ scale: CGFloat) -> UICModifiedView<View> {
+        self.onRendered {
             guard let font = ($0 as? View)?.font else {
                 print("[warning] text scale cannot be applied without font")
                 return
@@ -177,27 +200,27 @@ public extension TextElement where View: UITextField {
         }
     }
 
-    func textAlignment(_ alignment: NSTextAlignment) -> Self {
-        return self.onNotRendered {
+    func textAlignment(_ alignment: NSTextAlignment) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.textAlignment = alignment
         }
     }
 }
 
 public extension UIViewCreator where View: UITextField {
-    func adjustsFontForContentSizeCategory(_ flag: Bool) -> Self {
+    func adjustsFontForContentSizeCategory(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.adjustsFontForContentSizeCategory = flag
         }
     }
 
-    func adjustsFontSizeToFitWidth(_ flag: Bool) -> Self {
+    func adjustsFontSizeToFitWidth(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.adjustsFontSizeToFitWidth = flag
         }
     }
 
-    func allowsEditingTextAttributes(_ flag: Bool) -> Self {
+    func allowsEditingTextAttributes(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.allowsEditingTextAttributes = flag
         }
@@ -206,20 +229,8 @@ public extension UIViewCreator where View: UITextField {
 
 public extension UIViewCreator where View: UITextField {
 
-    func placeholder(_ string: String?) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.placeholder = string
-        }
-    }
-
-    func placeholder(_ attributedText: NSAttributedString?) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.attributedPlaceholder = attributedText
-        }
-    }
-
-    func borderStyle(_ style: UITextField.BorderStyle) -> Self {
-        return self.onNotRendered {
+    func borderStyle(_ style: UITextField.BorderStyle) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.borderStyle = style
         }
     }
@@ -227,49 +238,53 @@ public extension UIViewCreator where View: UITextField {
 
 public extension UIViewCreator where View: UITextField {
 
-    func clearButtonMode(_ mode: UITextField.ViewMode) -> Self {
-        return self.onNotRendered {
+    func clearButtonMode(_ mode: UITextField.ViewMode) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.clearButtonMode = mode
         }
     }
 
-    func clearsOnBegin(_ flag: Bool) -> Self {
-        return self.onNotRendered {
+    func clearsOnBegin(_ flag: Bool) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.clearsOnBeginEditing = flag
         }
     }
 
-    func clearsOnInsertion(_ flag: Bool) -> Self {
-        return self.onNotRendered {
+    func clearsOnInsertion(_ flag: Bool) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.clearsOnInsertion = flag
         }
     }
 }
 
-public extension UIViewCreator where Self: Control, View: UITextField {
-    func onEditingDidBegin(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onEvent(.editingDidBegin, handler)
+public extension UIViewCreator where View: UITextField {
+    func onEditingDidBegin(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onEvent(.editingDidBegin, handler)
     }
 
-    func onEditingChanged(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onEvent(.editingChanged, handler)
+    func onEditingChanged(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onEvent(.editingChanged, handler)
     }
 
-    func onEditingDidEnd(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onEvent(.editingDidEnd, handler)
+    func onEditingDidEnd(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onEvent(.editingDidEnd, handler)
     }
 
-    func onEditingDidEndOnExit(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onEvent(.editingDidEndOnExit, handler)
+    func onEditingDidEndOnExit(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onEvent(.editingDidEndOnExit, handler)
     }
 
-    func onAllEditingEvents(_ handler: @escaping (UIView) -> Void) -> Self {
-        return self.onEvent(.allEditingEvents, handler)
+    func onAllEditingEvents(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onEvent(.allEditingEvents, handler)
     }
 }
 
 public extension UIViewCreator where View: UITextField {
-    func leftView(_ mode: UITextField.ViewMode = .always, content: @escaping () -> _ViewCreator) -> Self {
+    func leftView(
+        _ mode: UITextField.ViewMode = .always,
+        content: @escaping () -> ViewCreator
+    ) -> UICModifiedView<View> {
+
         self.onRendered { view in
             var needsToAddConstraints = true
 
@@ -299,7 +314,11 @@ public extension UIViewCreator where View: UITextField {
         }
     }
 
-    func rightView(_ mode: UITextField.ViewMode = .always, content: @escaping () -> _ViewCreator) -> Self {
+    func rightView(
+        _ mode: UITextField.ViewMode = .always,
+        content: @escaping () -> ViewCreator
+    ) -> UICModifiedView<View> {
+
         self.onRendered { view in
             var needsToAddConstraints = true
 
@@ -330,48 +349,48 @@ public extension UIViewCreator where View: UITextField {
     }
 }
 
-public extension TextKeyboard where View: UITextField {
-    func autocapitalizationType(_ type: UITextAutocapitalizationType) -> Self {
-        return self.onNotRendered {
+public extension UIViewCreator where View: UITextField {
+    func autocapitalizationType(_ type: UITextAutocapitalizationType) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.autocapitalizationType = type
         }
     }
 
-    func autocorrectionType(_ type: UITextAutocorrectionType) -> Self {
-        return self.onNotRendered {
+    func autocorrectionType(_ type: UITextAutocorrectionType) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.autocorrectionType = type
         }
     }
 
-    func keyboardType(_ type: UIKeyboardType) -> Self {
-        return self.onNotRendered {
+    func keyboardType(_ type: UIKeyboardType) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.keyboardType = type
         }
     }
 
-    func keyboardAppearance(_ appearance: UIKeyboardAppearance) -> Self {
-        return self.onNotRendered {
+    func keyboardAppearance(_ appearance: UIKeyboardAppearance) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.keyboardAppearance = appearance
         }
     }
 }
 
-public extension TextKeyboard where View: UITextField {
+public extension UIViewCreator where View: UITextField {
 
-    func returnKeyType(_ type: UIReturnKeyType) -> Self {
+    func returnKeyType(_ type: UIReturnKeyType) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.returnKeyType = type
         }
     }
 
-    func isSecureTextEntry(_ flag: Bool = true) -> Self {
-        return self.onNotRendered {
+    func isSecureTextEntry(_ flag: Bool = true) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.isSecureTextEntry = flag
         }
     }
 
     @available(iOS 12, tvOS 12, *)
-    func passwordRules(_ passwordRules: UITextInputPasswordRules?) -> Self {
+    func passwordRules(_ passwordRules: UITextInputPasswordRules?) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.passwordRules = passwordRules
         }
@@ -379,117 +398,57 @@ public extension TextKeyboard where View: UITextField {
 }
 
 @available(iOS 11, tvOS 11, *)
-public extension TextKeyboard where View: UITextField {
+public extension UIViewCreator where View: UITextField {
 
-    func smartDashesType(_ type: UITextSmartDashesType) -> Self {
+    func smartDashesType(_ type: UITextSmartDashesType) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.smartDashesType = type
         }
     }
 
-    func smartQuotesType(_ type: UITextSmartQuotesType) -> Self {
+    func smartQuotesType(_ type: UITextSmartQuotesType) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.smartQuotesType = type
         }
     }
 
-    func smartInsertDeleteType(_ type: UITextSmartInsertDeleteType) -> Self {
+    func smartInsertDeleteType(_ type: UITextSmartInsertDeleteType) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.smartInsertDeleteType = type
         }
     }
 }
 
-public extension TextKeyboard where View: UITextField {
-    func textContentType(_ type: UITextContentType) -> Self {
+public extension UIViewCreator where View: UITextField {
+    func textContentType(_ type: UITextContentType) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.textContentType = type
         }
     }
 
-    func inputView(content: @escaping () -> _ViewCreator) -> Self {
+    func inputView(content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.inputView = ViewAdaptor(content().releaseUIView())
             ($0 as? View)?.inputView?.sizeToFit()
         }
     }
 
-    func inputAccessoryView(content: @escaping () -> _ViewCreator) -> Self {
+    func inputAccessoryView(content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.inputAccessoryView = ViewAdaptor(content().releaseUIView())
             ($0 as? View)?.inputAccessoryView?.sizeToFit()
         }
     }
 
-    func inputDelegate(_ delegate: UITextInputDelegate) -> Self {
+    func inputDelegate(_ delegate: UITextInputDelegate) -> UICModifiedView<View> {
         self.onInTheScene {
             ($0 as? View)?.inputDelegate = delegate
         }
     }
 
-    func typingAttributes(_ attributes: [NSAttributedString.Key: Any]?) -> Self {
+    func typingAttributes(_ attributes: [NSAttributedString.Key: Any]?) -> UICModifiedView<View> {
        self.onNotRendered {
            ($0 as? View)?.typingAttributes = attributes
        }
    }
-}
-
-public extension UIViewCreator where Self: Control & TextElement, View: UITextField {
-    init(_ value: Relay<String?>) {
-        self.init(value.wrappedValue)
-
-        _ = self.onInTheScene { [weak self] in
-            weak var view = $0 as? View
-            var isLocked = false
-
-            _ = self?.onEvent(.editingChanged) { _ in
-                guard !isLocked else {
-                    return
-                }
-
-                isLocked = true
-                value.wrappedValue = view?.text
-                isLocked = false
-            }
-
-            value.sync {
-                guard !isLocked else {
-                    return
-                }
-
-                isLocked = true
-                view?.text = $0
-                isLocked = false
-            }
-        }
-    }
-}
-
-public extension UIViewCreator where Self: TextElement & Control, View: UITextField {
-    func text(_ value: Relay<String?>) -> Self {
-        self.onNotRendered { view in
-            weak var view = view
-            var isLocked: Bool = false
-
-            _ = self.onEditingChanged {
-                guard !isLocked else {
-                    return
-                }
-
-                isLocked = true
-                value.wrappedValue = ($0 as? View)?.text
-                isLocked = false
-            }
-
-            value.sync {
-                guard !isLocked else {
-                    return
-                }
-
-                isLocked = true
-                (view as? View)?.text = $0
-                isLocked = false
-            }
-        }
-    }
 }

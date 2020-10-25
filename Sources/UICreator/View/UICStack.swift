@@ -22,8 +22,36 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 public class StackView: UIStackView {
+
+    enum Axis {
+        case vertical
+        case horizontal
+
+        var uiAxis: NSLayoutConstraint.Axis {
+            switch self {
+            case .horizontal:
+                return .horizontal
+            case .vertical:
+                return .vertical
+            }
+        }
+    }
+
+    init() {
+        super.init(frame: .zero)
+        self.makeSelfImplemented()
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    public override init(frame: CGRect) {
+        fatalError("init(frame:) has not been implemented")
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -67,125 +95,116 @@ public class StackView: UIStackView {
     }
 }
 
-public class UICStack: UIViewCreator {
+public struct UICStack: UIViewCreator {
     public typealias View = StackView
 
-    private func prepare(
-        axis: NSLayoutConstraint.Axis,
+    @Relay var axis: View.Axis
+    @Relay var spacing: CGFloat
+    let content: () -> ViewCreator
+
+    init(
+        axis: Relay<View.Axis>,
         spacing: CGFloat,
         @UICViewBuilder _ content: @escaping () -> ViewCreator) {
 
-        let content = content().zip
-        content.forEach {
-            self.tree.append($0)
-        }
+        self._axis = axis
+        self.content = content
+        self._spacing = .constant(spacing)
+    }
 
-        self.loadView { [unowned self] in
-            View.init(builder: self)
-        }
-        .onNotRendered {
-            ($0 as? View)?.axis = axis
-            ($0 as? View)?.spacing = spacing
-        }
-        .onNotRendered { view in
-            content.forEach {
-                if let forEachCreator = $0 as? ForEachCreator {
-                    forEachCreator.manager = self
+    init(
+        axis: Relay<View.Axis>,
+        spacing: Relay<CGFloat>,
+        @UICViewBuilder _ content: @escaping () -> ViewCreator) {
+
+        self._axis = axis
+        self.content = content
+        self._spacing = spacing
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return StackView()
+            .onNotRendered {
+                weak var view = $0 as? View
+
+                _self.$axis.sync {
+                    view?.axis = $0.uiAxis
                 }
-
-                UIView.CBSubview(view as? View)?.addArrangedSubview($0.releaseUIView())
             }
-        }
+            .onNotRendered {
+                weak var view = $0 as? View
+
+                _self.$spacing.sync {
+                    view?.spacing = $0
+                }
+            }
+            .onNotRendered {
+                weak var view: View! = $0 as? View
+
+                _self.content().zip.forEach {
+                    if let forEachCreator = $0 as? ForEachCreator {
+                        forEachCreator.manager = StackManager(view)
+                    }
+
+                    UIView.CBSubview(view).addArrangedSubview($0.releaseUIView())
+                }
+            }
     }
-
-    public init(
-        axis: NSLayoutConstraint.Axis,
-        spacing: CGFloat = 0,
-        @UICViewBuilder _ contents: @escaping () -> ViewCreator) {
-        self.prepare(axis: axis, spacing: spacing, contents)
-    }
-}
-
-public func UICHStack(spacing: CGFloat = 0, @UICViewBuilder _ contents: @escaping () -> ViewCreator) -> UICStack {
-    return .init(axis: .horizontal, spacing: spacing, contents)
-}
-
-public func UICVStack(spacing: CGFloat = 0, @UICViewBuilder _ contents: @escaping () -> ViewCreator) -> UICStack {
-    return .init(axis: .vertical, spacing: spacing, contents)
 }
 
 public extension UIViewCreator where View: UIStackView {
 
-    func spacing(_ constant: CGFloat) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.spacing = constant
-        }
-    }
-
-    func axis(_ axis: NSLayoutConstraint.Axis) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.axis = axis
-        }
-    }
-
-    func distribution(_ distribution: View.Distribution) -> Self {
+    func distribution(_ distribution: View.Distribution) -> UICModifiedView<View> {
         return self.onNotRendered {
             ($0 as? View)?.distribution = distribution
         }
     }
 
-    func alignment(_ alignment: View.Alignment) -> Self {
+    func alignment(_ alignment: View.Alignment) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.alignment = alignment
         }
     }
 }
 
-extension UICStack: SupportForEach {
-    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
-        self.onRendered { [sequence, weak placeholderView] in
-            weak var firstView: UIView? = placeholderView
-            weak var lastView: UIView? = placeholderView
+internal struct StackManager: SupportForEach {
+    private weak var view: UIStackView!
 
-            weak var view = $0 as? View
-            sequence.map {
-                $0.map { $0() }
-            }.sync { views in
-                let startIndex = view?.arrangedSubviews.enumerated().first(where: {
-                    $0.element == firstView
-                })?.offset ?? 0
-                let endIndex = view?.arrangedSubviews.enumerated().first(where: {
-                    $0.element == lastView
-                })?.offset ?? 0
-
-                if firstView != nil {
-                    view?.arrangedSubviews[startIndex...endIndex].forEach {
-                        $0.removeFromSuperview()
-                    }
-                }
-
-                views.enumerated().forEach {
-                    UIView.CBSubview(view)?.insertArrangedSubview(
-                        $0.element.releaseUIView(),
-                        at: startIndex + $0.offset
-                    )
-                }
-
-                firstView = views.first?.uiView
-                lastView = views.last?.uiView
-            }
-        }
+    init(_ view: UIStackView) {
+        self.view = view
     }
-}
 
-public extension UIViewCreator where View: UIStackView {
-    func axis(_ relay: Relay<NSLayoutConstraint.Axis>) -> Self {
-        self.onNotRendered {
-            weak var view = $0 as? View
+    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
+        weak var firstView: UIView? = placeholderView
+        weak var lastView: UIView? = placeholderView
 
-            relay.sync {
-                view?.axis = $0
+        sequence.map {
+            $0.map { $0().releaseUIView() }
+        }.sync { views in
+            let startIndex = view?.arrangedSubviews.enumerated().first(where: {
+                $0.element == firstView
+            })?.offset ?? 0
+            let endIndex = view?.arrangedSubviews.enumerated().first(where: {
+                $0.element == lastView
+            })?.offset ?? 0
+
+            if firstView != nil {
+                view?.arrangedSubviews[startIndex...endIndex].forEach {
+                    $0.removeFromSuperview()
+                }
             }
+
+            views.enumerated().forEach {
+                UIView.CBSubview(view)?.insertArrangedSubview(
+                    $0.element,
+                    at: startIndex + $0.offset
+                )
+            }
+
+            firstView = views.first
+            lastView = views.last
         }
     }
 }

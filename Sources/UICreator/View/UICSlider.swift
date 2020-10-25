@@ -22,9 +22,23 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 #if os(iOS)
 public class Slider: UISlider {
+
+    init() {
+        super.init(frame: .zero)
+        self.makeSelfImplemented()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    public override init(frame: CGRect) {
+        fatalError("init(frame:) has not been implemented")
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -68,106 +82,111 @@ public class Slider: UISlider {
     }
 }
 
-public class UICSlider: UIViewCreator, Control {
+public struct UICSlider: UIViewCreator {
     public typealias View = Slider
 
-    public init() {
-        self.loadView { [unowned self] in
-            View.init(builder: self)
-        }
+    @Relay var minimumValue: Double
+    @Relay var maximumValue: Double
+    @Relay var value: Double
+
+    public init(minimumValue: Double, maximumValue: Double, value: Relay<Double>) {
+        self._minimumValue = .constant(minimumValue)
+        self._minimumValue = .constant(maximumValue)
+        self._value = value
+    }
+
+    public init(minimumValue: Relay<Double>, maximumValue: Relay<Double>, value: Relay<Double>) {
+        self._minimumValue = minimumValue
+        self._minimumValue = maximumValue
+        self._value = value
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return View()
+            .onNotRendered {
+                weak var view = $0 as? View
+
+                _self.$minimumValue.sync {
+                    view?.minimumValue = Float($0)
+                }
+            }
+            .onNotRendered {
+                weak var view = $0 as? View
+
+                _self.$maximumValue.sync {
+                    view?.maximumValue = Float($0)
+                }
+            }
+            .onNotRendered {
+                weak var view = $0 as? View
+
+                _self.$value.distinctSync {
+                    view?.value = Float($0)
+                }
+            }
+            .onEvent(.valueChanged) {
+                _self.value = Double(($0 as! View).value)
+            }
     }
 }
 
 public extension UIViewCreator where View: UISlider {
-    func maximumValue(_ value: Float) -> Self {
-        self.self.onNotRendered {
-            ($0 as? View)?.maximumValue = value
-        }
-    }
 
-    func minimumValue(_ value: Float) -> Self {
-        self.self.onNotRendered {
-            ($0 as? View)?.minimumValue = value
-        }
-    }
-
-    func isContinuous(_ flag: Bool) -> Self {
-        self.self.onNotRendered {
+    func isContinuous(_ flag: Bool) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.isContinuous = flag
         }
     }
 
-    func maximumTrackTintColor(_ tintColor: UIColor) -> Self {
-        self.self.onNotRendered {
+    func maximumTrackTintColor(_ tintColor: UIColor) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.maximumTrackTintColor = tintColor
         }
     }
 
-    func minimumTrackTintColor(_ tintColor: UIColor) -> Self {
-        self.self.onNotRendered {
+    func minimumTrackTintColor(_ tintColor: UIColor) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.minimumTrackTintColor = tintColor
         }
     }
 
-    func maximumValueImage(_ image: UIImage?) -> Self {
-        self.self.onNotRendered {
+    func maximumValueImage(_ image: UIImage?) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.maximumValueImage = image
         }
     }
 
-    func minimumValueImage(_ image: UIImage?) -> Self {
-        self.self.onNotRendered {
+    func minimumValueImage(_ image: UIImage?) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.minimumValueImage = image
         }
     }
 
-    func maximumTrackImage(_ image: UIImage?, for state: UIControl.State = .normal) -> Self {
+    func maximumTrackImage(_ image: UIImage?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.setMaximumTrackImage(image, for: state)
         }
     }
 
-    func minimumTrackImage(_ image: UIImage?, for state: UIControl.State = .normal) -> Self {
+    func minimumTrackImage(_ image: UIImage?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.setMinimumTrackImage(image, for: state)
         }
     }
 
-    func thumbImage(_ image: UIImage?, for state: UIControl.State = .normal) -> Self {
+    func thumbImage(_ image: UIImage?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.setThumbImage(image, for: state)
         }
     }
 
-    func thumbTintColor(_ color: UIColor?) -> Self {
+    func thumbTintColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.thumbTintColor = color
         }
     }
-
-    func value(_ value: Float) -> Self {
-        self.self.onNotRendered {
-            ($0 as? View)?.value = value
-        }
-    }
 }
 
-public extension UIViewCreator where Self: Control, View: UISlider {
-    func onValueChanged(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.onEvent(.valueChanged, handler)
-    }
-}
-
-public extension UIViewCreator where View: UISlider, Self: Control {
-    func value(_ value: Relay<Float>) -> Self {
-        self.onValueChanged {
-            value.wrappedValue = ($0 as? View)?.value ?? 0.0
-        }.onInTheScene {
-            weak var view = $0 as? View
-            value.sync {
-                view?.setValue($0, animated: true)
-            }
-        }
-    }
-}
 #endif

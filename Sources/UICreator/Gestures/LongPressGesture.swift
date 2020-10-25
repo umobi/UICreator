@@ -23,39 +23,42 @@
 import Foundation
 import UIKit
 
-public class LongPress: UIGesture {
+public class LongPress: UIGestureCreator {
     public typealias Gesture = UILongPressGestureRecognizer
 
-    public required init(target view: UIView!) {
-        GestureUIGestureSwitch.switch(self, Gesture.init(target: view))
+    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        UILongPressGestureRecognizer()
     }
 }
 
-public extension UIGesture where Gesture: UILongPressGestureRecognizer {
-    func maximumMovement(_ value: CGFloat) -> Self {
-        self.uiGesture.allowableMovement = value
-        return self
+public extension UIGestureCreator where Gesture: UILongPressGestureRecognizer {
+    func maximumMovement(_ value: CGFloat) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.allowableMovement = value
+        }
     }
 
-    func minimumPressDuration(_ duration: TimeInterval) -> Self {
-        self.uiGesture.minimumPressDuration = duration
-        return self
+    func minimumPressDuration(_ duration: TimeInterval) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.minimumPressDuration = duration
+        }
     }
 }
 
 public extension UIViewCreator {
 
-    func onLongPressMaker(_ longPressConfigurator: @escaping (LongPress) -> LongPress) -> UICModifiedView<View> {
+    func onLongPressMaker<LongPress>(_ longPressConfigurator: @escaping () -> LongPress) -> UICModifiedView<View> where LongPress: UIGestureCreator, LongPress.Gesture: UILongPressGestureRecognizer {
         self.onNotRendered {
-            longPressConfigurator(LongPress(target: $0)).add()
+            longPressConfigurator().add($0)
         }
     }
 
     func onLongPress(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
-        return self.onLongPressMaker {
-            $0.onRecognized {
-                handler($0.view!)
-            }
+        self.onLongPressMaker {
+            LongPress()
+                .onRecognized {
+                    handler($0.view!)
+                }
         }
     }
 }

@@ -22,8 +22,22 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 public class Label: UILabel {
+
+    init() {
+        super.init(frame: .zero)
+        self.makeSelfImplemented()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    public override init(frame: CGRect) {
+        fatalError("init(frame:) has not been implemented")
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -67,112 +81,102 @@ public class Label: UILabel {
     }
 }
 
-public class UICLabel: UIViewCreator, TextElement {
+public struct UICLabel: UIViewCreator {
     public typealias View = Label
 
-    required public init(_ text: String?) {
-        self.loadView {
-            View(builder: self)
-        }
-        .onNotRendered {
-            ($0 as? View)?.text = text
-        }
+    enum Content {
+        case string(String?)
+        case attributed(NSAttributedString?)
     }
 
-    required public init(_ attributedText: NSAttributedString?) {
-        self.loadView {
-            View(builder: self)
-        }
-        .onNotRendered {
-            ($0 as? View)?.attributedText = attributedText
-        }
-    }
-}
+    @Relay var text: Content
 
-public extension UIViewCreator where View: UILabel, Self: TextElement {
-    init(_ text: Relay<String?>) {
-        self.init(text.wrappedValue)
-        self.onInTheScene {
-            weak var view = $0 as? View
-            text.sync {
-                view?.text = $0
+    public init(_ text: String?) {
+        self._text = .constant(.string(text))
+    }
+
+    public init(_ attributedText: NSAttributedString?) {
+        self._text = .constant(.attributed(attributedText))
+    }
+
+    public init(_ text: Relay<String?>) {
+        self._text = text.map { .string($0) }
+    }
+
+    public init(_ attributedText: Relay<NSAttributedString?>) {
+        self._text = attributedText.map { .attributed($0) }
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return View()
+            .onNotRendered {
+                weak var view = $0 as? View
+
+                _self.$text.sync {
+                    switch $0 {
+                    case .string(let string):
+                        view?.text = string
+                    case .attributed(let attributed):
+                        view?.attributedText = attributed
+                    }
+                }
             }
-        }
     }
 }
 
-public extension TextElement where View: UILabel {
-    func text(_ string: String?) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.text = string
-        }
-    }
+public extension UIViewCreator where View: UILabel {
 
-    func text(_ attributedText: NSAttributedString?) -> Self {
-        return self.onNotRendered {
-            ($0 as? View)?.attributedText = attributedText
-        }
-    }
-
-    func textColor(_ color: UIColor?) -> Self {
+    func textColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.textColor = color
         }
     }
 
-    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> Self {
-        return self.onNotRendered {
+    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.font = font
             ($0 as? View)?.adjustsFontForContentSizeCategory = isDynamicTextSize
         }
     }
 
-    func textScale(_ scale: CGFloat) -> Self {
-        return self.onNotRendered {
+    func textScale(_ scale: CGFloat) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.minimumScaleFactor = scale
             ($0 as? View)?.adjustsFontSizeToFitWidth = scale != 1
         }
     }
 
-    func textAlignment(_ alignment: NSTextAlignment) -> Self {
-        return self.onNotRendered {
+    func textAlignment(_ alignment: NSTextAlignment) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.textAlignment = alignment
         }
     }
 
-    func numberOfLines(_ number: Int) -> Self {
+    func numberOfLines(_ number: Int) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.numberOfLines = number
         }
     }
 }
 
-public extension TextElement where View: UILabel {
-    func adjustsFontForContentSizeCategory(_ flag: Bool) -> Self {
+public extension UIViewCreator where View: UILabel {
+    func adjustsFontForContentSizeCategory(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.adjustsFontForContentSizeCategory = flag
         }
     }
 
-    func adjustsFontSizeToFitWidth(_ flag: Bool) -> Self {
+    func adjustsFontSizeToFitWidth(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.adjustsFontSizeToFitWidth = flag
         }
     }
 }
 
-public extension UIViewCreator where View: UILabel, Self: TextElement {
-    init(_ attributed: Relay<NSAttributedString?>) {
-        self.init(NSAttributedString?(nil))
-
-        attributed.sync { [weak self] in
-            _ = self?.text($0)
-        }
-    }
-}
-
 public extension UIViewCreator where View: UILabel {
-    func lineBreakMode(_ mode: NSLineBreakMode) -> Self {
+    func lineBreakMode(_ mode: NSLineBreakMode) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.lineBreakMode = mode
         }
@@ -180,7 +184,7 @@ public extension UIViewCreator where View: UILabel {
 }
 
 public extension UIViewCreator where View: UILabel {
-    func textColor(_ relay: Relay<UIColor>) -> Self {
+    func textColor(_ relay: Relay<UIColor>) -> UICModifiedView<View> {
         self.onNotRendered {
             weak var view = $0 as? View
             relay.sync {
@@ -191,7 +195,7 @@ public extension UIViewCreator where View: UILabel {
 }
 
 public extension UIViewCreator where View: UILabel {
-    func font(_ relay: Relay<UIFont>) -> Self {
+    func font(_ relay: Relay<UIFont>) -> UICModifiedView<View> {
         self.onNotRendered {
             weak var view = $0 as? View
             relay.sync {

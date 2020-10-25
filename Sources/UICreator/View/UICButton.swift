@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 public class Button: UIButton {
 
@@ -80,67 +81,82 @@ public class Button: UIButton {
     }
 }
 
-public class UICButton: UIViewCreator, Control {
+public class UICButton: UIViewCreator {
     public typealias View = Button
 
-    public init(_ title: String?, type: UIButton.ButtonType? = nil) {
-        self.loadView { [unowned self] in
-            if let type = type {
-                let view = View.init(type: type)
-                view.updateBuilder(self)
-                return view
-            }
+    private enum Inicialization {
+        case `dynamic`(() -> ViewCreator)
+        case title(String)
+        case style(UIButton.ButtonType)
+    }
 
-            return View.init(builder: self)
-        }
-        .onNotRendered {
-            ($0 as? View)?.setTitle(title, for: .normal)
-        }
+    private let inicialization: Inicialization
+
+    public init(_ title: String) {
+        self.inicialization = .title(title)
+    }
+
+    public init(_ style: UIButton.ButtonType) {
+        self.inicialization = .style(style)
     }
 
     public init(content: @escaping () -> ViewCreator) {
-        let content = content()
-        self.tree.append(content)
+        self.inicialization = .dynamic(content)
+    }
 
-        self.loadView {
-            View(builder: self)
-        }.onNotRendered {
-            $0.add(content.releaseUIView())
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        switch _self.inicialization {
+        case .dynamic(let content):
+            return View().onNotRendered {
+                $0.add(content().releaseUIView())
+            }
+
+        case .style(let style):
+            return View(type: style)
+                .makeSelfImplemented()
+
+        case .title(let title):
+            return View()
+                .onNotRendered {
+                    ($0 as? View)?.setTitle(title, for: .normal)
+                }
         }
     }
 }
 
 public extension UIViewCreator where View: UIButton {
 
-    func title(_ string: String?, for state: UIControl.State = .normal) -> Self {
-        return self.onNotRendered {
+    func title(_ string: String?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.setTitle(string, for: state)
         }
     }
 
-    func title(_ attributedText: NSAttributedString?, for state: UIControl.State = .normal) -> Self {
-        return self.onNotRendered {
+    func title(_ attributedText: NSAttributedString?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.setTitle(attributedText?.string, for: state)
             ($0 as? View)?.titleLabel?.attributedText = attributedText
         }
     }
 
-    func title(color: UIColor?, for state: UIControl.State = .normal) -> Self {
-        return self.onNotRendered {
+    func title(color: UIColor?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
+        self.onNotRendered {
             ($0 as? View)?.setTitleColor(color, for: state)
         }
     }
 
-    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> Self {
-        return self.onRendered {
+    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> UICModifiedView<View> {
+        self.onRendered {
             ($0 as? View)?.titleLabel?.font = font
             ($0 as? View)?.titleLabel?.adjustsFontForContentSizeCategory = isDynamicTextSize
         }
     }
 }
 
-public extension UIViewCreator where View: UIButton, Self: Control {
-    func onTouchInside(_ handler: @escaping (UIView) -> Void) -> Self {
+public extension UIViewCreator where View: UIButton {
+    func onTouchInside(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
         self.onEvent(.touchUpInside, handler)
     }
 }

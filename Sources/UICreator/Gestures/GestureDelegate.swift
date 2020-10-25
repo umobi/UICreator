@@ -23,10 +23,10 @@
 import Foundation
 import UIKit
 
-public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate where Gesture: UIGestureRecognizer {
+public class GestureDelegate: NSObject, UIGestureRecognizerDelegate {
 
-    private var shouldBeginHandler: ((Gesture) -> Bool)?
-    func onShouldBegin(_ handler: @escaping (Gesture) -> Bool) {
+    private var shouldBeginHandler: ((UIGestureRecognizer) -> Bool)?
+    func onShouldBegin(_ handler: @escaping (UIGestureRecognizer) -> Bool) {
         let old = self.shouldBeginHandler
         self.shouldBeginHandler = {
             if old?($0) ?? false {
@@ -37,9 +37,9 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         }
     }
 
-    private var shouldRecognizeSimultaneouslyGesture: ((Gesture, UIGestureRecognizer) -> Bool)?
+    private var shouldRecognizeSimultaneouslyGesture: ((UIGestureRecognizer, UIGestureRecognizer) -> Bool)?
     func onShouldRecognizeSimultaneouslyOtherGesture(
-        _ handler: @escaping (Gesture, UIGestureRecognizer) -> Bool) {
+        _ handler: @escaping (UIGestureRecognizer, UIGestureRecognizer) -> Bool) {
 
         let old = self.shouldRecognizeSimultaneouslyGesture
         self.shouldRecognizeSimultaneouslyGesture = {
@@ -51,9 +51,9 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         }
     }
 
-    private var shouldRequireFailureOfGestureHandler: ((Gesture, UIGestureRecognizer) -> Bool)?
+    private var shouldRequireFailureOfGestureHandler: ((UIGestureRecognizer, UIGestureRecognizer) -> Bool)?
     func onShouldRequireFailureOfOtherGesture(
-        _ handler: @escaping (Gesture, UIGestureRecognizer) -> Bool) {
+        _ handler: @escaping (UIGestureRecognizer, UIGestureRecognizer) -> Bool) {
 
         let old = self.shouldRequireFailureOfGestureHandler
         self.shouldRequireFailureOfGestureHandler = {
@@ -65,9 +65,9 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         }
     }
 
-    private var shouldBeRequiredToFailByOtherGesture: ((Gesture, UIGestureRecognizer) -> Bool)?
+    private var shouldBeRequiredToFailByOtherGesture: ((UIGestureRecognizer, UIGestureRecognizer) -> Bool)?
     func onShouldBeRequiredToFailByOtherGesture(
-        _ handler: @escaping (Gesture, UIGestureRecognizer) -> Bool) {
+        _ handler: @escaping (UIGestureRecognizer, UIGestureRecognizer) -> Bool) {
 
         let old = self.shouldBeRequiredToFailByOtherGesture
         self.shouldBeRequiredToFailByOtherGesture = {
@@ -79,8 +79,8 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         }
     }
 
-    private var shouldReceiveTouchHandler: ((Gesture, UITouch) -> Bool)?
-    func onShouldReceiveTouch(_ handler: @escaping (Gesture, UITouch) -> Bool) {
+    private var shouldReceiveTouchHandler: ((UIGestureRecognizer, UITouch) -> Bool)?
+    func onShouldReceiveTouch(_ handler: @escaping (UIGestureRecognizer, UITouch) -> Bool) {
         let old = self.shouldReceiveTouchHandler
         self.shouldReceiveTouchHandler = {
             if old?($0, $1) ?? false {
@@ -91,8 +91,8 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         }
     }
 
-    private var shouldReceivePressHandler: ((Gesture, UIPress) -> Bool)?
-    func onShouldReceivePress(_ handler: @escaping (Gesture, UIPress) -> Bool) {
+    private var shouldReceivePressHandler: ((UIGestureRecognizer, UIPress) -> Bool)?
+    func onShouldReceivePress(_ handler: @escaping (UIGestureRecognizer, UIPress) -> Bool) {
         let old = self.shouldReceivePressHandler
         self.shouldReceivePressHandler = {
             if old?($0, $1) ?? false {
@@ -103,8 +103,8 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         }
     }
 
-    private var shouldReceiveEventHandler: ((Gesture, UIEvent) -> Bool)?
-    func onShouldReceiveEvent(_ handler: @escaping (Gesture, UIEvent) -> Bool) {
+    private var shouldReceiveEventHandler: ((UIGestureRecognizer, UIEvent) -> Bool)?
+    func onShouldReceiveEvent(_ handler: @escaping (UIGestureRecognizer, UIEvent) -> Bool) {
         let old = self.shouldReceiveEventHandler
         self.shouldReceiveEventHandler = {
             if old?($0, $1) ?? false {
@@ -118,22 +118,14 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
     public func gestureRecognizerShouldBegin(
         _ gestureRecognizer: UIGestureRecognizer) -> Bool {
 
-        guard let gestureRecognizer = gestureRecognizer as? Gesture else {
-            Fatal.Builder("GestureRecognizer should be a type of \(Gesture.self)").die()
-        }
-
-        return self.shouldBeginHandler?(gestureRecognizer) ?? true
+        self.shouldBeginHandler?(gestureRecognizer) ?? true
     }
 
     public func gestureRecognizer(
         _ gestureRecognizer: UIGestureRecognizer,
         shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
 
-        guard let gestureRecognizer = gestureRecognizer as? Gesture else {
-            Fatal.Builder("GestureRecognizer should be a type of \(Gesture.self)").die()
-        }
-
-        return self.shouldRecognizeSimultaneouslyGesture?(
+        self.shouldRecognizeSimultaneouslyGesture?(
             gestureRecognizer,
             otherGestureRecognizer
         ) ?? false
@@ -143,11 +135,7 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         _ gestureRecognizer: UIGestureRecognizer,
         shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer) -> Bool {
 
-        guard let gestureRecognizer = gestureRecognizer as? Gesture else {
-            Fatal.Builder("GestureRecognizer should be a type of \(Gesture.self)").die()
-        }
-
-        return self.shouldRequireFailureOfGestureHandler?(
+        self.shouldRequireFailureOfGestureHandler?(
             gestureRecognizer,
             otherGestureRecognizer
         ) ?? gestureRecognizer.shouldRequireFailure(of: otherGestureRecognizer)
@@ -157,11 +145,7 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         _ gestureRecognizer: UIGestureRecognizer,
         shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
 
-        guard let gestureRecognizer = gestureRecognizer as? Gesture else {
-            Fatal.Builder("GestureRecognizer should be a type of \(Gesture.self)").die()
-        }
-
-        return self.shouldBeRequiredToFailByOtherGesture?(
+        self.shouldBeRequiredToFailByOtherGesture?(
             gestureRecognizer,
             otherGestureRecognizer
         ) ?? gestureRecognizer.shouldBeRequiredToFail(by: otherGestureRecognizer)
@@ -171,11 +155,7 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         _ gestureRecognizer: UIGestureRecognizer,
         shouldReceive touch: UITouch) -> Bool {
 
-        guard let gestureRecognizer = gestureRecognizer as? Gesture else {
-            Fatal.Builder("GestureRecognizer should be a type of \(Gesture.self)").die()
-        }
-
-        return self.shouldReceiveTouchHandler?(
+        self.shouldReceiveTouchHandler?(
             gestureRecognizer,
             touch
         ) ?? true
@@ -185,11 +165,7 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
         _ gestureRecognizer: UIGestureRecognizer,
         shouldReceive press: UIPress) -> Bool {
 
-        guard let gestureRecognizer = gestureRecognizer as? Gesture else {
-            Fatal.Builder("GestureRecognizer should be a type of \(Gesture.self)").die()
-        }
-
-        return self.shouldReceivePressHandler?(
+        self.shouldReceivePressHandler?(
             gestureRecognizer,
             press
         ) ?? true
@@ -198,11 +174,6 @@ public class GestureDelegate<Gesture>: NSObject, UIGestureRecognizerDelegate whe
     public func gestureRecognizer(
         _ gestureRecognizer: UIGestureRecognizer,
         shouldReceive event: UIEvent) -> Bool {
-
-        guard let gestureRecognizer = gestureRecognizer as? Gesture else {
-            Fatal.Builder("GestureRecognizer should be a type of \(Gesture.self)").die()
-        }
-
         if #available(iOS 13.4, tvOS 13.4, *) {
             return self.shouldReceiveEventHandler?(
                 gestureRecognizer,

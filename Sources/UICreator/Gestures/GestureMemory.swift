@@ -23,74 +23,114 @@
 import Foundation
 import UIKit
 
-struct GestureMemory: MutableEditable {
-    typealias Handler = UIHandler<UIGestureRecognizer>
-
-    let began: Handler?
-    let cancelled: Handler?
-    let changed: Handler?
-    let failed: Handler?
-    let recognized: Handler?
-    let possible: Handler?
-    let ended: Handler?
-    let anyOther: Handler?
-    
-    let gesture: Mutable<MemorySwitch>
-    let isReleased: Mutable<Bool>
-
-    init() {
-        self.began = nil
-        self.cancelled = nil
-        self.changed = nil
-        self.failed = nil
-        self.recognized = nil
-        self.possible = nil
-        self.ended = nil
-        self.anyOther = nil
-        self.gesture = .init(value: .nil)
-        self.isReleased = .init(value: false)
+private var kGestureMemory = 0
+extension UIGestureRecognizer {
+    struct Memory {
+        @MutableBox var beganHandler: ((UIGestureRecognizer) -> Void)?
+        @MutableBox var cancelledHandler: ((UIGestureRecognizer) -> Void)?
+        @MutableBox var changedHandler: ((UIGestureRecognizer) -> Void)?
+        @MutableBox var failedHandler: ((UIGestureRecognizer) -> Void)?
+        @MutableBox var recognizedHandler: ((UIGestureRecognizer) -> Void)?
+        @MutableBox var possibleHandler: ((UIGestureRecognizer) -> Void)?
+        @MutableBox var endedHandler: ((UIGestureRecognizer) -> Void)?
+        @MutableBox var anyOtherHandler: ((UIGestureRecognizer) -> Void)?
     }
 
-    init(_ original: GestureMemory, editable: Editable) {
-        self.began = editable.began
-        self.cancelled = editable.cancelled
-        self.changed = editable.changed
-        self.failed = editable.failed
-        self.recognized = editable.recognized
-        self.possible = editable.possible
-        self.ended = editable.ended
-        self.anyOther = editable.anyOther
-        self.gesture = original.gesture
-        self.isReleased = original.isReleased
-    }
-
-    func edit(_ edit: @escaping (Editable) -> Void) -> GestureMemory {
-        let editable = Editable(self)
-        edit(editable)
-        return .init(self, editable: editable)
+    var memory: Memory {
+        OBJCSet(
+            self,
+            &kGestureMemory,
+            policity: .OBJC_ASSOCIATION_COPY,
+            orLoad: Memory.init
+        )
     }
 }
 
-extension GestureMemory {
-    class Editable {
-        var began: Handler?
-        var cancelled: Handler?
-        var changed: Handler?
-        var failed: Handler?
-        var recognized: Handler?
-        var possible: Handler?
-        var ended: Handler?
-        var anyOther: Handler?
+public extension UIGestureRecognizer {
+    func onBegan(_ handler: @escaping (UIGestureRecognizer) -> Void) {
+        let old = self.memory.beganHandler
+        self.memory.beganHandler = {
+            old?($0)
+            handler($0)
+        }
+    }
 
-        init(_ payload: GestureMemory) {
-            self.began = payload.began
-            self.cancelled = payload.cancelled
-            self.changed = payload.changed
-            self.failed = payload.failed
-            self.recognized = payload.recognized
-            self.possible = payload.possible
-            self.ended = payload.ended
-            self.anyOther = payload.anyOther
+    func onCancelled(_ handler: @escaping (UIGestureRecognizer) -> Void) {
+        let old = self.memory.cancelledHandler
+        memory.cancelledHandler = {
+            old?($0)
+            handler($0)
+        }
+    }
+
+    func onChanged(_ handler: @escaping (UIGestureRecognizer) -> Void) {
+        let old = self.memory.changedHandler
+        memory.changedHandler = {
+            old?($0)
+            handler($0)
+        }
+    }
+
+    func onFailed(_ handler: @escaping (UIGestureRecognizer) -> Void) {
+        let old = self.memory.failedHandler
+        self.memory.failedHandler = {
+            old?($0)
+            handler($0)
+        }
+    }
+
+    func onRecognized(_ handler: @escaping (UIGestureRecognizer) -> Void) {
+        let old = self.memory.recognizedHandler
+        self.memory.recognizedHandler = {
+            old?($0)
+            handler($0)
+        }
+    }
+
+    func onPossible(_ handler: @escaping (UIGestureRecognizer) -> Void) {
+        let old = self.memory.possibleHandler
+        self.memory.possibleHandler =  {
+            old?($0)
+            handler($0)
+        }
+    }
+
+    func onEnded(_ handler: @escaping (UIGestureRecognizer) -> Void) {
+        let old = self.memory.endedHandler
+        self.memory.endedHandler = {
+            old?($0)
+            handler($0)
+        }
+    }
+
+    func onAnyOther(_ handler: @escaping (UIGestureRecognizer) -> Void) {
+        let old = self.memory.anyOtherHandler
+        self.memory.anyOtherHandler = {
+            old?($0)
+            handler($0)
         }
     }
 }
+
+internal extension UIGestureRecognizer {
+    func commit(_ sender: UIGestureRecognizer) {
+        let memory = sender.memory
+        switch sender.state {
+        case .possible:
+            (memory.possibleHandler ?? memory.recognizedHandler)?(sender)
+        case .began:
+            (memory.beganHandler ?? memory.recognizedHandler)?(sender)
+        case .changed:
+            (memory.changedHandler ?? memory.recognizedHandler)?(sender)
+        case .ended:
+            (memory.endedHandler ?? memory.recognizedHandler)?(sender)
+        case .cancelled:
+            (memory.cancelledHandler ?? memory.recognizedHandler)?(sender)
+        case .failed:
+            (memory.failedHandler ?? memory.recognizedHandler)?(sender)
+        @unknown default:
+            memory.anyOtherHandler?(sender)
+        }
+    }
+}
+

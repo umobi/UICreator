@@ -26,29 +26,30 @@ import UIKit
 #if os(iOS)
 
 @available(iOS 13.0, *)
-public class Hover: UIGesture {
+public struct Hover: UIGestureCreator {
     public typealias Gesture = UIHoverGestureRecognizer
 
-    public required init(target view: UIView!) {
-        GestureUIGestureSwitch.switch(self, Gesture.init(target: view))
+    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        UIHoverGestureRecognizer()
     }
 }
 
 public extension UIViewCreator {
 
     @available(iOS 13.0, *)
-    func onHoverMaker(_ hoverConfigurator: @escaping (Hover) -> Hover) -> UICModifiedView<View> {
+    func onHoverMaker<Hover>(_ hoverConfigurator: @escaping () -> Hover) -> UICModifiedView<View> where Hover: UIGestureCreator, Hover.Gesture: UIHoverGestureRecognizer {
         self.onNotRendered {
-            hoverConfigurator(Hover(target: $0)).add()
+            hoverConfigurator().add($0)
         }
     }
 
     @available(iOS 13.0, *)
     func onHover(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
         self.onHoverMaker {
-            $0.onRecognized {
-                handler($0.view!)
-            }
+            Hover()
+                .onRecognized {
+                    handler($0.view!)
+                }
         }
     }
 }

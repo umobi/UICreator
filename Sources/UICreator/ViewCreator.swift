@@ -25,7 +25,6 @@ import UIKit
 import ConstraintBuilder
 
 public protocol ViewCreator {
-
     static func makeUIView(_ viewCreator: ViewCreator) -> CBView
 }
 

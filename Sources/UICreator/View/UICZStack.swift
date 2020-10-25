@@ -24,7 +24,12 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class ZStackView: UIView {
+public class ZStackView: CBView {
+
+    init() {
+        super.init(frame: .zero)
+        self.makeSelfImplemented()
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -69,22 +74,23 @@ public class ZStackView: UIView {
 }
 
 /// `class UICZStack` is a view that holds more than one **subview**.
-public class UICZStack: UIViewCreator {
+public struct UICZStack: UIViewCreator {
     public typealias View = ZStackView
 
-    public init(@UICViewBuilder _ contents: @escaping () -> ViewCreator) {
-        let contents = contents().zip
-        contents.forEach {
-            self.tree.append($0)
-        }
+    let contents: () -> ViewCreator
 
-        self.loadView { [unowned self] in
-            View.init(builder: self)
-        }
-        .onNotRendered { view in
-            contents.forEach {
-                view.add(priority: .fittingSizeLevel, $0.releaseUIView())
+    public init(@UICViewBuilder _ contents: @escaping () -> ViewCreator) {
+        self.contents = contents
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return View()
+            .onNotRendered { view in
+                _self.contents().zip.forEach {
+                    view.add(priority: .fittingSizeLevel, $0.releaseUIView())
+                }
             }
-        }
     }
 }

@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-struct _Render {
+struct Render {
     typealias State = CBView.RenderState
     
     weak var view: CBView!
@@ -114,7 +114,7 @@ struct _Render {
     }
 }
 
-private extension _Render {
+private extension Render {
     func recursive(commit state: State) {
         self.view.thatNeedsState(state)
             .reversed()
@@ -154,7 +154,7 @@ private extension CBView {
     }
 }
 
-extension _Render {
+extension Render {
 
     func onNotRendered(_ handler: @escaping (CBView) -> Void) {
         let old = self.notRenderedHandler
@@ -187,7 +187,7 @@ extension _Render {
     }
 }
 
-extension _Render {
+extension Render {
     enum Fatal: FatalType {
         case popedStatus(State)
 

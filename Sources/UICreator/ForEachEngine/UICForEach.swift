@@ -91,6 +91,8 @@ public struct EmptyView: UIViewCreator {
 public struct UICForEach<Content, Value>: ViewCreator, ForEachCreator where Content: UIViewCreator, Value: Collection {
     @MutableBox var view: Reference<UIView> = .nil
     @MutableBox var syncLoad: (() -> Void)?
+    @MutableBox var manager: SupportForEach!
+    
     let viewType: ViewCreator.Type
 
     let relay: Relay<Value>

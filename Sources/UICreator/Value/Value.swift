@@ -54,7 +54,7 @@ class ReactiveItemReference: CustomStringConvertible {
 
 @propertyWrapper
 public struct Value<Value> {
-    let mutableBox: Box
+    private let mutableBox: Box
 
     public var projectedValue: Relay<Value> { return .init(self.mutableBox.reference) }
 
@@ -69,18 +69,18 @@ public struct Value<Value> {
     }
 }
 
-extension Value {
-    class Box: Mutable<Value> {
+private extension Value {
+    class Box {
         let reference = ReactiveItemReference()
 
-        override var value: Value {
+        var value: Value {
             didSet {
                 self.reference.reactive.valueDidChange(self.value)
             }
         }
 
-        override init(value: Value) {
-            super.init(value: value)
+        init(value: Value) {
+            self.value = value
 
             self.reference.reactive.valueSetter { [weak self] in
                 self?.value = $0
