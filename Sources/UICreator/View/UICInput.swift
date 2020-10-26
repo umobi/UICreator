@@ -89,17 +89,49 @@ public struct UICInput: UIViewCreator {
     let content: () -> ViewCreator
 
     public init(
-        frame: CGRect = .zero,
+        x: CGFloat = .zero,
+        y: CGFloat = .zero,
+        height: CGFloat,
+        width: CGFloat,
         style: UIInputView.Style = .keyboard,
         content: @escaping () -> ViewCreator) {
 
-        self.frame = frame
+        self.frame = .init(x: x, y: y, width: width, height: height)
+        self.style = style
+        self.content = content
+    }
+
+    public init(
+        style: UIInputView.Style = .keyboard,
+        content: @escaping () -> ViewCreator) {
+
+        self.frame = .zero
         self.style = style
         self.content = content
     }
 
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
+
+        if _self.frame.height == .zero || _self.frame.width == .zero {
+            let contentView = _self.content().releaseUIView()
+
+            return InputView(
+                frame: {
+                    let possibleSize = contentView.sizeThatFits(UIScreen.main.bounds.size)
+
+                    return .init(
+                        x: _self.frame.origin.x,
+                        y: _self.frame.origin.y,
+                        width: _self.frame.width == .zero ? possibleSize.width : _self.frame.width,
+                        height: _self.frame.height == .zero ? possibleSize.height : _self.frame.height
+                    )
+                }(),
+                style: _self.style
+            ).onNotRendered {
+                $0.add(contentView)
+            }
+        }
 
         return InputView(frame: _self.frame, style: _self.style)
             .onNotRendered {

@@ -112,6 +112,24 @@ public struct UICDatePicker: UIViewCreator {
         self.locale = locale
     }
 
+    public init(
+        _ pickerMode: UICDatePicker.Mode = .date,
+        minimumDate: Date? = nil,
+        maximumDate: Date? = nil,
+        selectedDate: Relay<Date?>,
+        calendar: Calendar? = nil,
+        timeZone: TimeZone? = nil,
+        locale: Locale? = nil) {
+
+        self._minimumDate = .constant(minimumDate)
+        self._maximumDate = .constant(maximumDate)
+        self._selectedDate = selectedDate
+        self.calendar = calendar
+        self.pickerMode = pickerMode
+        self.timeZone = timeZone
+        self.locale = locale
+    }
+
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
