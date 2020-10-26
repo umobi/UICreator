@@ -55,9 +55,19 @@ public extension UIViewCreator {
         }
     }
 
-    func `as`<UIElement: UIView>(_ reference: UICOutlet<UIElement>) -> UICModifiedView<View> {
+    func alpha(_ dynamicConstant: Relay<CGFloat>) -> UICModifiedView<View> {
+        self.onNotRendered {
+            weak var view = $0 as? View
+
+            dynamicConstant.sync {
+                view?.alpha = $0
+            }
+        }
+    }
+
+    func `as`(_ reference: UICOutlet<View>) -> UICModifiedView<View> {
         self.onNotRendered { [reference] in
-            reference.ref($0 as? UIElement)
+            reference.ref($0 as? View)
         }
     }
 }

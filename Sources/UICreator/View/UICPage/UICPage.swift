@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class UICPage: UICViewControllerCreator {
+public struct UICPage: UIViewControllerCreator {
     public typealias View = ViewControllerAdaptor<PageViewController>
     public typealias ViewController = PageViewController
 
@@ -42,34 +42,28 @@ public class UICPage: UICViewControllerCreator {
         self.options = options
     }
 
-    public static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
+    public static func makeUIViewController(_ viewCreator: ViewCreator) -> UIViewController {
         let _self = viewCreator as! Self
 
-        return UICControllerAdapt {
-            {
-                let pageController = PageViewController(
-                    transitionStyle: _self.transitionStyle,
-                    navigationOrientation: _self.navigationOrientation,
-                    options: _self.options
-                )
+        let pageController = PageViewController(
+            transitionStyle: _self.transitionStyle,
+            navigationOrientation: _self.navigationOrientation,
+            options: _self.options
+        )
 
-                pageController.delegate = pageController
-                pageController.dataSource = pageController
+        pageController.delegate = pageController
+        pageController.dataSource = pageController
 
-                return pageController
-            }()
-        }
-        .releaseUIView()
+        return pageController
     }
 }
 
-public extension UICViewControllerCreator where ViewController: UIPageViewController {
+public extension UIViewControllerCreator where ViewController: UIPageViewController {
     func pages(
         direction: UIPageViewController.NavigationDirection,
-        @UICViewBuilder  _ contents: @escaping () -> ViewCreator) -> UICModifiedView<View> {
+        @UICViewBuilder  _ contents: @escaping () -> ViewCreator) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?
-                .dynamicViewController
+            ($0 as? ViewController)?
                 .updateViewControllers(
                     {
                         contents().zip.map {
@@ -84,30 +78,24 @@ public extension UICViewControllerCreator where ViewController: UIPageViewContro
     }
 }
 
-public extension UICPage {
+public extension UIViewControllerCreator where ViewController: PageViewController {
     #if os(iOS)
-    func spineLocation(_ handler: @escaping (UIInterfaceOrientation) -> UIPageViewController.SpineLocation) -> UICModifiedView<View> {
+    func spineLocation(_ handler: @escaping (UIInterfaceOrientation) -> UIPageViewController.SpineLocation) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?
-                .dynamicViewController
-                .spineLocationHandler = handler
+            ($0 as? ViewController)?.spineLocationHandler = handler
         }
     }
     #endif
 
-    func onPageChanged(_ handler: @escaping (Int) -> Void) -> UICModifiedView<View> {
+    func onPageChanged(_ handler: @escaping (Int) -> Void) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?
-                .dynamicViewController
-                .onPageChangeHandler = handler
+            ($0 as? ViewController)?.onPageChangeHandler = handler
         }
     }
 
-    func isInfinityScroll(_ flag: Bool) -> UICModifiedView<View> {
+    func isInfinityScroll(_ flag: Bool) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?
-                .dynamicViewController
-                .isInfinityScroll = flag
+            ($0 as? ViewController)?.isInfinityScroll = flag
         }
     }
 }

@@ -24,13 +24,9 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public protocol CollectionLayout: UIViewCreator where View: UICollectionView {
-    associatedtype Layout: UICollectionViewLayout
-}
+class UICCollectionView<CollectionLayout>: UICollectionView, ListSupport, UICollectionViewLayoutCreator where CollectionLayout: UICollectionViewLayout {
 
-internal class UICCollectionView: UICollectionView {
-
-    init(_ layout: UICollectionViewLayout) {
+    init(_ layout: CollectionLayout) {
         super.init(frame: .zero, collectionViewLayout: layout)
         self.makeSelfImplemented()
     }
@@ -90,19 +86,24 @@ internal class UICCollectionView: UICollectionView {
     }
 }
 
-public struct UICCollection<Layout>: UIViewCreator, CollectionLayout where Layout: UICollectionViewLayout {
+public struct UICCollection<Layout>: UIViewCreator where Layout: UICollectionViewLayout {
     public typealias View = UICollectionView
 
     private let layout: Layout
+    private let contents: () -> ViewCreator
 
-    public init(layout: Layout) {
+    public init(
+        layout: Layout,
+        @UICViewBuilder contents: @escaping () -> ViewCreator) {
         self.layout = layout
+        self.contents = contents
     }
 
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
         return UICCollectionView(_self.layout)
+            .dynamicData((viewCreator as! Self).contents)
     }
 }
 

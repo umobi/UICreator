@@ -22,14 +22,10 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
-public protocol UICViewControllerCreator: UIViewCreator where View == ViewControllerAdaptor<Self.ViewController> {
-    associatedtype ViewController: UIViewController
-}
-
-public struct UICNavigation: UICViewControllerCreator {
+public struct UICNavigation: UIViewControllerCreator {
     public typealias ViewController = UINavigationController
-    public typealias View = ViewControllerAdaptor<UINavigationController>
 
     let content: () -> ViewCreator
 
@@ -37,13 +33,10 @@ public struct UICNavigation: UICViewControllerCreator {
         self.content = content
     }
 
-    public static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
-        UICControllerAdapt {
-            UINavigationController(
-                rootViewController: UICHostingController(content: (viewCreator as! Self).content)
-            )
-        }
-        .releaseUIView()
+    public static func makeUIViewController(_ viewCreator: ViewCreator) -> UIViewController {
+        UINavigationController(
+            rootViewController: UICHostingController(content: (viewCreator as! Self).content)
+        )
     }
 }
 

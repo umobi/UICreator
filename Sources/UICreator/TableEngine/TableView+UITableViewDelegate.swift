@@ -23,15 +23,17 @@
 import Foundation
 import UIKit
 
+class UICTableViewDelegate: NSObject, UITableViewDelegate {}
+
 // swiftlint:disable file_length
-extension UICTableView: UITableViewDelegate {
+extension UICTableViewDelegate {
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = self.manager?.header(at: section) else {
+        guard let header = tableView.manager?.header(at: section) else {
             return nil
         }
 
         guard
-            let cell = self.dequeueReusableHeaderFooterView(
+            let cell = tableView.dequeueReusableHeaderFooterView(
                 withIdentifier: header.identifier
             ) as? TableViewHeaderFooterCell
         else {
@@ -43,11 +45,11 @@ extension UICTableView: UITableViewDelegate {
     }
 
     public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        guard let footer = self.manager?.footer(at: section) else {
+        guard let footer = tableView.manager?.footer(at: section) else {
             return nil
         }
 
-        guard let cell = self.dequeueReusableHeaderFooterView(
+        guard let cell = tableView.dequeueReusableHeaderFooterView(
                 withIdentifier: footer.identifier
             ) as? TableViewHeaderFooterCell
         else {

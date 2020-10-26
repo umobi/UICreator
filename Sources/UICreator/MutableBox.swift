@@ -54,7 +54,7 @@ struct WeakBox<Value> where Value: AnyObject {
     private class Box {
         var value: Value?
 
-        init(_ value: Value) {
+        init(_ value: Value?) {
             self.value = value
         }
     }

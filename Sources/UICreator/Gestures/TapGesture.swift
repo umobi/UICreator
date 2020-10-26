@@ -27,6 +27,8 @@ import UIKit
 public struct Tap: UIGestureCreator {
     public typealias Gesture = UITapGestureRecognizer
 
+    public init() {}
+    
     public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
         Gesture()
     }

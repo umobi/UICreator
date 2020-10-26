@@ -88,7 +88,7 @@ public struct EmptyView: UIViewCreator {
     }
 }
 
-public struct UICForEach<Content, Value>: ViewCreator, ForEachCreator where Content: UIViewCreator, Value: Collection {
+public struct UICForEach<Content, Value>: ViewCreator, ForEachCreator where Content: ViewCreator, Value: Collection {
     @MutableBox var view: Reference<UIView> = .nil
     @MutableBox var syncLoad: (() -> Void)?
     @MutableBox var manager: SupportForEach!
@@ -147,7 +147,7 @@ public struct UICForEach<Content, Value>: ViewCreator, ForEachCreator where Cont
         EmptyView()
             .height(equalTo: 0, priority: .defaultHigh)
             .width(equalTo: 0, priority: .defaultHigh)
-            .onNotRendered {
+            .onRendered {
                 (viewCreator as! Self).view = .weak($0)
                 (viewCreator as! Self).load()
             }

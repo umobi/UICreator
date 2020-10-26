@@ -143,7 +143,7 @@ public extension UIViewCreator where View: UITextField {
         }
     }
 
-    func placeholderColor(color: UIColor?) -> UICModifiedView<View> {
+    func placeholderColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onRendered {
             guard let label = $0 as? View else {
                 return

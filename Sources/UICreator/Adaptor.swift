@@ -33,7 +33,6 @@ class ViewAdaptor: UIView, ViewCreatorNoLayoutConstraints {
         self.adaptedView = .strong(view)
         super.init(frame: .zero)
         self.makeSelfImplemented()
-        self.adaptView()
     }
 
     override init(frame: CGRect) {
@@ -44,7 +43,7 @@ class ViewAdaptor: UIView, ViewCreatorNoLayoutConstraints {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func adaptView() {
+    internal func adaptView() {
         if !self.adaptedView.isWeak {
             let view = self.adaptedView.value!
             self.adaptedView = .weak(view)
@@ -53,8 +52,14 @@ class ViewAdaptor: UIView, ViewCreatorNoLayoutConstraints {
         }
     }
 
+    public override func sizeToFit() {
+        self.adaptView()
+        super.sizeToFit()
+    }
+
     override open func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
+        self.adaptView()
         self.renderManager.willMove(toSuperview: newSuperview)
     }
 

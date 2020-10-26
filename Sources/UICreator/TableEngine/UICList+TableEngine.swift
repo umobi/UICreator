@@ -25,14 +25,12 @@ import UIKit
 
 extension UICTableView: ListSupport {}
 
-public extension UITableView {
-    private typealias TableView = UITableView & UITableViewDataSource & UITableViewDelegate & ListSupport
-
+extension ListSupport where Self: UITableView {
     @discardableResult
     func dynamicData(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> Self {
         self.onNotRendered {
             let manager = ListManager(contents: contents().zip)
-            let tableView: TableView! = $0 as? TableView
+            let tableView: Self! = $0 as? Self
             
             manager.rowsIdentifier.forEach { [unowned tableView] in
                 tableView?.register(TableViewCell.self, forCellReuseIdentifier: $0)
@@ -47,10 +45,26 @@ public extension UITableView {
             }
 
             tableView.manager = manager
-            tableView.dataSource = tableView
-            tableView.delegate = tableView
+            tableView.strongDataSource(UICTableViewDataSource())
+            tableView.strongDelegate(UICTableViewDelegate())
             manager.listToken = tableView.makeToken()
 
         }
     }
 }
+
+private var kTableDelegate = 0
+private var kTableDataSource = 0
+extension UITableView {
+
+    func strongDelegate(_ delegate: UITableViewDelegate) {
+        self.delegate = delegate
+        objc_setAssociatedObject(self, &kTableDelegate, delegate, .OBJC_ASSOCIATION_RETAIN)
+    }
+
+    func strongDataSource(_ dataSource: UITableViewDataSource) {
+        self.dataSource = dataSource
+        objc_setAssociatedObject(self, &kTableDataSource, delegate, .OBJC_ASSOCIATION_RETAIN)
+    }
+}
+

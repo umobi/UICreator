@@ -23,26 +23,28 @@
 import Foundation
 import UIKit
 
-extension UICTableView: UITableViewDataSource {
+class UICTableViewDataSource: NSObject, UITableViewDataSource {}
+
+extension UICTableViewDataSource {
     public func numberOfSections(in tableView: UITableView) -> Int {
-        let numberOfSections = self.manager?.numberOfSections ?? 0
-        self.sizeManager.sections(count: numberOfSections)
+        let numberOfSections = tableView.manager?.numberOfSections ?? 0
+        tableView.sizeManager.sections(count: numberOfSections)
         return numberOfSections
     }
 
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let manager = self.manager else {
-            self.sizeManager.rows(count: .zero, in: section)
+        guard let manager = tableView.manager else {
+            tableView.sizeManager.rows(count: .zero, in: section)
             return 0
         }
 
         let numberOfRows = manager.numberOfRows(in: manager.section(at: section))
-        self.sizeManager.rows(count: numberOfRows, in: section)
+        tableView.sizeManager.rows(count: numberOfRows, in: section)
         return numberOfRows
     }
 
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let row = self.manager?.row(at: indexPath) else {
+        guard let row = tableView.manager?.row(at: indexPath) else {
             Fatal.Builder("UICList can't load row for indexPath at \(indexPath)").die()
         }
 
@@ -56,9 +58,9 @@ extension UICTableView: UITableViewDataSource {
         }
 
         cell.prepareCell(row, axis: .horizontal)
-        self.commitCell(cell)
+        tableView.commitCell(cell)
 
-        self.appendReusable(cell: cell)
+        tableView.appendReusable(cell: cell)
         return cell
     }
 

@@ -27,6 +27,8 @@ import UIKit
 public struct Rotation: UIGestureCreator {
     public typealias Gesture = UIRotationGestureRecognizer
 
+    public init() {}
+    
     public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
         Gesture()
     }

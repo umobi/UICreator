@@ -172,6 +172,12 @@ public extension UIViewCreator where View: UIImageView {
             }
         }
     }
+
+    func contentMode(_ contentMode: ContentMode) -> UICModifiedView<View> {
+        self.onNotRendered {
+            ($0 as? View)?.contentMode = contentMode.uiContentMode
+        }
+    }
 }
 
 public extension UIViewCreator where View: UIImageView {

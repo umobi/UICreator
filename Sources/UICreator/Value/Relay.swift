@@ -185,122 +185,6 @@ extension Optional: OptionalType {
     }
 }
 
-public extension Relay where Value: OptionalType {
-    // Lazy bind
-    func bind(to relay: Relay<Value>) {
-        self.sync {
-            relay.wrappedValue = $0
-        }
-    }
-}
-
-public extension Relay {
-    // Lazy bind
-    func bind(to relay: Relay<Value>) {
-        self.sync {
-            relay.wrappedValue = $0
-        }
-    }
-
-    // Lazy bind
-    func bind(to relay: Relay<Value?>) {
-        self.sync {
-            relay.wrappedValue = $0
-        }
-    }
-}
-
-/// Sync from left
-infix operator <->
-/// Sync from left
-public func <-> <T>(left: Relay<T>, right: Relay<T>) {
-    var isLocked = false
-
-    left.sync {
-        guard !isLocked else {
-            return
-        }
-
-        isLocked = true
-        right.wrappedValue = $0
-        isLocked = false
-    }
-
-    right.next {
-        guard !isLocked else {
-            return
-        }
-
-        isLocked = true
-        left.wrappedValue = $0
-        isLocked = false
-    }
-}
-
-/// Sync from left
-public func <-> <T>(left: Relay<T>?, right: Relay<T>) {
-    guard let left = left else {
-        return
-    }
-
-    left <-> right
-}
-
-/// Sync from left
-public func <-> <T>(left: Relay<T>?, right: Relay<T>?) {
-    guard let left = left, let right = right else {
-        return
-    }
-
-    left <-> right
-}
-
-/// Lazy operator
-infix operator <~>
-
-/// Lazy operator
-public func <~> <T>(left: Relay<T>, right: Relay<T>) {
-    var isLocked = false
-
-    left.next {
-        guard !isLocked else {
-            return
-        }
-
-        isLocked = true
-        right.wrappedValue = $0
-        isLocked = false
-    }
-
-    right.next {
-        guard !isLocked else {
-            return
-        }
-
-        isLocked = true
-        left.wrappedValue = $0
-        isLocked = false
-    }
-}
-
-/// Lazy operator
-public func <~> <T>(left: Relay<T>?, right: Relay<T>) {
-    guard let left = left else {
-        return
-    }
-
-    left <~> right
-}
-
-/// Lazy operator
-public func <~> <T>(left: Relay<T>?, right: Relay<T>?) {
-    guard let left = left, let right = right else {
-        return
-    }
-
-    left <~> right
-}
-
 public prefix func ! (_ relay: Relay<Bool>) -> Relay<Bool> {
     relay.map { !$0 }
 }
@@ -371,4 +255,124 @@ public func && (_ left: Relay<Bool>, _ right: Bool) -> Relay<Bool> {
     }
 
     return value.projectedValue
+}
+
+public func == <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Bool> where Value: Equatable {
+    left.withLatest(right) {
+        $0 == $1
+    }
+}
+
+public func == <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Bool> where Value: Equatable {
+    left.map {
+        $0 == right
+    }
+}
+
+public func != <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Bool> where Value: Equatable {
+    left.withLatest(right) {
+        $0 == $1
+    }
+}
+
+public func != <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Bool> where Value: Equatable {
+    left.map {
+        $0 != right
+    }
+}
+
+public func < <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Bool> where Value: Comparable {
+    left.withLatest(right) {
+        $0 < $1
+    }
+}
+
+public func < <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Bool> where Value: Comparable {
+    left.map {
+        $0 < right
+    }
+}
+
+public func <= <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Bool> where Value: Comparable {
+    left.withLatest(right) {
+        $0 <= $1
+    }
+}
+
+public func <= <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Bool> where Value: Comparable {
+    left.map {
+        $0 <= right
+    }
+}
+
+public func >= <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Bool> where Value: Comparable {
+    left.withLatest(right) {
+        $0 >= $1
+    }
+}
+
+public func >= <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Bool> where Value: Comparable {
+    left.map {
+        $0 >= right
+    }
+}
+
+public func > <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Bool> where Value: Comparable {
+    left.withLatest(right) {
+        $0 > $1
+    }
+}
+
+public func > <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Bool> where Value: Comparable {
+    left.map {
+        $0 > right
+    }
+}
+
+public func + <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Value> where Value: Numeric {
+    left.withLatest(right) {
+        $0 + $1
+    }
+}
+
+public func + <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Value> where Value: Numeric {
+    left.map {
+        $0 + right
+    }
+}
+
+public func - <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Value> where Value: Numeric {
+    left.withLatest(right) {
+        $0 - $1
+    }
+}
+
+public func - <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Value> where Value: Numeric {
+    left.map {
+        $0 - right
+    }
+}
+
+public func * <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Value> where Value: Numeric {
+    left.withLatest(right) {
+        $0 * $1
+    }
+}
+
+public func * <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Value> where Value: Numeric {
+    left.map {
+        $0 * right
+    }
+}
+
+public func / <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Value> where Value: FloatingPoint {
+    left.withLatest(right) {
+        $0 / $1
+    }
+}
+
+public func / <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Value> where Value: FloatingPoint {
+    left.map {
+        $0 / right
+    }
 }

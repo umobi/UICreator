@@ -26,18 +26,18 @@ import ConstraintBuilder
 public struct UICVStack: UIViewCreator {
     public typealias View = StackView
 
-    @Relay var spacing: CGFloat
-    let content: () -> ViewCreator
+    @Relay private var spacing: CGFloat
+    private let content: () -> ViewCreator
 
-    init(
-        spacing: CGFloat,
+    public init(
+        spacing: CGFloat = .zero,
         @UICViewBuilder _ content: @escaping () -> ViewCreator) {
 
         self.content = content
         self._spacing = .constant(spacing)
     }
 
-    init(
+    public init(
         spacing: Relay<CGFloat>,
         @UICViewBuilder _ content: @escaping () -> ViewCreator) {
 

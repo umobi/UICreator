@@ -28,6 +28,8 @@ import UIKit
 public struct Pinch: UIGestureCreator {
     public typealias Gesture = UIPinchGestureRecognizer
 
+    public init() {}
+    
     public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
         Gesture()
     }

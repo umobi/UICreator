@@ -146,38 +146,122 @@ public struct Segment {
         self.onSelected = handler
         return self
     }
+}
 
-    internal func apply(in segmented: UICModifiedView<SegmentedControl>, at index: Int) -> UICModifiedView<SegmentedControl> {
-        switch self.content {
-        case .image(let image):
-            return segmented.addSegment(image: image, at: index)
-        case .text(let text):
-            return segmented.addSegment(title: text, at: index)
-        case .empty:
-            return segmented.addSegment(title: nil, at: index)
+extension Segment {
+    struct Builder {
+        typealias SegmentedModified = UICModifiedView<SegmentedControl>
+
+        private let viewCreator: SegmentedModified
+        private let segment: Segment
+        let index: Int
+
+        init(_ viewCreator: SegmentedModified, segment: Segment, at index: Int) {
+            self.viewCreator = viewCreator
+            self.segment = segment
+            self.index = index
         }
 
-        return segmented.isEnabled(self.isEnabled, at: index)
-
-        if let contentOffset = self.contentOffset {
-            return segmented.contentOffset(contentOffset, at: index)
+        private init(_ viewCreator: SegmentedModified, _self: Self) {
+            self.viewCreator = viewCreator
+            self.segment = _self.segment
+            self.index = _self.index
         }
 
-        if let width = self.width {
-            return segmented.width(width, at: index)
+        func modify(_ edit: (SegmentedModified, Segment, Int) -> SegmentedModified) -> Self {
+            .init(edit(self.viewCreator, self.segment, self.index), _self: self)
         }
 
-        if let onSelected = self.onSelected {
-            return segmented.onSelectedIndex {
-                if $0 == index {
-                    onSelected(segmented.releaseUIView())
+        func release() -> SegmentedModified {
+            self.viewCreator
+        }
+    }
+}
+
+extension Segment.Builder {
+
+    func content() -> Self {
+        self.modify {
+            switch $1.content {
+            case .image(let image):
+                return $0.addSegment(image: image, at: $2)
+            case .text(let text):
+                return $0.addSegment(title: text, at: $2)
+            case .empty:
+                return $0.addSegment(title: nil, at: $2)
+            }
+        }
+    }
+
+    func isEnabled() -> Self {
+        self.modify {
+            $0.isEnabled($1.isEnabled, at: $2)
+        }
+    }
+
+    func contentOffset() -> Self {
+        self.modify {
+            guard let contentOffset = $1.contentOffset else {
+                return $0
+            }
+
+            return $0.contentOffset(contentOffset, at: $2)
+        }
+    }
+
+    func width() -> Self {
+        self.modify {
+            guard let width = $1.width else {
+                return $0
+            }
+
+            return $0.width(width, at: $2)
+        }
+    }
+
+    func onSelected() -> Self {
+        self.modify { viewCreator, segment, index in
+            guard let onSelected = segment.onSelected else {
+                return viewCreator
+            }
+
+            return viewCreator.onNotRendered {
+                ($0 as? UISegmentedControl)?.onEvent(.valueChanged) {
+                    guard let selected = ($0 as? UISegmentedControl)?.selectedSegmentIndex else {
+                        return
+                    }
+
+                    guard selected == index else {
+                        return
+                    }
+
+                    onSelected($0)
                 }
             }
         }
+    }
 
-        if self.isSelected {
-            return segmented.selectedSegment(at: index)
+    func isSelected() -> Self {
+        self.modify {
+            guard $1.isSelected else {
+                return $0
+            }
+
+            return $0.selectedSegment(at: $2)
         }
+    }
+}
+
+extension Segment {
+    func build(_ viewCreator: UICModifiedView<SegmentedControl>, at index: Int) -> UICModifiedView<SegmentedControl> {
+        Builder(viewCreator, segment: self, at: index)
+            .content()
+            .isEnabled()
+            .contentOffset()
+            .width()
+            .onSelected()
+            .isSelected()
+            .release()
     }
 }
 
@@ -197,7 +281,7 @@ public struct UICSegmented: UIViewCreator {
             .zip
             .enumerated()
             .reduce(UICModifiedView { SegmentedControl() }) {
-                $1.element.apply(in: $0, at: $1.offset)
+                $1.element.build($0, at: $1.offset)
             }
             .releaseUIView()
     }
@@ -297,15 +381,5 @@ public extension UIViewCreator where View: UISegmentedControl {
 public extension UIViewCreator where View: UISegmentedControl {
     func onValueChange(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
         self.onEvent(.valueChanged, handler)
-    }
-
-    func onSelectedIndex(_ handler: @escaping (Int) -> Void) -> UICModifiedView<View> {
-        self.onEvent(.valueChanged) { uiView in
-            guard let selected = (uiView as? View)?.selectedSegmentIndex else {
-                return
-            }
-
-            handler(selected)
-        }
     }
 }

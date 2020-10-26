@@ -24,7 +24,19 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-internal class FlowCollection: UICollectionView {
+public protocol UICollectionViewLayoutCreator: UICollectionView {
+    associatedtype CollectionLayout: UICollectionViewLayout
+}
+
+public extension UICollectionViewLayoutCreator {
+    var castedCollectionViewLayout: CollectionLayout {
+        self.collectionViewLayout as! CollectionLayout
+    }
+}
+
+public class UICFlowView: UICollectionView, ListSupport, UICollectionViewLayoutCreator {
+    public typealias CollectionLayout = UICollectionViewFlowLayout
+
     init() {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.minimumLineSpacing = .zero
@@ -37,11 +49,11 @@ internal class FlowCollection: UICollectionView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override init(frame: CGRect, collectionViewLayout: UICollectionViewLayout) {
+    public override init(frame: CGRect, collectionViewLayout: UICollectionViewLayout) {
         fatalError("init(frame:, collectionViewLayout:) has not been implemented")
     }
 
-    override open var isHidden: Bool {
+    public override var isHidden: Bool {
         get { super.isHidden }
         set {
             super.isHidden = newValue
@@ -49,7 +61,7 @@ internal class FlowCollection: UICollectionView {
         }
     }
 
-    override open var frame: CGRect {
+    public override var frame: CGRect {
         get { super.frame }
         set {
             super.frame = newValue
@@ -57,75 +69,75 @@ internal class FlowCollection: UICollectionView {
         }
     }
 
-    override public func willMove(toSuperview newSuperview: UIView?) {
+    public override func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.renderManager.willMove(toSuperview: newSuperview)
     }
 
-    override public func didMoveToSuperview() {
+    public override func didMoveToSuperview() {
         super.didMoveToSuperview()
         self.renderManager.didMoveToSuperview()
     }
 
-    override public func didMoveToWindow() {
+    public override func didMoveToWindow() {
         super.didMoveToWindow()
         self.renderManager.didMoveToWindow()
     }
 
-    override public func layoutSubviews() {
+    public override func layoutSubviews() {
         super.layoutSubviews()
         self.renderManager.layoutSubviews()
     }
 
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         self.renderManager.traitDidChange()
     }
 
-    override open func reloadData() {
+    public override func reloadData() {
         super.reloadData()
         self.invalidateLayoutMaker()
     }
 }
 
-public struct UICFlow: UIViewCreator, CollectionLayout {
-    public typealias Layout = UICollectionViewFlowLayout
-    public typealias View = UICollectionView
+public struct UICFlow: UIViewCreator {
+    public typealias View = UICFlowView
 
-    let contents: () -> ViewCreator
+    private let contents: () -> ViewCreator
 
-    init(@UICViewBuilder contents: @escaping () -> ViewCreator) {
+    public init(@UICViewBuilder contents: @escaping () -> ViewCreator) {
         self.contents = contents
     }
 
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
-        FlowCollection()
+        UICFlowView()
             .dynamicData((viewCreator as! Self).contents)
     }
 }
 
-public extension UIViewCreator where Self: CollectionLayout, Layout: UICollectionViewFlowLayout {
+public extension UIViewCreator where View: UICollectionViewLayoutCreator, View.CollectionLayout: UICollectionViewFlowLayout {
+
     func line(minimumSpacing: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
-            (($0 as? View)?.collectionViewLayout as? Layout)?.minimumLineSpacing = minimumSpacing
+            ($0 as? View)?.castedCollectionViewLayout.minimumLineSpacing = minimumSpacing
         }
     }
 
     func interItem(minimumSpacing: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
-            (($0 as? View)?.collectionViewLayout as? Layout)?.minimumInteritemSpacing = minimumSpacing
+            ($0 as? View)?.castedCollectionViewLayout.minimumInteritemSpacing = minimumSpacing
         }
     }
 
     func item(size: CGSize) -> UICModifiedView<View> {
         self.onRendered {
-            (($0 as? View)?.collectionViewLayout as? Layout)?.itemSize = size
+            ($0 as? View)?.castedCollectionViewLayout.itemSize = size
         }
     }
 
     func item(relativeHeight height: CGFloat) -> UICModifiedView<View> {
         self.onLayout {
-            let collectionLayout: Layout! = ($0 as? View)?.collectionViewLayout as? Layout
+            let collectionLayout: View.CollectionLayout! = ($0 as? View)?.castedCollectionViewLayout
 
             let itemSize = collectionLayout.itemSize
             collectionLayout.itemSize = .init(
@@ -137,7 +149,7 @@ public extension UIViewCreator where Self: CollectionLayout, Layout: UICollectio
 
     func item(relativeWidth width: CGFloat) -> UICModifiedView<View> {
         self.onLayout {
-            let collectionLayout: Layout! = ($0 as? View)?.collectionViewLayout as? Layout
+            let collectionLayout: View.CollectionLayout! = ($0 as? View)?.castedCollectionViewLayout
 
             let itemSize = collectionLayout.itemSize
             collectionLayout.itemSize = .init(
@@ -149,7 +161,7 @@ public extension UIViewCreator where Self: CollectionLayout, Layout: UICollectio
 
     func item(height: CGFloat) -> UICModifiedView<View> {
         self.onLayout {
-            let collectionLayout: Layout! = ($0 as? View)?.collectionViewLayout as? Layout
+            let collectionLayout: View.CollectionLayout! = ($0 as? View)?.castedCollectionViewLayout
 
             let itemSize = collectionLayout.itemSize
             collectionLayout.itemSize = .init(
@@ -161,7 +173,7 @@ public extension UIViewCreator where Self: CollectionLayout, Layout: UICollectio
 
     func item(width: CGFloat) -> UICModifiedView<View> {
         self.onLayout {
-            let collectionLayout: Layout! = ($0 as? View)?.collectionViewLayout as? Layout
+            let collectionLayout: View.CollectionLayout! = ($0 as? View)?.castedCollectionViewLayout
 
             let itemSize = collectionLayout.itemSize
             collectionLayout.itemSize = .init(
@@ -173,7 +185,7 @@ public extension UIViewCreator where Self: CollectionLayout, Layout: UICollectio
 
     func item(aspectRatioHeight constant: CGFloat) -> UICModifiedView<View> {
         self.onLayout {
-            (($0 as? View)?.collectionViewLayout as? Layout)?.itemSize = .init(
+            ($0 as? View)?.castedCollectionViewLayout.itemSize = .init(
                 width: $0.bounds.height * constant,
                 height: $0.bounds.height
             )
@@ -182,7 +194,7 @@ public extension UIViewCreator where Self: CollectionLayout, Layout: UICollectio
 
     func item(aspectRatioWidth constant: CGFloat) -> UICModifiedView<View> {
         self.onLayout {
-            (($0 as? View)?.collectionViewLayout as? Layout)?.itemSize = .init(
+            ($0 as? View)?.castedCollectionViewLayout.itemSize = .init(
                 width: $0.bounds.width,
                 height: $0.bounds.width * constant
             )
@@ -191,50 +203,50 @@ public extension UIViewCreator where Self: CollectionLayout, Layout: UICollectio
 
     func item(estimatedSize: CGSize) -> UICModifiedView<View> {
         self.onRendered {
-            (($0 as? View)?.collectionViewLayout as? Layout)?.estimatedItemSize = estimatedSize
+            ($0 as? View)?.castedCollectionViewLayout.estimatedItemSize = estimatedSize
         }
     }
 
     func scroll(direction: UICollectionView.ScrollDirection) -> UICModifiedView<View> {
         self.onRendered {
-            (($0 as? View)?.collectionViewLayout as? Layout)?.scrollDirection = direction
+            ($0 as? View)?.castedCollectionViewLayout.scrollDirection = direction
         }
     }
 
     func header(referenceSize size: CGSize) -> UICModifiedView<View> {
         self.onRendered {
-            (($0 as? View)?.collectionViewLayout as? Layout)?.headerReferenceSize = size
+            ($0 as? View)?.castedCollectionViewLayout.headerReferenceSize = size
         }
     }
 
     func footer(referenceSize size: CGSize) -> UICModifiedView<View> {
         self.onRendered {
-            (($0 as? View)?.collectionViewLayout as? Layout)?.footerReferenceSize = size
+            ($0 as? View)?.castedCollectionViewLayout.footerReferenceSize = size
         }
     }
 
     func section(inset: UIEdgeInsets) -> UICModifiedView<View> {
         self.onRendered {
-            (($0 as? View)?.collectionViewLayout as? Layout)?.sectionInset = inset
+            ($0 as? View)?.castedCollectionViewLayout.sectionInset = inset
         }
     }
 
     @available(iOS 11.0, tvOS 11.0, *)
-    func section(insetReference: Layout.SectionInsetReference) -> UICModifiedView<View> {
+    func section(insetReference: UICollectionViewFlowLayout.SectionInsetReference) -> UICModifiedView<View> {
         self.onRendered {
-            (($0 as? View)?.collectionViewLayout as? Layout)?.sectionInsetReference = insetReference
+            ($0 as? View)?.castedCollectionViewLayout.sectionInsetReference = insetReference
         }
     }
 
     func section(headersPinToVisibleBounds flag: Bool) -> UICModifiedView<View> {
         self.onRendered {
-            (($0 as? View)?.collectionViewLayout as? Layout)?.sectionHeadersPinToVisibleBounds = flag
+            ($0 as? View)?.castedCollectionViewLayout.sectionHeadersPinToVisibleBounds = flag
         }
     }
 
     func section(footersPinToVisibleBounds flag: Bool) -> UICModifiedView<View> {
         self.onRendered {
-            (($0 as? View)?.collectionViewLayout as? Layout)?.sectionFootersPinToVisibleBounds = flag
+            ($0 as? View)?.castedCollectionViewLayout.sectionFootersPinToVisibleBounds = flag
         }
     }
 }

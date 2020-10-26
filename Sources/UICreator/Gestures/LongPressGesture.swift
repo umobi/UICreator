@@ -26,6 +26,8 @@ import UIKit
 public struct LongPress: UIGestureCreator {
     public typealias Gesture = UILongPressGestureRecognizer
 
+    public init() {}
+    
     public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
         UILongPressGestureRecognizer()
     }

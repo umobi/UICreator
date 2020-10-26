@@ -27,7 +27,7 @@ import ConstraintBuilder
 public struct UICHScroll: UIViewCreator {
     public typealias View = ScrollView
 
-    let content: () -> ViewCreator
+    private let content: () -> ViewCreator
 
     public init(content: @escaping () -> ViewCreator) {
         self.content = content

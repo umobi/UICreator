@@ -22,22 +22,22 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
-protocol UICViewControllerRepresentable: UICViewControllerCreator {
+public protocol UICViewControllerRepresentable: UIViewControllerCreator {
     func makeUIViewController() -> ViewController
     func updateUIViewController(_ uiViewController: ViewController)
 }
 
-extension UICViewControllerRepresentable {
-    static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
+public extension UICViewControllerRepresentable {
+    static func makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
         let _self = viewCreator as! Self
 
-        return UICControllerAdapt {
-            _self.makeUIViewController()
+        let viewController = _self.makeUIViewController()
+        viewController.view.onInTheScene { [weak viewController] _ in
+            _self.updateUIViewController(viewController!)
         }
-        .onInTheScene {
-            _self.updateUIViewController(($0 as! View).dynamicViewController)
-        }
-        .releaseUIView()
+
+        return viewController
     }
 }

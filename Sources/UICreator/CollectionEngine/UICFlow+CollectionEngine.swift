@@ -23,16 +23,12 @@
 import Foundation
 import UIKit
 
-extension UICCollectionView: ListSupport {}
-
-public extension UICollectionView {
-    private typealias CollectionView = UICollectionView & UICollectionViewDataSource & UICollectionViewDelegate & ListSupport
-
+extension ListSupport where Self: UICollectionView {
     @discardableResult
     func dynamicData(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> Self {
         self.onNotRendered {
             let manager = ListManager(contents: contents().zip)
-            let collectionView: CollectionView! = $0 as? CollectionView
+            let collectionView: Self! = $0 as? Self
 
             manager.rowsIdentifier.forEach {
                 collectionView.register(
@@ -58,9 +54,24 @@ public extension UICollectionView {
             }
 
             collectionView.manager = manager
-            collectionView.dataSource = collectionView
-            collectionView.delegate = collectionView
+            collectionView.strongDataSource(UICCollectionViewDataSource())
+            collectionView.strongDelegate(UICCollectionViewDelegate())
             manager.listToken = collectionView.makeToken()
         }
+    }
+}
+
+private var kCollectionDelegate = 0
+private var kCollectionDataSource = 0
+extension UICollectionView {
+
+    func strongDelegate(_ delegate: UICollectionViewDelegate) {
+        self.delegate = delegate
+        objc_setAssociatedObject(self, &kCollectionDelegate, delegate, .OBJC_ASSOCIATION_RETAIN)
+    }
+
+    func strongDataSource(_ dataSource: UICollectionViewDataSource) {
+        self.dataSource = dataSource
+        objc_setAssociatedObject(self, &kCollectionDataSource, delegate, .OBJC_ASSOCIATION_RETAIN)
     }
 }

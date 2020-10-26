@@ -52,6 +52,12 @@ public class UICHostingController: UIViewController {
         }
     }
 
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+
+        (self.view as? ViewAdaptor)?.adaptView()
+    }
+
     override public func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         self.disappearHandler?(self)

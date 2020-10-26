@@ -29,6 +29,8 @@ import UIKit
 public struct Hover: UIGestureCreator {
     public typealias Gesture = UIHoverGestureRecognizer
 
+    public init() {}
+    
     public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
         UIHoverGestureRecognizer()
     }

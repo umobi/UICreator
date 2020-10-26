@@ -26,6 +26,8 @@ import UIKit
 public struct Swipe: UIGestureCreator {
     public typealias Gesture = UISwipeGestureRecognizer
 
+    public init() {}
+    
     public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
         Gesture()
     }

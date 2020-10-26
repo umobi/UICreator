@@ -83,6 +83,8 @@ public class TouchGestureRecognizer: UIGestureRecognizer {
 public struct Touch: UIGestureCreator {
     public typealias Gesture = TouchGestureRecognizer
 
+    public init() {}
+
     public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
         Gesture()
     }

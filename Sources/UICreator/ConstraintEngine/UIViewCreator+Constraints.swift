@@ -680,7 +680,7 @@ public extension UIViewCreator {
 
 public extension UIViewCreator {
     func insets(
-        equalTo value: CGFloat,
+        equalTo value: CGFloat = .zero,
         priority: UILayoutPriority = .required,
         orRelatedView relatedView: ConstraintRelatedView? = nil) -> UICModifiedView<View> {
 

@@ -23,12 +23,12 @@
 import Foundation
 import UIKit
 
-protocol UICViewRepresentable: UIViewCreator {
+public protocol UICViewRepresentable: UIViewCreator {
     func makeUIView() -> View
     func updateUIView(_ uiView: View)
 }
 
-extension UICViewRepresentable {
+public extension UICViewRepresentable {
     static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
         let _self = viewCreator as! Self
 

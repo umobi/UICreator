@@ -43,8 +43,7 @@ public extension UITabBarController {
     }
 }
 
-public struct UICTab: UICViewControllerCreator {
-    public typealias View = ViewControllerAdaptor<UITabBarController>
+public struct UICTab: UIViewControllerCreator {
     public typealias ViewController = UITabBarController
 
     let contents: () -> UICTabItem
@@ -53,73 +52,66 @@ public struct UICTab: UICViewControllerCreator {
         self.contents = contents
     }
 
-    public static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
-        UICControllerAdapt {
-            {
-                let tabController = UITabBarController()
-                tabController.setViewControllers((viewCreator as! Self).contents)
-                return tabController
-            }()
-        }
-        .releaseUIView()
+    public static func makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
+        let tabController = UITabBarController()
+        tabController.setViewControllers((viewCreator as! Self).contents)
+        return tabController
     }
 }
 
-public extension UICViewControllerCreator where ViewController: UITabBarController {
-    func tabBar(backgroundImage image: UIImage?) -> UICModifiedView<View> {
+public extension UIViewControllerCreator where ViewController: UITabBarController {
+    func tabBar(backgroundImage image: UIImage?) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?.dynamicViewController.tabBar.backgroundImage = image
+            ($0 as? ViewController)?.tabBar.backgroundImage = image
         }
     }
 
     #if os(iOS)
-    func tabBar(barStyle style: UIBarStyle) -> UICModifiedView<View> {
+    func tabBar(barStyle style: UIBarStyle) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?.dynamicViewController.tabBar.barStyle = style
+            ($0 as? ViewController)?.tabBar.barStyle = style
         }
     }
     #endif
 
-    func tabBar(barTintColor tintColor: UIColor?) -> UICModifiedView<View> {
+    func tabBar(barTintColor tintColor: UIColor?) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?.dynamicViewController.tabBar.barTintColor = tintColor
+            ($0 as? ViewController)?.tabBar.barTintColor = tintColor
         }
     }
 
-    func tabBar(isTranslucent flag: Bool) -> UICModifiedView<View> {
+    func tabBar(isTranslucent flag: Bool) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?.dynamicViewController.tabBar.isTranslucent = flag
+            ($0 as? ViewController)?.tabBar.isTranslucent = flag
         }
     }
 
     #if os(iOS)
-    func tabBar(itemPositioning position: UITabBar.ItemPositioning) -> UICModifiedView<View> {
+    func tabBar(itemPositioning position: UITabBar.ItemPositioning) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?.dynamicViewController.tabBar.itemPositioning = position
+            ($0 as? ViewController)?.tabBar.itemPositioning = position
         }
     }
     #endif
 
-    func tabBar(itemSpacing spacing: CGFloat) -> UICModifiedView<View> {
+    func tabBar(itemSpacing spacing: CGFloat) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?.dynamicViewController.tabBar.itemSpacing = spacing
+            ($0 as? ViewController)?.tabBar.itemSpacing = spacing
         }
     }
 
-    func tabBar(itemWidth width: CGFloat) -> UICModifiedView<View> {
+    func tabBar(itemWidth width: CGFloat) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?.dynamicViewController.tabBar.itemWidth = width
+            ($0 as? ViewController)?.tabBar.itemWidth = width
         }
     }
 
-    func tabBar(selectedItem firstHandler: @escaping (UITabBarItem) -> Bool) -> UICModifiedView<View> {
+    func tabBar(selectedItem firstHandler: @escaping (UITabBarItem) -> Bool) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?
-                .dynamicViewController
+            ($0 as? ViewController)?
                 .tabBar
                 .selectedItem = {
-                    ($0 as? View)?
-                        .dynamicViewController
+                    ($0 as? ViewController)?
                         .tabBar
                         .items?
                         .first(where: firstHandler)
@@ -127,40 +119,40 @@ public extension UICViewControllerCreator where ViewController: UITabBarControll
         }
     }
 
-    func tabBar(selectionIndicatorImage image: UIImage?) -> UICModifiedView<View> {
+    func tabBar(selectionIndicatorImage image: UIImage?) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?.dynamicViewController.tabBar.selectionIndicatorImage = image
+            ($0 as? ViewController)?.tabBar.selectionIndicatorImage = image
         }
     }
 
-    func tabBar(shadowImage image: UIImage?) -> UICModifiedView<View> {
+    func tabBar(shadowImage image: UIImage?) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?.dynamicViewController.tabBar.shadowImage = image
+            ($0 as? ViewController)?.tabBar.shadowImage = image
         }
     }
 
     @available(iOS 13.0, tvOS 13, *)
-    func tabBar(standardAppearance: UITabBarAppearance) -> UICModifiedView<View> {
+    func tabBar(standardAppearance: UITabBarAppearance) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?.dynamicViewController.tabBar.standardAppearance = standardAppearance
+            ($0 as? ViewController)?.tabBar.standardAppearance = standardAppearance
         }
     }
 
-    func tabBar(tintColor color: UIColor?) -> UICModifiedView<View> {
+    func tabBar(tintColor color: UIColor?) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?.dynamicViewController.tabBar.tintColor = color
+            ($0 as? ViewController)?.tabBar.tintColor = color
         }
     }
 
-    func tabBar(unselectedItemTintColor color: UIColor?) -> UICModifiedView<View> {
+    func tabBar(unselectedItemTintColor color: UIColor?) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?.dynamicViewController.tabBar.unselectedItemTintColor = color
+            ($0 as? ViewController)?.tabBar.unselectedItemTintColor = color
         }
     }
 
-    func tabBar(isHidden flag: Bool) -> UICModifiedView<View> {
+    func tabBar(isHidden flag: Bool) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? View)?.dynamicViewController.tabBar.isHidden = flag
+            ($0 as? ViewController)?.tabBar.isHidden = flag
         }
     }
 }
@@ -273,23 +265,23 @@ public extension UIViewCreator {
     }
 }
 
-public extension UICViewControllerCreator where ViewController: UITabBarController {
-    func selectedItem(_ selected: Relay<Int>) -> UICModifiedView<View> {
+public extension UIViewControllerCreator where ViewController: UITabBarController {
+    func selectedItem(_ selected: Relay<Int>) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            weak var viewController = $0 as? View
+            weak var viewController = $0 as? ViewController
 
             selected.sync {
-                viewController?.dynamicViewController.selectedIndex($0)
+                viewController?.selectedIndex($0)
             }
         }
     }
 
-    func selectedItem<Enum: RawRepresentable>(_ selected: Relay<Enum>) -> UICModifiedView<View> where Enum.RawValue == Int {
+    func selectedItem<Enum: RawRepresentable>(_ selected: Relay<Enum>) -> UICModifiedViewController<ViewController> where Enum.RawValue == Int {
         self.onInTheScene {
-            weak var viewController = $0 as? View
+            weak var viewController = $0 as? ViewController
 
             selected.sync {
-                viewController?.dynamicViewController.selectedIndex($0.rawValue)
+                viewController?.selectedIndex($0.rawValue)
             }
         }
     }

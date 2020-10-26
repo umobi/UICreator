@@ -26,7 +26,7 @@ import ConstraintBuilder
 
 public class StackView: UIStackView {
 
-    enum Axis {
+    public enum Axis {
         case vertical
         case horizontal
 
@@ -102,9 +102,9 @@ public struct UICStack: UIViewCreator {
     @Relay var spacing: CGFloat
     let content: () -> ViewCreator
 
-    init(
+    public init(
         axis: Relay<View.Axis>,
-        spacing: CGFloat,
+        spacing: CGFloat = .zero,
         @UICViewBuilder _ content: @escaping () -> ViewCreator) {
 
         self._axis = axis
@@ -112,7 +112,7 @@ public struct UICStack: UIViewCreator {
         self._spacing = .constant(spacing)
     }
 
-    init(
+    public init(
         axis: Relay<View.Axis>,
         spacing: Relay<CGFloat>,
         @UICViewBuilder _ content: @escaping () -> ViewCreator) {
@@ -170,41 +170,54 @@ public extension UIViewCreator where View: UIStackView {
 }
 
 internal struct StackManager: SupportForEach {
-    private weak var view: UIStackView!
+    private weak var stackView: UIStackView!
 
-    init(_ view: UIStackView) {
-        self.view = view
+    @WeakBox var firstView: UIView!
+    @WeakBox var lastView: UIView!
+
+    init(_ stackView: UIStackView) {
+        self.stackView = stackView
     }
 
     func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
-        weak var firstView: UIView? = placeholderView
-        weak var lastView: UIView? = placeholderView
+        self.firstView = placeholderView
+        self.lastView = placeholderView
 
         sequence.map {
             $0.map { $0().releaseUIView() }
         }.sync { views in
-            let startIndex = view?.arrangedSubviews.enumerated().first(where: {
-                $0.element == firstView
-            })?.offset ?? 0
-            let endIndex = view?.arrangedSubviews.enumerated().first(where: {
-                $0.element == lastView
-            })?.offset ?? 0
-
-            if firstView != nil {
-                view?.arrangedSubviews[startIndex...endIndex].forEach {
-                    $0.removeFromSuperview()
+            DispatchQueue.main.async {
+                guard let stackView = stackView else {
+                    return
                 }
-            }
 
-            views.enumerated().forEach {
-                UIView.CBSubview(view)?.insertArrangedSubview(
-                    $0.element,
-                    at: startIndex + $0.offset
-                )
-            }
+                let startIndex = stackView.arrangedSubviews.enumerated().first(where: {
+                    $0.element === firstView
+                })?.offset ?? 0
 
-            firstView = views.first
-            lastView = views.last
+                let endIndex = stackView.arrangedSubviews.enumerated().first(where: {
+                    $0.element === lastView
+                })?.offset ?? 0
+
+                if firstView != nil {
+                    stackView.arrangedSubviews[startIndex...endIndex].forEach {
+                        $0.removeFromSuperview()
+                    }
+                }
+
+                views.enumerated().forEach {
+                    UIView.CBSubview(stackView).insertArrangedSubview(
+                        $0.element,
+                        at: startIndex + $0.offset
+                    )
+                }
+
+                firstView = views.first
+                lastView = views.last
+            }
+//            OperationQueue.main.addOperation {
+
+//            }
         }
     }
 }

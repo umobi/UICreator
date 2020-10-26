@@ -27,6 +27,8 @@ import UIKit
 public struct ScreenEdgePan: UIGestureCreator {
     public typealias Gesture = UIScreenEdgePanGestureRecognizer
 
+    public init() {}
+    
     public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
         Gesture()
     }

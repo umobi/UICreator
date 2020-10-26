@@ -97,16 +97,16 @@ public class ViewControllerAdaptor<ViewController>: UIView, ViewCreatorNoLayoutC
     }
 }
 
-public class UICControllerAdapt<ViewController>: UICViewControllerCreator where ViewController: UIViewController {
-    public typealias View = ViewControllerAdaptor<ViewController>
-
-    private let viewControllerHandler: () -> ViewController
-
-    public init(_ viewControllerHandler: @escaping () -> ViewController) {
-        self.viewControllerHandler = viewControllerHandler
+public extension UIViewControllerCreator {
+    func `as`(_ outlet: UICOutlet<ViewController>) -> UICModifiedViewController<ViewController> {
+        self.onInTheScene {
+            outlet.ref($0 as? ViewController)
+        }
     }
+}
 
-    static public func makeUIView(_ viewCreator: ViewCreator) -> UIView {
-        ViewControllerAdaptor((viewCreator as! Self).viewControllerHandler())
+public extension UIViewControllerCreator {
+    func eraseToAnyView() -> AnyView {
+        AnyView(self)
     }
 }

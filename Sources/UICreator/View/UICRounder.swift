@@ -180,7 +180,7 @@ public extension UIViewCreator where View: RounderView {
     }
 }
 
-public extension UICRounder {
+public extension UIViewCreator where View: RounderView {
     func borderWidth(_ width: CGFloat) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.border(width: width)

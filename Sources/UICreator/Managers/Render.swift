@@ -130,7 +130,7 @@ private extension CBView {
             return []
         }
 
-        guard self.render.needs(renderState) && self.render.state >= .notRendered else {
+        guard self.render.needs(renderState) else {
             return []
         }
 

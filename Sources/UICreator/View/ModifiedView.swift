@@ -21,6 +21,7 @@
 //
 
 import UIKit
+import ConstraintBuilder
 
 public struct UICModifiedView<View>: UIViewCreator where View: UIView {
     let viewLoader: () -> View
@@ -31,5 +32,17 @@ public struct UICModifiedView<View>: UIViewCreator where View: UIView {
 
     public static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
         (viewCreator as! Self).viewLoader()
+    }
+}
+
+public struct UICModifiedViewController<ViewController>: UIViewControllerCreator where ViewController: CBViewController {
+    let viewControllerLoader: () -> ViewController
+
+    init(_ viewLoader: @escaping () -> ViewController) {
+        self.viewControllerLoader = viewLoader
+    }
+
+    public static func makeUIViewController(_ viewCreator: ViewCreator) -> UIViewController {
+        (viewCreator as! Self).viewControllerLoader()
     }
 }

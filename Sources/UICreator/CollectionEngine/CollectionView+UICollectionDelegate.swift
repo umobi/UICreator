@@ -23,30 +23,31 @@
 import Foundation
 import UIKit
 
-extension UICCollectionView: UICollectionViewDelegate {
+public class UICCollectionViewDelegate: NSObject, UICollectionViewDelegate {}
 
-    public func collectionView(
+public extension UICCollectionViewDelegate {
+    func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath) -> CGSize {
 
-        return self.sizeForItem(at: indexPath)
+        return collectionView.sizeForItem(at: indexPath)
     }
 
-    public func collectionView(
+    func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
         referenceSizeForHeaderInSection section: Int) -> CGSize {
 
-        return self.sizeForHeader(at: section) ?? .zero
+        return collectionView.sizeForHeader(at: section) ?? .zero
     }
 
-    public func collectionView(
+    func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
         referenceSizeForFooterInSection section: Int) -> CGSize {
 
-        return self.sizeForFooter(at: section) ?? .zero
+        return collectionView.sizeForFooter(at: section) ?? .zero
     }
 }
 
@@ -61,7 +62,7 @@ public extension UICollectionView {
     /// ViewCreator
     func sizeForItem(at indexPath: IndexPath) -> CGSize {
         guard let layoutManager = self.layoutManager else {
-            Fatal.noLayoutManagerConfigurated.die()
+            DelegateFatal.noLayoutManagerConfigurated.die()
         }
 
         return layoutManager
@@ -72,7 +73,7 @@ public extension UICollectionView {
     /// ViewCreator
     func sizeForHeader(at section: Int) -> CGSize? {
         guard let layoutManager = self.layoutManager else {
-            Fatal.noLayoutManagerConfigurated.die()
+            DelegateFatal.noLayoutManagerConfigurated.die()
         }
 
         return layoutManager
@@ -83,7 +84,7 @@ public extension UICollectionView {
     /// ViewCreator
     func sizeForFooter(at section: Int) -> CGSize? {
         guard let layoutManager = self.layoutManager else {
-            Fatal.noLayoutManagerConfigurated.die()
+            DelegateFatal.noLayoutManagerConfigurated.die()
         }
 
         return layoutManager
@@ -93,7 +94,7 @@ public extension UICollectionView {
 }
 
 extension UICollectionView {
-    enum Fatal: String, FatalType {
+    enum DelegateFatal: String, FatalType {
         case noLayoutManagerConfigurated = """
         UICollectionView is trying to get LayoutManager but there is no instance of it
         """

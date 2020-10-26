@@ -141,7 +141,7 @@ public extension UIViewCreator where View: UIButton {
         }
     }
 
-    func title(color: UIColor?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
+    func titleColor(_ color: UIColor?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.setTitleColor(color, for: state)
         }

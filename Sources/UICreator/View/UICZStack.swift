@@ -94,7 +94,7 @@ public struct UICZStack: UIViewCreator {
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
-        return View()
+        return ZStackView()
             .onNotRendered { view in
                 _self.contents().zip.forEach {
                     view.add(priority: .fittingSizeLevel, $0.releaseUIView())
