@@ -24,11 +24,27 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-class UICCollectionView<CollectionLayout>: UICollectionView, ListSupport, UICollectionViewLayoutCreator where CollectionLayout: UICollectionViewLayout {
+public protocol UICCollectionViewLayoutCreator: UICollectionViewLayout {
+    func provideDelegate() -> UICollectionViewDelegate
+}
+
+class UICCollectionViewDelegate: NSObject, UICollectionViewDelegate {}
+
+class UICCollectionViewLayout: UICollectionViewLayout, UICCollectionViewLayoutCreator {
+    func provideDelegate() -> UICollectionViewDelegate {
+        UICCollectionViewDelegate()
+    }
+}
+
+class UICCollectionView<CollectionLayout>: UICollectionView, ListSupport, UICollectionViewLayoutCreator where CollectionLayout: UICCollectionViewLayoutCreator {
 
     init(_ layout: CollectionLayout) {
         super.init(frame: .zero, collectionViewLayout: layout)
         self.makeSelfImplemented()
+    }
+
+    public func provideDelegate() -> UICollectionViewDelegate {
+        self.castedCollectionViewLayout.provideDelegate()
     }
 
     required init?(coder: NSCoder) {
@@ -86,7 +102,7 @@ class UICCollectionView<CollectionLayout>: UICollectionView, ListSupport, UIColl
     }
 }
 
-public struct UICCollection<Layout>: UIViewCreator where Layout: UICollectionViewLayout {
+public struct UICCollection<Layout>: UIViewCreator where Layout: UICCollectionViewLayoutCreator {
     public typealias View = UICollectionView
 
     private let layout: Layout

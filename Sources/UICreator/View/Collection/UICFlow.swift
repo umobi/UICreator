@@ -26,11 +26,39 @@ import ConstraintBuilder
 
 public protocol UICollectionViewLayoutCreator: UICollectionView {
     associatedtype CollectionLayout: UICollectionViewLayout
+
+    func provideDelegate() -> UICollectionViewDelegate
 }
 
 public extension UICollectionViewLayoutCreator {
     var castedCollectionViewLayout: CollectionLayout {
         self.collectionViewLayout as! CollectionLayout
+    }
+}
+
+class UICCollectionViewDelegateFlowLayout: NSObject, UICollectionViewDelegateFlowLayout {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath) -> CGSize {
+
+        return collectionView.sizeForItem(at: indexPath)
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForHeaderInSection section: Int) -> CGSize {
+
+        return collectionView.sizeForHeader(at: section) ?? .zero
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForFooterInSection section: Int) -> CGSize {
+
+        return collectionView.sizeForFooter(at: section) ?? .zero
     }
 }
 
@@ -43,6 +71,10 @@ public class UICFlowView: UICollectionView, ListSupport, UICollectionViewLayoutC
         flowLayout.minimumInteritemSpacing = .zero
         super.init(frame: .zero, collectionViewLayout: flowLayout)
         self.makeSelfImplemented()
+    }
+
+    public func provideDelegate() -> UICollectionViewDelegate {
+        UICCollectionViewDelegateFlowLayout()
     }
 
     required init?(coder: NSCoder) {

@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-extension ListSupport where Self: UICollectionView {
+extension ListSupport where Self: UICollectionView & UICollectionViewLayoutCreator {
     @discardableResult
     func dynamicData(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> Self {
         self.onNotRendered {
@@ -56,7 +56,7 @@ extension ListSupport where Self: UICollectionView {
 
             collectionView.manager = manager
             collectionView.strongDataSource(UICCollectionViewDataSource())
-            collectionView.strongDelegate(UICCollectionViewDelegate())
+            collectionView.strongDelegate(collectionView.provideDelegate())
             manager.list = collectionView
         }
     }

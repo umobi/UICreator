@@ -23,34 +23,6 @@
 import Foundation
 import UIKit
 
-public class UICCollectionViewDelegate: NSObject, UICollectionViewDelegate {}
-
-public extension UICCollectionViewDelegate {
-    func collectionView(
-        _ collectionView: UICollectionView,
-        layout collectionViewLayout: UICollectionViewLayout,
-        sizeForItemAt indexPath: IndexPath) -> CGSize {
-
-        return collectionView.sizeForItem(at: indexPath)
-    }
-
-    func collectionView(
-        _ collectionView: UICollectionView,
-        layout collectionViewLayout: UICollectionViewLayout,
-        referenceSizeForHeaderInSection section: Int) -> CGSize {
-
-        return collectionView.sizeForHeader(at: section) ?? .zero
-    }
-
-    func collectionView(
-        _ collectionView: UICollectionView,
-        layout collectionViewLayout: UICollectionViewLayout,
-        referenceSizeForFooterInSection section: Int) -> CGSize {
-
-        return collectionView.sizeForFooter(at: section) ?? .zero
-    }
-}
-
 public extension UICollectionView {
     fileprivate var size: CGSize {
         return .init(
