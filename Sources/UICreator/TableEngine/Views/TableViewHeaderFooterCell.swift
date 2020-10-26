@@ -24,12 +24,14 @@ import Foundation
 import UIKit
 
 internal class TableViewHeaderFooterCell: UITableViewHeaderFooterView, ReusableView, TableCellType {
+    weak var hostedView: UIView!
     var cellLoaded: UICCell.Loaded!
 
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
         self.backgroundView = self.backgroundView ?? UIView()
         self.backgroundView?.backgroundColor = .clear
+        self.makeSelfImplemented()
     }
 
     required init?(coder: NSCoder) {

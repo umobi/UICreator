@@ -23,12 +23,21 @@
 import Foundation
 import UIKit
 
-class ListManager: ListCollectionManager, ListContentSectionRestore {
-    var sections: [SectionManager] = []
-    weak var list: ListSupport!
+class ListToken: NSObject {
+    weak var listView: ListSupport!
 
-    convenience init(contents: [ViewCreator]) {
+    init(_ listView: ListSupport) {
+        self.listView = listView
+    }
+}
+
+struct ListManager: ListCollectionManager, ListContentSectionRestore {
+    @MutableBox var sections: [SectionManager] = []
+    @WeakBox var listToken: ListToken!
+
+    init(contents: [ViewCreator]) {
         self.init(contents)
+
         self.sections.forEach {
             $0.loadForEachIfNeeded()
         }
@@ -46,7 +55,7 @@ class ListManager: ListCollectionManager, ListContentSectionRestore {
                 }
 
                 return SectionManager
-                    .mount(self, with: section.content)
+                    .mount(self, with: section.contents().zip)
                     .index($0.offset)
                     .identifier($0.offset)
                     .isDynamic(false)
@@ -65,7 +74,7 @@ class ListManager: ListCollectionManager, ListContentSectionRestore {
             }
 
             if let section = $0.element as? UICSection {
-                return SectionManager.mount(self, with: section.content)
+                return SectionManager.mount(self, with: section.contents().zip)
                     .isDynamic(false)
                     .index($0.offset)
                     .identifier($0.offset)

@@ -72,7 +72,7 @@ extension UICTableView: UITableViewDelegate {
             return contextualAction?
                 .indexPath(indexPath)
                 .tableView(tableView)
-                .rowAction
+                .action
         })
 
         reusableView.cellLoaded.trailingActions.forEach {
@@ -95,7 +95,7 @@ extension UICTableView: UITableViewDelegate {
             return contextualAction?
                 .indexPath(indexPath)
                 .tableView(tableView)
-                .rowAction
+                .action
         })
 
         reusableView.cellLoaded.leadingActions.forEach {
@@ -117,7 +117,7 @@ extension UICTableView: UITableViewDelegate {
             return action?
                 .indexPath(indexPath)
                 .tableView(tableView)
-                .rowAction
+                .action
         }
     }
     #endif
@@ -202,7 +202,7 @@ struct ReusableHeight {
     }
 
     var height: CGFloat {
-        self.reusableView.hostedView.uiView?.frame.height ?? .zero
+        self.reusableView.hostedView?.frame.height ?? .zero
     }
 }
 
@@ -259,19 +259,17 @@ extension CGFloat {
 }
 
 struct CollectionOfSizes {
-    private let headers: Mutable<[SizeCache]> = .init(value: [])
-    private let footers: Mutable<[SizeCache]> = .init(value: [])
-    private let rows: Mutable<[Int: [SizeCache]]> = .init(value: [:])
-
-    init() {}
+    @MutableBox var headers: [SizeCache] = []
+    @MutableBox var footers: [SizeCache] = []
+    @MutableBox var rows: [Int: [SizeCache]] = [:]
 
     func header(at section: Int) -> SizeCache? {
-        guard self.headers.value.count > section else {
+        guard self.headers.count > section else {
             return nil
         }
 
         guard
-            let header = self.headers.value.binarySearch({
+            let header = self.headers.binarySearch({
                 guard case .headerFooter(let searchSection) = $0.contentType else {
                     fatalError()
                 }
@@ -286,12 +284,12 @@ struct CollectionOfSizes {
     }
 
     func footer(at section: Int) -> SizeCache? {
-        guard self.footers.value.count > section else {
+        guard self.footers.count > section else {
             return nil
         }
 
         guard
-            let footer = self.footers.value.binarySearch({
+            let footer = self.footers.binarySearch({
                 guard case .headerFooter(let searchSection) = $0.contentType else {
                     fatalError()
                 }
@@ -306,7 +304,7 @@ struct CollectionOfSizes {
     }
 
     func row(at indexPath: IndexPath) -> SizeCache? {
-        guard let rows = self.rows.value[indexPath.section] else {
+        guard let rows = self.rows[indexPath.section] else {
             return nil
         }
 
@@ -333,8 +331,8 @@ struct CollectionOfSizes {
             return
         }
 
-        guard var rows = self.rows.value[indexPath.section] else {
-            self.rows.value[indexPath.section] = [sizeCache]
+        guard var rows = self.rows[indexPath.section] else {
+            self.rows[indexPath.section] = [sizeCache]
             return
         }
 
@@ -343,18 +341,18 @@ struct CollectionOfSizes {
         }
 
         if index == rows.count {
-            self.rows.value[indexPath.section]  = rows + [sizeCache]
+            self.rows[indexPath.section]  = rows + [sizeCache]
             return
         }
 
         if case .cell(let searchIndexPath) = rows[index].contentType, searchIndexPath.row == indexPath.row {
             rows[index] = sizeCache
-            self.rows.value[indexPath.section] = rows
+            self.rows[indexPath.section] = rows
             return
         }
 
         rows.insert(sizeCache, at: index)
-        self.rows.value[indexPath.section] = rows
+        self.rows[indexPath.section] = rows
     }
 
     func updateHeader(_ sizeCache: SizeCache) {
@@ -362,21 +360,21 @@ struct CollectionOfSizes {
             return
         }
 
-        let index = self.headers.value.binaryInsert {
+        let index = self.headers.binaryInsert {
             $0.contentType.compare(sizeCache.contentType)
         }
 
-        if index == self.headers.value.count {
-            self.headers.value.append(sizeCache)
+        if index == self.headers.count {
+            self.headers.append(sizeCache)
             return
         }
 
-        if case .headerFooter(let searchSection) = self.headers.value[index].contentType, searchSection == section {
-            self.headers.value[index] = sizeCache
+        if case .headerFooter(let searchSection) = self.headers[index].contentType, searchSection == section {
+            self.headers[index] = sizeCache
             return
         }
 
-        self.headers.value.insert(sizeCache, at: index)
+        self.headers.insert(sizeCache, at: index)
     }
 
     func updateFooter(_ sizeCache: SizeCache) {
@@ -384,41 +382,41 @@ struct CollectionOfSizes {
             return
         }
 
-        let index = self.footers.value.binaryInsert {
+        let index = self.footers.binaryInsert {
             $0.contentType.compare(sizeCache.contentType)
         }
 
-        if index == self.footers.value.count {
-            self.footers.value.append(sizeCache)
+        if index == self.footers.count {
+            self.footers.append(sizeCache)
             return
         }
 
-        if case .headerFooter(let searchSection) = self.footers.value[index].contentType, searchSection == section {
-            self.footers.value[index] = sizeCache
+        if case .headerFooter(let searchSection) = self.footers[index].contentType, searchSection == section {
+            self.footers[index] = sizeCache
             return
         }
 
-        self.footers.value.insert(sizeCache, at: index)
+        self.footers.insert(sizeCache, at: index)
     }
 
     func sections(count: Int) {
-        if self.headers.value.count > count {
-            self.headers.value = Array(self.headers.value[0..<count])
+        if self.headers.count > count {
+            self.headers = Array(self.headers[0..<count])
         }
 
-        if self.footers.value.count > count {
-            self.footers.value = Array(self.footers.value[0..<count])
+        if self.footers.count > count {
+            self.footers = Array(self.footers[0..<count])
         }
     }
 
     func rows(count: Int, in section: Int) {
-        let rows = Array((self.rows.value[section] ?? []))
+        let rows = Array((self.rows[section] ?? []))
 
         guard rows.count > count else {
             return
         }
 
-        self.rows.value[section] = count == 0 ? nil : Array(rows[0..<count])
+        self.rows[section] = count == 0 ? nil : Array(rows[0..<count])
     }
 }
 

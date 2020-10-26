@@ -24,6 +24,7 @@ import Foundation
 import UIKit
 
 internal class TableViewCell: UITableViewCell, ReusableView, TableCellType {
+    weak var hostedView: UIView!
     var cellLoaded: UICCell.Loaded!
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -31,6 +32,7 @@ internal class TableViewCell: UITableViewCell, ReusableView, TableCellType {
         self.selectionStyle = .none
         self.backgroundColor = .clear
         self.focusStyle = .custom
+        self.makeSelfImplemented()
     }
 
     required init?(coder: NSCoder) {

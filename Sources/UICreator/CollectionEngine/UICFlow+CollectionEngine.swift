@@ -60,7 +60,7 @@ public extension UICollectionView {
             collectionView.manager = manager
             collectionView.dataSource = collectionView
             collectionView.delegate = collectionView
-            manager.list = collectionView
+            manager.listToken = collectionView.makeToken()
         }
     }
 }

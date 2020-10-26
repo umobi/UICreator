@@ -49,7 +49,7 @@ public extension UITableView {
             tableView.manager = manager
             tableView.dataSource = tableView
             tableView.delegate = tableView
-            manager.list = tableView
+            manager.listToken = tableView.makeToken()
 
         }
     }

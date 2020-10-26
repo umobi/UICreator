@@ -30,7 +30,7 @@ protocol ListSectionDelegate {
 }
 
 extension ListManager {
-    final class SectionManager {
+    struct SectionManager {
         let rows: [RowManager]
         let header: RowManager?
         let footer: RowManager?
@@ -39,18 +39,18 @@ extension ListManager {
         let index: Int
         let isDynamic: Bool
 
-        private(set) weak var listManager: (ListManager & ListSectionDelegate)!
-        private(set) weak var forEach: ForEachCreator?
+        @MutableBox var listManager: ListManager
+        @MutableBox var forEach: ForEachCreator?
 
-        init(_ listManager: ListManager & ListSectionDelegate) {
+        init(_ listManager: ListManager) {
             self.rows = []
             self.header = nil
             self.footer = nil
             self.identifier = 0
             self.index = 0
             self.isDynamic = false
-            self.listManager = listManager
-            self.forEach = nil
+            self._listManager = .init(wrappedValue: listManager)
+            self._forEach = .init(wrappedValue: nil)
         }
 
         private init(_ original: SectionManager, editable: Editable) {
@@ -62,7 +62,7 @@ extension ListManager {
             self.identifier = editable.identifier
             self.index = editable.index
             self.isDynamic = editable.isDynamic
-            self.listManager = editable.listManager
+            self._listManager = .init(wrappedValue: editable.listManager)
             self.forEach = original.forEach
             self.forEach?.manager = self
         }
@@ -111,13 +111,13 @@ extension ListManager {
             }
         }
 
-        func listManager(_ listManager: ListManager & ListSectionDelegate) -> SectionManager {
+        func listManager(_ listManager: ListManager) -> SectionManager {
             self.edit {
                 $0.listManager = listManager
             }
         }
 
-        func update(listManager: ListManager & ListSectionDelegate) {
+        func update(listManager: ListManager) {
             self.listManager = listManager
         }
 
@@ -161,7 +161,7 @@ private extension ListManager.SectionManager {
         var index: Int
         var isDynamic: Bool
 
-        weak var listManager: (ListManager & ListSectionDelegate)!
+        var listManager: ListManager
 
         fileprivate init(_ manager: ListManager.SectionManager) {
             self.rows = manager.rows
@@ -190,8 +190,8 @@ extension ListManager.SectionManager {
         let identifier: Int
         let isDynamic: Bool
         let index: Int
-        weak var listManager: (ListManager & ListSectionDelegate)!
-        weak var forEach: ForEachCreator?
+        let listManager: ListManager
+        let forEach: ForEachCreator?
 
         fileprivate init(_ content: ListManager.SectionManager) {
             self.header = content.header
@@ -261,7 +261,7 @@ extension ListManager.SectionManager: ListContentDelegate {
 
 extension ListManager.SectionManager: SupportForEach {
     static func mount(
-        _ manager: ListManager & ListSectionDelegate,
+        _ manager: ListManager,
         with contents: [ViewCreator]) -> ListManager.SectionManager {
 
         var footer: ListManager.RowManager?
@@ -317,11 +317,11 @@ extension ListManager.SectionManager: SupportForEach {
     func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
         sequence.sync { [compactCopy] contents in
             let sections = contents.compactMap {
-                ($0() as? UICSection)?.content
+                ($0() as? UICSection)?.contents().zip
             }
 
             if sections.isEmpty {
-                compactCopy.listManager?.content(compactCopy, updateSections: [])
+                compactCopy.listManager.content(compactCopy, updateSections: [])
                 return
             }
 

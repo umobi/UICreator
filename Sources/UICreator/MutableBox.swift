@@ -48,3 +48,30 @@ struct MutableBox<Value> {
         self
     }
 }
+
+@propertyWrapper
+struct WeakBox<Value> where Value: AnyObject {
+    private class Box {
+        var value: Value?
+
+        init(_ value: Value) {
+            self.value = value
+        }
+    }
+
+    private let box: Box
+
+    init(wrappedValue: Value!) {
+        self.box = .init(wrappedValue)
+    }
+
+    var wrappedValue: Value! {
+        get { self.box.value }
+        nonmutating
+        set { self.box.value = newValue }
+    }
+
+    var projectedValue: WeakBox<Value> {
+        self
+    }
+}

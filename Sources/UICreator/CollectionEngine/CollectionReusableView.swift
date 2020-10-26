@@ -24,6 +24,8 @@ import Foundation
 import UIKit
 
 public class CollectionReusableView: UICollectionReusableView, ReusableView {
+    weak var hostedView: UIView!
+
     var contentView: UIView {
         return self
     }
@@ -33,6 +35,7 @@ public class CollectionReusableView: UICollectionReusableView, ReusableView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .clear
+        self.makeSelfImplemented()
     }
 
     required init?(coder: NSCoder) {

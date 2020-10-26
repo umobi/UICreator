@@ -24,11 +24,13 @@ import Foundation
 import UIKit
 
 public class CollectionViewCell: UICollectionViewCell, ReusableView {
+    weak var hostedView: UIView!
     var cellLoaded: UICCell.Loaded!
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .clear
+        self.makeSelfImplemented()
     }
 
     required init?(coder: NSCoder) {

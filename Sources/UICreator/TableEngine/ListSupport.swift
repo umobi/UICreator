@@ -37,3 +37,19 @@ extension ListSupport {
         self.reloadData()
     }
 }
+
+private var kListToken = 0
+extension ListSupport {
+    private var listToken: ListToken! {
+        get { objc_getAssociatedObject(self, &kListToken) as? ListToken }
+        set { objc_setAssociatedObject(self, &kListToken, newValue, .OBJC_ASSOCIATION_RETAIN) }
+    }
+
+    func makeToken() -> ListToken {
+        .init(self)
+    }
+
+    func expireToken() {
+        self.listToken = nil
+    }
+}

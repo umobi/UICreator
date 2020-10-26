@@ -25,12 +25,12 @@ import UIKit
 
 extension ListManager: ListSectionDelegate {
     private func update(sections: [ListManager.SectionManager]) {
-        guard let list = self.list else {
+        guard let listView = self.listToken?.listView else {
             self.sections = sections
             return
         }
 
-        self.list = nil
+        listView.expireToken()
 
         let oldRowIdentifier = self.rowsIdentifier
         let oldHeadersIdentifier = self.headersIdentifier
@@ -41,7 +41,7 @@ extension ListManager: ListSectionDelegate {
             $0.loadForEachIfNeeded()
         }
 
-        self.list = list
+        self.listToken = listView.makeToken()
 
         let newRows: [String] = self.rowsIdentifier.compactMap {
             oldRowIdentifier.contains($0) ? nil : $0
@@ -55,7 +55,7 @@ extension ListManager: ListSectionDelegate {
             oldFootersIdentifier.contains($0) ? nil: $0
         }
 
-        switch list {
+        switch listView {
         case let table as UITableView:
             newRows.forEach {
                 table.register(TableViewCell.self, forCellReuseIdentifier: $0)
@@ -73,7 +73,7 @@ extension ListManager: ListSectionDelegate {
             break
         }
 
-        list.setNeedsReloadData()
+        listView.setNeedsReloadData()
     }
 
     func content(updateSection: ListManager.SectionManager) {

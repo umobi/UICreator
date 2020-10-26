@@ -46,6 +46,7 @@ private extension UIView {
 }
 
 protocol ReusableView: class {
+    var hostedView: UIView! { get set }
     var contentView: UIView { get }
 
     func prepareCell(_ cell: UICCell, axis: ReusableViewAxis)
@@ -65,9 +66,9 @@ extension ReusableView {
         }
 
         let host = cellLoaded.cell.rowManager.payload.content()
-        self.hostedView = host
 
         let hostedView: UIView! = host.releaseUIView()
+        self.hostedView = hostedView
 
         if hostedView.reusableAxis != axis {
             hostedView.reusableAxis = axis
@@ -190,33 +191,6 @@ extension ReusableView {
         }
     }
 
-//    func newReusableCell(_ cell: UICCell) {
-//        if self.cellLoaded == nil {
-//            let cellLoaded = cell.load
-//            let new = cellLoaded.cell.rowManager.payload.content()
-//            self.cellLoaded = cellLoaded
-//            self.newAddView(new)
-//            return
-//        }
-//
-//        guard self.cellLoaded?.cell.rowManager !== cell.rowManager else {
-//            return
-//        }
-//
-//        let cellLoaded = cell.load
-//        let new = cellLoaded.cell.rowManager.payload.content()
-//        let old = self.hostedView
-//        self.cellLoaded = cellLoaded
-//
-//        if let old = old {
-//            if !ReplacementTree(old).replace(with: new) {
-//                self.newAddView(new)
-//            }
-//        } else {
-//            self.newAddView(new)
-//        }
-//    }
-
     func reuseCell(_ cell: UICCell, axis: ReusableViewAxis) {
         if self.cellLoaded == nil {
             self.cellLoaded = cell.load
@@ -224,7 +198,17 @@ extension ReusableView {
             return
         }
 
-        guard self.cellLoaded?.cell.rowManager !== cell.rowManager else {
+        let actualRowManager = self.cellLoaded?.cell.rowManager
+        let oldRowManager = cell.rowManager
+
+        if oldRowManager.listManager?.listToken == nil {
+            self.cellLoaded = cell.load
+            self.addView(axis)
+            return
+        }
+
+        if actualRowManager?.indexPath == oldRowManager.indexPath
+            && oldRowManager.listManager?.listToken === actualRowManager?.listManager?.listToken {
             return
         }
 
@@ -291,23 +275,19 @@ extension UITableView {
         }
     }
 
-    var callbackIsPending: Mutable<Bool> {
-        OBJCSet(
-            self,
-            &kTableViewCallbackIsPending,
-            policity: .OBJC_ASSOCIATION_RETAIN,
-            orLoad: { .init(value: false) }
-        )
+    var callbackIsPending: Bool {
+        get { objc_getAssociatedObject(self, &kTableViewCallbackIsPending) as? Bool ?? false }
+        set { objc_setAssociatedObject(self, &kTableViewCallbackIsPending, newValue, .OBJC_ASSOCIATION_COPY) }
     }
 
     func addUniqueCallback(_ callback: @escaping () -> Void) {
-        if self.callbackIsPending.value {
+        if self.callbackIsPending {
             return
         }
 
-        self.callbackIsPending.value = true
+        self.callbackIsPending = true
         OperationQueue.main.addOperation {
-            self.callbackIsPending.value = false
+            self.callbackIsPending = false
             callback()
         }
     }
