@@ -60,9 +60,9 @@ public struct UICTab: UIViewControllerCreator {
 }
 
 public extension UIViewControllerCreator where ViewController: UITabBarController {
-    func tabBar(backgroundImage image: UIImage?) -> UICModifiedViewController<ViewController> {
+    func tabBar(backgroundImage image: UICImage?) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? ViewController)?.tabBar.backgroundImage = image
+            ($0 as? ViewController)?.tabBar.backgroundImage = image?.uiImage
         }
     }
 
@@ -119,15 +119,15 @@ public extension UIViewControllerCreator where ViewController: UITabBarControlle
         }
     }
 
-    func tabBar(selectionIndicatorImage image: UIImage?) -> UICModifiedViewController<ViewController> {
+    func tabBar(selectionIndicatorImage image: UICImage?) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? ViewController)?.tabBar.selectionIndicatorImage = image
+            ($0 as? ViewController)?.tabBar.selectionIndicatorImage = image?.uiImage
         }
     }
 
-    func tabBar(shadowImage image: UIImage?) -> UICModifiedViewController<ViewController> {
+    func tabBar(shadowImage image: UICImage?) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
-            ($0 as? ViewController)?.tabBar.shadowImage = image
+            ($0 as? ViewController)?.tabBar.shadowImage = image?.uiImage
         }
     }
 
@@ -166,10 +166,10 @@ public extension UIViewCreator {
         }
     }
 
-    func tabBarItem(image: UIImage?) -> UICModifiedView<View> {
+    func tabBarItem(image: UICImage?) -> UICModifiedView<View> {
         self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
-            tabItem.image = image
+            tabItem.image = image?.uiImage
             $0.tabBarItem = tabItem
         }
     }
@@ -182,10 +182,10 @@ public extension UIViewCreator {
         }
     }
 
-    func tabBarItem(selectedImage image: UIImage?) -> UICModifiedView<View> {
+    func tabBarItem(selectedImage image: UICImage?) -> UICModifiedView<View> {
         self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
-            tabItem.selectedImage = image
+            tabItem.selectedImage = image?.uiImage
             $0.tabBarItem = tabItem
         }
     }

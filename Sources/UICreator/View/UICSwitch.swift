@@ -120,15 +120,15 @@ public extension UIViewCreator where View: UISwitch {
         }
     }
 
-    func offImage(_ image: UIImage?) -> UICModifiedView<View> {
+    func offImage(_ image: UICImage?) -> UICModifiedView<View> {
         self.onNotRendered {
-            ($0 as? View)?.offImage = image
+            ($0 as? View)?.offImage = image?.uiImage
         }
     }
 
-    func onImage(_ image: UIImage?) -> UICModifiedView<View> {
+    func onImage(_ image: UICImage?) -> UICModifiedView<View> {
         self.onNotRendered {
-            ($0 as? View)?.onImage = image
+            ($0 as? View)?.onImage = image?.uiImage
         }
     }
 

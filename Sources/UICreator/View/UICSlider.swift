@@ -152,33 +152,33 @@ public extension UIViewCreator where View: UISlider {
         }
     }
 
-    func maximumValueImage(_ image: UIImage?) -> UICModifiedView<View> {
+    func maximumValueImage(_ image: UICImage?) -> UICModifiedView<View> {
         self.onNotRendered {
-            ($0 as? View)?.maximumValueImage = image
+            ($0 as? View)?.maximumValueImage = image?.uiImage
         }
     }
 
-    func minimumValueImage(_ image: UIImage?) -> UICModifiedView<View> {
+    func minimumValueImage(_ image: UICImage?) -> UICModifiedView<View> {
         self.onNotRendered {
-            ($0 as? View)?.minimumValueImage = image
+            ($0 as? View)?.minimumValueImage = image?.uiImage
         }
     }
 
-    func maximumTrackImage(_ image: UIImage?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
+    func maximumTrackImage(_ image: UICImage?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
         self.onRendered {
-            ($0 as? View)?.setMaximumTrackImage(image, for: state)
+            ($0 as? View)?.setMaximumTrackImage(image?.uiImage, for: state)
         }
     }
 
-    func minimumTrackImage(_ image: UIImage?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
+    func minimumTrackImage(_ image: UICImage?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
         self.onRendered {
-            ($0 as? View)?.setMinimumTrackImage(image, for: state)
+            ($0 as? View)?.setMinimumTrackImage(image?.uiImage, for: state)
         }
     }
 
-    func thumbImage(_ image: UIImage?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
+    func thumbImage(_ image: UICImage?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
         self.onRendered {
-            ($0 as? View)?.setThumbImage(image, for: state)
+            ($0 as? View)?.setThumbImage(image?.uiImage, for: state)
         }
     }
 

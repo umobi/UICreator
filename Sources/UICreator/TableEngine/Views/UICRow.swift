@@ -134,7 +134,7 @@ public struct UICContextualAction: RowAction {
 
     @MutableBox private(set) var configuratorHandler: ((UISwipeActionsConfiguration) -> Void)?
 
-    public init(title: String? = nil, image: UIImage? = nil, style: UIContextualAction.Style) {
+    public init(title: String? = nil, image: UICImage? = nil, style: UIContextualAction.Style) {
         self._indexPath = .init(wrappedValue: .init(row: .zero, section: .zero))
         self._handler = .init(wrappedValue: nil)
         self._action = .init(wrappedValue: .init())
@@ -148,7 +148,7 @@ public struct UICContextualAction: RowAction {
                 success(self.$handler.wrappedValue?(self.$indexPath.wrappedValue) ?? false)
             })
 
-        self.action.image = image
+        self.action.image = image?.uiImage
     }
 
     internal func tableView(_ tableView: UITableView) -> Self {
@@ -218,7 +218,6 @@ public struct UICRowAction: RowAction {
 
     public init(
         _ title: String? = nil,
-        _ image: UIImage? = nil,
         style: UITableViewRowAction.Style) {
 
         self._indexPath = .init(wrappedValue: .init(row: .zero, section: .zero))

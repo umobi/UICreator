@@ -106,53 +106,65 @@ public struct UICImage: UIViewCreator {
     }
 
     let content: Content
+    let contentMode: ContentMode
 
     public init(uiImage: UIImage) {
         self.content = .uiImage(uiImage)
+        self.contentMode = .fit
     }
 
     public init(ciImage: CIImage) {
         self.content = .ciImage(ciImage)
+        self.contentMode = .fit
     }
 
     public init(cgImage: CGImage) {
         self.content = .cgImage(cgImage)
+        self.contentMode = .fit
     }
 
     public init(contentsOfFile path: String) {
         self.content = .contentsOfFile(path)
+        self.contentMode = .fit
     }
 
     public init(data: Data) {
         self.content = .data(data)
+        self.contentMode = .fit
     }
 
     public init(named: String) {
         self.content = .named(named)
+        self.contentMode = .fit
     }
 
     public init(named: String, bundle: Bundle? = nil, colorScheme: ColorScheme) {
         self.content = .namedWithScheme(named, bundle, colorScheme)
+        self.contentMode = .fit
     }
 
     @available(iOS 13, tvOS 13, *)
     public init(named: String, bundle: Bundle? = nil, configuration: UIImage.Configuration) {
         self.content = .namedWithConfiguration(named, bundle, configuration)
+        self.contentMode = .fit
     }
 
     @available(iOS 13, tvOS 13, *)
     public init(systemName: String) {
         self.content = .systemName(systemName)
+        self.contentMode = .fit
     }
 
     @available(iOS 13, tvOS 13, *)
     public init(systemName: String, colorScheme: ColorScheme) {
         self.content = .systemNameWithScheme(systemName, colorScheme)
+        self.contentMode = .fit
     }
 
     @available(iOS 13, tvOS 13, *)
     public init(systemName: String, configuration: UIImage.Configuration) {
         self.content = .systemNameWithConfiguration(systemName, configuration)
+        self.contentMode = .fit
     }
 
     public var uiImage: UIImage {
@@ -165,7 +177,20 @@ public struct UICImage: UIViewCreator {
         return ImageView()
             .onNotRendered {
                 ($0 as? View)?.image = _self.content.uiImage
+                ($0 as? View)?.contentMode = _self.contentMode.uiContentMode
             }
+    }
+
+    private init(uiImage: UIImage, contentMode: ContentMode) {
+        self.content = .uiImage(uiImage)
+        self.contentMode = contentMode
+    }
+
+    public func contentMode(_ contentMode: ContentMode) -> Self {
+        .init(
+            uiImage: self.uiImage,
+            contentMode: contentMode
+        )
     }
 
     fileprivate func modify(_ edit: (UIImage) -> UIImage?) -> UICImage {

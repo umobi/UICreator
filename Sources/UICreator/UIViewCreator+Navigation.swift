@@ -124,7 +124,7 @@ public extension UIViewCreator {
     }
 
     func navigation(
-        background image: UIImage?,
+        background image: UICImage?,
         for position: UIBarPosition = .any,
         barMetrics: UIBarMetrics = .default) -> UICModifiedView<View> {
         self.onInTheScene {
@@ -132,7 +132,7 @@ public extension UIViewCreator {
                 .navigationController?
                 .navigationBar
                 .setBackgroundImage(
-                    image,
+                    image?.uiImage,
                     for: position,
                     barMetrics: barMetrics
                 )
@@ -281,9 +281,9 @@ public extension UIViewCreator {
     }
 
     @available(iOS 13.0, *)
-    func navigation(largeContentImage image: UIImage?) -> UICModifiedView<View> {
+    func navigation(largeContentImage image: UICImage?) -> UICModifiedView<View> {
         self.onInTheScene {
-            $0.navigation?.navigationController?.navigationBar.largeContentImage = image
+            $0.navigation?.navigationController?.navigationBar.largeContentImage = image?.uiImage
         }
     }
 

@@ -46,19 +46,19 @@ public struct UICMenu: UICMenuElement {
         self.provider = nil
     }
 
-    public init(image: UIImage, options: Set<Options> = []) {
+    public init(image: UICImage, options: Set<Options> = []) {
         self.id = nil
-        self.image = image
+        self.image = image.uiImage
         self.title = nil
         self.options = options
         self.children = []
         self.provider = nil
     }
 
-    public init(image: UIImage, title: String, options: Set<Options> = []) {
+    public init(image: UICImage, title: String, options: Set<Options> = []) {
         self.id = nil
         self.title = title
-        self.image = image
+        self.image = image.uiImage
         self.options = options
         self.children = []
         self.provider = nil
@@ -117,9 +117,9 @@ public extension UICMenu {
         }
     }
 
-    func image(_ image: UIImage) -> Self {
+    func image(_ image: UICImage) -> Self {
         self.edit {
-            $0.image = image
+            $0.image = image.uiImage
         }
     }
 

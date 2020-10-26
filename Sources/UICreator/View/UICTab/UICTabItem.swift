@@ -74,10 +74,10 @@ public struct UICTabItem {
         self.collection = nil
     }
 
-    public init(image: UIImage, content: @escaping () -> ViewCreator) {
+    public init(image: UICImage, content: @escaping () -> ViewCreator) {
         self.title = nil
         self.content = content
-        self.image = image
+        self.image = image.uiImage
         self.selectedImage = nil
         self.tabSystem = nil
         self.tag = 0
@@ -90,9 +90,9 @@ public struct UICTabItem {
         }
     }
 
-    public func image(_ image: UIImage?) -> Self {
+    public func image(_ image: UICImage?) -> Self {
         self.edit {
-            $0.image = image
+            $0.image = image?.uiImage
         }
     }
 
@@ -102,9 +102,9 @@ public struct UICTabItem {
         }
     }
 
-    public func selectedImage(_ image: UIImage) -> Self {
+    public func selectedImage(_ image: UICImage) -> Self {
         self.edit {
-            $0.selectedImage = image
+            $0.selectedImage = image.uiImage
         }
     }
 

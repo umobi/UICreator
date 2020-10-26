@@ -53,18 +53,18 @@ public struct UICAction: UICMenuElement {
         self.tapHandler = onTap
     }
 
-    public init(image: UIImage, onTap: @escaping () -> Void) {
+    public init(image: UICImage, onTap: @escaping () -> Void) {
         self.title = nil
-        self.image = image
+        self.image = image.uiImage
         self.id = nil
         self.attributes = []
         self.state = .on
         self.tapHandler = onTap
     }
 
-    public init(image: UIImage, title: String, onTap: @escaping () -> Void) {
+    public init(image: UICImage, title: String, onTap: @escaping () -> Void) {
         self.title = title
-        self.image = image
+        self.image = image.uiImage
         self.id = nil
         self.attributes = []
         self.state = .on
@@ -121,9 +121,9 @@ public extension UICAction {
         }
     }
 
-    func image(_ image: UIImage) -> Self {
+    func image(_ image: UICImage) -> Self {
         self.edit {
-            $0.image = image
+            $0.image = image.uiImage
         }
     }
 
