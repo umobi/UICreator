@@ -81,10 +81,18 @@ class _EmptyView: UIView {
 public struct EmptyView: UIViewCreator {
     public typealias View = UIView
 
-    init() {}
+    let view: UIView?
+
+    public init() {
+        self.view = nil
+    }
+    
+    init(_ view: UIView) {
+        self.view = view
+    }
 
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
-        _EmptyView()
+        (viewCreator as! Self).view ?? _EmptyView()
     }
 }
 

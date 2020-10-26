@@ -240,31 +240,31 @@ public struct UICSpacer: UIViewCreator {
 public extension UICSpacer {
     init(vertical: CGFloat, horizontal: CGFloat) {
         self.init(margin: .init(vertical: vertical, horizontal: horizontal)) {
-            EmptyView()
+            EmptyView(SpacerView())
         }
     }
 
     init(vertical: CGFloat) {
         self.init(margin: .init(vertical: vertical, horizontal: 0)) {
-            EmptyView()
+            EmptyView(SpacerView())
         }
     }
 
     init(horizontal: CGFloat) {
         self.init(margin: .init(vertical: 0, horizontal: horizontal)) {
-            EmptyView()
+            EmptyView(SpacerView())
         }
     }
 
     init() {
         self.init(margin: .init(spacing: 0)) {
-            EmptyView()
+            EmptyView(SpacerView())
         }
     }
 
     init(spacing: CGFloat) {
         self.init(margin: .init(spacing: spacing)) {
-            EmptyView()
+            EmptyView(SpacerView())
         }
     }
 }

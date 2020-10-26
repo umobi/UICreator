@@ -42,6 +42,7 @@ internal class ContentView: UIView, UICManagerContentView {
         self.priority = .fittingSizeLevel
         self.layoutMode = .center
         super.init(frame: .zero)
+        self.makeSelfImplemented()
     }
 
     weak var view: UIView?
