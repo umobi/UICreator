@@ -29,7 +29,7 @@ public protocol UICManagerContentView {
     func reloadContentLayout()
 }
 
-internal class RounderView: UIView, UICManagerContentView {
+public class RounderView: UIView, UICManagerContentView {
 
     init() {
         self.radius = .zero
@@ -96,7 +96,7 @@ internal class RounderView: UIView, UICManagerContentView {
     }
 }
 
-extension RounderView {
+public extension RounderView {
 
     func addContent(_ view: UIView) {
         CBSubview(self).addSubview(view)
@@ -141,10 +141,7 @@ extension RounderView {
 }
 
 public struct UICRounder: UIViewCreator {
-    public typealias View = UIView
-
-    @MutableBox var borderWidth: Relay<CGFloat> = .constant(.zero)
-    @MutableBox var borderColor: Relay<UIColor> = .constant(.clear)
+    public typealias View = RounderView
 
     let radius: CGFloat
     let content: () -> ViewCreator
@@ -157,53 +154,46 @@ public struct UICRounder: UIViewCreator {
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
-        guard
-            _self.radius != .zero
-                && _self.borderColor.wrappedValue != .clear
-                && _self.borderWidth.wrappedValue != .zero
-        else { return _self.content().releaseUIView() }
-
         return RounderView()
             .onNotRendered {
                 ($0 as? RounderView)?.radius = _self.radius
-            }
-            .onNotRendered {
                 ($0 as? RounderView)?.addContent(_self.content().releaseUIView())
             }
-            .onNotRendered {
-                weak var view = $0 as? RounderView
+    }
+}
 
-                _self.borderColor.sync {
-                    view?.border(color: $0)
-                }
+public extension UIViewCreator where View: RounderView {
+    func borderColor(_ color: UIColor) -> UICModifiedView<View> {
+        self.onNotRendered {
+            ($0 as? View)?.border(color: color)
+        }
+    }
 
-                _self.borderWidth.sync {
-                    view?.border(width: $0)
-                }
+    func borderColor(_ dynamicColor: Relay<UIColor>) -> UICModifiedView<View> {
+        self.onNotRendered {
+            weak var view = $0 as? View
+
+            dynamicColor.sync {
+                view?.border(color: $0)
             }
+        }
     }
 }
 
 public extension UICRounder {
-    func borderColor(_ color: UIColor) -> Self {
-        self.borderColor = .constant(color)
-        return self
+    func borderWidth(_ width: CGFloat) -> UICModifiedView<View> {
+        self.onNotRendered {
+            ($0 as? View)?.border(width: width)
+        }
     }
 
-    func borderColor(_ dynamicColor: Relay<UIColor>) -> Self {
-        self.borderColor = dynamicColor
-        return self
-    }
-}
+    func borderWidth(_ dynamicWidth: Relay<CGFloat>) -> UICModifiedView<View> {
+        self.onNotRendered {
+            weak var view = $0 as? View
 
-public extension UICRounder {
-    func borderWidth(_ width: CGFloat) -> Self {
-        self.borderWidth = .constant(width)
-        return self
-    }
-
-    func borderWidth(_ dynamicWidth: Relay<CGFloat>) -> Self {
-        self.borderWidth = dynamicWidth
-        return self
+            dynamicWidth.sync {
+                view?.border(width: $0)
+            }
+        }
     }
 }

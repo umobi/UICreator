@@ -46,7 +46,6 @@ private extension UIView {
 }
 
 protocol ReusableView: class {
-    var hostedView: ViewCreator! { get }
     var contentView: UIView { get }
 
     func prepareCell(_ cell: UICCell, axis: ReusableViewAxis)
@@ -54,41 +53,7 @@ protocol ReusableView: class {
     var cellLoaded: UICCell.Loaded! { get set }
 }
 
-struct ReusableObject {
-    weak var viewCreator: ViewCreator!
-    init(_ viewCreator: ViewCreator) {
-        self.viewCreator = viewCreator
-    }
-}
-
-private var kHostedView: UInt = 0
 extension ReusableView {
-    private var mutableReusableObject: Mutable<ReusableObject?> {
-        OBJCSet(self, &kHostedView, policity: .OBJC_ASSOCIATION_RETAIN) {
-            .init(value: nil)
-        }
-    }
-
-    private var reusableObject: ReusableObject! {
-        get { self.mutableReusableObject.value }
-        set { self.mutableReusableObject.value = newValue }
-    }
-
-    fileprivate(set) var hostedView: ViewCreator! {
-        get { self.reusableObject.viewCreator }
-        set { self.reusableObject = .init(newValue) }
-    }
-}
-
-extension ReusableView {
-//    func newAddView(_ hosted: ViewCreator) {
-//        self.contentView.subviews.forEach {
-//            $0.removeFromSuperview()
-//        }
-//
-//        self.hostedView = hosted
-//        self.contentView.add(priority: .init(500), hosted.releaseUIView())
-//    }
 
     func addView(_ axis: ReusableViewAxis) {
         guard let cellLoaded = self.cellLoaded else {

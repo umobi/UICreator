@@ -22,7 +22,7 @@
 
 import Foundation
 
-public extension ContentView {
+internal extension ContentView {
     enum LayoutMode {
         case top
         case topLeft

@@ -34,6 +34,7 @@ public class DashedView: UIView, UICManagerContentView {
     private var shape: CAShapeLayer!
 
     init() {
+        self.dashPattern = []
         super.init(frame: .zero)
         self.makeSelfImplemented()
     }
@@ -212,6 +213,7 @@ public struct UICDashed: UIViewCreator {
 
                 _self.$color.sync {
                     view?.apply(strokeColor: $0)
+                        .refreshView()
                 }
             }
             .onNotRendered {
@@ -219,6 +221,7 @@ public struct UICDashed: UIViewCreator {
 
                 _self.$pattern.sync {
                     view?.apply(dashPattern: $0)
+                        .refreshView()
                 }
             }
             .onNotRendered {
@@ -226,6 +229,7 @@ public struct UICDashed: UIViewCreator {
 
                 _self.$width.sync {
                     view?.apply(lineWidth: $0)
+                        .refreshView()
                 }
             }
     }

@@ -22,77 +22,220 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
-public class UICContent: UIViewCreator {
-    public typealias View = ContentView
+public struct UICTop: UIViewCreator {
+    public typealias View = CBView
+
+    private let priority: UILayoutPriority
+    private let content: () -> ViewCreator
 
     public init(
-        mode: ContentView.LayoutMode = .center,
-        priority: UILayoutPriority = .required,
+        _ priority: UILayoutPriority = .required,
         content: @escaping () -> ViewCreator) {
-        let content = content()
-        self.tree.append(content)
 
-        self.loadView { [unowned self] in
-            View(builder: self)
-        }
-        .onNotRendered {
-            ($0 as? View)?.layoutMode = mode
-            ($0 as? View)?.priority = priority
-        }
-        .onNotRendered {
-            ($0 as? View)?.addContent(content.releaseUIView())
-        }
+        self.priority = priority
+        self.content = content
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return ContentView(.top, priority: _self.priority)
+            .onNotRendered {
+                ($0 as? ContentView)?.addContent(_self.content().releaseUIView())
+            }
     }
 }
 
-public func UICCenter(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .center, priority: priority, content: content)
-}
+public struct UICTopLeft: UIViewCreator {
+    public typealias View = CBView
 
-public func UICTopLeft(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .topLeft, priority: priority, content: content)
-}
+    private let priority: UILayoutPriority
+    private let content: () -> ViewCreator
 
-public func UICTop(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .top, priority: priority, content: content)
-}
+    public init(
+        _ priority: UILayoutPriority = .required,
+        content: @escaping () -> ViewCreator) {
 
-public func UICTopRight(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .topRight, priority: priority, content: content)
-}
-
-public func UICLeft(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .left, priority: priority, content: content)
-}
-
-public func UICRight(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .right, priority: priority, content: content)
-}
-
-public func UICBottomLeft(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .bottomLeft, priority: priority, content: content)
-}
-
-public func UICBottom(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .bottom, priority: priority, content: content)
-}
-
-public func UICBottomRight(priority: UILayoutPriority = .required, content: @escaping () -> ViewCreator) -> UICContent {
-    return .init(mode: .bottomRight, priority: priority, content: content)
-}
-
-public extension UIViewCreator where View: ContentView {
-
-    func content(mode: View.LayoutMode) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.layoutMode = mode
-        }
+        self.priority = priority
+        self.content = content
     }
 
-    func fitting(priority: UILayoutPriority) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.priority = priority
-        }
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return ContentView(.topLeft, priority: _self.priority)
+            .onNotRendered {
+                ($0 as? ContentView)?.addContent(_self.content().releaseUIView())
+            }
+    }
+}
+
+public struct UICTopRight: UIViewCreator {
+    public typealias View = CBView
+
+    private let priority: UILayoutPriority
+    private let content: () -> ViewCreator
+
+    public init(
+        _ priority: UILayoutPriority = .required,
+        content: @escaping () -> ViewCreator) {
+
+        self.priority = priority
+        self.content = content
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return ContentView(.topRight, priority: _self.priority)
+            .onNotRendered {
+                ($0 as? ContentView)?.addContent(_self.content().releaseUIView())
+            }
+    }
+}
+
+public struct UICCenter: UIViewCreator {
+    public typealias View = CBView
+
+    private let priority: UILayoutPriority
+    private let content: () -> ViewCreator
+
+    public init(
+        _ priority: UILayoutPriority = .required,
+        content: @escaping () -> ViewCreator) {
+
+        self.priority = priority
+        self.content = content
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return ContentView(.center, priority: _self.priority)
+            .onNotRendered {
+                ($0 as? ContentView)?.addContent(_self.content().releaseUIView())
+            }
+    }
+}
+
+public struct UICLeft: UIViewCreator {
+    public typealias View = CBView
+
+    private let priority: UILayoutPriority
+    private let content: () -> ViewCreator
+
+    public init(
+        _ priority: UILayoutPriority = .required,
+        content: @escaping () -> ViewCreator) {
+
+        self.priority = priority
+        self.content = content
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return ContentView(.left, priority: _self.priority)
+            .onNotRendered {
+                ($0 as? ContentView)?.addContent(_self.content().releaseUIView())
+            }
+    }
+}
+
+public struct UICRight: UIViewCreator {
+    public typealias View = CBView
+
+    private let priority: UILayoutPriority
+    private let content: () -> ViewCreator
+
+    public init(
+        _ priority: UILayoutPriority = .required,
+        content: @escaping () -> ViewCreator) {
+
+        self.priority = priority
+        self.content = content
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return ContentView(.right, priority: _self.priority)
+            .onNotRendered {
+                ($0 as? ContentView)?.addContent(_self.content().releaseUIView())
+            }
+    }
+}
+
+public struct UICBottom: UIViewCreator {
+    public typealias View = CBView
+
+    private let priority: UILayoutPriority
+    private let content: () -> ViewCreator
+
+    public init(
+        _ priority: UILayoutPriority = .required,
+        content: @escaping () -> ViewCreator) {
+
+        self.priority = priority
+        self.content = content
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return ContentView(.bottom, priority: _self.priority)
+            .onNotRendered {
+                ($0 as? ContentView)?.addContent(_self.content().releaseUIView())
+            }
+    }
+}
+
+public struct UICBottomLeft: UIViewCreator {
+    public typealias View = CBView
+
+    private let priority: UILayoutPriority
+    private let content: () -> ViewCreator
+
+    public init(
+        _ priority: UILayoutPriority = .required,
+        content: @escaping () -> ViewCreator) {
+
+        self.priority = priority
+        self.content = content
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return ContentView(.bottomLeft, priority: _self.priority)
+            .onNotRendered {
+                ($0 as? ContentView)?.addContent(_self.content().releaseUIView())
+            }
+    }
+}
+
+public struct UICBottomRight: UIViewCreator {
+    public typealias View = CBView
+
+    private let priority: UILayoutPriority
+    private let content: () -> ViewCreator
+
+    public init(
+        _ priority: UILayoutPriority = .required,
+        content: @escaping () -> ViewCreator) {
+
+        self.priority = priority
+        self.content = content
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return ContentView(.bottomRight, priority: _self.priority)
+            .onNotRendered {
+                ($0 as? ContentView)?.addContent(_self.content().releaseUIView())
+            }
     }
 }

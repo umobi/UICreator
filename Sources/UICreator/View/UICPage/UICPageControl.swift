@@ -22,8 +22,22 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 public class PageControl: UIPageControl {
+
+    init() {
+        super.init(frame: .zero)
+        self.makeSelfImplemented()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    public override init(frame: CGRect) {
+        fatalError("init(frame:) has not been implemented")
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -67,93 +81,78 @@ public class PageControl: UIPageControl {
     }
 }
 
-public class UICPageControl: UIViewCreator, Control {
+public struct UICPageControl: UIViewCreator {
     public typealias View = PageControl
 
-    public init(numberOfPages: Int) {
-        self.loadView { [unowned self] in
-            View.init(builder: self)
-        }
-        .onNotRendered {
-            ($0 as? View)?.numberOfPages = numberOfPages
-        }
+    @Relay var numberOfPages: Int
+    @Relay var currentPage: Int
+
+    init(
+        numberOfPages: Int,
+        currentPage: Relay<Int>) {
+
+        self._numberOfPages = .constant(numberOfPages)
+        self._currentPage = currentPage
     }
 
-    public init(numberOfPages: Relay<Int>) {
-        self.loadView { [unowned self] in
-            View.init(builder: self)
-        }
-        .onNotRendered {
-            weak var view = $0 as? View
-            numberOfPages.sync {
-                view?.numberOfPages = $0
+    init(
+        numberOfPages: Relay<Int>,
+        currentPage: Relay<Int>) {
+
+        self._numberOfPages = numberOfPages
+        self._currentPage = currentPage
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return PageControl()
+            .onNotRendered {
+                weak var view = $0 as? View
+
+                _self.$numberOfPages.sync {
+                    view?.numberOfPages = $0
+                }
+
+                _self.$currentPage.distinctSync {
+                    view?.currentPage = $0
+                }
             }
-        }
+            .onEvent(.valueChanged) {
+                _self.currentPage = ($0 as? View)?.currentPage ?? .zero
+            }
     }
 }
 
 public extension UIViewCreator where View: UIPageControl {
-    func currentPage(_ page: Int) -> Self {
-        self.onInTheScene {
-            ($0 as? View)?.currentPage = page
-        }
-    }
 
-    func currentPage(indicatorTintColor: UIColor?) -> Self {
+    func currentPageIndicatorTintColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onNotRendered {
-            ($0 as? View)?.currentPageIndicatorTintColor = indicatorTintColor
+            ($0 as? View)?.currentPageIndicatorTintColor = color
         }
     }
 
-    func defersCurrentPageDisplay(_ flag: Bool) -> Self {
+    func defersCurrentPageDisplay(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.defersCurrentPageDisplay = flag
         }
     }
 
-    func hidesForSinglePage(_ flag: Bool) -> Self {
+    func hidesForSinglePage(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.hidesForSinglePage = flag
         }
     }
 
-    func numberOfPages(_ pages: Int) -> Self {
+    func numberOfPages(_ pages: Int) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.numberOfPages = pages
         }
     }
 
-    func page(indicatorTintColor: UIColor?) -> Self {
+    func pageIndicatorTintColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onNotRendered {
-            ($0 as? View)?.pageIndicatorTintColor = indicatorTintColor
-        }
-    }
-
-    func currentPage(_ value: Relay<Int>) -> Self {
-        self.onNotRendered {
-            weak var view = $0 as? View
-            value.sync {
-                view?.currentPage = $0
-            }
-        }
-    }
-}
-
-public extension UIViewCreator where Self: Control, View: UIPageControl {
-    func onPageChanged(_ handler: @escaping (UIView) -> Void) -> Self {
-        self.onEvent(.valueChanged, handler)
-    }
-
-    func currentPage(_ value: Relay<Int>) -> Self {
-        self.onNotRendered { [weak self] in
-            weak var view = $0 as? View
-            _ = self?.onPageChanged { _ in
-                value.wrappedValue = view?.currentPage ?? .zero
-            }
-
-            value.sync {
-                view?.currentPage = $0
-            }
+            ($0 as? View)?.pageIndicatorTintColor = color
         }
     }
 }

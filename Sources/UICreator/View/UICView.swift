@@ -23,12 +23,12 @@
 import Foundation
 import UIKit
 
-public protocol UICView: _UIViewCreator where View == UIView {
-    var body: _ViewCreator { get }
+public protocol UICView: UIViewCreator where View == UIView {
+    var body: ViewCreator { get }
 }
 
 public extension UICView {
-    static func makeUIView(_ viewCreator: _ViewCreator) -> UIView {
+    static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
         (viewCreator as! Self).body.releaseUIView()
     }
 }

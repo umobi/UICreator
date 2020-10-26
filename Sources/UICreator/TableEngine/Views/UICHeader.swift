@@ -21,14 +21,19 @@
 //
 
 import Foundation
-import UIKit
+import ConstraintBuilder
+import CoreGraphics
 
-public class UICHeader: ViewCreator {
+public struct UICHeader: ViewCreator {
     let content: () -> ViewCreator
-    fileprivate(set) var height: CGFloat?
+    @MutableBox var height: CGFloat?
 
     public init(content: @escaping () -> ViewCreator) {
         self.content = content
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        fatalError()
     }
 }
 
@@ -41,10 +46,9 @@ public extension UICHeader {
 
 public extension UICHeader {
     static var empty: UICHeader {
-        return UICHeader(content: {
-            UICEmpty()
-        })
-        .height(equalTo: 0)
+        UICHeader {
+            EmptyView()
+        }
         .estimatedHeight(0)
     }
 }

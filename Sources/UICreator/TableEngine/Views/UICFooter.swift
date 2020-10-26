@@ -21,12 +21,16 @@
 //
 
 import Foundation
-import UIKit
+import ConstraintBuilder
 
-public class UICFooter: ViewCreator {
+public struct UICFooter: ViewCreator {
     let content: () -> ViewCreator
 
     public init(content: @escaping () -> ViewCreator) {
         self.content = content
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        fatalError()
     }
 }

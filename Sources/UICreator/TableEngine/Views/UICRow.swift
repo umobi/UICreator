@@ -130,18 +130,22 @@ public struct UICContextualAction: RowAction {
     @MutableBox private(set) var action: UIContextualAction
     @MutableBox private(set) var handler: ((IndexPath) -> Bool)?
     @MutableBox private(set) var indexPath: IndexPath
-    @MutableBox private(set) var tableView: Reference<UITableView> = .nil
+    @MutableBox private(set) var tableView: Reference<UITableView>
 
     @MutableBox private(set) var configuratorHandler: ((UISwipeActionsConfiguration) -> Void)?
 
     public init(title: String? = nil, image: UIImage? = nil, style: UIContextualAction.Style) {
-        self.indexPath = .init(row: .zero, section: .zero)
-        self.handler = nil
+        self._indexPath = .init(wrappedValue: .init(row: .zero, section: .zero))
+        self._handler = .init(wrappedValue: nil)
+        self._action = .init(wrappedValue: .init())
+        self._configuratorHandler = .init(wrappedValue: nil)
+        self._tableView = .init(wrappedValue: .nil)
+
         self.action = UIContextualAction(
             style: style,
             title: title,
-            handler: { _, _, success in
-                success(self.handler?(self.indexPath) ?? false)
+            handler: { [self] _, _, success in
+                success(self.$handler.wrappedValue?(self.$indexPath.wrappedValue) ?? false)
             })
 
         self.action.image = image
@@ -212,14 +216,21 @@ public struct UICRowAction: RowAction {
     @MutableBox private(set) var indexPath: IndexPath
     @MutableBox private(set) var tableView: Reference<UITableView>
 
-    public init(_ title: String? = nil, _ image: UIImage? = nil, style: UITableViewRowAction.Style) {
-        self.indexPath = .init(row: .zero, section: .zero)
-        self.handler = nil
+    public init(
+        _ title: String? = nil,
+        _ image: UIImage? = nil,
+        style: UITableViewRowAction.Style) {
+
+        self._indexPath = .init(wrappedValue: .init(row: .zero, section: .zero))
+        self._handler = .init(wrappedValue: nil)
+        self._tableView = .init(wrappedValue: .nil)
+        self._action = .init(wrappedValue: .init())
+
         self.action = UITableViewRowAction(
             style: style,
             title: title,
-            handler: { _, _ in
-                self.handler?(self.indexPath)
+            handler: { [self] _, _ in
+                self.$handler.wrappedValue?(self.$indexPath.wrappedValue)
             }
         )
     }

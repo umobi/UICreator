@@ -91,13 +91,13 @@ public struct UICSlider: UIViewCreator {
 
     public init(minimumValue: Double, maximumValue: Double, value: Relay<Double>) {
         self._minimumValue = .constant(minimumValue)
-        self._minimumValue = .constant(maximumValue)
+        self._maximumValue = .constant(maximumValue)
         self._value = value
     }
 
     public init(minimumValue: Relay<Double>, maximumValue: Relay<Double>, value: Relay<Double>) {
         self._minimumValue = minimumValue
-        self._minimumValue = maximumValue
+        self._maximumValue = maximumValue
         self._value = value
     }
 

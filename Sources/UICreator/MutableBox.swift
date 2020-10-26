@@ -43,4 +43,8 @@ struct MutableBox<Value> {
         nonmutating
         set { self.box.value = newValue }
     }
+
+    var projectedValue: MutableBox<Value> {
+        self
+    }
 }

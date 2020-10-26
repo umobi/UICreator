@@ -36,6 +36,7 @@ private class SpacerView: UIView {
     }
 
     init() {
+        self.margin = .zero
         super.init(frame: .zero)
         self.makeSelfImplemented()
     }
@@ -51,6 +52,7 @@ private class SpacerView: UIView {
     @discardableResult
     func setMargin(_ margin: UICSpacer.Edges) -> Self {
         self.margin = margin
+        return self
     }
 
     override open var isHidden: Bool {
@@ -214,11 +216,12 @@ public extension UICSpacer {
 public struct UICSpacer: UIViewCreator {
     public typealias View = UIView
 
-    @MutableBox var margin: Edges = .zero
+    @MutableBox var margin: Edges
     let content: () -> ViewCreator
 
     public init(margin: Edges, content: @escaping () -> ViewCreator) {
-        self.margin = margin
+        self._margin = .init(wrappedValue: margin)
+        self.content = content
     }
 
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {

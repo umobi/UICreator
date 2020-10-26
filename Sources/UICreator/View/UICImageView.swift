@@ -24,8 +24,7 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-#if os(iOS)
-public class DatePicker: UIDatePicker {
+public class ImageView: UIImageView {
 
     init() {
         super.init(frame: .zero)
@@ -36,7 +35,15 @@ public class DatePicker: UIDatePicker {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override init(frame: CGRect) {
+    override public init(image: UIImage?) {
+        fatalError("init(image:) has not been implemented")
+    }
+
+    override public init(image: UIImage?, highlightedImage: UIImage?) {
+        fatalError("init(image:, highlightedImage:) has not been implemented")
+    }
+
+    override public init(frame: CGRect) {
         fatalError("init(frame:) has not been implemented")
     }
 
@@ -80,115 +87,106 @@ public class DatePicker: UIDatePicker {
         super.traitCollectionDidChange(previousTraitCollection)
         self.renderManager.traitDidChange()
     }
+
+    override public func removeConstraint(_ constraint: NSLayoutConstraint) {
+        super.removeConstraint(constraint)
+    }
+
+    override public func removeConstraints(_ constraints: [NSLayoutConstraint]) {
+        super.removeConstraints(constraints)
+    }
 }
 
-public struct UICDatePicker: UIViewCreator {
-    public typealias View = DatePicker
+public struct UICImageView: UIViewCreator {
+    public typealias View = UIImageView
 
-    @Relay var minimumDate: Date?
-    @Relay var maximumDate: Date?
-    @Relay var selectedDate: Date?
+    @Relay var image: UICImage?
+    @Relay var highlighted: UICImage?
+    let placeholder: UICImage?
 
-    let calendar: Calendar?
-    let pickerMode: UICDatePicker.Mode
-    let timeZone: TimeZone?
-    let locale: Locale?
+    public init(_ image: UICImage) {
+        self._image = .constant(image)
+        self._highlighted = .constant(nil)
+        self.placeholder = nil
+    }
 
-    public init(
-        _ pickerMode: UICDatePicker.Mode = .date,
-        minimumDate: Relay<Date?>,
-        maximumDate: Relay<Date?>,
-        selectedDate: Relay<Date?>,
-        calendar: Calendar? = nil,
-        timeZone: TimeZone? = nil,
-        locale: Locale? = nil) {
+    public init(_ image: UICImage, highlighted: UICImage) {
+        self._image = .constant(image)
+        self._highlighted = .constant(highlighted)
+        self.placeholder = nil
+    }
 
-        self._minimumDate = minimumDate
-        self._maximumDate = maximumDate
-        self._selectedDate = selectedDate
-        self.calendar = calendar
-        self.pickerMode = pickerMode
-        self.timeZone = timeZone
-        self.locale = locale
+    public init(_ image: Relay<UICImage?>) {
+        self._image = image
+        self._highlighted = .constant(nil)
+        self.placeholder = nil
+    }
+
+    public init(_ image: Relay<UICImage?>, highlighted: Relay<UICImage?>) {
+        self._image = image
+        self._highlighted = highlighted
+        self.placeholder = nil
+    }
+
+    public init(_ image: Relay<UICImage?>, placeholder: UICImage) {
+        self._image = image
+        self._highlighted = .constant(nil)
+        self.placeholder = placeholder
     }
 
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
-        return DatePicker()
+        return ImageView()
             .onNotRendered {
-                if #available(iOS 13.4, *) {
-                    ($0 as? View)?.preferredDatePickerStyle = .wheels
-                }
+                weak var view = $0 as? View
 
-                ($0 as? View)?.calendar = _self.calendar
-                ($0 as? View)?.datePickerMode = _self.pickerMode.uiPickerMode
-                ($0 as? View)?.timeZone = _self.timeZone
-                ($0 as? View)?.locale = _self.locale
+                _self.$highlighted.sync {
+                    view?.highlightedImage = $0?.uiImage
+                }
             }
             .onNotRendered {
                 weak var view = $0 as? View
 
-                _self.$minimumDate.sync {
-                    view?.minimumDate = $0
+                _self.$image.sync {
+                    view?.image = ($0 ?? _self.placeholder)?.uiImage
                 }
-
-                _self.$maximumDate.sync {
-                    view?.maximumDate = $0
-                }
-
-                _self.$maximumDate.distinctSync {
-                    guard let date = $0 else {
-                        return
-                    }
-
-                    view?.setDate(date, animated: true)
-                }
-            }
-            .onEvent(.valueChanged) {
-                _self.selectedDate = ($0 as? View)?.date
             }
     }
 }
 
-public extension UICDatePicker {
-    enum Mode {
-        case date
-        case dateAndTime
-        case time
+public extension UIViewCreator where View: UIImageView {
+    @available(iOS 13, tvOS 13.0, *)
+    func preferredSymbolConfiguration(_ configuration: UIImage.SymbolConfiguration) -> UICModifiedView<View> {
+        self.onNotRendered {
+            ($0 as? View)?.preferredSymbolConfiguration = configuration
+        }
+    }
 
-        internal var uiPickerMode: UIDatePicker.Mode {
-            switch self {
-            case .date:
-                return .date
-            case .dateAndTime:
-                return .dateAndTime
-            case .time:
-                return .time
+    func isHighlighted(_ dynamicFlag: Relay<Bool>) -> UICModifiedView<View> {
+        self.onNotRendered {
+            weak var view = $0 as? View
+
+            dynamicFlag.distinctSync {
+                view?.isHighlighted = $0
             }
         }
     }
 }
 
-public extension UIViewCreator where View: UIDatePicker {
-    @available(iOS 13.4, *)
-    func preferredStyle(_ style: UIDatePickerStyle) -> UICModifiedView<View> {
+public extension UIViewCreator where View: UIImageView {
+    func isAnimating(_ dynamicFlag: Relay<Bool>) -> UICModifiedView<View> {
         self.onNotRendered {
-            ($0 as? View)?.preferredDatePickerStyle = style
-        }
-    }
+            weak var view = $0 as? View
 
-    func countDownDuration(_ duration: TimeInterval) -> UICModifiedView<View> {
-        self.onNotRendered {
-            ($0 as? View)?.countDownDuration = duration
-        }
-    }
+            dynamicFlag.distinctSync {
+                if $0 {
+                    view?.startAnimating()
+                    return
+                }
 
-    func minuteInterval(_ interval: Int) -> UICModifiedView<View> {
-        self.onNotRendered {
-            ($0 as? View)?.minuteInterval = interval
+                view?.stopAnimating()
+            }
         }
     }
 }
-
-#endif

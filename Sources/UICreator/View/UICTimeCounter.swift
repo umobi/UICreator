@@ -24,22 +24,52 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public struct UICCircle: UIViewCreator {
-    public typealias View = RounderView
+#if os(iOS)
+public struct UICTimeCounter: UIViewCreator {
+    public typealias View = DatePicker
 
-    let content: () -> ViewCreator
+    @Relay var selectedTimeInterval: TimeInterval
 
-    public init(_ content: @escaping () -> ViewCreator) {
-        self.content = content
+    let timeZone: TimeZone?
+    let locale: Locale?
+
+    public init(
+        selectedTimeInterval: Relay<TimeInterval>,
+        timeZone: TimeZone? = nil,
+        locale: Locale? = nil) {
+
+        self._selectedTimeInterval = selectedTimeInterval
+        self.timeZone = timeZone
+        self.locale = locale
     }
 
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
-        return RounderView()
+        return DatePicker()
             .onNotRendered {
-                ($0 as? RounderView)?.radius = 0.5
-                ($0 as? RounderView)?.addContent(_self.content().releaseUIView())
+                if #available(iOS 13.4, *) {
+                    ($0 as? View)?.preferredDatePickerStyle = .wheels
+                }
+
+                ($0 as? View)?.datePickerMode = .countDownTimer
+                ($0 as? View)?.timeZone = _self.timeZone
+                ($0 as? View)?.locale = _self.locale
+            }
+            .onNotRendered {
+                weak var view = $0 as? View
+
+                _self.$selectedTimeInterval.distinctSync {
+                    view?.countDownDuration = $0
+                }
+            }
+            .onEvent(.valueChanged) {
+                guard let time = ($0 as? View)?.countDownDuration else {
+                    return
+                }
+
+                _self.selectedTimeInterval = time
             }
     }
 }
+#endif

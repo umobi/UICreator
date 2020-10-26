@@ -187,7 +187,7 @@ extension ListManager.RowManager {
         let isDynamic: Bool
         let indexPath: IndexPath
         weak var listManager: (ListManager & ListContentSectionRestore)!
-        private weak var forEach: ForEachCreator?
+        private let forEach: ForEachCreator?
 
         fileprivate init(_ content: ListManager.RowManager) {
             self.identifier = content.identifier

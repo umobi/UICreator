@@ -53,7 +53,7 @@ public struct UICTab: UICViewControllerCreator {
         self.contents = contents
     }
 
-    public static func makeUIView(_ viewCreator: _ViewCreator) -> UIView {
+    public static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
         UICControllerAdapt {
             {
                 let tabController = UITabBarController()
@@ -165,7 +165,7 @@ public extension UICViewControllerCreator where ViewController: UITabBarControll
     }
 }
 
-public extension _UIViewCreator {
+public extension UIViewCreator {
     func tabBarItem(title: String?) -> UICModifiedView<View> {
         self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
@@ -224,7 +224,7 @@ public extension _UIViewCreator {
     }
 }
 
-public extension _UIViewCreator {
+public extension UIViewCreator {
 
     func tabBarItem(badgeColor color: UIColor?) -> UICModifiedView<View> {
         self.onInTheScene {

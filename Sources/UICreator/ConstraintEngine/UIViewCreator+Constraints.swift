@@ -27,10 +27,10 @@ import UIKit
 extension UIView {
     var safeAreaCompatibleGuide: UILayoutGuide {
         if #available(iOS 11, tvOS 11, *) {
-            self.safeAreaLayoutGuide
+            return self.safeAreaLayoutGuide
         }
 
-        self.layoutMarginsGuide
+        return self.layoutMarginsGuide
     }
 }
 
@@ -1292,38 +1292,38 @@ public extension UIViewCreator {
     func hugging(
         vertical verticalPriority: UILayoutPriority = .defaultLow,
         horizontal horizontalPriority: UILayoutPriority = .defaultLow) -> UICModifiedView<View> {
-
+        
         self.onNotRendered {
-            ($0.dynamicView ?? $0)
+            $0.dynamicView
                 .setContentHuggingPriority(
                     verticalPriority,
                     for: .vertical
-            )
-
-            ($0.dynamicView ?? $0)
+                )
+            
+            $0.dynamicView
                 .setContentHuggingPriority(
                     horizontalPriority,
                     for: .horizontal
-            )
+                )
         }
     }
-
+    
     func compression(
         vertical verticalPriority: UILayoutPriority = .defaultHigh,
         horizontal horizontalPriority: UILayoutPriority = .defaultHigh) -> UICModifiedView<View> {
 
         self.onNotRendered {
-            ($0.dynamicView ?? $0)
+            $0.dynamicView
                 .setContentCompressionResistancePriority(
                     verticalPriority,
                     for: .vertical
-            )
+                )
 
-            ($0.dynamicView ?? $0)
+            $0.dynamicView
                 .setContentCompressionResistancePriority(
                     horizontalPriority,
                     for: .horizontal
-            )
+                )
         }
     }
 
@@ -1332,16 +1332,17 @@ public extension UIViewCreator {
         compression compressionPriority: UILayoutPriority = .defaultHigh) -> UICModifiedView<View> {
 
         self.onNotRendered {
-            ($0.dynamicView ?? $0)
+            $0.dynamicView
                 .setContentHuggingPriority(
                     huggingPriority,
                     for: .vertical
-            )
-            ($0.dynamicView ?? $0)
+                )
+
+            $0.dynamicView
                 .setContentCompressionResistancePriority(
                     compressionPriority,
                     for: .vertical
-            )
+                )
         }
     }
 
@@ -1350,17 +1351,17 @@ public extension UIViewCreator {
         compression compressionPriority: UILayoutPriority = .defaultHigh) -> UICModifiedView<View> {
 
         self.onNotRendered {
-            ($0.dynamicView ?? $0)
+            $0.dynamicView
                 .setContentHuggingPriority(
                     huggingPriority,
                     for: .horizontal
-            )
+                )
 
-            ($0.dynamicView ?? $0)
+            $0.dynamicView
                 .setContentCompressionResistancePriority(
                     compressionPriority,
                     for: .horizontal
-            )
+                )
         }
     }
 }

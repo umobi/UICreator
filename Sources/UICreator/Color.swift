@@ -39,4 +39,14 @@ extension ColorScheme {
 
         return .light
     }
+
+    @available(iOS 12, tvOS 12, *)
+    var uiUserInterfaceStyle: UIUserInterfaceStyle {
+        switch self {
+        case .dark:
+            return .dark
+        case .light:
+            return .light
+        }
+    }
 }

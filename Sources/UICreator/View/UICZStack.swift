@@ -24,11 +24,19 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class ZStackView: CBView {
+private class ZStackView: CBView {
 
     init() {
         super.init(frame: .zero)
         self.makeSelfImplemented()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    public override init(frame: CGRect) {
+        fatalError("init(frame:) has not been implemented")
     }
 
     override open var isHidden: Bool {
@@ -75,7 +83,7 @@ public class ZStackView: CBView {
 
 /// `class UICZStack` is a view that holds more than one **subview**.
 public struct UICZStack: UIViewCreator {
-    public typealias View = ZStackView
+    public typealias View = CBView
 
     let contents: () -> ViewCreator
 

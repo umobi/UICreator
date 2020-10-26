@@ -30,61 +30,64 @@ public enum Margin: CaseIterable {
     case trailing
 }
 
-public extension ViewCreator {
+public extension UIViewCreator {
     func safeArea(
         priority: UILayoutPriority = .required,
         _ margins: Margin...,
-        equalTo value: CGFloat = 0) -> Self {
+        equalTo value: CGFloat = 0) -> UICModifiedView<View> {
 
-        Set(margins.isEmpty ? Margin.allCases : margins).reduce(self) {
-            switch $1 {
-            case .top:
-                return self.safeArea(topEqualTo: value, priority: priority)
-            case .bottom:
-                return self.safeArea(bottomEqualTo: value, priority: priority)
-            case .leading:
-                return self.safeArea(leadingEqualTo: value, priority: priority)
-            case .trailing:
-                return self.safeArea(trailingEqualTo: value, priority: priority)
+        Set(margins.isEmpty ? Margin.allCases : margins)
+            .reduce(UICModifiedView { self.releaseOperationCastedView() }) {
+                switch $1 {
+                case .top:
+                    return $0.safeArea(topEqualTo: value, priority: priority)
+                case .bottom:
+                    return $0.safeArea(bottomEqualTo: value, priority: priority)
+                case .leading:
+                    return $0.safeArea(leadingEqualTo: value, priority: priority)
+                case .trailing:
+                    return $0.safeArea(trailingEqualTo: value, priority: priority)
+                }
             }
-        }
     }
 
     func insets(
         priority: UILayoutPriority = .required,
         _ margins: Margin...,
-        equalTo value: CGFloat = 0) -> Self {
+        equalTo value: CGFloat = 0) -> UICModifiedView<View> {
 
-        Set(margins.isEmpty ? Margin.allCases : margins).reduce(self) {
-            switch $1 {
-            case .top:
-                return self.top(equalTo: value, priority: priority)
-            case .bottom:
-                return self.bottom(equalTo: value, priority: priority)
-            case .leading:
-                return self.leading(equalTo: value, priority: priority)
-            case .trailing:
-                return self.trailing(equalTo: value, priority: priority)
+        Set(margins.isEmpty ? Margin.allCases : margins)
+            .reduce(UICModifiedView { self.releaseOperationCastedView() }) {
+                switch $1 {
+                case .top:
+                    return $0.top(equalTo: value, priority: priority)
+                case .bottom:
+                    return $0.bottom(equalTo: value, priority: priority)
+                case .leading:
+                    return $0.leading(equalTo: value, priority: priority)
+                case .trailing:
+                    return $0.trailing(equalTo: value, priority: priority)
+                }
             }
-        }
     }
 
     func margin(
         priority: UILayoutPriority = .required,
         _ margins: Margin...,
-        equalTo value: CGFloat = 0) -> Self {
+        equalTo value: CGFloat = 0) -> UICModifiedView<View> {
 
-        Set(margins.isEmpty ? Margin.allCases : margins).reduce(self) {
-            switch $1 {
-            case .top:
-                return self.topMargin(equalTo: value, priority: priority)
-            case .bottom:
-                return self.bottomMargin(equalTo: value, priority: priority)
-            case .leading:
-                return self.leadingMargin(equalTo: value, priority: priority)
-            case .trailing:
-                return self.trailingMargin(equalTo: value, priority: priority)
+        Set(margins.isEmpty ? Margin.allCases : margins)
+            .reduce(UICModifiedView { self.releaseOperationCastedView() }) {
+                switch $1 {
+                case .top:
+                    return $0.topMargin(equalTo: value, priority: priority)
+                case .bottom:
+                    return $0.bottomMargin(equalTo: value, priority: priority)
+                case .leading:
+                    return $0.leadingMargin(equalTo: value, priority: priority)
+                case .trailing:
+                    return $0.trailingMargin(equalTo: value, priority: priority)
+                }
             }
-        }
     }
 }

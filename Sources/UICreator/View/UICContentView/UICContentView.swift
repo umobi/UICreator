@@ -25,7 +25,7 @@ import UIKit
 import ConstraintBuilder
 
 // swiftlint:disable file_length type_body_length
-public class ContentView: UIView, UICManagerContentView {
+internal class ContentView: UIView, UICManagerContentView {
     public var priority: UILayoutPriority {
         didSet {
             self.reloadContentLayout()
@@ -38,18 +38,16 @@ public class ContentView: UIView, UICManagerContentView {
         }
     }
 
-    weak var view: UIView?
-    public required init(_ view: UIView!, contentMode: LayoutMode, priority: UILayoutPriority = .required) {
-        self.priority = priority
-        self.layoutMode = contentMode
+    init(_ contentMode: LayoutMode, priority: UILayoutPriority) {
+        self.priority = .fittingSizeLevel
+        self.layoutMode = .center
         super.init(frame: .zero)
-        self.addContent(view)
     }
 
+    weak var view: UIView?
+
     override public init(frame: CGRect) {
-        self.priority = .required
-        self.layoutMode = .center
-        super.init(frame: frame)
+        Fatal.Builder("init(frame:) has not been implemented").die()
     }
 
     required init?(coder: NSCoder) {

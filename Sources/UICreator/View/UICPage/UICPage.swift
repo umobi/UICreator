@@ -42,7 +42,7 @@ public class UICPage: UICViewControllerCreator {
         self.options = options
     }
 
-    public static func makeUIView(_ viewCreator: _ViewCreator) -> UIView {
+    public static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
         let _self = viewCreator as! Self
 
         return UICControllerAdapt {
@@ -73,7 +73,7 @@ public extension UICViewControllerCreator where ViewController: UIPageViewContro
                 .updateViewControllers(
                     {
                         contents().zip.map {
-                            UICHostingController(view: $0)
+                            UICHostingController(rootView: $0)
                         }
                     }(),
                     direction: direction,

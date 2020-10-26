@@ -39,6 +39,19 @@ public class GradientView: UIView {
         }
     }
 
+    init() {
+        super.init(frame: .zero)
+        self.makeSelfImplemented()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    public override init(frame: CGRect) {
+        fatalError("init(frame:) has not been implemented")
+    }
+
     var locations: [NSNumber] {
         guard self.colors.count > 1 else {
             return [0]
@@ -155,51 +168,42 @@ public extension GradientView {
 
 extension CGPoint {
     func distance(to point: CGPoint) -> CGFloat {
-        return sqrt(pow(x - point.x, 2) + pow(y - point.y, 2))
+        sqrt(pow(x - point.x, 2) + pow(y - point.y, 2))
     }
 }
 
-public class UICGradient: UIViewCreator {
+public struct UICGradient: UIViewCreator {
     public typealias View = GradientView
 
+    private let colors: [UIColor]
+    private let direction: View.Direction
+
     public init(_ colors: [UIColor], direction: View.Direction = .right) {
-        self.colors(colors)
-            .direction(direction)
-            .loadView { [unowned self] in
-                View.init(builder: self)
-            }
+        self.colors = colors
+        self.direction = direction
     }
 
-    public convenience init(_ colors: UIColor..., direction: View.Direction = .right) {
-        self.init(colors, direction: direction)
+    public init(_ colors: UIColor..., direction: View.Direction = .right) {
+        self.colors = colors
+        self.direction = direction
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return GradientView()
+            .onNotRendered {
+                ($0 as? View)?.direction = _self.direction
+                ($0 as? View)?.colors = _self.colors
+            }
     }
 }
 
 public extension UIViewCreator where View: GradientView {
 
-    func colors(_ colors: UIColor...) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.colors = colors
-        }
-    }
-
-    func colors(_ colors: [UIColor]) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.colors = colors
-        }
-    }
-
-    func direction(_ direction: View.Direction) -> Self {
-        self.onNotRendered {
-            ($0 as? View)?.direction = direction
-        }
-    }
-
-    func animation(_ layerHandler: @escaping (CAGradientLayer) -> Void) -> Self {
+    func animation(_ layerHandler: @escaping (CAGradientLayer) -> Void) -> UICModifiedView<View> {
         self.onRendered {
-            ($0 as? View)?.animates {
-                layerHandler($0)
-            }
+            ($0 as? View)?.animates(animator: layerHandler)
         }
     }
 }

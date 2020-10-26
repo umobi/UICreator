@@ -22,8 +22,22 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 public class InputView: UIInputView {
+
+    init(frame: CGRect, style: Style) {
+        super.init(frame: frame, inputViewStyle: style)
+        self.makeSelfImplemented()
+    }
+
+    public override init(frame: CGRect, inputViewStyle: Style) {
+        fatalError("init(frame:, inputViewStyle:) has not been implemented")
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override open var isHidden: Bool {
         get { super.isHidden }
@@ -67,27 +81,35 @@ public class InputView: UIInputView {
     }
 }
 
-public class UICInput: UIViewCreator {
+public struct UICInput: UIViewCreator {
     public typealias View = InputView
 
+    let frame: CGRect
+    let style: UIInputView.Style
+    let content: () -> ViewCreator
+
     public init(
-        size: CGSize = .zero,
+        frame: CGRect = .zero,
         style: UIInputView.Style = .keyboard,
         content: @escaping () -> ViewCreator) {
-        let content = content()
-        self.tree.append(content)
 
-        self.loadView { [unowned self] in
-            return View.init(builder: self)
-        }
-        .onNotRendered {
-            $0.add(content.releaseUIView())
-        }
+        self.frame = frame
+        self.style = style
+        self.content = content
+    }
+
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return InputView(frame: _self.frame, style: _self.style)
+            .onNotRendered {
+                $0.add(_self.content().releaseUIView())
+            }
     }
 }
 
 public extension UIViewCreator where View: UIInputView {
-    func allowsSelfsSizing(_ flag: Bool) -> Self {
+    func allowsSelfsSizing(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.allowsSelfSizing = flag
         }
