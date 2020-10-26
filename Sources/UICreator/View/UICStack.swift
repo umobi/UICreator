@@ -144,8 +144,10 @@ public struct UICStack: UIViewCreator {
                 weak var view: View! = $0 as? View
 
                 _self.content().zip.forEach {
-                    if let forEachCreator = $0 as? ForEachCreator {
-                        forEachCreator.manager = StackManager(view)
+                    if let forEachShared = $0 as? ForEachEnviromentShared {
+                        let stackManager = StackManager(view)
+                        view.strongStackManager(stackManager)
+                        forEachShared.enviroment.setManager(stackManager)
                     }
 
                     UIView.CBSubview(view).addArrangedSubview($0.releaseUIView())
@@ -169,7 +171,7 @@ public extension UIViewCreator where View: UIStackView {
     }
 }
 
-internal struct StackManager: SupportForEach {
+internal class StackManager: SupportForEach {
     private weak var stackView: UIStackView!
 
     @WeakBox var firstView: UIView!
@@ -179,14 +181,14 @@ internal struct StackManager: SupportForEach {
         self.stackView = stackView
     }
 
-    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
+    func viewsDidChange(_ placeholderView: UIView!, _ dynamicContent: Relay<[() -> ViewCreator]>) {
         self.firstView = placeholderView
         self.lastView = placeholderView
 
-        sequence.map {
+        dynamicContent.map {
             $0.map { $0().releaseUIView() }
         }.sync { views in
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [unowned self] in
                 guard let stackView = stackView else {
                     return
                 }

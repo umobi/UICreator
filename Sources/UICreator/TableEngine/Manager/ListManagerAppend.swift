@@ -28,7 +28,7 @@ extension ListManager {
         private let manager: ListManager
 
         var sections: [ListManager.SectionManager] {
-            return self.manager.sections
+            self.manager.sections
         }
 
         init(_ manager: ListManager) {

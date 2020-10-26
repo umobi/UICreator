@@ -23,22 +23,22 @@
 import Foundation
 import UIKit
 
-protocol ListContentDelegate {
+protocol ListContentDelegate: class {
     func content(_ compactCopy: ListManager.RowManager.Copy, updatedWith sequence: [ListManager.RowManager])
 }
 
-protocol ListContentSectionRestore {
+protocol ListContentSectionRestore: class {
     func section(at index: Int) -> ListManager.SectionManager
 }
 
 extension ListManager {
-    struct RowManager {
+    final class RowManager {
         let payload: Payload
         let identifier: Int
         let indexPath: IndexPath
         let isDynamic: Bool
-        let listManager: ListManager?
-        @MutableBox private(set) var forEach: ForEachCreator?
+        private(set) weak var listManager: (ListManager & ListContentSectionRestore)!
+        private(set) var forEachEnviroment: ForEachEnviromentType?
 
         fileprivate init(_ payload: Payload) {
             self.payload = payload
@@ -46,7 +46,7 @@ extension ListManager {
             self.indexPath = .init(row: .zero, section: .zero)
             self.identifier = 0
             self.listManager = nil
-            self._forEach = .init(wrappedValue: nil)
+            self.forEachEnviroment = nil
         }
 
         private init(_ original: RowManager, editable: Editable) {
@@ -55,8 +55,8 @@ extension ListManager {
             self.indexPath = editable.indexPath
             self.isDynamic = editable.isDynamic
             self.listManager = original.listManager ?? editable.listManager
-            self._forEach = .init(wrappedValue: original.forEach)
-            self.forEach?.manager = self
+            self.forEachEnviroment = original.forEachEnviroment
+            self.forEachEnviroment?.setManager(self)
         }
 
         func identifier(_ identifier: Int) -> RowManager {
@@ -77,13 +77,7 @@ extension ListManager {
             }
         }
 
-        func listManager(_ listManager: ListManager) -> RowManager {
-            self.edit {
-                $0.listManager = listManager
-            }
-        }
-
-        fileprivate func listManager(_ listManager: ListManager?) -> RowManager {
+        func listManager(_ listManager: ListManager & ListContentSectionRestore) -> RowManager {
             self.edit {
                 $0.listManager = listManager
             }
@@ -91,27 +85,27 @@ extension ListManager {
 
         @discardableResult
         func loadForEachIfNeeded() -> Bool {
-            guard let forEach = self.forEach, !forEach.isLoaded else {
+            guard let forEachEnviroment = self.forEachEnviroment, !forEachEnviroment.isReleased else {
                 return false
             }
 
-            forEach.load()
-            return forEach.isLoaded
+            forEachEnviroment.syncManager()
+            return forEachEnviroment.isReleased
         }
 
-        static func forEach(_ forEachCreator: ForEachCreator) -> RowManager {
+        static func forEachShared(_ forEachShared: ForEachEnviromentShared) -> RowManager {
             let manager = Payload(row: UICRow {
-                forEachCreator
+                forEachShared
             }).asRowManager
 
-            forEachCreator.manager = manager
-            manager.forEach = forEachCreator
+            forEachShared.enviroment.setManager(manager)
+            manager.forEachEnviroment = forEachShared.enviroment
             return manager
         }
 
-        private func forEach(_ forEachCreator: ForEachCreator?) -> RowManager {
-            self.forEach = forEachCreator
-            forEachCreator?.manager = self
+        private func forEachEnviroment(_ forEachEnviroment: ForEachEnviromentType?) -> RowManager {
+            self.forEachEnviroment = forEachEnviroment
+            forEachEnviroment?.setManager(self)
             return self
         }
     }
@@ -170,7 +164,7 @@ private extension ListManager.RowManager {
         var identifier: Int
         var isDynamic: Bool
         var indexPath: IndexPath
-        var listManager: ListManager?
+        weak var listManager: (ListManager & ListContentSectionRestore)!
 
         fileprivate init(_ content: ListManager.RowManager) {
             self.identifier = content.identifier
@@ -192,15 +186,15 @@ extension ListManager.RowManager {
         let identifier: Int
         let isDynamic: Bool
         let indexPath: IndexPath
-        let listManager: ListManager!
-        private let forEach: ForEachCreator!
+        weak var listManager: (ListManager & ListContentSectionRestore)!
+        weak private var forEachEnviroment: ForEachEnviromentType?
 
         fileprivate init(_ content: ListManager.RowManager) {
             self.identifier = content.identifier
             self.isDynamic = content.isDynamic
             self.listManager = content.listManager
             self.indexPath = content.indexPath
-            self.forEach = content.forEach
+            self.forEachEnviroment = content.forEachEnviroment
         }
 
         fileprivate func restore(_ payload: Payload) -> ListManager.RowManager {
@@ -209,7 +203,7 @@ extension ListManager.RowManager {
                 .isDynamic(self.isDynamic)
                 .listManager(self.listManager)
                 .indexPath(self.indexPath)
-                .forEach(self.forEach)
+                .forEachEnviroment(self.forEachEnviroment)
         }
     }
 
@@ -219,8 +213,8 @@ extension ListManager.RowManager {
 }
 
 extension ListManager.RowManager: SupportForEach {
-    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
-        sequence.sync { [compactCopy] in
+    func viewsDidChange(_ placeholderView: UIView!, _ dynamicContent: Relay<[() -> ViewCreator]>) {
+        dynamicContent.sync { [compactCopy] in
             compactCopy.listManager
                 .section(at: compactCopy.indexPath.section)
                 .content(compactCopy, updatedWith: $0.map { content in

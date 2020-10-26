@@ -23,13 +23,6 @@
 import Foundation
 import UIKit
 
-protocol SupportForEach {
-    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>)
-}
-
-protocol ForEachCreator: ViewCreator {
-    var viewType: ViewCreator.Type { get }
-    func load()
-    var isLoaded: Bool { get }
-    var manager: SupportForEach! { get nonmutating set }
+protocol SupportForEach: class {
+    func viewsDidChange(_ placeholderView: UIView!, _ dynamicContent: Relay<[() -> ViewCreator]>)
 }

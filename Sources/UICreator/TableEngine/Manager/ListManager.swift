@@ -23,21 +23,12 @@
 import Foundation
 import UIKit
 
-class ListToken: NSObject {
-    weak var listView: ListSupport!
+class ListManager: ListCollectionManager, ListContentSectionRestore {
+    var sections: [SectionManager] = []
+    weak var list: ListSupport!
 
-    init(_ listView: ListSupport) {
-        self.listView = listView
-    }
-}
-
-struct ListManager: ListCollectionManager, ListContentSectionRestore {
-    @MutableBox var sections: [SectionManager] = []
-    @WeakBox var listToken: ListToken!
-
-    init(contents: [ViewCreator]) {
+    convenience init(contents: [ViewCreator]) {
         self.init(contents)
-
         self.sections.forEach {
             $0.loadForEachIfNeeded()
         }
@@ -65,9 +56,9 @@ struct ListManager: ListCollectionManager, ListContentSectionRestore {
         }
 
         self.sections = contents.enumerated().compactMap {
-            if let forEach = $0.element as? ForEachCreator, forEach.viewType is UICSection.Type {
+            if let forEachShared = $0.element as? ForEachEnviromentShared, forEachShared.enviroment.contentType is UICSection.Type {
                 return SectionManager(self)
-                    .forEach(forEach)
+                    .forEachShared(forEachShared)
                     .isDynamic(true)
                     .index($0.offset)
                     .identifier($0.offset)

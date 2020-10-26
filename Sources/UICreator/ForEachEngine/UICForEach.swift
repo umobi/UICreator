@@ -88,68 +88,81 @@ public struct EmptyView: UIViewCreator {
     }
 }
 
-public struct UICForEach<Content, Value>: ViewCreator, ForEachCreator where Content: ViewCreator, Value: Collection {
-    @MutableBox var view: Reference<UIView> = .nil
-    @MutableBox var syncLoad: (() -> Void)?
-    @MutableBox var manager: SupportForEach!
-    
-    let viewType: ViewCreator.Type
+extension UICForEach {
+    class Enviroment: ForEachEnviromentType {
+        let contentType: ViewCreator.Type
+        @UICOutlet var view: UIView!
+        @Relay private var dynamicContent: [() -> ViewCreator]
 
-    let relay: Relay<Value>
-    let content: (Value.Element) -> ViewCreator
+        private weak var manager: SupportForEach!
+        private(set) var isReleased: Bool = false
 
-    private func startObservation() {
-        let content = self.content
-        self.manager?.viewsDidChange(placeholderView: self.view.value, self.relay.map {
-            $0.map { element in
-                {
-                    content(element)
+        init(_ dynamicValue: Relay<Value>, content: @escaping (Value.Element) -> Content) {
+            self.contentType = Content.self
+            self._dynamicContent = dynamicValue.map {
+                $0.map { element in
+                    {
+                        content(element)
+                    }
                 }
             }
-        })
+        }
+
+        func syncManager() {
+            guard !self.isReleased, let manager = self.manager else {
+                return
+            }
+
+            self.isReleased = true
+            manager.viewsDidChange(self.view, self.$dynamicContent)
+        }
+
+        func setManager(_ manager: SupportForEach) {
+            self.manager = manager
+            
+            guard !self.isReleased else {
+                return
+            }
+        }
+    }
+}
+
+protocol ForEachEnviromentType: class {
+    var contentType: ViewCreator.Type { get }
+    func syncManager()
+    func setManager(_ manager: SupportForEach)
+
+    var isReleased: Bool { get }
+}
+
+protocol ForEachEnviromentShared: ViewCreator {
+    var enviroment: ForEachEnviromentType { get }
+}
+
+public struct UICForEach<Content, Value>: ViewCreator, ForEachEnviromentShared where Content: ViewCreator, Value: Collection {
+    private let privateEnviroment: Enviroment
+
+    var enviroment: ForEachEnviromentType {
+        self.privateEnviroment
     }
 
-    private init(private relay: Relay<Value>, content: @escaping (Value.Element) -> Content) {
-        self.relay = relay
-        self.content = content
-        self.viewType = Content.self
-        self.syncLoad = self.startObservation
-    }
-
-    public init(_ relay: Relay<Value>, content: @escaping (Value.Element) -> Content) {
-        self.init(private: relay, content: content)
+    public init(_ dynamicValue: Relay<Value>, content: @escaping (Value.Element) -> Content) {
+        self.privateEnviroment = .init(dynamicValue, content: content)
     }
 
     public init(_ value: Value, content: @escaping (Value.Element) -> Content) {
-        self.init(private: .constant(value), content: content)
-    }
-
-    func load() {
-        let syncLoad = self.syncLoad
-        self.syncLoad = nil
-
-        self.view = {
-            if let view = self.view.value {
-                return .weak(view)
-            }
-
-            return .strong(Self.makeUIView(self))
-        }()
-
-        syncLoad?()
-    }
-
-    var isLoaded: Bool {
-        self.syncLoad == nil
+        self.privateEnviroment = .init(.constant(value), content: content)
     }
 
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         EmptyView()
             .height(equalTo: 0, priority: .defaultHigh)
             .width(equalTo: 0, priority: .defaultHigh)
-            .onRendered {
-                (viewCreator as! Self).view = .weak($0)
-                (viewCreator as! Self).load()
+            .onNotRendered {
+                (viewCreator as! Self).privateEnviroment.$view.ref($0)
+            }
+            .onRendered { _ in
+                (viewCreator as! Self).privateEnviroment.syncManager()
             }
             .releaseUIView()
     }

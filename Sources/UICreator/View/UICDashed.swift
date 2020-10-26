@@ -94,6 +94,10 @@ public class DashedView: UIView, UICManagerContentView {
             return
         }
 
+        if self.shape == nil {
+            self.reloadContentLayout()
+        }
+
         view.setNeedsLayout()
         view.layoutIfNeeded()
 

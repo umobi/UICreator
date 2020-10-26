@@ -198,17 +198,7 @@ extension ReusableView {
             return
         }
 
-        let actualRowManager = self.cellLoaded?.cell.rowManager
-        let oldRowManager = cell.rowManager
-
-        if oldRowManager.listManager?.listToken == nil {
-            self.cellLoaded = cell.load
-            self.addView(axis)
-            return
-        }
-
-        if actualRowManager?.indexPath == oldRowManager.indexPath
-            && oldRowManager.listManager?.listToken === actualRowManager?.listManager?.listToken {
+        guard self.cellLoaded?.cell.rowManager !== cell.rowManager else {
             return
         }
 

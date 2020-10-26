@@ -27,8 +27,9 @@ extension ListSupport where Self: UICollectionView {
     @discardableResult
     func dynamicData(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> Self {
         self.onNotRendered {
-            let manager = ListManager(contents: contents().zip)
             let collectionView: Self! = $0 as? Self
+
+            let manager = ListManager(contents: contents().zip)
 
             manager.rowsIdentifier.forEach {
                 collectionView.register(
@@ -56,7 +57,7 @@ extension ListSupport where Self: UICollectionView {
             collectionView.manager = manager
             collectionView.strongDataSource(UICCollectionViewDataSource())
             collectionView.strongDelegate(UICCollectionViewDelegate())
-            manager.listToken = collectionView.makeToken()
+            manager.list = collectionView
         }
     }
 }
@@ -72,6 +73,6 @@ extension UICollectionView {
 
     func strongDataSource(_ dataSource: UICollectionViewDataSource) {
         self.dataSource = dataSource
-        objc_setAssociatedObject(self, &kCollectionDataSource, delegate, .OBJC_ASSOCIATION_RETAIN)
+        objc_setAssociatedObject(self, &kCollectionDataSource, dataSource, .OBJC_ASSOCIATION_RETAIN)
     }
 }

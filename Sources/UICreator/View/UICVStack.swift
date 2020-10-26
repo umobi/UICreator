@@ -63,12 +63,21 @@ public struct UICVStack: UIViewCreator {
                 weak var view: View! = $0 as? View
 
                 _self.content().zip.forEach {
-                    if let forEachCreator = $0 as? ForEachCreator {
-                        forEachCreator.manager = StackManager(view)
+                    if let forEachShared = $0 as? ForEachEnviromentShared {
+                        let stackManager = StackManager(view)
+                        view.strongStackManager(stackManager)
+                        forEachShared.enviroment.setManager(stackManager)
                     }
 
                     UIView.CBSubview(view).addArrangedSubview($0.releaseUIView())
                 }
             }
+    }
+}
+
+private var kStackManager = 0
+extension StackView {
+    func strongStackManager(_ stackManager: StackManager) {
+        objc_setAssociatedObject(self, &kStackManager, stackManager, .OBJC_ASSOCIATION_RETAIN)
     }
 }

@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-protocol ListCollectionManager {
+protocol ListCollectionManager: class {
     var sections: [ListManager.SectionManager] { get }
 
     var numberOfSections: Int { get }

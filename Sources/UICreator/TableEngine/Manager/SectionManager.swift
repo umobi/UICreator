@@ -30,7 +30,7 @@ protocol ListSectionDelegate {
 }
 
 extension ListManager {
-    struct SectionManager {
+    final class SectionManager {
         let rows: [RowManager]
         let header: RowManager?
         let footer: RowManager?
@@ -39,18 +39,18 @@ extension ListManager {
         let index: Int
         let isDynamic: Bool
 
-        @MutableBox var listManager: ListManager
-        @MutableBox var forEach: ForEachCreator?
+        private(set) weak var listManager: (ListManager & ListSectionDelegate)!
+        weak private(set) var forEachEnviroment: ForEachEnviromentType?
 
-        init(_ listManager: ListManager) {
+        init(_ listManager: ListManager & ListSectionDelegate) {
             self.rows = []
             self.header = nil
             self.footer = nil
             self.identifier = 0
             self.index = 0
             self.isDynamic = false
-            self._listManager = .init(wrappedValue: listManager)
-            self._forEach = .init(wrappedValue: nil)
+            self.listManager = listManager
+            self.forEachEnviroment = nil
         }
 
         private init(_ original: SectionManager, editable: Editable) {
@@ -62,9 +62,9 @@ extension ListManager {
             self.identifier = editable.identifier
             self.index = editable.index
             self.isDynamic = editable.isDynamic
-            self._listManager = .init(wrappedValue: editable.listManager)
-            self.forEach = original.forEach
-            self.forEach?.manager = self
+            self.listManager = editable.listManager
+            self.forEachEnviroment = original.forEachEnviroment
+            self.forEachEnviroment?.setManager(self)
         }
 
         func rows(_ rows: [RowManager]) -> SectionManager {
@@ -111,41 +111,41 @@ extension ListManager {
             }
         }
 
-        func listManager(_ listManager: ListManager) -> SectionManager {
+        func listManager(_ listManager: ListManager & ListSectionDelegate) -> SectionManager {
             self.edit {
                 $0.listManager = listManager
             }
         }
 
-        func update(listManager: ListManager) {
+        func update(listManager: ListManager & ListSectionDelegate) {
             self.listManager = listManager
         }
 
-        func forEach(_ forEachCreator: ForEachCreator) -> SectionManager {
+        func forEachShared(_ forEachShared: ForEachEnviromentShared) -> SectionManager {
             let manager = self.rows([RowManager.Payload(row: UICRow {
-                forEachCreator
+                forEachShared
             }).asRowManager])
 
-            forEachCreator.manager = manager
-            manager.forEach = forEachCreator
+            forEachShared.enviroment.setManager(manager)
+            manager.forEachEnviroment = forEachShared.enviroment
             return manager
         }
 
         @discardableResult
         func loadForEachIfNeeded() -> Bool {
-            guard let forEach = self.forEach, !forEach.isLoaded else {
+            guard let forEachEnviroment = self.forEachEnviroment, !forEachEnviroment.isReleased else {
                 return self.rows.contains(where: {
                     $0.loadForEachIfNeeded()
                 })
             }
 
-            forEach.load()
-            return forEach.isLoaded
+            forEachEnviroment.syncManager()
+            return forEachEnviroment.isReleased
         }
 
-        private func forEach(_ forEachCreator: ForEachCreator?) -> SectionManager {
-            self.forEach = forEachCreator
-            forEachCreator?.manager = self
+        private func forEachEnviroment(_ forEachEnviroment: ForEachEnviromentType!) -> SectionManager {
+            self.forEachEnviroment = forEachEnviroment
+            forEachEnviroment?.setManager(self)
             return self
         }
     }
@@ -161,7 +161,7 @@ private extension ListManager.SectionManager {
         var index: Int
         var isDynamic: Bool
 
-        var listManager: ListManager
+        weak var listManager: (ListManager & ListSectionDelegate)!
 
         fileprivate init(_ manager: ListManager.SectionManager) {
             self.rows = manager.rows
@@ -190,8 +190,8 @@ extension ListManager.SectionManager {
         let identifier: Int
         let isDynamic: Bool
         let index: Int
-        let listManager: ListManager
-        let forEach: ForEachCreator?
+        weak var listManager: (ListManager & ListSectionDelegate)!
+        weak var forEachEnviroment: ForEachEnviromentType?
 
         fileprivate init(_ content: ListManager.SectionManager) {
             self.header = content.header
@@ -200,7 +200,7 @@ extension ListManager.SectionManager {
             self.isDynamic = content.isDynamic
             self.listManager = content.listManager
             self.index = content.index
-            self.forEach = content.forEach
+            self.forEachEnviroment = content.forEachEnviroment
         }
 
         fileprivate func restore(rows: [ListManager.RowManager]) -> ListManager.SectionManager {
@@ -211,7 +211,7 @@ extension ListManager.SectionManager {
                 .identifier(self.identifier)
                 .isDynamic(self.isDynamic)
                 .index(self.index)
-                .forEach(self.forEach)
+                .forEachEnviroment(self.forEachEnviroment)
         }
     }
 
@@ -261,7 +261,7 @@ extension ListManager.SectionManager: ListContentDelegate {
 
 extension ListManager.SectionManager: SupportForEach {
     static func mount(
-        _ manager: ListManager,
+        _ manager: ListManager & ListSectionDelegate,
         with contents: [ViewCreator]) -> ListManager.SectionManager {
 
         var footer: ListManager.RowManager?
@@ -295,9 +295,9 @@ extension ListManager.SectionManager: SupportForEach {
                 return
             }
 
-            if let forEachCreator = $0 as? ForEachCreator, forEachCreator.viewType == UICRow.self {
+            if let forEachShared = $0 as? ForEachEnviromentShared, forEachShared.enviroment.contentType == UICRow.self {
                 rows.append(ListManager.RowManager
-                    .forEach(forEachCreator)
+                    .forEachShared(forEachShared)
                     .identifier(identifier)
                 )
                 return
@@ -314,14 +314,14 @@ extension ListManager.SectionManager: SupportForEach {
             .footer(footer)
     }
 
-    func viewsDidChange(placeholderView: UIView!, _ sequence: Relay<[() -> ViewCreator]>) {
-        sequence.sync { [compactCopy] contents in
+    func viewsDidChange(_ placeholderView: UIView!, _ dynamicContent: Relay<[() -> ViewCreator]>) {
+        dynamicContent.sync { [compactCopy] contents in
             let sections = contents.compactMap {
                 ($0() as? UICSection)?.contents().zip
             }
 
             if sections.isEmpty {
-                compactCopy.listManager.content(compactCopy, updateSections: [])
+                compactCopy.listManager?.content(compactCopy, updateSections: [])
                 return
             }
 

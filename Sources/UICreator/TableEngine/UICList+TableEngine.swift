@@ -47,8 +47,7 @@ extension ListSupport where Self: UITableView {
             tableView.manager = manager
             tableView.strongDataSource(UICTableViewDataSource())
             tableView.strongDelegate(UICTableViewDelegate())
-            manager.listToken = tableView.makeToken()
-
+            manager.list = tableView
         }
     }
 }
@@ -64,7 +63,7 @@ extension UITableView {
 
     func strongDataSource(_ dataSource: UITableViewDataSource) {
         self.dataSource = dataSource
-        objc_setAssociatedObject(self, &kTableDataSource, delegate, .OBJC_ASSOCIATION_RETAIN)
+        objc_setAssociatedObject(self, &kTableDataSource, dataSource, .OBJC_ASSOCIATION_RETAIN)
     }
 }
 

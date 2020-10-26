@@ -32,14 +32,14 @@ public struct UICRow: ViewCreator {
     let leadingActions: (() -> RowAction)?
     let accessoryType: UITableViewCell.AccessoryType
 
-    public init(_ content: @escaping () -> ViewCreator) {
+    public init(content: @escaping () -> ViewCreator) {
         self.content = content
         self.trailingActions = nil
         self.leadingActions = nil
         self.accessoryType = .none
     }
 
-    private init(_ original: UICRow, _ editable: Editable) {
+    private init(_ original: UICRow, editable: Editable) {
         self.content = original.content
         self.trailingActions = editable.trailingActions
         self.leadingActions = editable.leadingActions
@@ -53,7 +53,7 @@ public struct UICRow: ViewCreator {
 
         init(_ original: UICRow) {
             self.trailingActions = original.trailingActions
-            self.leadingActions = original.trailingActions
+            self.leadingActions = original.leadingActions
             self.accessoryType = original.accessoryType
         }
     }
@@ -61,7 +61,7 @@ public struct UICRow: ViewCreator {
     fileprivate func edit(_ edit: (Editable) -> Void) -> Self {
         let editable = Editable(self)
         edit(editable)
-        return .init(self, editable)
+        return .init(self, editable: editable)
     }
 
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
@@ -70,6 +70,18 @@ public struct UICRow: ViewCreator {
 }
 
 public extension UICRow {
+    func trailingActions(@RowActionBuilder _ actions: @escaping () -> RowAction) -> Self {
+        self.edit {
+            $0.trailingActions = actions
+        }
+    }
+
+    func leadingActions(@RowActionBuilder _ actions: @escaping () -> RowAction) -> Self {
+        self.edit {
+            $0.leadingActions = actions
+        }
+    }
+
     func accessoryType(_ type: UITableViewCell.AccessoryType) -> Self {
         self.edit {
             $0.accessoryType = type
@@ -80,24 +92,22 @@ public extension UICRow {
 @_functionBuilder
 public struct RowActionBuilder {
     static public func buildBlock(_ segments: RowAction...) -> RowAction {
-        Combined(segments)
+        CombinedRowActions(children: segments)
     }
 }
 
-private extension RowActionBuilder {
-    struct Combined: RowAction {
-        let children: [RowAction]
+internal class CombinedRowActions: RowAction {
+    let children: [RowAction]
 
-        init(_ children: [RowAction]) {
-            self.children = children
-        }
+    init(children: [RowAction]) {
+        self.children = children
     }
 }
 
 internal extension RowAction {
     var zip: [RowAction] {
         switch self {
-        case let views as RowActionBuilder.Combined:
+        case let views as CombinedRowActions:
             return views.children
         default:
             return [self]
@@ -126,38 +136,30 @@ extension UITableViewRowAction {
 
 @available(iOS 11, tvOS 11, *)
 @available(tvOS, unavailable)
-public struct UICContextualAction: RowAction {
-    @MutableBox private(set) var action: UIContextualAction
-    @MutableBox private(set) var handler: ((IndexPath) -> Bool)?
-    @MutableBox private(set) var indexPath: IndexPath
-    @MutableBox private(set) var tableView: Reference<UITableView>
+public class UICContextualAction: RowAction {
+    private(set) var rowAction: UIContextualAction
+    private(set) var handler: ((IndexPath) -> Bool)?
+    private(set) var indexPath: IndexPath
+    private weak var tableView: UITableView!
 
-    @MutableBox private(set) var configuratorHandler: ((UISwipeActionsConfiguration) -> Void)?
+    public init(_ title: String? = nil, _ image: UICImage? = nil, style: UIContextualAction.Style) {
+        self.indexPath = .init(row: .zero, section: .zero)
+        self.rowAction = UIContextualAction(style: style, title: title, handler: { (_, _, _) in })
+        self.handler = nil
+        self.rowAction = self.rowAction.editHandler { [weak self] _, _, success in
+            success(self?.handler?(self!.indexPath) ?? false)
+        }
 
-    public init(title: String? = nil, image: UICImage? = nil, style: UIContextualAction.Style) {
-        self._indexPath = .init(wrappedValue: .init(row: .zero, section: .zero))
-        self._handler = .init(wrappedValue: nil)
-        self._action = .init(wrappedValue: .init())
-        self._configuratorHandler = .init(wrappedValue: nil)
-        self._tableView = .init(wrappedValue: .nil)
-
-        self.action = UIContextualAction(
-            style: style,
-            title: title,
-            handler: { [self] _, _, success in
-                success(self.$handler.wrappedValue?(self.$indexPath.wrappedValue) ?? false)
-            })
-
-        self.action.image = image?.uiImage
+        self.rowAction.image = image?.uiImage
     }
 
     internal func tableView(_ tableView: UITableView) -> Self {
-        self.tableView = .weak(tableView)
+        self.tableView = tableView
         return self
     }
 
     public func backgroundColor(_ color: UIColor?) -> Self {
-        self.action.backgroundColor = color
+        self.rowAction.backgroundColor = color
         return self
     }
 
@@ -171,6 +173,7 @@ public struct UICContextualAction: RowAction {
         return self
     }
 
+    private var configuratorHandler: ((UISwipeActionsConfiguration) -> Void)?
     public func configurator(_ configuratorHandler: @escaping (UISwipeActionsConfiguration) -> Void) -> Self {
         self.configuratorHandler = configuratorHandler
         return self
@@ -183,22 +186,20 @@ public struct UICContextualAction: RowAction {
     public func deleteAction(
         with animation: UITableView.RowAnimation,
         onCompletion handler: @escaping (IndexPath) -> Void) -> Self {
-        self.onAction { indexPath in
-            let tableView: UITableView! = self.tableView.value
-
-            guard let manager = tableView.manager as? ListManager else {
+        self.onAction { [weak self] indexPath in
+            guard let manager = self?.tableView?.manager as? ListManager else {
                 UICList.Fatal.deleteRows([indexPath]).warning()
                 return false
             }
 
-            tableView.manager = ListManager.Delete(manager)
+            self?.tableView.manager = ListManager.Delete(manager)
                 .disableIndexPath(indexPath)
 
-            tableView.performBatchUpdates({
-                tableView.deleteRows(at: [indexPath], with: animation)
+            self?.tableView?.performBatchUpdates({
+                self?.tableView.deleteRows(at: [indexPath], with: animation)
             }, completion: { didEnd in
                 if didEnd {
-                    tableView.manager = manager
+                    self?.tableView.manager = manager
                     handler(indexPath)
                 }
             })
@@ -210,37 +211,28 @@ public struct UICContextualAction: RowAction {
 
 @available(iOS, deprecated: 13.0)
 @available(tvOS, unavailable)
-public struct UICRowAction: RowAction {
-    @MutableBox private(set) var action: UITableViewRowAction
-    @MutableBox private(set) var handler: ((IndexPath) -> Void)?
-    @MutableBox private(set) var indexPath: IndexPath
-    @MutableBox private(set) var tableView: Reference<UITableView>
+public class UICRowAction: RowAction {
+    private(set) var rowAction: UITableViewRowAction
+    private(set) var handler: ((IndexPath) -> Void)?
+    private(set) var indexPath: IndexPath
+    weak var tableView: UITableView!
 
-    public init(
-        _ title: String? = nil,
-        style: UITableViewRowAction.Style) {
-
-        self._indexPath = .init(wrappedValue: .init(row: .zero, section: .zero))
-        self._handler = .init(wrappedValue: nil)
-        self._tableView = .init(wrappedValue: .nil)
-        self._action = .init(wrappedValue: .init())
-
-        self.action = UITableViewRowAction(
-            style: style,
-            title: title,
-            handler: { [self] _, _ in
-                self.$handler.wrappedValue?(self.$indexPath.wrappedValue)
-            }
-        )
+    public init(_ title: String? = nil, style: UITableViewRowAction.Style) {
+        self.indexPath = .init(row: .zero, section: .zero)
+        self.rowAction = UITableViewRowAction(style: style, title: title, handler: { (_, _) in })
+        self.handler = nil
+        self.rowAction = self.rowAction.editHandler { [weak self] _, _ in
+            self?.handler?(self!.indexPath)
+        }
     }
 
     public func backgroundColor(_ color: UIColor?) -> Self {
-        self.action.backgroundColor = color
+        self.rowAction.backgroundColor = color
         return self
     }
 
     public func backgroundEffect(_ effect: UIVisualEffect) -> Self {
-        self.action.backgroundEffect = effect
+        self.rowAction.backgroundEffect = effect
         return self
     }
 
@@ -255,31 +247,28 @@ public struct UICRowAction: RowAction {
     }
 
     internal func tableView(_ tableView: UITableView) -> Self {
-        self.tableView = .weak(tableView)
+        self.tableView = tableView
         return self
     }
 
     public func deleteAction(
         with animation: UITableView.RowAnimation,
         onCompletion handler: @escaping (IndexPath) -> Void) -> Self {
-        
-        self.onAction { indexPath in
-            let tableView: UITableView! = self.tableView.value
-
-            guard let manager = tableView.manager as? ListManager else {
+        self.onAction { [weak self] indexPath in
+            guard let manager = self?.tableView?.manager as? ListManager else {
                 UICList.Fatal.deleteRows([indexPath]).warning()
                 return
             }
 
-            tableView.manager = ListManager.Delete(manager)
+            self?.tableView.manager = ListManager.Delete(manager)
                 .disableIndexPath(indexPath)
 
             if #available(iOS 11.0, tvOS 11.0, *) {
-                tableView.performBatchUpdates({
-                    tableView.deleteRows(at: [indexPath], with: animation)
+                self?.tableView?.performBatchUpdates({
+                    self?.tableView.deleteRows(at: [indexPath], with: animation)
                 }, completion: { didEnd in
                     if didEnd {
-                        tableView.manager = manager
+                        self?.tableView.manager = manager
                         handler(indexPath)
                     }
                 })
@@ -287,26 +276,12 @@ public struct UICRowAction: RowAction {
                 return
             }
 
-            tableView.beginUpdates()
-            tableView.deleteRows(at: [indexPath], with: animation)
-            tableView.endUpdates()
+            self?.tableView?.beginUpdates()
+            self?.tableView?.deleteRows(at: [indexPath], with: animation)
+            self?.tableView?.endUpdates()
 
-            tableView.manager = manager
+            self?.tableView?.manager = manager
             handler(indexPath)
-        }
-    }
-}
-
-public extension UICRow {
-    func trailingActions(@RowActionBuilder _ actions: @escaping () -> RowAction) -> Self {
-        self.edit {
-            $0.trailingActions = actions
-        }
-    }
-
-    func leadingActions(@RowActionBuilder _ actions: @escaping () -> RowAction) -> Self {
-        self.edit {
-            $0.leadingActions = actions
         }
     }
 }

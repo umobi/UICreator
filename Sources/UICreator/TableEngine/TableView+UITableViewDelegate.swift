@@ -74,7 +74,7 @@ extension UICTableViewDelegate {
             return contextualAction?
                 .indexPath(indexPath)
                 .tableView(tableView)
-                .action
+                .rowAction
         })
 
         reusableView.cellLoaded.trailingActions.forEach {
@@ -97,7 +97,7 @@ extension UICTableViewDelegate {
             return contextualAction?
                 .indexPath(indexPath)
                 .tableView(tableView)
-                .action
+                .rowAction
         })
 
         reusableView.cellLoaded.leadingActions.forEach {
@@ -119,13 +119,13 @@ extension UICTableViewDelegate {
             return action?
                 .indexPath(indexPath)
                 .tableView(tableView)
-                .action
+                .rowAction
         }
     }
     #endif
 }
 
-extension UICTableView {
+extension UICTableViewDelegate {
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         (tableView.heightForHeader(in: section) ?? .zero)
             .ifZeroOrLower(.ulpOfOne)
@@ -148,7 +148,7 @@ private extension Numeric where Self: Comparable {
     }
 }
 
-extension UICTableView {
+extension UICTableViewDelegate {
 
     public func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
         (tableView.heightForHeader(in: section) ?? .zero)
