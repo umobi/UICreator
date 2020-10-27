@@ -39,7 +39,7 @@ internal class ContentView: UIView, UICManagerContentView {
     }
 
     init(_ contentMode: LayoutMode, priority: UILayoutPriority) {
-        self.priority = .fittingSizeLevel
+        self.priority = priority
         self.layoutMode = .center
         super.init(frame: .zero)
         self.makeSelfImplemented()

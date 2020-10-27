@@ -23,7 +23,7 @@
 import Foundation
 import UIKit
 
-extension ListSupport where Self: UICollectionView & UICollectionViewLayoutCreator {
+extension ListSupport where Self: UICollectionViewLayoutCreator {
     @discardableResult
     func dynamicData(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> Self {
         self.onNotRendered {

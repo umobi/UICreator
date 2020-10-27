@@ -457,6 +457,7 @@ public extension UIViewCreator {
     func isHidden(_ isHidden: Relay<Bool>) -> UICModifiedView<View> {
         self.onNotRendered { view in
             weak var weakView = view
+
             isHidden.sync {
                 weakView?.isHidden = $0
             }
