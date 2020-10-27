@@ -23,31 +23,51 @@
 import Foundation
 import UIKit
 
-#if os(iOS)
-public struct ScreenEdgePan: UIGestureCreator {
-    public typealias Gesture = UIScreenEdgePanGestureRecognizer
+@frozen
+public struct Touch: UIGestureCreator {
+    public typealias Gesture = Gestures.TouchGestureRecognizer
 
     public init() {}
-    
+
+    @inline(__always)
     public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
         Gesture()
     }
 }
 
-public extension UIViewCreator {
-    func onScreenEdgePanMaker<ScreenEdgePan>(_ screenEdgePanConfigurator: @escaping () -> ScreenEdgePan) -> UICModifiedView<View> where ScreenEdgePan: UIGestureCreator, ScreenEdgePan.Gesture: UIScreenEdgePanGestureRecognizer {
-        self.onNotRendered {
-            screenEdgePanConfigurator().add($0)
+#if os(iOS)
+public extension UIGestureCreator where Gesture: Gestures.TouchGestureRecognizer {
+    @inlinable
+    func number(ofTouchesRequired number: Int) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.numberOfTouchedRequired = number
         }
     }
 
-    func onScreenEdgePan(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
-        self.onScreenEdgePanMaker {
-            ScreenEdgePan()
+    @inlinable
+    func cancelWhenTouchMoves(_ flag: Bool) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.cancelWhenTouchMoves = flag
+        }
+    }
+}
+#endif
+
+public extension UIViewCreator {
+    @inlinable
+    func onTouchMaker<Touch>(_ touchConfigurator: @escaping () -> Touch) -> UICModifiedView<View> where Touch: UIGestureCreator, Touch.Gesture: Gestures.TouchGestureRecognizer {
+        self.onNotRendered {
+            touchConfigurator().add($0)
+        }
+    }
+
+    @inlinable
+    func onTouch(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onTouchMaker {
+            Touch()
                 .onRecognized {
                     handler($0.view!)
                 }
         }
     }
 }
-#endif

@@ -23,6 +23,7 @@
 import Foundation
 import UIKit
 
+@frozen
 public struct UICAction: UICMenuElement {
     let title: String?
     let image: UIImage?
@@ -81,23 +82,35 @@ public struct UICAction: UICMenuElement {
     }
 }
 
-private extension UICAction {
-    class Editable {
+extension UICAction {
+    @usableFromInline
+    struct Editable {
+        @MutableBox @usableFromInline
         var title: String?
+
+        @MutableBox @usableFromInline
         var image: UIImage?
+
+        @MutableBox @usableFromInline
         var id: ObjectIdentifier?
+
+        @MutableBox @usableFromInline
         var attributes: Set<Attributes>
+
+        @MutableBox @usableFromInline
         var state: State
 
+        @usableFromInline
         init(_ original: UICAction) {
-            self.title = original.title
-            self.image = original.image
-            self.id = original.id
-            self.attributes = original.attributes
-            self.state = original.state
+            self._title = .init(wrappedValue: original.title)
+            self._image = .init(wrappedValue: original.image)
+            self._id = .init(wrappedValue: original.id)
+            self._attributes = .init(wrappedValue: original.attributes)
+            self._state = .init(wrappedValue: original.state)
         }
     }
 
+    @inline(__always) @usableFromInline
     func edit(_ edit: (Editable) -> Void) -> Self {
         let editable = Editable(self)
         edit(editable)
@@ -115,18 +128,21 @@ extension UICAction {
 }
 
 public extension UICAction {
+    @inlinable
     func title(_ title: String) -> Self {
         self.edit {
             $0.title = title
         }
     }
 
+    @inlinable
     func image(_ image: UICImage) -> Self {
         self.edit {
             $0.image = image.uiImage
         }
     }
 
+    @inlinable
     func state(_ state: State) -> Self {
         self.edit {
             $0.state = state
@@ -135,12 +151,14 @@ public extension UICAction {
 }
 
 public extension UICAction {
+    @inlinable
     func attributes(_ attributes: Set<Attributes>) -> Self {
         self.edit {
             $0.attributes = attributes
         }
     }
 
+    @inlinable
     func attributes(_ attributes: Attributes...) -> Self {
         self.edit {
             $0.attributes = .init(attributes)

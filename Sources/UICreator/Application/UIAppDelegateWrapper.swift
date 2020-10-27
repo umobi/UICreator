@@ -24,12 +24,15 @@ import Foundation
 import UIKit
 
 #if swift(>=5.3)
+@usableFromInline
 var customAppDelegate: UIApplicationDelegate?
 
 @propertyWrapper
+@frozen
 public struct UIApplicationDelegateWrapper<ApplicationDelegate>
 where ApplicationDelegate: UIApplicationDelegate & NSObject {
 
+    @inline(__always) @inlinable
     public init(_ type: ApplicationDelegate.Type) {
         guard customAppDelegate == nil else {
             fatalError()

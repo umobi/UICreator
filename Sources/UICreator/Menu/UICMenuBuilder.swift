@@ -34,6 +34,7 @@ struct CombinedMenuElements: UICMenuElement {
 }
 
 internal extension UICMenuElement {
+    @usableFromInline
     var zip: [UICMenuElement] {
         switch self {
         case let views as CombinedMenuElements:

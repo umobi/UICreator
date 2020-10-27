@@ -32,6 +32,7 @@ public enum Margin: CaseIterable {
 }
 
 public extension UIViewCreator {
+    @inlinable
     func safeArea(
         priority: CBLayoutPriority = .required,
         _ margins: Margin...,
@@ -52,6 +53,7 @@ public extension UIViewCreator {
             }
     }
 
+    @inlinable
     func insets(
         priority: CBLayoutPriority = .required,
         _ margins: Margin...,
@@ -72,6 +74,7 @@ public extension UIViewCreator {
             }
     }
 
+    @inlinable
     func margin(
         priority: CBLayoutPriority = .required,
         _ margins: Margin...,

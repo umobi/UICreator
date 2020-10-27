@@ -24,6 +24,7 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
+@usableFromInline
 struct Appear {
     enum State {
         case appeared
@@ -41,10 +42,12 @@ struct Appear {
         self.view = view
     }
 
+    @inline(__always)
     static func create(_ view: CBView) -> Self {
         .init(view)
     }
 
+    @inline(__always)
     func needs(_ state: State) -> Bool {
         self.state != state
     }
@@ -77,8 +80,9 @@ struct Appear {
     }
 }
 
-private extension Appear {
+extension Appear {
 
+    @usableFromInline
     func onAppear(_ handler: @escaping (CBView) -> Void) {
         if self.state == .appeared {
             handler(self.view)
@@ -91,6 +95,7 @@ private extension Appear {
         }
     }
 
+    @usableFromInline
     func onDisappear(_ handler: @escaping (CBView) -> Void) {
         if self.state == .disappeared {
             handler(self.view)
@@ -121,13 +126,13 @@ private extension CBView {
 }
 
 public extension CBView {
-    @discardableResult
+    @inline(__always) @inlinable @discardableResult
     func onAppear(_ handler: @escaping (CBView) -> Void) -> Self {
         self.appear.onAppear(handler)
         return self
     }
 
-    @discardableResult
+    @inline(__always) @inlinable @discardableResult
     func onDisappear(_ handler: @escaping (CBView) -> Void) -> Self {
         self.appear.onDisappear(handler)
         return self

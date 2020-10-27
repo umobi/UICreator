@@ -24,9 +24,13 @@ import Foundation
 import ConstraintBuilder
 import UIKit
 
-public struct UICResized {
+@frozen
+public struct ResizeView {
 
-    private let superview: UIView
+    @usableFromInline
+    let superview: UIView
+    @usableFromInline
+    let addHandler: ((UIView) -> Void)?
 
     public init(_ superview: UIView) {
         self.superview = superview
@@ -51,17 +55,19 @@ public struct UICResized {
         self.addHandler = nil
     }
 
-    private init(_ original: UICResized, addHandler: @escaping (UIView) -> Void) {
+    @usableFromInline
+    init(_ original: ResizeView, addHandler: @escaping (UIView) -> Void) {
         self.superview = original.superview
         self.addHandler = addHandler
     }
 
-    private let addHandler: ((UIView) -> Void)?
+    @inlinable
     public func onAdd(_ handler: @escaping (UIView) -> Void) -> Self {
         .init(self, addHandler: handler)
     }
 
-    public func addSubview(_ subview: UIView) -> UICWeakResized {
+    @inlinable
+    public func addSubview(_ subview: UIView) -> ResizeWeakView {
         UIView.CBSubview(self.superview)?.addSubview(subview)
 
         self.superview.translatesAutoresizingMaskIntoConstraints = true

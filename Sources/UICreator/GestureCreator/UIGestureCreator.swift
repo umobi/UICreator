@@ -23,31 +23,21 @@
 import Foundation
 import UIKit
 
-public protocol GestureCreator {
-    static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer
-}
-
-extension GestureCreator {
-    func releaseUIGesture() -> UIGestureRecognizer {
-        Self.makeUIGesture(self)
-    }
-}
-
-public extension GestureCreator {
-    func add(_ view: UIView) {
-        let gestureRecognizer = self.releaseUIGesture()
-        view.addGestureRecognizer(gestureRecognizer)
-        gestureRecognizer.addTarget(gestureRecognizer, action: #selector(gestureRecognizer.commit(_:)))
-    }
-}
-
 public protocol UIGestureCreator: GestureCreator {
     associatedtype Gesture: UIGestureRecognizer
 
     func onModify(_ handler: @escaping (Gesture) -> Void) -> UICModifiedGesture<Gesture>
 }
 
+extension UIGestureCreator {
+    @inline(__always) @usableFromInline
+    func releaseCastedGesture() -> Gesture {
+        self.releaseUIGesture() as! Gesture
+    }
+}
+
 public extension UIGestureCreator {
+    @inlinable
     func onModify(_ handler: @escaping (Gesture) -> Void) -> UICModifiedGesture<Gesture> {
         UICModifiedGesture {
             let gesture = self.releaseCastedGesture()
@@ -57,98 +47,64 @@ public extension UIGestureCreator {
     }
 }
 
-extension UIGestureCreator {
-    func releaseCastedGesture() -> Gesture {
-        self.releaseUIGesture() as! Gesture
-    }
-}
-
-public struct UICModifiedGesture<Gesture>: UIGestureCreator where Gesture: UIGestureRecognizer {
-    let gestureLoader: () -> Gesture
-
-    init(_ gestureLoader: @escaping () -> Gesture) {
-        self.gestureLoader = gestureLoader
-    }
-
-    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
-        (gestureCreator as! Self).gestureLoader()
-    }
-}
-
-public struct AnyGesture: UIGestureCreator {
-    public typealias Gesture = UIGestureRecognizer
-
-    let gestureLoader: () -> Gesture
-
-    init(_ gestureLoader: @escaping () -> Gesture) {
-        self.gestureLoader = gestureLoader
-    }
-
-    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
-        (gestureCreator as! Self).gestureLoader()
-    }
-}
-
-public protocol UICGestureRepresentable: UIGestureCreator {
-    func makeUIGesture() -> Gesture
-}
-
-public extension UICGestureRepresentable {
-    static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
-        (gestureCreator as! Self).makeUIGesture()
-    }
-}
-
 public extension UIGestureCreator {
+    @inlinable
     func `as`(_ outlet: UICOutlet<Gesture>) -> UICModifiedGesture<Gesture> {
         self.onModify {
             outlet.ref($0)
         }
     }
 
+    @inlinable
     func allowedPress(types pressTypes: Set<UIPress.PressType>) -> UICModifiedGesture<Gesture> {
         self.onModify {
             $0.allowedPressTypes = pressTypes.map { NSNumber(value: $0.rawValue) }
         }
     }
 
+    @inlinable
     func allowedTouch(types touchTypes: Set<UITouch.TouchType>) -> UICModifiedGesture<Gesture> {
         self.onModify {
             $0.allowedTouchTypes = touchTypes.map { NSNumber(value: $0.rawValue) }
         }
     }
 
+    @inlinable
     func cancelsTouches(inView flag: Bool) -> UICModifiedGesture<Gesture> {
         self.onModify {
             $0.cancelsTouchesInView = flag
         }
     }
 
+    @inlinable
     func delaysTouches(atBegan flag: Bool) -> UICModifiedGesture<Gesture> {
         self.onModify {
             $0.delaysTouchesEnded = flag
         }
     }
 
+    @inlinable
     func delaysTouches(atEnded flag: Bool) -> UICModifiedGesture<Gesture> {
         self.onModify {
             $0.delaysTouchesEnded = flag
         }
     }
 
+    @inlinable
     func isEnabled(_ flag: Bool) -> UICModifiedGesture<Gesture> {
         self.onModify {
             $0.isEnabled = flag
         }
     }
 
-    @available(iOS 11, tvOS 11.0, *)
+    @inlinable @available(iOS 11, tvOS 11.0, *)
     func name(_ string: String?) -> UICModifiedGesture<Gesture> {
         self.onModify {
             $0.name = string
         }
     }
 
+    @inlinable
     func requiredExclusive(touchType flag: Bool) -> UICModifiedGesture<Gesture> {
         self.onModify {
             $0.requiresExclusiveTouchType = flag
@@ -157,48 +113,57 @@ public extension UIGestureCreator {
 }
 
 public extension UIGestureCreator {
+
+    @inlinable
     func onBegan(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
         self.onModify {
             $0.onBegan(handler)
         }
     }
 
+    @inlinable
     func onCancelled(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
         self.onModify {
             $0.onCancelled(handler)
         }
     }
 
+    @inlinable
     func onChanged(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
         self.onModify {
             $0.onChanged(handler)
         }
     }
 
+    @inlinable
     func onFailed(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
         self.onModify {
             $0.onFailed(handler)
         }
     }
 
+    @inlinable
     func onRecognized(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
         self.onModify {
             $0.onRecognized(handler)
         }
     }
 
+    @inlinable
     func onPossible(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
         self.onModify {
             $0.onPossible(handler)
         }
     }
 
+    @inlinable
     func onEnded(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
         self.onModify {
             $0.onEnded(handler)
         }
     }
 
+    @inlinable
     func onAnyOther(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
         self.onModify {
             $0.onAnyOther(handler)
@@ -207,48 +172,57 @@ public extension UIGestureCreator {
 }
 
 public extension UIGestureCreator {
+
+    @inlinable
     func onShouldBegin(_ handler: @escaping (UIGestureRecognizer) -> Bool) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.gestureDelegate.onShouldBegin(handler)
+            $0.onShouldBegin(handler)
         }
     }
 
-    func onShouldRecognizeSimultaneouslyOtherGesture(
+    @inlinable
+    func onShouldRecognizeSimultaneouslyGesture(
         _ handler: @escaping (UIGestureRecognizer, UIGestureRecognizer) -> Bool) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.gestureDelegate.onShouldRecognizeSimultaneouslyOtherGesture(handler)
+            $0.onShouldRecognizeSimultaneouslyGesture(handler)
         }
     }
 
-    func onShouldRequireFailureOfOtherGesture(
+    @inlinable
+    func onShouldRequireFailureOfGesture(
         _ handler: @escaping (UIGestureRecognizer, UIGestureRecognizer) -> Bool) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.gestureDelegate.onShouldRequireFailureOfOtherGesture(handler)
+            $0.onShouldRequireFailureOfGesture(handler)
         }
     }
 
+    @inlinable
     func onShouldBeRequiredToFailByOtherGesture(
         _ handler: @escaping (UIGestureRecognizer, UIGestureRecognizer) -> Bool) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.gestureDelegate.onShouldBeRequiredToFailByOtherGesture(handler)
+            $0.onShouldBeRequiredToFailByOther(handler)
         }
     }
 
+    @inlinable
     func onShouldReceiveTouch(_ handler: @escaping (UIGestureRecognizer, UITouch) -> Bool) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.gestureDelegate.onShouldReceiveTouch(handler)
+            $0.onShouldReceiveTouch(handler)
         }
     }
 
+    @inlinable
     func onShouldReceivePress(_ handler: @escaping (UIGestureRecognizer, UIPress) -> Bool) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.gestureDelegate.onShouldReceivePress(handler)
+            $0.onShouldReceivePress(handler)
         }
     }
 
+    @inlinable
     func onShouldReceiveEvent(_ handler: @escaping (UIGestureRecognizer, UIEvent) -> Bool) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.gestureDelegate.onShouldReceiveEvent(handler)
+            $0.onShouldReceiveEvent(handler)
         }
     }
 }
+

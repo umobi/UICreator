@@ -27,6 +27,7 @@ import UIKit
 public protocol ViewScene {}
 
 public extension ViewScene {
+    @inlinable
     func dynamicProperty<Value>(
         _ property: Property<Value>,
         _ handler: @escaping (Value) -> Void) -> Self where Value: Equatable {

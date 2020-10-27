@@ -25,6 +25,7 @@ import ConstraintBuilder
 import UIKit
 
 extension UIView {
+    @usableFromInline
     var safeAreaCompatibleGuide: UILayoutGuide {
         if #available(iOS 11, tvOS 11, *) {
             return self.safeAreaLayoutGuide
@@ -35,6 +36,8 @@ extension UIView {
 }
 
 public extension UIViewCreator {
+
+    @inlinable
     func safeArea(
         topEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -56,6 +59,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         topGreaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -77,6 +81,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         topLessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -98,6 +103,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         bottomEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -119,6 +125,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         bottomGreaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -140,6 +147,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         bottomLessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -161,6 +169,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         leadingEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -182,6 +191,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         leadingGreaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -203,6 +213,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         leadingLessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -224,6 +235,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         trailingEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -245,6 +257,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         trailingGreaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -266,6 +279,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         trailingLessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -287,6 +301,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inline(__always) @inlinable
     func safeAreaInsets(
         equalTo value: CGFloat = 0,
         priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
@@ -297,6 +312,7 @@ public extension UIViewCreator {
             .safeArea(trailingEqualTo: value, priority: priority)
     }
 
+    @inlinable
     func top(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
@@ -318,6 +334,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func top(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -339,6 +356,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func top(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -360,6 +378,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func bottom(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
@@ -381,6 +400,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func bottom(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -402,6 +422,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func bottom(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -423,6 +444,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func leading(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
@@ -444,6 +466,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func leading(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -465,6 +488,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func leading(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -486,6 +510,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func trailing(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
@@ -507,6 +532,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func trailing(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -528,6 +554,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func trailing(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -549,6 +576,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func height(
         equalToSuperview multiplier: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -570,6 +598,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func height(
         greaterThanOrEqualToSuperview multiplier: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -591,6 +620,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func height(
         lessThanOrEqualToSuperview multiplier: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -614,6 +644,7 @@ public extension UIViewCreator {
 
     typealias ConstraintRelatedView = () -> UIView
 
+    @inlinable
     func width(
         equalToSuperview multiplier: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -635,6 +666,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func width(
         greaterThanOrEqualToSuperview multiplier: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -656,6 +688,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func width(
         lessThanOrEqualToSuperview multiplier: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -679,6 +712,8 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
+
+    @inline(__always) @inlinable
     func insets(
         equalTo value: CGFloat = .zero,
         priority: CBLayoutPriority = .required,
@@ -692,6 +727,8 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
+
+    @inline(__always) @inlinable
     func aspectRatio(
         equalTo multiplier: CGFloat = 1,
         priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
@@ -699,6 +736,7 @@ public extension UIViewCreator {
         self.aspectRatio(heightEqualTo: multiplier, priority: priority)
     }
 
+    @inlinable
     func aspectRatio(
         heightEqualTo multiplier: CGFloat,
         priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
@@ -717,6 +755,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func aspectRatio(
         heightGreaterThanOrEqualTo multiplier: CGFloat,
         priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
@@ -735,6 +774,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func aspectRatio(
         heightLessThanOrEqualTo multiplier: CGFloat,
         priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
@@ -753,6 +793,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func aspectRatio(
         widthEqualTo multiplier: CGFloat,
         priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
@@ -771,6 +812,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func aspectRatio(
         widthGreaterThanOrEqualTo multiplier: CGFloat,
         priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
@@ -789,6 +831,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func aspectRatio(
         widthLessThanOrEqualTo multiplier: CGFloat,
         priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
@@ -809,6 +852,8 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
+
+    @inlinable
     func height(
         equalTo constant: CGFloat,
         priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
@@ -825,6 +870,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func height(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
@@ -841,6 +887,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func height(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
@@ -857,6 +904,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func width(
         equalTo constant: CGFloat,
         priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
@@ -873,6 +921,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func width(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
@@ -889,6 +938,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func width(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
@@ -907,6 +957,8 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
+
+    @inlinable
     func center(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
@@ -928,6 +980,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func center(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -949,6 +1002,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func center(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -970,6 +1024,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func centerX(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
@@ -991,6 +1046,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func centerX(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1012,6 +1068,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func centerX(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1033,6 +1090,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func centerY(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
@@ -1054,6 +1112,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func centerY(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1075,6 +1134,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func centerY(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1098,6 +1158,8 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
+
+    @inlinable
     func safeArea(
         centerEqualTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
@@ -1119,6 +1181,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         centerGreaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1140,6 +1203,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         centerLessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1161,6 +1225,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         centerXEqualTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
@@ -1182,6 +1247,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         centerXGreaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1203,6 +1269,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         centerXLessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1224,6 +1291,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         centerYEqualTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
@@ -1245,6 +1313,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         centerYGreaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1266,6 +1335,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func safeArea(
         centerYLessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1289,6 +1359,8 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
+
+    @inlinable
     func hugging(
         vertical verticalPriority: CBLayoutPriority = .defaultLow,
         horizontal horizontalPriority: CBLayoutPriority = .defaultLow) -> UICModifiedView<View> {
@@ -1308,6 +1380,8 @@ public extension UIViewCreator {
         }
     }
     
+
+    @inlinable
     func compression(
         vertical verticalPriority: CBLayoutPriority = .defaultHigh,
         horizontal horizontalPriority: CBLayoutPriority = .defaultHigh) -> UICModifiedView<View> {
@@ -1327,6 +1401,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func vertical(
         hugging huggingPriority: CBLayoutPriority = .defaultLow,
         compression compressionPriority: CBLayoutPriority = .defaultHigh) -> UICModifiedView<View> {
@@ -1346,6 +1421,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func horizontal(
         hugging huggingPriority: CBLayoutPriority = .defaultLow,
         compression compressionPriority: CBLayoutPriority = .defaultHigh) -> UICModifiedView<View> {
@@ -1367,6 +1443,8 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
+
+    @inlinable
     func topMargin(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
@@ -1388,6 +1466,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func topMargin(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1409,6 +1488,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func topMargin(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1430,6 +1510,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func bottomMargin(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
@@ -1451,6 +1532,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func bottomMargin(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1472,6 +1554,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func bottomMargin(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1493,6 +1576,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func leadingMargin(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
@@ -1514,6 +1598,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func leadingMargin(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1535,6 +1620,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func leadingMargin(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1556,6 +1642,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func trailingMargin(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
@@ -1577,6 +1664,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func trailingMargin(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
@@ -1598,6 +1686,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func trailingMargin(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,

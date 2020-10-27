@@ -24,7 +24,8 @@ import Foundation
 import ConstraintBuilder
 import UIKit
 
-public struct UICWeakResized {
+@frozen
+public struct ResizeWeakView {
     weak var superview: UIView!
     weak var subview: UIView!
 
@@ -32,6 +33,7 @@ public struct UICWeakResized {
     fileprivate let width: CBLayoutPriority?
     fileprivate let addHandler: ((UIView) -> Void)?
 
+    @usableFromInline
     init(_ superview: UIView!, subview: UIView!, _ addHandler: ((UIView) -> Void)?) {
         self.superview = superview
         self.subview = subview
@@ -41,7 +43,7 @@ public struct UICWeakResized {
     }
 
     private init(
-        _ original: UICWeakResized,
+        _ original: ResizeWeakView,
         height: CBLayoutPriority?,
         width: CBLayoutPriority?) {
 
@@ -61,7 +63,7 @@ public struct UICWeakResized {
     }
 }
 
-public extension UICWeakResized {
+public extension ResizeWeakView {
     private struct Copy {
         let subview: UIView
         let superview: UIView
@@ -69,7 +71,7 @@ public extension UICWeakResized {
         let width: CBLayoutPriority?
         let addHandler: ((UIView) -> Void)?
 
-        init?(_ original: UICWeakResized) {
+        init?(_ original: ResizeWeakView) {
             guard let superview = original.superview, let subview = original.subview else {
                 return nil
             }
@@ -86,8 +88,9 @@ public extension UICWeakResized {
         }
     }
 
+    @inline(__always)
     private func copy() -> Copy? {
-        return Copy(self)
+        Copy(self)
     }
 
     mutating func dealloac() {
@@ -96,7 +99,7 @@ public extension UICWeakResized {
     }
 
     func watch(in resizableView: UIView!) {
-        var muttable: UICWeakResized? = self
+        var muttable: ResizeWeakView? = self
 
         muttable?.subview.onLayout { [self] in
             guard let copy = self.copy() else {

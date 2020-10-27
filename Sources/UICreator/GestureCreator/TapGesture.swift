@@ -23,41 +23,48 @@
 import Foundation
 import UIKit
 
-public struct LongPress: UIGestureCreator {
-    public typealias Gesture = UILongPressGestureRecognizer
+@frozen
+public struct Tap: UIGestureCreator {
+    public typealias Gesture = UITapGestureRecognizer
 
     public init() {}
-    
+
+    @inline(__always)
     public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
-        UILongPressGestureRecognizer()
+        Gesture()
     }
 }
 
-public extension UIGestureCreator where Gesture: UILongPressGestureRecognizer {
-    func maximumMovement(_ value: CGFloat) -> UICModifiedGesture<Gesture> {
+public extension UIGestureCreator where Gesture: UITapGestureRecognizer {
+    @inlinable
+    func number(ofTapsRequired number: Int) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.allowableMovement = value
+            $0.numberOfTapsRequired = number
         }
     }
 
-    func minimumPressDuration(_ duration: TimeInterval) -> UICModifiedGesture<Gesture> {
+    #if os(iOS)
+    @inlinable
+    func number(ofTouchesRequired number: Int) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.minimumPressDuration = duration
+            $0.numberOfTouchesRequired = number
         }
     }
+    #endif
 }
 
 public extension UIViewCreator {
-
-    func onLongPressMaker<LongPress>(_ longPressConfigurator: @escaping () -> LongPress) -> UICModifiedView<View> where LongPress: UIGestureCreator, LongPress.Gesture: UILongPressGestureRecognizer {
+    @inlinable
+    func onTapMaker<Tap>(_ tapConfigurator: @escaping () -> Tap) -> UICModifiedView<View> where Tap: UIGestureCreator, Tap.Gesture: UITapGestureRecognizer {
         self.onNotRendered {
-            longPressConfigurator().add($0)
+            tapConfigurator().add($0)
         }
     }
 
-    func onLongPress(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
-        self.onLongPressMaker {
-            LongPress()
+    @inlinable
+    func onTap(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onTapMaker {
+            Tap()
                 .onRecognized {
                     handler($0.view!)
                 }

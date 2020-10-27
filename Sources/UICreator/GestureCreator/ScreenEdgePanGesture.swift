@@ -23,46 +23,36 @@
 import Foundation
 import UIKit
 
-public struct Pan: UIGestureCreator {
-    public typealias Gesture = UIPanGestureRecognizer
+#if os(iOS)
+@frozen
+public struct ScreenEdgePan: UIGestureCreator {
+    public typealias Gesture = UIScreenEdgePanGestureRecognizer
 
     public init() {}
-    
+
+    @inline(__always)
     public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
         Gesture()
     }
 }
 
-#if os(iOS)
-public extension UIGestureCreator where Gesture: UIPanGestureRecognizer {
-    func maximumNumber(ofTouches number: Int) -> UICModifiedGesture<Gesture> {
-        self.onModify {
-            $0.maximumNumberOfTouches = number
-        }
-    }
-
-    func minimumNumber(ofTouches number: Int) -> UICModifiedGesture<Gesture> {
-        self.onModify {
-            $0.minimumNumberOfTouches = number
-        }
-    }
-}
-#endif
-
 public extension UIViewCreator {
 
-    func onPanMaker<Pan>(_ panConfigurator: @escaping () -> Pan) -> UICModifiedView<View> where Pan: UIGestureCreator, Pan.Gesture: UIPanGestureRecognizer {
+    @inlinable
+    func onScreenEdgePanMaker<ScreenEdgePan>(_ screenEdgePanConfigurator: @escaping () -> ScreenEdgePan) -> UICModifiedView<View> where ScreenEdgePan: UIGestureCreator, ScreenEdgePan.Gesture: UIScreenEdgePanGestureRecognizer {
         self.onNotRendered {
-            panConfigurator().add($0)
+            screenEdgePanConfigurator().add($0)
         }
     }
 
-    func onPan(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
-        return self.onPanMaker {
-            Pan()
+    @inlinable
+    func onScreenEdgePan(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onScreenEdgePanMaker {
+            ScreenEdgePan()
                 .onRecognized {
                     handler($0.view!)
                 }
         }
     }
 }
+#endif

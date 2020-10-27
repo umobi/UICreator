@@ -47,6 +47,13 @@ public struct UICAnyView: UIViewCreator {
         self.viewLoader = viewLoader
     }
 
+    @usableFromInline
+    init(_ view:  CBView) {
+        self.viewLoader = {
+            view
+        }
+    }
+
     @inline(__always)
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         (viewCreator as! Self).viewLoader()

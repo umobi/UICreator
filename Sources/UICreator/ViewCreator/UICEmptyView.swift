@@ -22,34 +22,20 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
-#if os(iOS)
+@frozen
+public struct UICEmptyView: UIViewCreator {
+    public typealias View = UIView
 
-public struct Pinch: UIGestureCreator {
-    public typealias Gesture = UIPinchGestureRecognizer
+    let view: UIView?
 
-    public init() {}
-    
-    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
-        Gesture()
+    public init() {
+        self.view = nil
+    }
+
+    @inline(__always)
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        (viewCreator as! Self).view ?? Views.EmptyView()
     }
 }
-
-public extension UIViewCreator {
-
-    func onPinchMaker<Pinch>(_ pinchConfigurator: @escaping () -> Pinch) -> UICModifiedView<View> where Pinch: UIGestureCreator, Pinch.Gesture: UIPinchGestureRecognizer {
-        self.onNotRendered {
-            pinchConfigurator().add($0)
-        }
-    }
-
-    func onPinch(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
-        self.onPinchMaker {
-            Pinch()
-                .onRecognized {
-                    handler($0.view!)
-                }
-        }
-    }
-}
-#endif

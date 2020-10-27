@@ -21,14 +21,7 @@
 //
 
 import Foundation
+import UIKit
 
-#if swift(>=5.3)
 @frozen
-public struct UICWindowGroup: ViewScene {
-    let content: () -> ViewCreator
-
-    public init(content: @escaping () -> ViewCreator) {
-        self.content = content
-    }
-}
-#endif
+public enum Gestures {}

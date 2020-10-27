@@ -24,42 +24,30 @@ import Foundation
 import UIKit
 
 @frozen
-public struct Tap: UIGestureCreator {
-    public typealias Gesture = UITapGestureRecognizer
+public struct Swipe: UIGestureCreator {
+    public typealias Gesture = UISwipeGestureRecognizer
 
     public init() {}
-    
+
+    @inline(__always)
     public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
         Gesture()
     }
 }
 
-public extension UIGestureCreator where Gesture: UITapGestureRecognizer {
-    func number(ofTapsRequired number: Int) -> UICModifiedGesture<Gesture> {
-        self.onModify {
-            $0.numberOfTapsRequired = number
-        }
-    }
-
-    #if os(iOS)
-    func number(ofTouchesRequired number: Int) -> UICModifiedGesture<Gesture> {
-        self.onModify {
-            $0.numberOfTouchesRequired = number
-        }
-    }
-    #endif
-}
-
 public extension UIViewCreator {
-    func onTapMaker<Tap>(_ tapConfigurator: @escaping () -> Tap) -> UICModifiedView<View> where Tap: UIGestureCreator, Tap.Gesture: UITapGestureRecognizer {
+
+    @inlinable
+    func onSwipeMaker<Swipe>(_ swipeConfigurator: @escaping () -> Swipe) -> UICModifiedView<View> where Swipe: UIGestureCreator, Swipe.Gesture: UISwipeGestureRecognizer {
         self.onNotRendered {
-            tapConfigurator().add($0)
+            swipeConfigurator().add($0)
         }
     }
 
-    func onTap(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
-        self.onTapMaker {
-            Tap()
+    @inlinable
+    func onSwipe(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onSwipeMaker {
+            Swipe()
                 .onRecognized {
                     handler($0.view!)
                 }

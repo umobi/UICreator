@@ -32,6 +32,7 @@ extension UIContextMenuInteraction {
         set { objc_setAssociatedObject(self, &kContentMenuDelegate, newValue, .OBJC_ASSOCIATION_RETAIN) }
     }
 
+    @inline(__always) @usableFromInline
     static func interaction(_ uicDelegate: UICMenu.Delegate) -> UIContextMenuInteraction {
         let interaction = UIContextMenuInteraction(delegate: uicDelegate)
         interaction.menuDelegate = uicDelegate
@@ -40,14 +41,16 @@ extension UIContextMenuInteraction {
 }
 
 extension UICMenu {
-    @available(iOS 13, *)
+    @usableFromInline @available(iOS 13, *)
     class Delegate: NSObject, UIContextMenuInteractionDelegate {
         let menu: UICMenu
 
+        @usableFromInline
         init(_ menu: UICMenu) {
             self.menu = menu
         }
 
+        @usableFromInline
         func contextMenuInteraction(
             _ interaction: UIContextMenuInteraction,
             configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
@@ -64,8 +67,9 @@ extension UICMenu {
                 actionProvider: { [weak self] _ in
                     self?.menu.uiMenu
                 })
-          }
+        }
 
+        @usableFromInline
         func contextMenuInteraction(
             _ interaction: UIContextMenuInteraction,
             willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,

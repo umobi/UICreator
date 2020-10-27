@@ -21,14 +21,38 @@
 //
 
 import Foundation
+import UIKit
 
-#if swift(>=5.3)
+#if os(iOS)
 @frozen
-public struct UICWindowGroup: ViewScene {
-    let content: () -> ViewCreator
+public struct Pinch: UIGestureCreator {
+    public typealias Gesture = UIPinchGestureRecognizer
 
-    public init(content: @escaping () -> ViewCreator) {
-        self.content = content
+    public init() {}
+
+    @inline(__always)
+    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        Gesture()
+    }
+}
+
+public extension UIViewCreator {
+
+    @inlinable
+    func onPinchMaker<Pinch>(_ pinchConfigurator: @escaping () -> Pinch) -> UICModifiedView<View> where Pinch: UIGestureCreator, Pinch.Gesture: UIPinchGestureRecognizer {
+        self.onNotRendered {
+            pinchConfigurator().add($0)
+        }
+    }
+
+    @inlinable
+    func onPinch(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onPinchMaker {
+            Pinch()
+                .onRecognized {
+                    handler($0.view!)
+                }
+        }
     }
 }
 #endif

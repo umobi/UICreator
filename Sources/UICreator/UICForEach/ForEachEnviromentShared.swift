@@ -21,32 +21,8 @@
 //
 
 import Foundation
-import UIKit
 
-public struct Swipe: UIGestureCreator {
-    public typealias Gesture = UISwipeGestureRecognizer
-
-    public init() {}
-    
-    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
-        Gesture()
-    }
-}
-
-public extension UIViewCreator {
-
-    func onSwipeMaker<Swipe>(_ swipeConfigurator: @escaping () -> Swipe) -> UICModifiedView<View> where Swipe: UIGestureCreator, Swipe.Gesture: UISwipeGestureRecognizer {
-        self.onNotRendered {
-            swipeConfigurator().add($0)
-        }
-    }
-
-    func onSwipe(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
-        self.onSwipeMaker {
-            Swipe()
-                .onRecognized {
-                    handler($0.view!)
-                }
-        }
-    }
+@usableFromInline
+protocol ForEachEnviromentShared: ViewCreator {
+    var enviroment: ForEachEnviromentType { get }
 }

@@ -23,6 +23,7 @@
 import Foundation
 import UIKit
 
+@frozen
 public struct UICMenu: UICMenuElement {
     //swiftlint:disable identifier_name
     let id: ObjectIdentifier?
@@ -32,6 +33,7 @@ public struct UICMenu: UICMenuElement {
     let options: Set<Options>
     let provider: (() -> ViewCreator)?
 
+    @frozen
     public enum Options {
         case inline
         case destructive
@@ -74,26 +76,40 @@ public struct UICMenu: UICMenuElement {
     }
 }
 
-private extension UICMenu {
-    class Editable {
+extension UICMenu {
+    @usableFromInline
+    struct Editable {
         //swiftlint:disable identifier_name
+        @MutableBox @usableFromInline
         var id: ObjectIdentifier?
+
+        @MutableBox @usableFromInline
         var children: [UICMenuElement]
+
+        @MutableBox @usableFromInline
         var title: String?
+
+        @MutableBox @usableFromInline
         var image: UIImage?
+
+        @MutableBox @usableFromInline
         var options: Set<Options>
+
+        @MutableBox @usableFromInline
         var provider: (() -> ViewCreator)?
 
+        @usableFromInline
         init(_ original: UICMenu) {
-            self.id = original.id
-            self.children = original.children
-            self.title = original.title
-            self.image = original.image
-            self.options = original.options
-            self.provider = original.provider
+            self._id = .init(wrappedValue: original.id)
+            self._children = .init(wrappedValue: original.children)
+            self._title = .init(wrappedValue: original.title)
+            self._image = .init(wrappedValue: original.image)
+            self._options = .init(wrappedValue: original.options)
+            self._provider = .init(wrappedValue: original.provider)
         }
     }
 
+    @usableFromInline
     func edit(_ edit: (Editable) -> Void) -> Self {
         let editable = Editable(self)
         edit(editable)
@@ -111,18 +127,21 @@ extension UICMenu {
 }
 
 public extension UICMenu {
+    @inlinable
     func title(_ title: String) -> Self {
         self.edit {
             $0.title = title
         }
     }
 
+    @inlinable
     func image(_ image: UICImage) -> Self {
         self.edit {
             $0.image = image.uiImage
         }
     }
 
+    @inlinable
     func provider(_ content: @escaping () -> ViewCreator) -> Self {
         self.edit {
             $0.provider = content
@@ -131,6 +150,7 @@ public extension UICMenu {
 }
 
 public extension UICMenu {
+    @inlinable
     func children(@UICMenuBuilder _ contents: @escaping () -> UICMenuElement) -> Self {
         self.edit {
             $0.children = contents().zip
@@ -140,12 +160,14 @@ public extension UICMenu {
 
 public extension UICMenu {
 
+    @inlinable
     func options(_ options: Options...) -> Self {
         self.edit {
             $0.options = .init(options)
         }
     }
 
+    @inlinable
     func options(_ options: Set<Options>) -> Self {
         self.edit {
             $0.options = options
@@ -167,7 +189,7 @@ extension UICMenu.Options {
 
 #if os(iOS)
 public extension UIViewCreator {
-    @available(iOS 13, *)
+    @inlinable @available(iOS 13, *)
     func contextMenu(_ content: @escaping () -> UICMenu) -> UICModifiedView<View> {
         self.onInTheScene {
             $0.addInteraction(UIContextMenuInteraction.interaction(

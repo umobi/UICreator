@@ -30,6 +30,7 @@ public enum ColorScheme {
 }
 
 extension ColorScheme {
+    @usableFromInline
     static func uiTraitCollection(_ traitCollection: UITraitCollection) -> ColorScheme {
         if #available(iOS 12, tvOS 12, *) {
             if case .dark = traitCollection.userInterfaceStyle {
@@ -40,7 +41,7 @@ extension ColorScheme {
         return .light
     }
 
-    @available(iOS 12, tvOS 12, *)
+    @usableFromInline @available(iOS 12, tvOS 12, *)
     var uiUserInterfaceStyle: UIUserInterfaceStyle {
         switch self {
         case .dark:

@@ -22,69 +22,51 @@
 
 import Foundation
 import UIKit
-import ConstraintBuilder
 
-@usableFromInline
-struct Trait {
-    private weak var view: CBView!
+@frozen
+public struct LongPress: UIGestureCreator {
+    public typealias Gesture = UILongPressGestureRecognizer
 
-    @MutableBox fileprivate var traitHandler: ((CBView) -> Void)?
-
-    private init(_ view: CBView) {
-        self.view = view
-    }
+    public init() {}
 
     @inline(__always)
-    static func create(_ view: CBView) -> Self {
-        .init(view)
-    }
-
-    @inline(__always)
-    private func pop() {
-        self.traitHandler?(self.view)
-    }
-
-    func commit() {
-        guard self.view.isSelfImplemented else {
-            return
-        }
-
-        ([self.view] + self.view.thatNeedsTrait())
-            .reversed()
-            .forEach {
-                $0.trait.pop()
-            }
+    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        UILongPressGestureRecognizer()
     }
 }
 
-private extension CBView {
-    func thatNeedsTrait() -> [CBView] {
-        guard !self.isSelfImplemented else {
-            return []
+public extension UIGestureCreator where Gesture: UILongPressGestureRecognizer {
+    @inlinable
+    func maximumMovement(_ value: CGFloat) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.allowableMovement = value
         }
+    }
 
-        return [self] + self.subviews.reduce([]) {
-            $0 + $1.thatNeedsTrait()
+    @inlinable
+    func minimumPressDuration(_ duration: TimeInterval) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.minimumPressDuration = duration
         }
     }
 }
 
-private extension Trait {
-    func onTrait(_ handler: @escaping (CBView) -> Void) {
-        handler(self.view)
+public extension UIViewCreator {
 
-        let oldHandler = self.traitHandler
-        self.traitHandler = {
-            oldHandler?($0)
-            handler($0)
+    @inlinable
+    func onLongPressMaker<LongPress>(_ longPressConfigurator: @escaping () -> LongPress) -> UICModifiedView<View> where LongPress: UIGestureCreator, LongPress.Gesture: UILongPressGestureRecognizer {
+        self.onNotRendered {
+            longPressConfigurator().add($0)
         }
     }
-}
 
-public extension CBView {
-    @discardableResult
-    func onTrait(_ handler: @escaping (CBView) -> Void) -> Self {
-        self.trait.onTrait(handler)
-        return self
+    @inlinable
+    func onLongPress(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onLongPressMaker {
+            LongPress()
+                .onRecognized {
+                    handler($0.view!)
+                }
+        }
     }
 }

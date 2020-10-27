@@ -23,8 +23,10 @@
 import Foundation
 import UIKit
 
+@frozen
 public struct PropertyKey {
-    private weak var uiView: UIView?
+    @usableFromInline
+    weak var uiView: UIView?
 
     internal init() {
         self.uiView = nil
@@ -34,23 +36,27 @@ public struct PropertyKey {
         self.uiView = uiView
     }
 
+    @inline(__always) @inlinable
     public var sizeCategory: UIContentSizeCategory {
         self.uiView?.traitCollection.preferredContentSizeCategory ?? .unspecified
     }
 
+    @inline(__always) @inlinable
     public var horizontalSizeClass: UIUserInterfaceSizeClass {
         self.uiView?.traitCollection.horizontalSizeClass ?? .unspecified
     }
 
+    @inline(__always) @inlinable
     public var verticalSizeClass: UIUserInterfaceSizeClass {
         self.uiView?.traitCollection.verticalSizeClass ?? .unspecified
     }
 
-    @available(iOS 13.0, tvOS 13.0, *)
+    @inline(__always) @inlinable @available(iOS 13.0, tvOS 13.0, *)
     public var accessibilityContrast: UIAccessibilityContrast {
         self.uiView?.traitCollection.accessibilityContrast ?? .unspecified
     }
 
+    @inlinable
     public var colorScheme: ColorScheme {
         if #available(iOS 12, tvOS 12, *) {
             return .uiTraitCollection(self.uiView?.traitCollection ?? {
@@ -69,34 +75,42 @@ public struct PropertyKey {
         return .uiTraitCollection(traitCollection)
     }
 
+    @inline(__always) @inlinable
     public var accessibilityInvertColors: Bool {
         UIAccessibility.isInvertColorsEnabled
     }
 
+    @inline(__always) @inlinable
     public var accessibilityGrayscaleEnabled: Bool {
         UIAccessibility.isGrayscaleEnabled
     }
 
+    @inline(__always) @inlinable
     public var accessibilityEnabled: Bool {
         UIAccessibility.isAssistiveTouchRunning
     }
 
+    @inline(__always) @inlinable
     public var accessibilityReduceTransparency: Bool {
         UIAccessibility.isReduceTransparencyEnabled
     }
 
+    @inline(__always) @inlinable
     public var accessibilityReduceMotion: Bool {
         UIAccessibility.isReduceMotionEnabled
     }
 
+    @inline(__always) @inlinable
     public var applicationState: UIApplication.State {
         UIApplication.shared.applicationState
     }
 
+    @inline(__always) @inlinable
     public var layoutDirection: UITraitEnvironmentLayoutDirection {
         self.uiView?.traitCollection.layoutDirection ?? .unspecified
     }
 
+    @inline(__always) @inlinable
     public var openURL: URLCaller {
         .init()
     }

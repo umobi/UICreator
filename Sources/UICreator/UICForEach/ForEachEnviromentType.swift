@@ -22,6 +22,11 @@
 
 import Foundation
 
-public protocol Opaque: class {
+@usableFromInline
+protocol ForEachEnviromentType: class {
+    var contentType: ViewCreator.Type { get }
+    func syncManager()
+    func setManager(_ manager: SupportForEach)
 
+    var isReleased: Bool { get }
 }

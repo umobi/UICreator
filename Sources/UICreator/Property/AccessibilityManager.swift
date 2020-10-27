@@ -26,6 +26,7 @@ import UIKit
 class NotificationManager {
     private var observers: [NSObjectProtocol] = []
 
+    @inline(__always)
     func append(_ object: NSObjectProtocol) {
         self.observers.append(object)
     }

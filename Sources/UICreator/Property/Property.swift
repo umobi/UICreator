@@ -24,6 +24,7 @@ import Foundation
 import UIKit
 
 @propertyWrapper
+@frozen
 public struct Property<Key> {
     @Value private var value: Key
     private let keyPath: KeyPath<PropertyKey, Key>
@@ -44,7 +45,7 @@ public struct Property<Key> {
 }
 
 private extension Property {
-    static func notification(
+    func notification(
         _ notificationName: NSNotification.Name,
         _ view: UIView,
         handler: @escaping (UIView) -> Void) {
@@ -69,10 +70,11 @@ private extension Property {
 
 internal extension Property {
     //swiftlint:disable function_body_length
+    @usableFromInline
     func assign(_ view: UIView) {
         switch self.keyPath {
         case \PropertyKey.accessibilityInvertColors:
-            Self.notification(
+            notification(
                 UIAccessibility.invertColorsStatusDidChangeNotification,
                 view,
                 handler: {
@@ -81,7 +83,7 @@ internal extension Property {
             )
 
         case \PropertyKey.accessibilityGrayscaleEnabled:
-            Self.notification(
+            notification(
                 UIAccessibility.grayscaleStatusDidChangeNotification,
                 view,
                 handler: {
@@ -90,7 +92,7 @@ internal extension Property {
             )
 
         case \PropertyKey.accessibilityReduceTransparency:
-            Self.notification(
+            notification(
                 UIAccessibility.reduceTransparencyStatusDidChangeNotification,
                 view,
                 handler: {
@@ -98,7 +100,7 @@ internal extension Property {
                 })
 
         case \PropertyKey.accessibilityReduceMotion:
-            Self.notification(
+            notification(
                 UIAccessibility.reduceMotionStatusDidChangeNotification,
                 view,
                 handler: {
@@ -106,7 +108,7 @@ internal extension Property {
                 })
 
         case \PropertyKey.accessibilityEnabled:
-            Self.notification(
+            notification(
                 UIAccessibility.assistiveTouchStatusDidChangeNotification,
                 view,
                 handler: {
@@ -115,7 +117,7 @@ internal extension Property {
 
         case \PropertyKey.applicationState:
             UIApplication.stateNotifications.forEach {
-                Self.notification(
+                notification(
                     $0,
                     view,
                     handler: {
@@ -203,12 +205,14 @@ public extension UIViewCreator {
 
 //swiftlint:disable function_parameter_count identifier_name
 public extension UIViewCreator {
+    @inlinable
     func dynamicProperty<P0>(_ p0: Property<P0>) -> UICModifiedView<View> {
         self.onNotRendered {
             p0.assign($0)
         }
     }
 
+    @inlinable
     func dynamicProperty<P0, P1>(
         _ p0: Property<P0>,
         _ p1: Property<P1>) -> UICModifiedView<View> {
@@ -219,6 +223,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func dynamicProperty<P0, P1, P2>(
         _ p0: Property<P0>,
         _ p1: Property<P1>,
@@ -231,6 +236,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func dynamicProperty<P0, P1, P2, P3>(
         _ p0: Property<P0>,
         _ p1: Property<P1>,
@@ -245,6 +251,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func dynamicProperty<P0, P1, P2, P3, P4>(
         _ p0: Property<P0>,
         _ p1: Property<P1>,
@@ -261,6 +268,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func dynamicProperty<P0, P1, P2, P3, P4, P5>(
         _ p0: Property<P0>,
         _ p1: Property<P1>,
@@ -279,6 +287,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func dynamicProperty<P0, P1, P2, P3, P4, P5, P6>(
         _ p0: Property<P0>,
         _ p1: Property<P1>,
@@ -299,6 +308,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func dynamicProperty<P0, P1, P2, P3, P4, P5, P6, P7>(
         _ p0: Property<P0>,
         _ p1: Property<P1>,

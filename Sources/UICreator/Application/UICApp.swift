@@ -31,6 +31,7 @@ public protocol UICApp {
 }
 
 extension UICApp {
+    @inline(__always)
     public static func main() {
         UICAppDelegate.register(app: Self.init())
         UICAppDelegate.main()

@@ -21,14 +21,19 @@
 //
 
 import Foundation
+import UIKit
 
-#if swift(>=5.3)
 @frozen
-public struct UICWindowGroup: ViewScene {
-    let content: () -> ViewCreator
+public struct UICModifiedGesture<Gesture>: UIGestureCreator where Gesture: UIGestureRecognizer {
+    private let gestureLoader: () -> Gesture
 
-    public init(content: @escaping () -> ViewCreator) {
-        self.content = content
+    @usableFromInline
+    init(_ gestureLoader: @escaping () -> Gesture) {
+        self.gestureLoader = gestureLoader
+    }
+
+    @inline(__always)
+    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        (gestureCreator as! Self).gestureLoader()
     }
 }
-#endif

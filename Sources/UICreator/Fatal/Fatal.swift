@@ -63,9 +63,12 @@ extension FatalType {
 }
 
 extension Fatal {
+    @usableFromInline
     struct Builder: FatalType {
+        @inline(__always) @usableFromInline
         let error: String
 
+        @inline(__always) @usableFromInline
         init(_ string: String) {
             self.error = string
         }

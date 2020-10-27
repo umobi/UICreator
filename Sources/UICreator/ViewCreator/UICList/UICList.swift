@@ -95,7 +95,7 @@ public extension UIViewCreator where View: UITableView {
         self.onInTheScene { tableView in
             weak var tableView = tableView
 
-            UICResized(superview: (tableView as? View)?.backgroundView)
+            ResizeView(superview: (tableView as? View)?.backgroundView)
                 .onAdd {
                     (tableView as? View)?.backgroundView = $0
                 }.addSubview(
@@ -150,7 +150,7 @@ public extension UIViewCreator where View: UITableView {
         self.onInTheScene { tableView in
             weak var tableView = tableView
 
-            UICResized(size: size, superview: (tableView as? View)?.tableHeaderView)
+            ResizeView(size: size, superview: (tableView as? View)?.tableHeaderView)
                 .onAdd {
                     (tableView as? View)?.tableHeaderView = $0
                 }.addSubview(
@@ -166,7 +166,7 @@ public extension UIViewCreator where View: UITableView {
         self.onInTheScene { tableView in
             weak var tableView = tableView
 
-            UICResized(size: size, superview: (tableView as? View)?.tableFooterView)
+            ResizeView(size: size, superview: (tableView as? View)?.tableFooterView)
                 .onAdd {
                     (tableView as? View)?.tableFooterView = $0
                 }.addSubview(

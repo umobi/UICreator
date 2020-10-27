@@ -23,7 +23,8 @@
 import Foundation
 import UIKit
 
-private extension UIFont {
+extension UIFont {
+    @usableFromInline
     static func stylizedFont(_ style: TextStyle, _ weight: Weight) -> UIFont {
         let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: style)
         var attributes = descriptor.fontAttributes
@@ -36,98 +37,118 @@ private extension UIFont {
 
 public extension UIFont {
     #if os(iOS)
-    @available(iOS 11.0, *)
+    @inline(__always) @inlinable @available(iOS 11.0, *)
     static var largeTitle: UIFont {
-        return .stylizedFont(.largeTitle, .regular)
+        stylizedFont(.largeTitle, .regular)
     }
     #endif
 
+    @inline(__always) @inlinable
     static var title1: UIFont {
-        return .stylizedFont(.title1, .regular)
+        .stylizedFont(.title1, .regular)
     }
 
+    @inline(__always) @inlinable
     static var title2: UIFont {
-        return .stylizedFont(.title2, .regular)
+        stylizedFont(.title2, .regular)
     }
 
+    @inline(__always) @inlinable
     static var title3: UIFont {
-        return .stylizedFont(.title3, .regular)
+        stylizedFont(.title3, .regular)
     }
 
+    @inline(__always) @inlinable
     static var headline: UIFont {
-        return .stylizedFont(.headline, .regular)
+        stylizedFont(.headline, .regular)
     }
 
+    @inline(__always) @inlinable
     static var subheadline: UIFont {
-        return .stylizedFont(.subheadline, .regular)
+        stylizedFont(.subheadline, .regular)
     }
 
+    @inline(__always) @inlinable
     static var body: UIFont {
-        return .stylizedFont(.body, .regular)
+        stylizedFont(.body, .regular)
     }
 
+    @inline(__always) @inlinable
     static var callout: UIFont {
-        return .stylizedFont(.callout, .regular)
+        stylizedFont(.callout, .regular)
     }
 
+    @inline(__always) @inlinable
     static var footnote: UIFont {
-        return .stylizedFont(.footnote, .regular)
+        stylizedFont(.footnote, .regular)
     }
 
+    @inline(__always) @inlinable
     static var caption1: UIFont {
-        return .stylizedFont(.caption1, .regular)
+        stylizedFont(.caption1, .regular)
     }
 
+    @inline(__always) @inlinable
     static var caption2: UIFont {
-        return .stylizedFont(.caption2, .regular)
+        stylizedFont(.caption2, .regular)
     }
 }
 
 public extension UIFont {
     #if os(iOS)
-    @available(iOS 11.0, *)
+    @inline(__always) @inlinable @available(iOS 11.0, *)
     static func largeTitle(weight: Weight) -> UIFont {
-        return .stylizedFont(.largeTitle, weight)
+        stylizedFont(.largeTitle, weight)
     }
     #endif
 
+    @inline(__always) @inlinable
     static func title1(weight: Weight) -> UIFont {
-        return .stylizedFont(.title1, weight)
+        stylizedFont(.title1, weight)
     }
 
+    @inline(__always) @inlinable
     static func title2(weight: Weight) -> UIFont {
-        return .stylizedFont(.title2, weight)
+        stylizedFont(.title2, weight)
     }
 
+    @inline(__always) @inlinable
     static func title3(weight: Weight) -> UIFont {
-        return .stylizedFont(.title3, weight)
+        stylizedFont(.title3, weight)
     }
 
+    @inline(__always) @inlinable
     static func headline(weight: Weight) -> UIFont {
-        return .stylizedFont(.headline, weight)
+        stylizedFont(.headline, weight)
     }
 
+    @inline(__always) @inlinable
     static func subheadline(weight: Weight) -> UIFont {
-        return .stylizedFont(.subheadline, weight)
+        stylizedFont(.subheadline, weight)
     }
 
+    @inline(__always) @inlinable
     static func body(weight: Weight) -> UIFont {
-        return .stylizedFont(.body, weight)
+        stylizedFont(.body, weight)
     }
 
+    @inline(__always) @inlinable
     static func callout(weight: Weight) -> UIFont {
-        return .stylizedFont(.callout, weight)
+        stylizedFont(.callout, weight)
     }
 
+    @inline(__always) @inlinable
     static func footnote(weight: Weight) -> UIFont {
-        return .stylizedFont(.footnote, weight)
+        stylizedFont(.footnote, weight)
     }
 
+    @inline(__always) @inlinable
     static func caption1(weight: Weight) -> UIFont {
-        return .stylizedFont(.caption1, weight)
+        stylizedFont(.caption1, weight)
     }
 
+    @inline(__always) @inlinable
     static func caption2(weight: Weight) -> UIFont {
-        return .stylizedFont(.caption2, weight)
+        stylizedFont(.caption2, weight)
     }
 }

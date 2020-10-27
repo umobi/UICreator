@@ -90,27 +90,27 @@ extension CBView {
 
 extension CBView {
 
-    @inline(__always)
+    @inline(__always) @usableFromInline
     var render: Render {
         self.memory.render
     }
 
-    @inline(__always)
+    @inline(__always) @usableFromInline
     var layout: Layout {
         self.memory.layout
     }
 
-    @inline(__always)
+    @inline(__always) @usableFromInline
     var appear: Appear {
         self.memory.appear
     }
 
-    @inline(__always)
+    @inline(__always) @usableFromInline
     var trait: Trait {
         self.memory.trait
     }
 
-    @inline(__always)
+    @inline(__always) @usableFromInline
     var isSelfImplemented: Bool {
         get { self.memory.isSelfImplemented }
         set { self.memory.isSelfImplemented = newValue }
@@ -119,7 +119,7 @@ extension CBView {
 
 extension CBView {
 
-    @discardableResult @inline(__always)
+    @inline(__always) @usableFromInline @discardableResult
     func makeSelfImplemented() -> Self {
         self.isSelfImplemented = true
         return self

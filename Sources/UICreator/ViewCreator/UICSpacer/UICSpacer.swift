@@ -55,35 +55,35 @@ public extension UICSpacer {
     @inline(__always)
     init(vertical: CGFloat, horizontal: CGFloat) {
         self.init(margin: .init(vertical: vertical, horizontal: horizontal)) {
-            EmptyView(Views.SpacerView())
+            UICAnyView(Views.SpacerView())
         }
     }
 
     @inline(__always)
     init(vertical: CGFloat) {
         self.init(margin: .init(vertical: vertical, horizontal: 0)) {
-            EmptyView(Views.SpacerView())
+            UICAnyView(Views.SpacerView())
         }
     }
 
     @inline(__always)
     init(horizontal: CGFloat) {
         self.init(margin: .init(vertical: 0, horizontal: horizontal)) {
-            EmptyView(Views.SpacerView())
+            UICAnyView(Views.SpacerView())
         }
     }
 
     @inline(__always)
     init() {
         self.init(margin: .zero) {
-            EmptyView(Views.SpacerView())
+            UICAnyView(Views.SpacerView())
         }
     }
 
     @inline(__always)
     init(spacing: CGFloat) {
         self.init(margin: .init(spacing: spacing)) {
-            EmptyView(Views.SpacerView())
+            UICAnyView(Views.SpacerView())
         }
     }
 }

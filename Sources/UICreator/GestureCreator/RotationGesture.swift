@@ -21,14 +21,38 @@
 //
 
 import Foundation
+import UIKit
 
-#if swift(>=5.3)
+#if os(iOS)
 @frozen
-public struct UICWindowGroup: ViewScene {
-    let content: () -> ViewCreator
+public struct Rotation: UIGestureCreator {
+    public typealias Gesture = UIRotationGestureRecognizer
 
-    public init(content: @escaping () -> ViewCreator) {
-        self.content = content
+    public init() {}
+
+    @inline(__always)
+    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        Gesture()
+    }
+}
+
+public extension UIViewCreator {
+
+    @inlinable
+    func onRotationMaker<Rotation>(_ rotationConfigurator: @escaping () -> Rotation) -> UICModifiedView<View> where Rotation: UIGestureCreator, Rotation.Gesture: UIRotationGestureRecognizer {
+        self.onNotRendered {
+            rotationConfigurator().add($0)
+        }
+    }
+
+    @inlinable
+    func onRotation(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onRotationMaker {
+            Rotation()
+                .onRecognized {
+                    handler($0.view!)
+                }
+        }
     }
 }
 #endif

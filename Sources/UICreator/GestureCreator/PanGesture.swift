@@ -24,28 +24,51 @@ import Foundation
 import UIKit
 
 @frozen
-public struct URLCaller {
-    @usableFromInline
-    init() {}
+public struct Pan: UIGestureCreator {
+    public typealias Gesture = UIPanGestureRecognizer
 
+    public init() {}
+
+    @inline(__always)
+    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        Gesture()
+    }
+}
+
+#if os(iOS)
+public extension UIGestureCreator where Gesture: UIPanGestureRecognizer {
     @inlinable
-    public func callAsFunction(_ url: URL) {
-        UIApplication.shared.open(
-            url,
-            options: [:],
-            completionHandler: nil
-        )
+    func maximumNumber(ofTouches number: Int) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.maximumNumberOfTouches = number
+        }
     }
 
     @inlinable
-    public func callAsFunction(
-        _ url: URL,
-        _ handler: @escaping (Bool) -> Void) {
+    func minimumNumber(ofTouches number: Int) -> UICModifiedGesture<Gesture> {
+        self.onModify {
+            $0.minimumNumberOfTouches = number
+        }
+    }
+}
+#endif
 
-        UIApplication.shared.open(
-            url,
-            options: [:],
-            completionHandler: handler
-        )
+public extension UIViewCreator {
+
+    @inlinable
+    func onPanMaker<Pan>(_ panConfigurator: @escaping () -> Pan) -> UICModifiedView<View> where Pan: UIGestureCreator, Pan.Gesture: UIPanGestureRecognizer {
+        self.onNotRendered {
+            panConfigurator().add($0)
+        }
+    }
+
+    @inlinable
+    func onPan(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        self.onPanMaker {
+            Pan()
+                .onRecognized {
+                    handler($0.view!)
+                }
+        }
     }
 }

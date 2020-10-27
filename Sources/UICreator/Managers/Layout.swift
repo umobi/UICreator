@@ -24,6 +24,7 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
+@usableFromInline
 struct Layout {
     private weak var view: CBView!
 
@@ -33,10 +34,12 @@ struct Layout {
         self.view = view
     }
 
+    @inline(__always)
     static func create(_ view: CBView) -> Self {
         .init(view)
     }
 
+    @inline(__always)
     private func pop() {
         self.layoutHandler?(self.view)
     }
@@ -66,7 +69,9 @@ private extension CBView {
     }
 }
 
-private extension Layout {
+extension Layout {
+    
+    @usableFromInline
     func onLayout(_ handler: @escaping (CBView) -> Void) {
         if self.view.frame != .zero {
             handler(self.view)
@@ -81,7 +86,7 @@ private extension Layout {
 }
 
 public extension CBView {
-    @discardableResult
+    @inline(__always) @inlinable @discardableResult
     func onLayout(_ handler: @escaping (CBView) -> Void) -> Self {
         self.layout.onLayout(handler)
         return self

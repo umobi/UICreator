@@ -58,7 +58,7 @@ public extension UICHeader {
     @inline(__always) @inlinable
     static var empty: UICHeader {
         UICHeader {
-            EmptyView()
+            UICEmptyView()
         }
         .estimatedHeight(0)
     }

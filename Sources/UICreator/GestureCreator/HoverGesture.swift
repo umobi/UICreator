@@ -26,11 +26,13 @@ import UIKit
 #if os(iOS)
 
 @available(iOS 13.0, *)
+@frozen
 public struct Hover: UIGestureCreator {
     public typealias Gesture = UIHoverGestureRecognizer
 
     public init() {}
-    
+
+    @inline(__always)
     public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
         UIHoverGestureRecognizer()
     }
@@ -38,14 +40,14 @@ public struct Hover: UIGestureCreator {
 
 public extension UIViewCreator {
 
-    @available(iOS 13.0, *)
+    @inlinable @available(iOS 13.0, *)
     func onHoverMaker<Hover>(_ hoverConfigurator: @escaping () -> Hover) -> UICModifiedView<View> where Hover: UIGestureCreator, Hover.Gesture: UIHoverGestureRecognizer {
         self.onNotRendered {
             hoverConfigurator().add($0)
         }
     }
 
-    @available(iOS 13.0, *)
+    @inlinable @available(iOS 13.0, *)
     func onHover(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
         self.onHoverMaker {
             Hover()

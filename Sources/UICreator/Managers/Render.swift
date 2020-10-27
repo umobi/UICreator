@@ -24,6 +24,7 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
+@usableFromInline
 struct Render {
     typealias State = CBView.RenderState
     
@@ -41,8 +42,9 @@ struct Render {
         self.view = view
     }
 
+    @inline(__always)
     static func create(_ view: CBView) -> Self {
-        return .init(view)
+        .init(view)
     }
 
     func append(_ state: State) {
@@ -60,6 +62,7 @@ struct Render {
         }
     }
 
+    @inline(__always)
     func needs(_ state: State) -> Bool {
         self.needs.contains(state)
     }
@@ -156,6 +159,7 @@ private extension CBView {
 
 extension Render {
 
+    @usableFromInline
     func onNotRendered(_ handler: @escaping (CBView) -> Void) {
         let old = self.notRenderedHandler
         self.notRenderedHandler = {
@@ -166,6 +170,7 @@ extension Render {
         self.append(.notRendered)
     }
 
+    @usableFromInline
     func onRendered(_ handler: @escaping (CBView) -> Void) {
         let old = self.renderedHandler
         self.renderedHandler = {
@@ -176,6 +181,7 @@ extension Render {
         self.append(.rendered)
     }
 
+    @usableFromInline
     func onInTheScene(_ handler: @escaping (CBView) -> Void) {
         let old = self.inTheSceneHandler
         self.inTheSceneHandler = {
@@ -203,19 +209,20 @@ extension Render {
 }
 
 public extension CBView {
-    @discardableResult
+
+    @inline(__always) @inlinable @discardableResult
     func onNotRendered(_ handler: @escaping (CBView) -> Void) -> Self {
         self.render.onNotRendered(handler)
         return self
     }
 
-    @discardableResult
+    @inline(__always) @inlinable @discardableResult
     func onRendered(_ handler: @escaping (CBView) -> Void) -> Self {
         self.render.onRendered(handler)
         return self
     }
 
-    @discardableResult
+    @inline(__always) @inlinable @discardableResult
     func onInTheScene(_ handler: @escaping (CBView) -> Void) -> Self {
         self.render.onInTheScene(handler)
         return self

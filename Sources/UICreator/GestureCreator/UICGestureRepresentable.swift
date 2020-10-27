@@ -21,69 +21,15 @@
 //
 
 import Foundation
+import UIKit
 
-struct WeakOpaque {
-    fileprivate weak var object: Opaque?
-
-    fileprivate init(_ object: Opaque?) {
-        self.object = object
-    }
+public protocol UICGestureRepresentable: UIGestureCreator {
+    func makeUIGesture() -> Gesture
 }
 
-struct StrongOpaque {
-    fileprivate var object: Opaque?
-
-    fileprivate init(_ object: Opaque?) {
-        self.object = object
+public extension UICGestureRepresentable {
+    @inline(__always)
+    static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+        (gestureCreator as! Self).makeUIGesture()
     }
-}
-
-enum MemorySwitch: Memory {
-    typealias Object = Opaque
-
-    case weak(WeakOpaque)
-    case strong(StrongOpaque)
-    case `nil`
-
-    static func weak(_ object: Opaque?) -> Self {
-        return .weak(WeakOpaque(object))
-    }
-
-    static func strong(_ object: Opaque?) -> Self {
-        return .strong(StrongOpaque(object))
-    }
-}
-
-extension MemorySwitch {
-    var isWeak: Bool {
-        if case .weak = self {
-            return true
-        }
-
-        return false
-    }
-}
-
-extension MemorySwitch {
-    var object: Object! {
-        switch self {
-        case .weak(let opaque):
-            return opaque.object
-        case .strong(let opaque):
-            return opaque.object
-        case .nil:
-            return nil
-        }
-    }
-}
-
-extension MemorySwitch {
-    func castedObject<T>() -> T? {
-        return self.object as? T
-    }
-}
-
-enum MemoryStoreType {
-    case weak
-    case strong
 }
