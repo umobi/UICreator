@@ -35,21 +35,12 @@ public struct UICInput: UIViewCreator {
     public init(
         x: CGFloat = .zero,
         y: CGFloat = .zero,
-        height: CGFloat,
-        width: CGFloat,
+        height: CGFloat = .zero,
+        width: CGFloat = .zero,
         style: UIInputView.Style = .keyboard,
         content: @escaping () -> ViewCreator) {
 
         self.frame = .init(x: x, y: y, width: width, height: height)
-        self.style = style
-        self.content = content
-    }
-
-    public init(
-        style: UIInputView.Style = .keyboard,
-        content: @escaping () -> ViewCreator) {
-
-        self.frame = .zero
         self.style = style
         self.content = content
     }

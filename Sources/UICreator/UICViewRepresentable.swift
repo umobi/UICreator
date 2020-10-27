@@ -34,7 +34,7 @@ public extension UICViewRepresentable {
 
         return Views.ViewAdaptor(_self.makeUIView())
             .onNotRendered {
-                _self.updateUIView($0 as! View)
+                _self.updateUIView($0.dynamicView as! View)
             }
     }
 }
