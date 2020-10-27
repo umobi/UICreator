@@ -21,20 +21,18 @@
 //
 
 import Foundation
-import UIKit
+import ConstraintBuilder
 
-public protocol UICViewRepresentable: UIViewCreator {
-    func makeUIView() -> View
-    func updateUIView(_ uiView: View)
-}
+@frozen
+public struct UICFooter: ViewCreator {
+    let content: () -> ViewCreator
 
-public extension UICViewRepresentable {
-    static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
-        let _self = viewCreator as! Self
+    public init(content: @escaping () -> ViewCreator) {
+        self.content = content
+    }
 
-        return Views.ViewAdaptor(_self.makeUIView())
-            .onNotRendered {
-                _self.updateUIView($0 as! View)
-            }
+//    @inline(__always)
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        fatalError()
     }
 }

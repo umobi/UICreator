@@ -24,70 +24,14 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class PageControl: UIPageControl {
-
-    init() {
-        super.init(frame: .zero)
-        self.makeSelfImplemented()
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    public override init(frame: CGRect) {
-        fatalError("init(frame:) has not been implemented")
-    }
-
-    override open var isHidden: Bool {
-        get { super.isHidden }
-        set {
-            super.isHidden = newValue
-            self.renderManager.isHidden(newValue)
-        }
-    }
-
-    override open var frame: CGRect {
-        get { super.frame }
-        set {
-            super.frame = newValue
-            self.renderManager.frame(newValue)
-        }
-    }
-
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        self.renderManager.willMove(toSuperview: newSuperview)
-    }
-
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        self.renderManager.didMoveToSuperview()
-    }
-
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        self.renderManager.didMoveToWindow()
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        self.renderManager.layoutSubviews()
-    }
-
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        self.renderManager.traitDidChange()
-    }
-}
-
+@frozen
 public struct UICPageControl: UIViewCreator {
-    public typealias View = PageControl
+    public typealias View = UIPageControl
 
-    @Relay var numberOfPages: Int
-    @Relay var currentPage: Int
+    @Relay private var numberOfPages: Int
+    @Relay private var currentPage: Int
 
-    init(
+    public init(
         numberOfPages: Int,
         currentPage: Relay<Int>) {
 
@@ -95,7 +39,7 @@ public struct UICPageControl: UIViewCreator {
         self._currentPage = currentPage
     }
 
-    init(
+    public init(
         numberOfPages: Relay<Int>,
         currentPage: Relay<Int>) {
 
@@ -103,10 +47,11 @@ public struct UICPageControl: UIViewCreator {
         self._currentPage = currentPage
     }
 
+    @inline(__always)
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
-        return PageControl()
+        return Views.PageControl()
             .onNotRendered {
                 weak var view = $0 as? View
 
@@ -126,30 +71,35 @@ public struct UICPageControl: UIViewCreator {
 
 public extension UIViewCreator where View: UIPageControl {
 
+    @inlinable
     func currentPageIndicatorTintColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.currentPageIndicatorTintColor = color
         }
     }
 
+    @inlinable
     func defersCurrentPageDisplay(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.defersCurrentPageDisplay = flag
         }
     }
 
+    @inlinable
     func hidesForSinglePage(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.hidesForSinglePage = flag
         }
     }
 
+    @inlinable
     func numberOfPages(_ pages: Int) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.numberOfPages = pages
         }
     }
 
+    @inlinable
     func pageIndicatorTintColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.pageIndicatorTintColor = color

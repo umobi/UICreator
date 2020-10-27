@@ -42,7 +42,6 @@ extension UITableView {
 }
 
 private var kTableMemory: UInt = 0
-
 extension UITableView {
     var memory: Memory {
         OBJCSet(
@@ -55,7 +54,7 @@ extension UITableView {
 }
 
 extension UITableView {
-    @usableFromInline
+    @inline(__always) @usableFromInline
     var manager: ListCollectionManager? {
         get { self.memory.manager }
         set { self.memory.manager = newValue }
@@ -63,6 +62,7 @@ extension UITableView {
 }
 
 extension UITableView {
+    @inline(__always)
     private var reusableCells: [WeakCell] {
         get { self.memory.reusableCells }
         set { self.memory.reusableCells = newValue }

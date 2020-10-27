@@ -20,16 +20,33 @@
 // THE SOFTWARE.
 //
 
-import ConstraintBuilder
+import Foundation
+import UIKit
 
-public struct UICSection: ViewCreator {
-    public let contents: () -> ViewCreator
+extension ViewControllers.PageViewController: UIPageViewControllerDelegate {
+    public func pageViewController(
+        _ pageViewController: UIPageViewController,
+        didFinishAnimating finished: Bool,
+        previousViewControllers: [UIViewController],
+        transitionCompleted completed: Bool) {
+        if !completed {
+            return
+        }
 
-    public init(@UICViewBuilder _ contents: @escaping () -> ViewCreator) {
-        self.contents = contents
+        let currentPage = self.currentPage
+        self.onPageChangeHandler?(currentPage)
     }
 
-    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
-        fatalError()
+    #if os(iOS)
+    public func pageViewController(
+        _ pageViewController: UIPageViewController,
+        spineLocationFor orientation: UIInterfaceOrientation) -> UIPageViewController.SpineLocation {
+        self.spineLocationHandler?(orientation) ?? .none
     }
+
+    public func pageViewControllerSupportedInterfaceOrientations(
+        _ pageViewController: UIPageViewController) -> UIInterfaceOrientationMask {
+        UIApplication.shared.supportedInterfaceOrientations(for: self.view.window)
+    }
+    #endif
 }

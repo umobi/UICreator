@@ -256,19 +256,17 @@ public extension UIViewCreator where View: UITextField {
 
             (view as? View)?.leftViewMode = mode
             (view as? View)?.leftView = UICAnyView(content).releaseUIView()
-                .onAppear { viewAdaptor in
+                .onAppear { leftView in
                     guard needsToAddConstraints else {
                         return
                     }
 
-                    let viewAdaptor = viewAdaptor as! ViewAdaptor
-
                     Constraintable.activate {
-                        viewAdaptor.cbuild
+                        leftView.cbuild
                             .centerY
                             .equalTo(view.cbuild.centerY)
 
-                        viewAdaptor.cbuild
+                        leftView.cbuild
                             .leading
                     }
 
@@ -290,19 +288,17 @@ public extension UIViewCreator where View: UITextField {
 
             (view as? View)?.rightViewMode = mode
             (view as? View)?.rightView = UICAnyView(content).releaseUIView()
-                .onAppear { viewAdaptor in
+                .onAppear { rightView in
                     guard needsToAddConstraints else {
                         return
                     }
 
-                    let viewAdaptor = viewAdaptor as! ViewAdaptor
-
                     Constraintable.activate {
-                        viewAdaptor.cbuild
+                        rightView.cbuild
                             .centerY
                             .equalTo(view.cbuild.centerY)
 
-                        viewAdaptor.cbuild
+                        rightView.cbuild
                             .trailing
                     }
 

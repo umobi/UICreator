@@ -25,11 +25,14 @@ import UIKit
 
 @frozen
 public struct PresentMaker {
-    let viewToPresent: () -> ViewCreator
     let onCompletion: (() -> Void)?
-    let animated: Bool
     let presentingStyle: UIModalPresentationStyle
     let transitionStyle: UIModalTransitionStyle
+    
+    @usableFromInline
+    let animated: Bool
+    @usableFromInline
+    let viewToPresent: () -> ViewCreator
 
     public init(_ content: @escaping () -> ViewCreator) {
         self.viewToPresent = content
@@ -51,52 +54,70 @@ public struct PresentMaker {
         self.animated = editable.animated
     }
 
-    private func edit(_ edit: @escaping (Editable) -> Void) -> Self {
-        let editable = Editable(self)
-        edit(editable)
-        return .init(self, editable: editable)
-    }
-
+    @inlinable
     public func presentingStyle(_ style: UIModalPresentationStyle) -> Self {
         self.edit {
             $0.presentingStyle = style
         }
     }
 
+    @inlinable
     public func transitionStyle(_ style: UIModalTransitionStyle) -> Self {
         self.edit {
             $0.transitionStyle = style
         }
     }
 
+    @inlinable
     public func onCompletion(_ handler: @escaping () -> Void) -> Self {
         self.edit {
             $0.onCompletion = handler
         }
     }
 
+    @inlinable
     public func animated(_ flag: Bool) -> Self {
         self.edit {
             $0.animated = flag
         }
     }
 
+    @usableFromInline
     func setViewController(_ viewController: UIViewController) {
         viewController.modalPresentationStyle = self.presentingStyle
         viewController.modalTransitionStyle = self.transitionStyle
     }
+}
 
-    private class Editable {
+extension PresentMaker {
+    @usableFromInline
+    struct Editable {
+
+        @MutableBox @usableFromInline
         var presentingStyle: UIModalPresentationStyle
+
+        @MutableBox @usableFromInline
         var transitionStyle: UIModalTransitionStyle
+
+        @MutableBox @usableFromInline
         var onCompletion: (() -> Void)?
+
+        @MutableBox @usableFromInline
         var animated: Bool
 
+        @usableFromInline
         init(_ present: PresentMaker) {
-            self.presentingStyle = present.presentingStyle
-            self.transitionStyle = present.transitionStyle
-            self.onCompletion = present.onCompletion
-            self.animated = present.animated
+            self._presentingStyle = .init(wrappedValue: present.presentingStyle)
+            self._transitionStyle = .init(wrappedValue: present.transitionStyle)
+            self._onCompletion = .init(wrappedValue: present.onCompletion)
+            self._animated = .init(wrappedValue: present.animated)
         }
+    }
+
+    @usableFromInline @inline(__always)
+    func edit(_ edit: @escaping (Editable) -> Void) -> Self {
+        let editable = Editable(self)
+        edit(editable)
+        return .init(self, editable: editable)
     }
 }

@@ -29,7 +29,7 @@ public extension UIViewCreator {
     func toolbar(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.onInTheScene {
             $0.nearVCFromNavigation()?.toolbarItems = contents().zip.map { view in
-                UIBarButtonItem(customView: ViewAdaptor(view.releaseUIView()))
+                UIBarButtonItem(customView: UICAnyView(view).releaseUIView())
             }
         }
     }
@@ -170,7 +170,7 @@ public extension UIViewCreator {
         self.onInTheScene {
             $0.navigationItem
                 .setLeftBarButtonItems(contents().zip.map { view in
-                    .init(customView: ViewAdaptor(view.releaseUIView()))
+                    .init(customView: UICAnyView(view).releaseUIView())
                 }, animated: false)
         }
     }
@@ -190,7 +190,7 @@ public extension UIViewCreator {
         self.onInTheScene {
             $0.navigationItem
                 .setRightBarButtonItems(contents().zip.map { view in
-                    .init(customView: ViewAdaptor(view.releaseUIView()))
+                    .init(customView: UICAnyView(view).releaseUIView())
                 }, animated: false)
         }
     }

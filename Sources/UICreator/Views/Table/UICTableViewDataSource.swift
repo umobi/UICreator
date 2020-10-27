@@ -23,9 +23,8 @@
 import Foundation
 import UIKit
 
-class UICTableViewDataSource: NSObject, UITableViewDataSource {}
+class UICTableViewDataSource: NSObject, UITableViewDataSource {
 
-extension UICTableViewDataSource {
     public func numberOfSections(in tableView: UITableView) -> Int {
         let numberOfSections = tableView.manager?.numberOfSections ?? 0
         tableView.sizeManager.sections(count: numberOfSections)
@@ -52,7 +51,7 @@ extension UICTableViewDataSource {
             let cell = tableView.dequeueReusableCell(
                 withIdentifier: row.identifier,
                 for: indexPath
-            ) as? TableViewCell
+            ) as? Views.TableViewCell
         else {
             Fatal.Builder("UICList can't dequeue cell for indexPath at \(indexPath)").die()
         }

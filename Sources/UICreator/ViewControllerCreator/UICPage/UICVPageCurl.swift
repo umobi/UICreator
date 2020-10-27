@@ -25,19 +25,43 @@ import UIKit
 import ConstraintBuilder
 
 @frozen
-public struct UICNavigation: UIViewControllerCreator {
-    public typealias ViewController = UINavigationController
+public struct UICVPageCurl: UIViewControllerCreator {
+    public typealias ViewController = ViewControllers.PageViewController
 
-    private let content: () -> ViewCreator
+    @Relay private var currentPage: Int
+    private let contents: [ViewCreator]
+    private let spacing: CGFloat
 
-    public init(_ content: @escaping () -> ViewCreator) {
-        self.content = content
+    public init(
+        currentPage: Relay<Int>,
+        spacing: CGFloat = .zero,
+        @UICViewBuilder contents: @escaping () -> ViewCreator) {
+
+        self._currentPage = currentPage
+        self.spacing = spacing
+        self.contents = contents().zip
     }
 
     @inline(__always)
-    public static func makeUIViewController(_ viewCreator: ViewCreator) -> UIViewController {
-        UINavigationController(
-            rootViewController: UICHostingController(content: (viewCreator as! Self).content)
+    public static func makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
+        let _self = viewCreator as! Self
+
+        let pageController = ViewControllers.PageViewController(
+            transitionStyle: .pageCurl,
+            navigationOrientation: .vertical,
+            options: [.interPageSpacing: _self.spacing],
+            viewControllers: {
+                _self.contents.map {
+                    UICHostingController(rootView: $0)
+                }
+            }(),
+            onPageChanged: { _self.currentPage = $0 }
         )
+
+        _self.$currentPage.distinctSync { [weak pageController] in
+            pageController?.currentPage = $0
+        }
+
+        return pageController
     }
 }

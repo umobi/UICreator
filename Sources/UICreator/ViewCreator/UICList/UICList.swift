@@ -39,10 +39,11 @@ public struct UICList: UIViewCreator {
         self.contents = contents
     }
 
+    @inline(__always)
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
         
-        return UICTableView(_self.style)
+        return Views.TableView(_self.style)
             .dynamicData(_self.contents)
             .onNotRendered {
                 #if os(iOS)

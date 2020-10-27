@@ -24,42 +24,40 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-@_functionBuilder
-public struct UICTabItemBuilder {
-    static public func buildBlock(_ segments: UICTabItem...) -> UICTabItem {
-        UICTabItem(segments)
-    }
-}
-
-public extension UITabBarController {
-    func setViewControllers(@UICTabItemBuilder _ contents: @escaping () -> UICTabItem) {
-        let viewControllers: [UIViewController] = contents().zip.map {
-            let controller = UICHostingController(content: $0.content)
-            controller.tabBarItem = $0.tabItem
-            return controller
-        }
-
-        self.viewControllers = viewControllers
-    }
-}
-
 public struct UICTab: UIViewControllerCreator {
     public typealias ViewController = UITabBarController
 
-    let contents: () -> UICTabItem
+    @Relay private var selectedItem: Int
+    private let contents: () -> UICTabItem
 
-    init(@UICTabItemBuilder _ contents: @escaping () -> UICTabItem) {
+    public init(
+        selectedItem: Relay<Int>,
+        @UICTabItemBuilder _ contents: @escaping () -> UICTabItem) {
+        self._selectedItem = selectedItem
         self.contents = contents
     }
 
+    @inline(__always)
     public static func makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
+        let _self = viewCreator as! Self
+
         let tabController = UITabBarController()
-        tabController.setViewControllers((viewCreator as! Self).contents)
+        tabController.setViewControllers(_self.contents)
+
+        _self.$selectedItem.distinctSync { [weak tabController] in
+            tabController?.selectedIndex($0)
+        }
+
+        tabController.onDidSelect {
+            _self.selectedItem = $0.selectedIndex
+        }
+
         return tabController
     }
 }
 
 public extension UIViewControllerCreator where ViewController: UITabBarController {
+    @inlinable
     func tabBar(backgroundImage image: UICImage?) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
             ($0 as? ViewController)?.tabBar.backgroundImage = image?.uiImage
@@ -67,6 +65,7 @@ public extension UIViewControllerCreator where ViewController: UITabBarControlle
     }
 
     #if os(iOS)
+    @inlinable
     func tabBar(barStyle style: UIBarStyle) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
             ($0 as? ViewController)?.tabBar.barStyle = style
@@ -74,12 +73,14 @@ public extension UIViewControllerCreator where ViewController: UITabBarControlle
     }
     #endif
 
+    @inlinable
     func tabBar(barTintColor tintColor: UIColor?) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
             ($0 as? ViewController)?.tabBar.barTintColor = tintColor
         }
     }
 
+    @inlinable
     func tabBar(isTranslucent flag: Bool) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
             ($0 as? ViewController)?.tabBar.isTranslucent = flag
@@ -87,6 +88,7 @@ public extension UIViewControllerCreator where ViewController: UITabBarControlle
     }
 
     #if os(iOS)
+    @inlinable
     func tabBar(itemPositioning position: UITabBar.ItemPositioning) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
             ($0 as? ViewController)?.tabBar.itemPositioning = position
@@ -94,18 +96,21 @@ public extension UIViewControllerCreator where ViewController: UITabBarControlle
     }
     #endif
 
+    @inlinable
     func tabBar(itemSpacing spacing: CGFloat) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
             ($0 as? ViewController)?.tabBar.itemSpacing = spacing
         }
     }
 
+    @inlinable
     func tabBar(itemWidth width: CGFloat) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
             ($0 as? ViewController)?.tabBar.itemWidth = width
         }
     }
 
+    @inlinable
     func tabBar(selectedItem firstHandler: @escaping (UITabBarItem) -> Bool) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
             ($0 as? ViewController)?
@@ -119,37 +124,42 @@ public extension UIViewControllerCreator where ViewController: UITabBarControlle
         }
     }
 
+    @inlinable
     func tabBar(selectionIndicatorImage image: UICImage?) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
             ($0 as? ViewController)?.tabBar.selectionIndicatorImage = image?.uiImage
         }
     }
 
+    @inlinable
     func tabBar(shadowImage image: UICImage?) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
             ($0 as? ViewController)?.tabBar.shadowImage = image?.uiImage
         }
     }
 
-    @available(iOS 13.0, tvOS 13, *)
+    @inlinable @available(iOS 13.0, tvOS 13, *)
     func tabBar(standardAppearance: UITabBarAppearance) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
             ($0 as? ViewController)?.tabBar.standardAppearance = standardAppearance
         }
     }
 
+    @inlinable
     func tabBar(tintColor color: UIColor?) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
             ($0 as? ViewController)?.tabBar.tintColor = color
         }
     }
 
+    @inlinable
     func tabBar(unselectedItemTintColor color: UIColor?) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
             ($0 as? ViewController)?.tabBar.unselectedItemTintColor = color
         }
     }
 
+    @inlinable
     func tabBar(isHidden flag: Bool) -> UICModifiedViewController<ViewController> {
         self.onInTheScene {
             ($0 as? ViewController)?.tabBar.isHidden = flag
@@ -158,6 +168,7 @@ public extension UIViewControllerCreator where ViewController: UITabBarControlle
 }
 
 public extension UIViewCreator {
+    @inlinable
     func tabBarItem(title: String?) -> UICModifiedView<View> {
         self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
@@ -166,6 +177,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func tabBarItem(image: UICImage?) -> UICModifiedView<View> {
         self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
@@ -174,6 +186,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func tabBarItem(tag: Int) -> UICModifiedView<View> {
         self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
@@ -182,6 +195,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func tabBarItem(selectedImage image: UICImage?) -> UICModifiedView<View> {
         self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
@@ -190,6 +204,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func tabBarItem(titlePositionAdjustment position: UIOffset) -> UICModifiedView<View> {
         self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
@@ -198,6 +213,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func tabBarItem(imageInsets insets: UIEdgeInsets) -> UICModifiedView<View> {
         self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
@@ -206,7 +222,7 @@ public extension UIViewCreator {
         }
     }
 
-    @available(iOS 13.0, tvOS 13, *)
+    @inlinable @available(iOS 13.0, tvOS 13, *)
     func tabBarItem(standardAppearance: UITabBarAppearance?) -> UICModifiedView<View> {
         self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
@@ -218,6 +234,7 @@ public extension UIViewCreator {
 
 public extension UIViewCreator {
 
+    @inlinable
     func tabBarItem(badgeColor color: UIColor?) -> UICModifiedView<View> {
         self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
@@ -226,6 +243,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func tabBarItem(
         badgeTextAttributes attributes: [NSAttributedString.Key: Any]?,
         for state: UIControl.State) -> UICModifiedView<View> {
@@ -236,6 +254,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func tabBarItem(badgeFont font: UIFont, for state: UIControl.State = .normal) -> UICModifiedView<View> {
         self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
@@ -250,6 +269,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func tabBarItem(badgeFontColor color: UIFont, for state: UIControl.State = .normal) -> UICModifiedView<View> {
         self.onInTheScene {
             let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
@@ -265,29 +285,8 @@ public extension UIViewCreator {
     }
 }
 
-public extension UIViewControllerCreator where ViewController: UITabBarController {
-    func selectedItem(_ selected: Relay<Int>) -> UICModifiedViewController<ViewController> {
-        self.onInTheScene {
-            weak var viewController = $0 as? ViewController
-
-            selected.sync {
-                viewController?.selectedIndex($0)
-            }
-        }
-    }
-
-    func selectedItem<Enum: RawRepresentable>(_ selected: Relay<Enum>) -> UICModifiedViewController<ViewController> where Enum.RawValue == Int {
-        self.onInTheScene {
-            weak var viewController = $0 as? ViewController
-
-            selected.sync {
-                viewController?.selectedIndex($0.rawValue)
-            }
-        }
-    }
-}
-
-public extension UITabBarController {
+extension UITabBarController {
+    @usableFromInline
     func selectedIndex(_ index: Int) {
         guard index != self.selectedIndex else {
             return

@@ -20,21 +20,18 @@
 // THE SOFTWARE.
 //
 
-import Foundation
-import UIKit
+import ConstraintBuilder
 
-public protocol UICViewRepresentable: UIViewCreator {
-    func makeUIView() -> View
-    func updateUIView(_ uiView: View)
-}
+@frozen
+public struct UICSection: ViewCreator {
+    public let contents: () -> ViewCreator
 
-public extension UICViewRepresentable {
-    static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
-        let _self = viewCreator as! Self
+    public init(@UICViewBuilder _ contents: @escaping () -> ViewCreator) {
+        self.contents = contents
+    }
 
-        return Views.ViewAdaptor(_self.makeUIView())
-            .onNotRendered {
-                _self.updateUIView($0 as! View)
-            }
+    @inline(__always)
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        fatalError()
     }
 }

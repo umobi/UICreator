@@ -20,17 +20,9 @@
 // THE SOFTWARE.
 //
 
-import Foundation
-import ConstraintBuilder
-
-public struct UICFooter: ViewCreator {
-    let content: () -> ViewCreator
-
-    public init(content: @escaping () -> ViewCreator) {
-        self.content = content
-    }
-
-    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
-        fatalError()
+@_functionBuilder
+public struct UICTabItemBuilder {
+    static public func buildBlock(_ segments: UICTabItem...) -> UICTabItem {
+        UICTabItem(segments)
     }
 }

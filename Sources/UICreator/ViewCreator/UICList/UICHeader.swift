@@ -21,23 +21,64 @@
 //
 
 import Foundation
-import UIKit
 import ConstraintBuilder
+import UIKit
 
 @frozen
-public struct UICNavigation: UIViewControllerCreator {
-    public typealias ViewController = UINavigationController
+public struct UICHeader: ViewCreator {
+    let content: () -> ViewCreator
+    let height: CGFloat?
 
-    private let content: () -> ViewCreator
-
-    public init(_ content: @escaping () -> ViewCreator) {
+    public init(content: @escaping () -> ViewCreator) {
         self.content = content
+        self.height = nil
+    }
+
+    private init(_ original: UICHeader, _ editable: Editable) {
+        self.content = original.content
+        self.height = editable.height
     }
 
     @inline(__always)
-    public static func makeUIViewController(_ viewCreator: ViewCreator) -> UIViewController {
-        UINavigationController(
-            rootViewController: UICHostingController(content: (viewCreator as! Self).content)
-        )
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        fatalError()
+    }
+}
+
+public extension UICHeader {
+    @inlinable
+    func estimatedHeight(_ height: CGFloat) -> Self {
+        self.edit {
+            $0.height = height
+        }
+    }
+}
+
+public extension UICHeader {
+    @inline(__always) @inlinable
+    static var empty: UICHeader {
+        UICHeader {
+            EmptyView()
+        }
+        .estimatedHeight(0)
+    }
+}
+
+extension UICHeader {
+    @usableFromInline
+    struct Editable {
+        @MutableBox @usableFromInline
+        var height: CGFloat?
+
+        init(_ original: UICHeader) {
+            self._height = .init(wrappedValue: original.height)
+        }
+    }
+
+    @inline(__always) @usableFromInline
+    func edit(_ edit: (Editable) -> Void) -> Self {
+        let editable = Editable(self)
+        edit(editable)
+        return .init(self, editable)
     }
 }

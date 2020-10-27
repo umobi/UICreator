@@ -23,8 +23,6 @@
 import Foundation
 import UIKit
 
-extension UICTableView: ListSupport {}
-
 extension ListSupport where Self: UITableView {
     @discardableResult
     func dynamicData(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> Self {
@@ -33,15 +31,15 @@ extension ListSupport where Self: UITableView {
             let tableView: Self! = $0 as? Self
             
             manager.rowsIdentifier.forEach { [unowned tableView] in
-                tableView?.register(TableViewCell.self, forCellReuseIdentifier: $0)
+                tableView?.register(Views.TableViewCell.self, forCellReuseIdentifier: $0)
             }
 
             manager.headersIdentifier.forEach { [unowned tableView] in
-                tableView?.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
+                tableView?.register(Views.TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
             }
 
             manager.footersIdentifier.forEach { [unowned tableView] in
-                tableView?.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
+                tableView?.register(Views.TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
             }
 
             tableView.manager = manager
@@ -56,11 +54,13 @@ private var kTableDelegate = 0
 private var kTableDataSource = 0
 extension UITableView {
 
+    @inline(__always)
     func strongDelegate(_ delegate: UITableViewDelegate) {
         self.delegate = delegate
         objc_setAssociatedObject(self, &kTableDelegate, delegate, .OBJC_ASSOCIATION_RETAIN)
     }
 
+    @inline(__always)
     func strongDataSource(_ dataSource: UITableViewDataSource) {
         self.dataSource = dataSource
         objc_setAssociatedObject(self, &kTableDataSource, dataSource, .OBJC_ASSOCIATION_RETAIN)

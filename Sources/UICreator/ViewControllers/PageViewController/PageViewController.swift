@@ -24,6 +24,19 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
+extension ViewControllers {
+    public class PageViewController: UIPageViewController {
+        #if os(iOS)
+        @usableFromInline
+        internal var spineLocationHandler: ((UIInterfaceOrientation) -> SpineLocation)?
+        #endif
+        @usableFromInline
+        internal var onPageChangeHandler: ((Int) -> Void)?
+        @usableFromInline
+        internal var isInfinityScroll: Bool = false
+    }
+}
+
 private var kQueueViewControllers = 0
 extension UIPageViewController {
     var queuedViewControllers: [UIViewController]! {
@@ -79,109 +92,5 @@ extension UIPageViewController {
                 }(), animated: !UIAccessibility.isReduceMotionEnabled && self.view.window != nil, completion: nil)
             }
         }
-    }
-}
-
-public class PageViewController: UIPageViewController {
-    #if os(iOS)
-    internal var spineLocationHandler: ((UIInterfaceOrientation) -> SpineLocation)?
-    #endif
-    internal var onPageChangeHandler: ((Int) -> Void)?
-    internal var isInfinityScroll: Bool = false
-}
-
-extension PageViewController: UIPageViewControllerDelegate {
-    public func pageViewController(
-        _ pageViewController: UIPageViewController,
-        didFinishAnimating finished: Bool,
-        previousViewControllers: [UIViewController],
-        transitionCompleted completed: Bool) {
-        if !completed {
-            return
-        }
-
-        let currentPage = self.currentPage
-        self.onPageChangeHandler?(currentPage)
-    }
-
-    #if os(iOS)
-    public func pageViewController(
-        _ pageViewController: UIPageViewController,
-        spineLocationFor orientation: UIInterfaceOrientation) -> UIPageViewController.SpineLocation {
-        return self.spineLocationHandler?(orientation) ?? .none
-    }
-
-    public func pageViewControllerSupportedInterfaceOrientations(
-        _ pageViewController: UIPageViewController) -> UIInterfaceOrientationMask {
-        return UIApplication.shared.supportedInterfaceOrientations(for: self.view.window)
-    }
-    #endif
-}
-
-extension PageViewController: UIPageViewControllerDataSource {
-    public func pageViewController(
-        _ pageViewController: UIPageViewController,
-        viewControllerBefore viewController: UIViewController) -> UIViewController? {
-        let queueViews = self.queuedViewControllers!
-        guard
-            let viewControllerSlice = queueViews
-                .enumerated()
-                .first(where: {
-                    $0.element === viewController
-                }
-            )
-        else {
-            return nil
-        }
-
-        guard let back = queueViews
-            .enumerated()
-            .split(
-                maxSplits: 1,
-                omittingEmptySubsequences: true,
-                whereSeparator: {
-                    $0.element === viewController
-                }
-            ).first?.last
-        else {
-            return nil
-        }
-
-        if !self.isInfinityScroll && back.offset >= viewControllerSlice.offset {
-            return nil
-        }
-
-        return back.element
-    }
-
-    public func pageViewController(
-        _ pageViewController: UIPageViewController,
-        viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        let queueViews = self.queuedViewControllers ?? []
-        guard let viewControllerSlice = queueViews.enumerated().first(where: {
-            $0.element === viewController
-        }) else {
-            return nil
-        }
-
-        guard
-            let next = queueViews
-                .enumerated()
-                .split(
-                    maxSplits: 1,
-                    omittingEmptySubsequences: true,
-                    whereSeparator: {
-                        $0.element === viewController
-                    }
-                ).last?.first
-        else {
-            return nil
-        }
-
-        if !self.isInfinityScroll && next.offset <= viewControllerSlice.offset {
-            return nil
-        }
-
-        return next.element
     }
 }

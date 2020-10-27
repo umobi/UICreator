@@ -20,6 +20,5 @@
 // THE SOFTWARE.
 //
 
-import Foundation
-
+@frozen
 public enum Views {}

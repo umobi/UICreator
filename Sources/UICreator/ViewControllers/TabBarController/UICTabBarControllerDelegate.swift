@@ -23,18 +23,13 @@
 import Foundation
 import UIKit
 
-public protocol UICViewRepresentable: UIViewCreator {
-    func makeUIView() -> View
-    func updateUIView(_ uiView: View)
-}
 
-public extension UICViewRepresentable {
-    static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
-        let _self = viewCreator as! Self
+class UICTabBarControllerDelegate: NSObject, UITabBarControllerDelegate {
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        tabBarController.didSelect()
+    }
 
-        return Views.ViewAdaptor(_self.makeUIView())
-            .onNotRendered {
-                _self.updateUIView($0 as! View)
-            }
+    func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+        !viewController.view.dynamicView.isHidden
     }
 }

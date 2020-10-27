@@ -54,8 +54,7 @@ public class UICHostingController: UIViewController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-
-        (self.view as? ViewAdaptor)?.adaptView()
+//        (self.view as? ViewAdaptor)?.adaptView()
     }
 
     override public func viewDidDisappear(_ animated: Bool) {
@@ -76,7 +75,7 @@ public class UICHostingController: UIViewController {
     #endif
 
     public override func loadView() {
-        self.view = ViewAdaptor(self.viewCreator.releaseUIView())
+        self.view = self.viewCreator.releaseUIView()
     }
 
     @available(iOS 11.0, tvOS 11, *)

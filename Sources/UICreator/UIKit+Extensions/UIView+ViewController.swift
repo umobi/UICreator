@@ -88,6 +88,18 @@ extension CBView {
 }
 
 extension CBView {
+
+    @usableFromInline
+    func presentableViewController() -> CBViewController! {
+        self.window?.rootViewController.map {
+            sequence(first: $0, next: { $0.presentedViewController })
+                .reversed()
+                .first!
+        }
+    }
+}
+
+extension CBView {
     @inline(__always) @usableFromInline
     var navigationController: UINavigationController? {
         self.nearVCFromNavigation()?.navigationController
@@ -106,5 +118,17 @@ extension CBView {
     var tabBarItem: UITabBarItem? {
         get { self.nearVCFromTabBarController()?.tabBarItem }
         set { self.nearVCFromTabBarController()?.tabBarItem = newValue }
+    }
+}
+
+public extension UITabBarController {
+    func setViewControllers(@UICTabItemBuilder _ contents: @escaping () -> UICTabItem) {
+        let viewControllers: [UIViewController] = contents().zip.map {
+            let controller = UICHostingController(content: $0.content)
+            controller.tabBarItem = $0.tabItem
+            return controller
+        }
+
+        self.viewControllers = viewControllers
     }
 }

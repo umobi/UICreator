@@ -118,10 +118,9 @@ extension UITextView {
 
 private extension UITextView {
 
-    @inline(__always)
-    func onHandler<Parameters, Return>(
-        _ keyPath: ReferenceWritableKeyPath<Memory, ((Parameters) -> Return)?>,
-        handler: @escaping (Parameters) -> Return,
+    func onHandler<P1, Return>(
+        _ keyPath: ReferenceWritableKeyPath<Memory, ((P1) -> Return)?>,
+        handler: @escaping (P1) -> Return,
         returning: @escaping (Return?, Return) -> Return) -> Self {
 
         self.setDelegateIfNeeded()
@@ -134,7 +133,6 @@ private extension UITextView {
         return self
     }
 
-    @inline(__always)
     func onHandler<P1, P2, P3, Return>(
         _ keyPath: ReferenceWritableKeyPath<Memory, ((P1, P2, P3) -> Return)?>,
         handler: @escaping (P1, P2, P3) -> Return,
@@ -150,7 +148,6 @@ private extension UITextView {
         return self
     }
 
-    @inline(__always)
     func onHandler<P1, P2, P3, P4, Return>(
         _ keyPath: ReferenceWritableKeyPath<Memory, ((P1, P2, P3, P4) -> Return)?>,
         handler: @escaping (P1, P2, P3, P4) -> Return,
@@ -169,7 +166,7 @@ private extension UITextView {
 
 public extension UITextView {
 
-    @discardableResult
+    @discardableResult @inline(__always)
     func onDidChanged(_ handler: @escaping (UITextView) -> Void) -> Self {
         self.onHandler(
             \.didChange,
@@ -178,7 +175,7 @@ public extension UITextView {
         )
     }
 
-    @discardableResult
+    @discardableResult @inline(__always)
     func onDidBeginEditing(_ handler: @escaping (UITextView) -> Void) -> Self {
         self.onHandler(
             \.didBeginEditing,
@@ -187,7 +184,7 @@ public extension UITextView {
         )
     }
 
-    @discardableResult
+    @discardableResult @inline(__always)
     func onDidEndEditing(_ handler: @escaping (UITextView) -> Void) -> Self {
         self.onHandler(
             \.didEndEditing,
@@ -196,7 +193,7 @@ public extension UITextView {
         )
     }
 
-    @discardableResult
+    @discardableResult @inline(__always)
     func onDidChangeSelection(_ handler: @escaping (UITextView) -> Void) -> Self {
         self.onHandler(
             \.didChangeSelection,
@@ -208,7 +205,7 @@ public extension UITextView {
 
 public extension UITextView {
 
-    @discardableResult
+    @discardableResult @inline(__always)
     func onShouldBeginEditing(_ handler: @escaping (UITextView) -> Bool) -> Self {
         self.onHandler(
             \.shouldBeginEditing,
@@ -217,7 +214,7 @@ public extension UITextView {
         )
     }
 
-    @discardableResult
+    @discardableResult @inline(__always)
     func onShouldEndEditing(_ handler: @escaping (UITextView) -> Bool) -> Self {
         self.onHandler(
             \.shouldEndEditing,
@@ -229,7 +226,7 @@ public extension UITextView {
 
 public extension UITextView {
 
-    @discardableResult
+    @discardableResult @inline(__always)
     func onShouldChangeTextByReplacement(_ handler: @escaping (UITextView, NSRange, String) -> Bool) -> Self {
         self.onHandler(
             \.shouldChangeTextByReplacement,
@@ -238,7 +235,7 @@ public extension UITextView {
         )
     }
 
-    @discardableResult
+    @discardableResult @inline(__always)
     func onShouldInteractWithURLInRange(_ handler: @escaping (UITextView, URL, NSRange, UITextItemInteraction) -> Bool) -> Self {
         self.onHandler(
             \.shouldInteractWithURLInRange,
@@ -247,7 +244,7 @@ public extension UITextView {
         )
     }
 
-    @discardableResult
+    @discardableResult @inline(__always)
     func onShouldInteractWithAttachmentInRange(_ handler: @escaping (UITextView, NSTextAttachment, NSRange, UITextItemInteraction) -> Bool) -> Self {
         self.onHandler(
             \.shouldInteractWithAttachmentInRange,

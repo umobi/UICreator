@@ -58,11 +58,11 @@ extension ListManager: ListSectionDelegate {
         switch list {
         case let table as UITableView:
             newRows.forEach {
-                table.register(TableViewCell.self, forCellReuseIdentifier: $0)
+                table.register(Views.TableViewCell.self, forCellReuseIdentifier: $0)
             }
 
             (newHeaders + newFooters).forEach {
-                table.register(TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
+                table.register(Views.TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
             }
 
         case let collection as UICollectionView:

@@ -20,35 +20,5 @@
 // THE SOFTWARE.
 //
 
-import Foundation
-import ConstraintBuilder
-import CoreGraphics
-
-public struct UICHeader: ViewCreator {
-    let content: () -> ViewCreator
-    @MutableBox var height: CGFloat?
-
-    public init(content: @escaping () -> ViewCreator) {
-        self.content = content
-    }
-
-    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
-        fatalError()
-    }
-}
-
-public extension UICHeader {
-    func estimatedHeight(_ height: CGFloat) -> Self {
-        self.height = height
-        return self
-    }
-}
-
-public extension UICHeader {
-    static var empty: UICHeader {
-        UICHeader {
-            EmptyView()
-        }
-        .estimatedHeight(0)
-    }
-}
+@frozen
+public enum ViewControllers {}

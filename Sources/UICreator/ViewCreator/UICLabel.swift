@@ -56,7 +56,7 @@ public struct UICLabel: UIViewCreator {
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
-        return View()
+        return Views.Label()
             .onNotRendered {
                 weak var view = $0 as? View
 

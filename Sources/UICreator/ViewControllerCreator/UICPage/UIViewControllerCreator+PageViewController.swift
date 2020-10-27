@@ -22,19 +22,22 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
-public protocol UICViewRepresentable: UIViewCreator {
-    func makeUIView() -> View
-    func updateUIView(_ uiView: View)
-}
+public extension UIViewControllerCreator where ViewController: ViewControllers.PageViewController {
+    #if os(iOS)
+    @inlinable
+    func spineLocation(_ handler: @escaping (UIInterfaceOrientation) -> UIPageViewController.SpineLocation) -> UICModifiedViewController<ViewController> {
+        self.onInTheScene {
+            ($0 as? ViewController)?.spineLocationHandler = handler
+        }
+    }
+    #endif
 
-public extension UICViewRepresentable {
-    static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
-        let _self = viewCreator as! Self
-
-        return Views.ViewAdaptor(_self.makeUIView())
-            .onNotRendered {
-                _self.updateUIView($0 as! View)
-            }
+    @inlinable
+    func isInfinityScroll(_ flag: Bool) -> UICModifiedViewController<ViewController> {
+        self.onInTheScene {
+            ($0 as? ViewController)?.isInfinityScroll = flag
+        }
     }
 }

@@ -23,6 +23,7 @@
 import Foundation
 import UIKit
 
+@frozen
 public struct UICTabItem {
 
     let title: String?
@@ -64,7 +65,7 @@ public struct UICTabItem {
         self.collection = nil
     }
 
-    public init(title: String, content: @escaping () -> ViewCreator) {
+    public init(_ title: String, content: @escaping () -> ViewCreator) {
         self.title = title
         self.content = content
         self.image = nil
@@ -74,7 +75,7 @@ public struct UICTabItem {
         self.collection = nil
     }
 
-    public init(image: UICImage, content: @escaping () -> ViewCreator) {
+    public init(_ image: UICImage, content: @escaping () -> ViewCreator) {
         self.title = nil
         self.content = content
         self.image = image.uiImage
@@ -82,36 +83,6 @@ public struct UICTabItem {
         self.tabSystem = nil
         self.tag = 0
         self.collection = nil
-    }
-
-    public func title(_ title: String?) -> Self {
-        self.edit {
-            $0.title = title
-        }
-    }
-
-    public func image(_ image: UICImage?) -> Self {
-        self.edit {
-            $0.image = image?.uiImage
-        }
-    }
-
-    public func tag(_ tag: Int) -> Self {
-        self.edit {
-            $0.tag = tag
-        }
-    }
-
-    public func selectedImage(_ image: UICImage) -> Self {
-        self.edit {
-            $0.selectedImage = image.uiImage
-        }
-    }
-
-    public func systemItem(_ systemItem: UITabBarItem.SystemItem) -> Self {
-        self.edit {
-            $0.tabSystem = systemItem
-        }
     }
 
     private init(_ original: UICTabItem, editable: Editable) {
@@ -122,28 +93,6 @@ public struct UICTabItem {
         self.tag = editable.tag
         self.content = original.content
         self.collection = nil
-    }
-
-    private func edit(_ edit: @escaping (Editable) -> Void) -> Self {
-        let editable = Editable(self)
-        edit(editable)
-        return .init(self, editable: editable)
-    }
-
-    private class Editable {
-        var title: String?
-        var image: UIImage?
-        var selectedImage: UIImage?
-        var tabSystem: UITabBarItem.SystemItem?
-        var tag: Int
-
-        init(_ tabItem: UICTabItem) {
-            self.title = tabItem.title
-            self.image = tabItem.image
-            self.selectedImage = tabItem.selectedImage
-            self.tabSystem = tabItem.tabSystem
-            self.tag = tabItem.tag
-        }
     }
 
     var tabItem: UITabBarItem {
@@ -161,5 +110,81 @@ public struct UICTabItem {
         tabItem.tag = self.tag
         tabItem.selectedImage = self.selectedImage
         return tabItem
+    }
+}
+
+public extension UICTabItem {
+
+    @inlinable
+    func title(_ title: String?) -> Self {
+        self.edit {
+            $0.title = title
+        }
+    }
+
+    @inlinable
+    func image(_ image: UICImage?) -> Self {
+        self.edit {
+            $0.image = image?.uiImage
+        }
+    }
+
+    @inlinable
+    func tag(_ tag: Int) -> Self {
+        self.edit {
+            $0.tag = tag
+        }
+    }
+
+    @inlinable
+    func selectedImage(_ image: UICImage) -> Self {
+        self.edit {
+            $0.selectedImage = image.uiImage
+        }
+    }
+
+    @inlinable
+    func systemItem(_ systemItem: UITabBarItem.SystemItem) -> Self {
+        self.edit {
+            $0.tabSystem = systemItem
+        }
+    }
+}
+
+extension UICTabItem {
+
+    @usableFromInline
+    struct Editable {
+
+        @MutableBox @usableFromInline
+        var title: String?
+
+        @MutableBox @usableFromInline
+        var image: UIImage?
+
+        @MutableBox @usableFromInline
+        var selectedImage: UIImage?
+
+        @MutableBox @usableFromInline
+        var tabSystem: UITabBarItem.SystemItem?
+
+        @MutableBox @usableFromInline
+        var tag: Int
+
+        @usableFromInline
+        init(_ tabItem: UICTabItem) {
+            self._title = .init(wrappedValue: tabItem.title)
+            self._image = .init(wrappedValue: tabItem.image)
+            self._selectedImage = .init(wrappedValue: tabItem.selectedImage)
+            self._tabSystem = .init(wrappedValue: tabItem.tabSystem)
+            self._tag = .init(wrappedValue: tabItem.tag)
+        }
+    }
+
+    @inline(__always) @usableFromInline
+    func edit(_ edit: @escaping (Editable) -> Void) -> Self {
+        let editable = Editable(self)
+        edit(editable)
+        return .init(self, editable: editable)
     }
 }

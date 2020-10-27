@@ -192,7 +192,7 @@ public extension UIViewControllerCreator {
 public extension UIViewControllerCreator {
 
     @inlinable
-    func eraseToUICAnyView() -> UICAnyView {
+    func eraseToAnyView() -> UICAnyView {
         UICAnyView(self)
     }
 }
