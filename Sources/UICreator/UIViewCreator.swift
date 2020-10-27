@@ -95,8 +95,8 @@ public protocol UIViewCreator: ViewCreator {
 }
 
 extension UIViewCreator {
-    @inline(__always)
-    @usableFromInline
+
+    @inline(__always) @usableFromInline
     func releaseOperationCastedView() -> View {
         self.operationUIView().dynamicView as! View
     }

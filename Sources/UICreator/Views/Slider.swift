@@ -22,16 +22,22 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
-internal class UICTableView: UITableView {
+#if os(iOS)
+public class Slider: UISlider {
 
-    init(_ style: Style) {
-        super.init(frame: .zero, style: style)
+    init() {
+        super.init(frame: .zero)
         self.makeSelfImplemented()
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    public override init(frame: CGRect) {
+        fatalError("init(frame:) has not been implemented")
     }
 
     override open var isHidden: Bool {
@@ -65,14 +71,6 @@ internal class UICTableView: UITableView {
         self.renderManager.didMoveToWindow()
     }
 
-    override public func setNeedsLayout() {
-        super.setNeedsLayout()
-    }
-
-    override public func layoutIfNeeded() {
-        super.layoutIfNeeded()
-    }
-
     override public func layoutSubviews() {
         super.layoutSubviews()
         self.renderManager.layoutSubviews()
@@ -83,26 +81,4 @@ internal class UICTableView: UITableView {
         self.renderManager.traitDidChange()
     }
 }
-
-extension UITableView {
-    private var tableViewCellHandler: ((UITableViewCell) -> Void)? {
-        get { self.memory.cellHandler }
-        set { self.memory.cellHandler = newValue }
-    }
-
-    @discardableResult
-    @usableFromInline
-    func appendCellHandler(handler: @escaping (UITableViewCell) -> Void) -> Self {
-        let all = self.tableViewCellHandler
-        self.tableViewCellHandler = {
-            all?($0)
-            handler($0)
-        }
-
-        return self
-    }
-
-    func commitCell(_ cell: UITableViewCell) {
-        self.tableViewCellHandler?(cell)
-    }
-}
+#endif

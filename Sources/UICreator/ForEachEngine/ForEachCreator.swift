@@ -23,6 +23,7 @@
 import Foundation
 import UIKit
 
+@usableFromInline
 protocol SupportForEach: class {
     func viewsDidChange(_ placeholderView: UIView!, _ dynamicContent: Relay<[() -> ViewCreator]>)
 }

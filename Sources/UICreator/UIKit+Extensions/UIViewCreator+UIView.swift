@@ -22,39 +22,46 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 // swiftlint:disable file_length
 public extension UIViewCreator {
+    @inlinable
     func backgroundColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.backgroundColor = color
         }
     }
 
+    @inlinable
     func tintColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.tintColor = color
         }
     }
 
+    @inlinable
     func contentScaleFactor(_ scale: CGFloat) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.contentScaleFactor = scale
         }
     }
 
+    @inlinable
     func zIndex(_ zIndex: CGFloat) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.layer.zPosition = zIndex
         }
     }
 
+    @inlinable
     func alpha(_ constant: CGFloat) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.alpha = constant
         }
     }
 
+    @inlinable
     func alpha(_ dynamicConstant: Relay<CGFloat>) -> UICModifiedView<View> {
         self.onNotRendered {
             weak var view = $0 as? View
@@ -65,6 +72,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func `as`(_ reference: UICOutlet<View>) -> UICModifiedView<View> {
         self.onNotRendered { [reference] in
             reference.ref($0 as? View)
@@ -73,12 +81,14 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
+    @inlinable
     func shadowRadius(_ radius: CGFloat) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.layer.shadowRadius = radius
         }
     }
 
+    @inlinable
     func shadowOffset(_ offset: CGSize) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.layer.shadowOffset = offset
@@ -86,6 +96,7 @@ public extension UIViewCreator {
     }
 
     // swiftlint:disable identifier_name
+    @inlinable
     func shadowOffset(x: CGFloat) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.layer.shadowOffset = .init(width: x, height: 0)
@@ -93,6 +104,7 @@ public extension UIViewCreator {
     }
 
     // swiftlint:disable identifier_name
+    @inlinable
     func shadowOffset(y: CGFloat) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.layer.shadowOffset = .init(width: 0, height: y)
@@ -100,18 +112,21 @@ public extension UIViewCreator {
     }
 
     // swiftlint:disable identifier_name
+    @inlinable
     func shadowOffset(x: CGFloat, y: CGFloat) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.layer.shadowOffset = .init(width: x, height: y)
         }
     }
 
+    @inlinable
     func shadowOcupacity(_ alpha: CGFloat) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.layer.shadowOpacity = Float(alpha)
         }
     }
 
+    @inlinable
     func shadowColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.layer.shadowColor = color?.cgColor
@@ -121,24 +136,28 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func clipsToBounds(_ flag: Bool) -> UICModifiedView<View> {
         self.onInTheScene {
             $0.clipsToBounds = flag
         }
     }
 
+    @inlinable
     func isOpaque(_ flag: Bool) -> UICModifiedView<View> {
         self.onInTheScene {
             $0.isOpaque = flag
         }
     }
 
+    @inlinable
     func isHidden(_ flag: Bool) -> UICModifiedView<View> {
         self.onInTheScene {
             $0.isHidden = flag
         }
     }
 
+    @inlinable
     func isUserInteractionEnabled(_ flag: Bool) -> UICModifiedView<View> {
         self.onInTheScene {
             $0.isUserInteractionEnabled = flag
@@ -146,6 +165,7 @@ public extension UIViewCreator {
     }
 
     #if os(iOS)
+    @inlinable
     func isExclusiveTouch(_ flag: Bool) -> UICModifiedView<View> {
         self.onInTheScene {
             $0.isExclusiveTouch = flag
@@ -156,22 +176,24 @@ public extension UIViewCreator {
 
 public extension UIViewCreator {
     #if os(iOS)
+    @inlinable
     func statusBar(_ appearanceStyle: UIStatusBarStyle) -> UICModifiedView<View> {
         self.onInTheScene {
-            ($0.viewController as? UICHostingController)?.statusBarStyle = appearanceStyle
+            $0.nearHostingController().statusBarStyle = appearanceStyle
         }
     }
     #endif
 }
 
 public extension UIViewCreator {
-    @available(iOS 13.0, tvOS 13.0, *)
+    @available(iOS 13.0, tvOS 13.0, *) @inlinable
     func transform3d(_ transform3d: CATransform3D) -> UICModifiedView<View> {
         self.onRendered {
             $0.transform3D = transform3d
         }
     }
 
+    @inlinable
     func transform(_ transform: CGAffineTransform) -> UICModifiedView<View> {
         self.onRendered {
             $0.transform = transform
@@ -180,7 +202,7 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
-    @available(iOS 13, tvOS 13, *)
+    @available(iOS 13, tvOS 13, *) @inlinable
     func userInterfaceStyle(_ style: UIUserInterfaceStyle) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.overrideUserInterfaceStyle = style
@@ -189,8 +211,11 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
-    func accessibily(_ handler: @escaping () -> UIAccessibilityCreator<Self>) -> UICModifiedView<View> {
-        handler().viewCreator(self)
+    @inlinable
+    func makeAccessibility() -> UICAccessibilityView<View> {
+        UICAccessibilityView {
+            self.releaseOperationCastedView()
+        }
     }
 }
 
@@ -199,7 +224,7 @@ public extension UIViewCreator {
         Use this function to move the view inside superview
         If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
      */
-    @discardableResult
+    @inlinable
     // swiftlint:disable identifier_name
     func frame(x: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
@@ -213,7 +238,7 @@ public extension UIViewCreator {
         If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
      */
     // swiftlint:disable identifier_name
-    @discardableResult
+    @inlinable
     func frame(y: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
             let frame = $0.frame
@@ -225,7 +250,7 @@ public extension UIViewCreator {
         Use this function to move the view inside superview
         If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
      */
-    @discardableResult
+    @inlinable
     func frame(height: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
             let frame = $0.frame
@@ -237,7 +262,7 @@ public extension UIViewCreator {
         Use this function to move the view inside superview
         If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
      */
-    @discardableResult
+    @inlinable
     func frame(width: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
             let frame = $0.frame
@@ -252,7 +277,7 @@ public extension UIViewCreator {
         Use this function to move the view inside superview
         If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
      */
-    @discardableResult
+    @inlinable
     func frame(insetByX xInset: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
             let frame = $0.frame
@@ -264,7 +289,7 @@ public extension UIViewCreator {
         Use this function to move the view inside superview
         If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
      */
-    @discardableResult
+    @inlinable
     func frame(insetByY yInset: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
             let frame = $0.frame
@@ -279,7 +304,7 @@ public extension UIViewCreator {
         Use this function to move the view inside superview
         If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
      */
-    @discardableResult
+    @inlinable
     func frame(offsetByX xOffset: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
             let frame = $0.frame
@@ -291,7 +316,7 @@ public extension UIViewCreator {
         Use this function to move the view inside superview
         If you trying to set the frame directly at `var body: ViewCreator { get }`, use the frame(_:).
      */
-    @discardableResult
+    @inlinable
     func frame(offsetByY yOffset: CGFloat) -> UICModifiedView<View> {
         self.onRendered {
             let frame = $0.frame
@@ -301,7 +326,8 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
-    /// Set frame to UIView
+    /// Set frame to CBView
+    @inlinable
     func frame(_ frame: CGRect) -> UICModifiedView<View> {
         self.onRendered {
             $0.frame = frame
@@ -310,11 +336,11 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
-    @discardableResult
+    @inlinable
     func animate(
         _ isAnimating: Relay<Bool>,
         _ duration: TimeInterval,
-        animations: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+        animations: @escaping (CBView) -> Void) -> UICModifiedView<View> {
 
         self.onInTheScene {
             weak var view = $0
@@ -324,7 +350,7 @@ public extension UIViewCreator {
                     return
                 }
 
-                UIView.animate(withDuration: duration, animations: {
+                CBView.animate(withDuration: duration, animations: {
                     animations(view)
                     view.setNeedsLayout()
                 }, completion: nil)
@@ -332,11 +358,11 @@ public extension UIViewCreator {
         }
     }
 
-    @discardableResult
+    @inlinable
     func animate(
         _ isAnimating: Relay<Bool>,
         _ duration: TimeInterval,
-        animations: @escaping (UIView) -> Void,
+        animations: @escaping (CBView) -> Void,
         completion: @escaping (Bool) -> Void) -> UICModifiedView<View> {
 
         self.onInTheScene {
@@ -347,7 +373,7 @@ public extension UIViewCreator {
                     return
                 }
 
-                UIView.animate(withDuration: duration, animations: {
+                CBView.animate(withDuration: duration, animations: {
                     animations(view)
                     view.setNeedsLayout()
                 }, completion: completion)
@@ -355,13 +381,13 @@ public extension UIViewCreator {
         }
     }
 
-    @discardableResult
+    @inlinable
     func animate(
         _ isAnimating: Relay<Bool>,
         _ duration: TimeInterval,
         delay: TimeInterval,
-        options: UIView.AnimationOptions,
-        animations: @escaping (UIView) -> Void,
+        options: CBView.AnimationOptions,
+        animations: @escaping (CBView) -> Void,
         completion: ((Bool) -> Void)? = nil) -> UICModifiedView<View> {
 
         self.onInTheScene {
@@ -372,7 +398,7 @@ public extension UIViewCreator {
                     return
                 }
 
-                UIView.animate(
+                CBView.animate(
                     withDuration: duration,
                     delay: delay,
                     options: options,
@@ -386,13 +412,13 @@ public extension UIViewCreator {
         }
     }
 
-    @discardableResult
+    @inlinable
     func animateWithKeyframes(
         _ isAnimating: Relay<Bool>,
         _ duration: TimeInterval,
         delay: TimeInterval = 0,
-        options: UIView.KeyframeAnimationOptions = [],
-        animations animationsSequence: UIView.CreatorKeyframeSequence,
+        options: CBView.KeyframeAnimationOptions = [],
+        animations animationsSequence: CBView.CreatorKeyframeSequence,
         completion: ((Bool) -> Void)? = nil) -> UICModifiedView<View> {
 
         self.onInTheScene {
@@ -403,13 +429,13 @@ public extension UIViewCreator {
                     return
                 }
 
-                UIView.animateKeyframes(
+                CBView.animateKeyframes(
                     withDuration: duration,
                     delay: delay,
                     options: options,
                     animations: {
                         animationsSequence.sequence.forEach { keyframe in
-                            UIView.addKeyframe(
+                            CBView.addKeyframe(
                                 withRelativeStartTime: keyframe.startTime,
                                 relativeDuration: keyframe.duration,
                                 animations: {
@@ -424,7 +450,8 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
-    func addLayer(_ handler: @escaping (UIView) -> CALayer) -> UICModifiedView<View> {
+    @inlinable
+    func addLayer(_ handler: @escaping (CBView) -> CALayer) -> UICModifiedView<View> {
         self.onNotRendered {
             $0.layer.addSublayer(handler($0))
         }
@@ -432,6 +459,7 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
+    @inlinable
     func backgroundColor(_ color: Relay<UIColor>) -> UICModifiedView<View> {
         self.onNotRendered { view in
             weak var view = view
@@ -443,6 +471,7 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
+    @inlinable
     func isUserInteractionEnabled(_ value: Relay<Bool>) -> UICModifiedView<View> {
         self.onInTheScene {
             weak var view = $0
@@ -454,6 +483,7 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
+    @inlinable
     func isHidden(_ isHidden: Relay<Bool>) -> UICModifiedView<View> {
         self.onNotRendered { view in
             weak var weakView = view
@@ -464,6 +494,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func tintColor(_ tintColor: Relay<UIColor>) -> UICModifiedView<View> {
         self.onNotRendered { view in
             weak var weakView = view

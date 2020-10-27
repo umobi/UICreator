@@ -55,6 +55,7 @@ extension UITableView {
 }
 
 extension UITableView {
+    @usableFromInline
     var manager: ListCollectionManager? {
         get { self.memory.manager }
         set { self.memory.manager = newValue }

@@ -20,54 +20,13 @@
 // THE SOFTWARE.
 //
 
-import Foundation
-
-@usableFromInline
-struct Fatal {
-    @inline(__always) @usableFromInline
-    static func die(_ type: FatalType) -> Never {
-        fatalError(type.error)
-    }
-
-    @inline(__always) @usableFromInline
-    static func warning(_ type: FatalType) {
-        print("[WARNING] \(type.error)")
-    }
-}
-
-@usableFromInline
-protocol FatalType {
-    var error: String { get }
-    func die() -> Never
-    func warning()
-}
-
-extension FatalType where Self: RawRepresentable, RawValue == String {
-
-    @inline(__always) @usableFromInline
-    var error: String {
-        self.rawValue
-    }
-}
-
-extension FatalType {
-    @inline(__always) @usableFromInline
-    func die() -> Never {
-        Fatal.die(self)
-    }
-
-    @inline(__always) @usableFromInline
-    func warning() {
-        Fatal.warning(self)
-    }
-}
-
-extension Fatal {
-    struct Builder: FatalType {
-        let error: String
-
-        init(_ string: String) {
-            self.error = string
-        }
-    }
+@frozen
+public enum PaddingEdges {
+    case top
+    case bottom
+    case left
+    case right
+    case all
+    case horizontal
+    case vertical
 }

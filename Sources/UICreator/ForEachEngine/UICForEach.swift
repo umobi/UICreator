@@ -97,12 +97,17 @@ public struct EmptyView: UIViewCreator {
 }
 
 extension UICForEach {
+    @usableFromInline
     class Enviroment: ForEachEnviromentType {
-        let contentType: ViewCreator.Type
         @UICOutlet var view: UIView!
         @Relay private var dynamicContent: [() -> ViewCreator]
 
         private weak var manager: SupportForEach!
+
+        @usableFromInline
+        let contentType: ViewCreator.Type
+
+        @usableFromInline
         private(set) var isReleased: Bool = false
 
         init(_ dynamicValue: Relay<Value>, content: @escaping (Value.Element) -> Content) {
@@ -116,6 +121,7 @@ extension UICForEach {
             }
         }
 
+        @usableFromInline
         func syncManager() {
             guard !self.isReleased, let manager = self.manager else {
                 return
@@ -125,6 +131,7 @@ extension UICForEach {
             manager.viewsDidChange(self.view, self.$dynamicContent)
         }
 
+        @usableFromInline
         func setManager(_ manager: SupportForEach) {
             self.manager = manager
             
@@ -135,6 +142,7 @@ extension UICForEach {
     }
 }
 
+@usableFromInline
 protocol ForEachEnviromentType: class {
     var contentType: ViewCreator.Type { get }
     func syncManager()
@@ -143,13 +151,16 @@ protocol ForEachEnviromentType: class {
     var isReleased: Bool { get }
 }
 
+@usableFromInline
 protocol ForEachEnviromentShared: ViewCreator {
     var enviroment: ForEachEnviromentType { get }
 }
 
+@frozen
 public struct UICForEach<Content, Value>: ViewCreator, ForEachEnviromentShared where Content: ViewCreator, Value: Collection {
     private let privateEnviroment: Enviroment
 
+    @usableFromInline
     var enviroment: ForEachEnviromentType {
         self.privateEnviroment
     }
@@ -162,6 +173,7 @@ public struct UICForEach<Content, Value>: ViewCreator, ForEachEnviromentShared w
         self.privateEnviroment = .init(.constant(value), content: content)
     }
 
+    @inline(__always)
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         EmptyView()
             .height(equalTo: 0, priority: .defaultHigh)

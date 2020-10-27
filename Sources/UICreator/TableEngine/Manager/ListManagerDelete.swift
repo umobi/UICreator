@@ -24,35 +24,42 @@ import Foundation
 import UIKit
 
 extension ListManager {
+    @usableFromInline
     class Delete: ListCollectionManager {
         private let manager: ListManager
 
+        @inline(__always) @usableFromInline
         var sections: [ListManager.SectionManager] {
-            return self.manager.sections
+            self.manager.sections
         }
 
         private var disableIndexPath: [IndexPath] = []
         private var disableSections: [Int] = []
 
+        @usableFromInline
         init(_ manager: ListManager) {
             self.manager = manager
         }
 
+        @inline(__always) @usableFromInline
         func disableIndexPath(_ indexPath: IndexPath) -> Self {
             self.disableIndexPath.append(indexPath)
             return self
         }
 
+        @inline(__always) @usableFromInline
         func disableIndexPaths(_ indexPaths: [IndexPath]) -> Self {
             self.disableIndexPath = indexPaths
             return self
         }
 
+        @inline(__always) @usableFromInline
         func disableSections(_ sections: [Int]) -> Self {
             self.disableSections = sections
             return self
         }
 
+        @usableFromInline
         func numberOfRows(in section: ListManager.SectionManager) -> Int {
             let numberOfRows = self.manager.numberOfRows(in: section)
 
@@ -63,8 +70,9 @@ extension ListManager {
             return numberOfRows - self.disableIndexPath.reduce(0) { $0 + ($1.section == section.index ? 1 : 0 )}
         }
 
+        @inline(__always) @usableFromInline
         var numberOfSections: Int {
-            return self.manager.numberOfSections - IndexSet(self.disableSections).count
+            self.manager.numberOfSections - IndexSet(self.disableSections).count
         }
     }
 }

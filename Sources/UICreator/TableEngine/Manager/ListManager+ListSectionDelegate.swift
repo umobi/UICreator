@@ -76,6 +76,7 @@ extension ListManager: ListSectionDelegate {
         list.setNeedsReloadData()
     }
 
+    @usableFromInline
     func content(updateSection: ListManager.SectionManager) {
         self.update(sections: self.sections.map {
             $0.index == updateSection.index ? updateSection : $0
@@ -108,6 +109,7 @@ extension ListManager: ListSectionDelegate {
             Array(self.sections[first.offset..<self.sections.count])
     }
 
+    @usableFromInline
     func content(_ section: ListManager.SectionManager.Copy, updateSections: [ListManager.SectionManager]) {
         self.update(
             sections: self.updatedSections(

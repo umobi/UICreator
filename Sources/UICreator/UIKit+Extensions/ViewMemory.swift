@@ -56,15 +56,19 @@ private extension CBView {
 }
 
 extension CBView {
+
+    @inline(__always) @usableFromInline
     @objc var dynamicView: CBView {
-        return self
+        self
     }
 
+    @inline(__always) @usableFromInline
     var adaptedByView: ViewAdaptor! {
         get { self.memory.adaptedByView }
         set { self.memory.adaptedByView = newValue }
     }
 
+    @inline(__always)
     private var adaptorOrView: CBView! {
         if self.superview is ViewAdaptor {
             return self.superview
@@ -73,6 +77,7 @@ extension CBView {
         return self
     }
 
+    @usableFromInline
     var layoutSuperview: CBView? {
         guard let superview = self.superview else {
             return nil
@@ -84,22 +89,28 @@ extension CBView {
 }
 
 extension CBView {
+
+    @inline(__always)
     var render: Render {
         self.memory.render
     }
 
+    @inline(__always)
     var layout: Layout {
         self.memory.layout
     }
 
+    @inline(__always)
     var appear: Appear {
         self.memory.appear
     }
 
+    @inline(__always)
     var trait: Trait {
         self.memory.trait
     }
 
+    @inline(__always)
     var isSelfImplemented: Bool {
         get { self.memory.isSelfImplemented }
         set { self.memory.isSelfImplemented = newValue }
@@ -108,7 +119,7 @@ extension CBView {
 
 extension CBView {
 
-    @discardableResult
+    @discardableResult @inline(__always)
     func makeSelfImplemented() -> Self {
         self.isSelfImplemented = true
         return self

@@ -24,11 +24,12 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
+@frozen
 public struct UICList: UIViewCreator {
     public typealias View = UITableView
 
-    let style: UITableView.Style
-    let contents: () -> ViewCreator
+    private let style: UITableView.Style
+    private let contents: () -> ViewCreator
 
     public init(
         _ style: UITableView.Style,
@@ -52,25 +53,28 @@ public struct UICList: UIViewCreator {
 }
 
 public extension UIViewCreator where View: UITableView {
-
+    @inlinable
     func allowsMultipleSelection(_ flag: Bool) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.allowsMultipleSelection = flag
         }
     }
 
+    @inlinable
     func allowsSelection(_ flag: Bool) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.allowsSelection = flag
         }
     }
 
+    @inlinable
     func allowsSelectionDuringEditing(_ flag: Bool) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.allowsSelectionDuringEditing = flag
         }
     }
 
+    @inlinable
     func allowsMultipleSelectionDuringEditing(_ flag: Bool) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.allowsMultipleSelectionDuringEditing = flag
@@ -78,12 +82,14 @@ public extension UIViewCreator where View: UITableView {
     }
 
     @available(iOS 11.0, tvOS 11.0, *)
+    @inlinable
     func insetsContentViews(toSafeArea flag: Bool) -> UICModifiedView<View> {
         self.onInTheScene {
             ($0 as? View)?.insetsContentViewsToSafeArea = flag
         }
     }
 
+    @inlinable
     func background(_ content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.onInTheScene { tableView in
             weak var tableView = tableView
@@ -92,7 +98,7 @@ public extension UIViewCreator where View: UITableView {
                 .onAdd {
                     (tableView as? View)?.backgroundView = $0
                 }.addSubview(
-                    ViewAdaptor(content().releaseUIView())
+                    UICAnyView(content).releaseUIView()
                 )
                 .height(.required)
                 .width(.required)
@@ -101,18 +107,21 @@ public extension UIViewCreator where View: UITableView {
     }
 
     #if os(iOS)
+    @inlinable
     func separatorEffect(_ effect: UIVisualEffect) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.separatorEffect = effect
         }
     }
 
+    @inlinable
     func separatorColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.separatorColor = color
         }
     }
 
+    @inlinable
     func separatorStyle(_ style: UITableViewCell.SeparatorStyle) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.separatorStyle = style
@@ -120,6 +129,7 @@ public extension UIViewCreator where View: UITableView {
     }
     #endif
 
+    @inlinable
     func separatorInsets(_ insets: UIEdgeInsets) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.separatorInset = insets
@@ -127,12 +137,14 @@ public extension UIViewCreator where View: UITableView {
     }
 
     @available(iOS 11.0, tvOS 11.0, *)
+    @inlinable
     func separatorInsetReference(_ insetReference: UITableView.SeparatorInsetReference) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.separatorInsetReference = insetReference
         }
     }
 
+    @inlinable
     func header(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.onInTheScene { tableView in
             weak var tableView = tableView
@@ -141,13 +153,14 @@ public extension UIViewCreator where View: UITableView {
                 .onAdd {
                     (tableView as? View)?.tableHeaderView = $0
                 }.addSubview(
-                    ViewAdaptor(content().releaseUIView())
+                    UICAnyView(content).releaseUIView()
                 )
                 .width(.required)
                 .watch(in: tableView)
         }
     }
 
+    @inlinable
     func footer(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.onInTheScene { tableView in
             weak var tableView = tableView
@@ -156,7 +169,7 @@ public extension UIViewCreator where View: UITableView {
                 .onAdd {
                     (tableView as? View)?.tableFooterView = $0
                 }.addSubview(
-                    ViewAdaptor(content().releaseUIView())
+                    UICAnyView(content).releaseUIView()
                 )
                 .width(.required)
                 .watch(in: tableView)
@@ -165,6 +178,7 @@ public extension UIViewCreator where View: UITableView {
 }
 
 public extension UIViewCreator where View: UITableView {
+    @inlinable
     func accessoryType(_ type: UITableViewCell.AccessoryType) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.appendCellHandler {
@@ -175,6 +189,7 @@ public extension UIViewCreator where View: UITableView {
 }
 
 public extension UIViewCreator where View: UITableView {
+    @inlinable
     func deleteRows(
         with animation: UITableView.RowAnimation,
         _ value: Relay<[IndexPath]>,
@@ -214,6 +229,7 @@ public extension UIViewCreator where View: UITableView {
         }
     }
 
+    @inlinable
     func deleteSections(
         with animation: UITableView.RowAnimation,
         _ value: Relay<[Int]>,
@@ -256,6 +272,7 @@ public extension UIViewCreator where View: UITableView {
 
 public extension UIViewCreator where View: UITableView {
 
+    @inlinable
     func insertRows(
         with animation: UITableView.RowAnimation,
         _ value: Relay<[IndexPath]>,
@@ -293,6 +310,7 @@ public extension UIViewCreator where View: UITableView {
         }
     }
 
+    @inlinable
     func insertSections(
         with animation: UITableView.RowAnimation,
         _ value: Relay<[Int]>,
@@ -343,12 +361,14 @@ public extension UIViewCreator where View: UITableView {
 }
 
 extension UICList {
+    @usableFromInline
     enum Fatal: FatalType {
         case deleteRows([IndexPath])
         case deleteSections([Int])
         case insertRows([IndexPath])
         case insertSections([Int])
 
+        @usableFromInline
         var error: String {
             switch self {
             case .deleteRows(let indexPaths):

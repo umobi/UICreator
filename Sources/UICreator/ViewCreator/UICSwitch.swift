@@ -25,65 +25,9 @@ import UIKit
 import ConstraintBuilder
 
 #if os(iOS)
-public class SwitchView: UISwitch {
-
-    init() {
-        super.init(frame: .zero)
-        self.makeSelfImplemented()
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override public init(frame: CGRect) {
-        fatalError("init(frame:) has not been implemented")
-    }
-
-    override open var isHidden: Bool {
-        get { super.isHidden }
-        set {
-            super.isHidden = newValue
-            self.renderManager.isHidden(newValue)
-        }
-    }
-
-    override open var frame: CGRect {
-        get { super.frame }
-        set {
-            super.frame = newValue
-            self.renderManager.frame(newValue)
-        }
-    }
-
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        self.renderManager.willMove(toSuperview: newSuperview)
-    }
-
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        self.renderManager.didMoveToSuperview()
-    }
-
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        self.renderManager.didMoveToWindow()
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        self.renderManager.layoutSubviews()
-    }
-
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        self.renderManager.traitDidChange()
-    }
-}
-
+@frozen
 public struct UICSwitch: UIViewCreator {
-    public typealias View = SwitchView
+    public typealias View = UISwitch
 
     @Relay private var isOn: Bool
 
@@ -95,10 +39,11 @@ public struct UICSwitch: UIViewCreator {
         self._isOn = isOn
     }
 
+    @inline(__always)
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
-        return View()
+        return Views.Switch()
             .onEvent(.valueChanged) {
                 _self.isOn = ($0 as? View)?.isOn ?? false
             }
@@ -114,30 +59,35 @@ public struct UICSwitch: UIViewCreator {
 
 public extension UIViewCreator where View: UISwitch {
 
+    @inlinable
     func isOn(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.isOn = flag
         }
     }
 
+    @inlinable
     func offImage(_ image: UICImage?) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.offImage = image?.uiImage
         }
     }
 
+    @inlinable
     func onImage(_ image: UICImage?) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.onImage = image?.uiImage
         }
     }
 
+    @inlinable
     func onTintColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.onTintColor = color
         }
     }
 
+    @inlinable
     func thumbTintColor(_ color: UIColor?) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.thumbTintColor = color

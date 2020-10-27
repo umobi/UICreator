@@ -209,7 +209,7 @@ public extension UIViewCreator {
     @available(iOS 13.0, tvOS 13, *)
     func tabBarItem(standardAppearance: UITabBarAppearance?) -> UICModifiedView<View> {
         self.onInTheScene {
-            let tabItem = $0.viewController.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
+            let tabItem = $0.tabBarItem ?? .init(title: nil, image: nil, tag: 0)
             tabItem.standardAppearance = standardAppearance
             $0.tabBarItem = tabItem
         }
@@ -303,22 +303,5 @@ public extension UITabBarController {
 
         self.selectedViewController = view
         self.delegate?.tabBarController?(self, didSelect: view)
-    }
-}
-
-public extension UIView {
-    var tabBarItem: UITabBarItem? {
-        get {
-            ViewControllerSearch(
-                self,
-                searchFor: UITabBarController.self
-            ).viewNearFromSearch?.tabBarItem
-        }
-        set {
-            ViewControllerSearch(
-                self,
-                searchFor: UITabBarController.self
-            ).viewNearFromSearch?.tabBarItem = newValue
-        }
     }
 }

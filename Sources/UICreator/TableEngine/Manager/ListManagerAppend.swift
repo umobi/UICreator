@@ -24,13 +24,16 @@ import Foundation
 import UIKit
 
 extension ListManager {
+    @usableFromInline
     class Append: ListCollectionManager {
         private let manager: ListManager
 
+        @usableFromInline
         var sections: [ListManager.SectionManager] {
             self.manager.sections
         }
 
+        @usableFromInline
         init(_ manager: ListManager) {
             self.manager = manager
         }

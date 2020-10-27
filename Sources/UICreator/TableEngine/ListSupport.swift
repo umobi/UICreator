@@ -23,12 +23,14 @@
 import Foundation
 import UIKit
 
+@usableFromInline
 protocol ListSupport: class {
     func reloadData()
     var manager: ListCollectionManager? { get }
 }
 
 extension ListSupport {
+    @usableFromInline
     func setNeedsReloadData() {
         guard manager == nil || !(manager is ListManager.Append) else {
             return

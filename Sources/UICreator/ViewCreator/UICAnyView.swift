@@ -21,50 +21,34 @@
 //
 
 import Foundation
-import UIKit
+import ConstraintBuilder
 
-public extension UIView {
-    @frozen
-    struct CreatorKeyframe {
-        @usableFromInline
-        let startTime: TimeInterval
+@frozen
+public struct UICAnyView: UIViewCreator {
+    public typealias View = CBView
 
-        @usableFromInline
-        let duration: TimeInterval
-        
-        @usableFromInline
-        let animations: (UIView) -> Void
+    private let viewLoader: () -> CBView
 
-        private init(
-            startAt startTime: TimeInterval,
-            duration: TimeInterval,
-            animations: @escaping (UIView) -> Void) {
-
-            self.startTime = startTime
-            self.duration = duration
-            self.animations = animations
-        }
-
-        public static func keyframe(
-            startAt startTime: TimeInterval,
-            duration: TimeInterval,
-            animations: @escaping (UIView) -> Void) -> CreatorKeyframe {
-
-            return .init(
-                startAt: startTime,
-                duration: duration,
-                animations: animations
-            )
+    public init(_ viewCreator: ViewCreator) {
+        self.viewLoader = {
+            viewCreator.releaseUIView()
         }
     }
 
-    @frozen
-    struct CreatorKeyframeSequence {
-        @usableFromInline
-        let sequence: [CreatorKeyframe]
-
-        public init(_ sequence: CreatorKeyframe...) {
-            self.sequence = sequence
+    @usableFromInline
+    init(_ viewCreator: @escaping () -> ViewCreator) {
+        self.viewLoader = {
+            viewCreator().releaseUIView()
         }
+    }
+
+    @usableFromInline
+    init(_ viewLoader: @escaping () -> CBView) {
+        self.viewLoader = viewLoader
+    }
+
+    @inline(__always)
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        (viewCreator as! Self).viewLoader()
     }
 }

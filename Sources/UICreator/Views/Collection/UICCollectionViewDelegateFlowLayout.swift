@@ -21,22 +21,30 @@
 //
 
 import Foundation
-import ConstraintBuilder
+import UIKit
 
-@frozen
-public struct AnyView: UIViewCreator {
-    public typealias View = CBView
+class UICCollectionViewDelegateFlowLayout: NSObject, UICollectionViewDelegateFlowLayout {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath) -> CGSize {
 
-    private let viewLoader: () -> CBView
-
-    public init(_ viewCreator: ViewCreator) {
-        self.viewLoader = {
-            viewCreator.releaseUIView()
-        }
+        return collectionView.sizeForItem(at: indexPath)
     }
 
-    @inline(__always)
-    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
-        (viewCreator as! Self).viewLoader()
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForHeaderInSection section: Int) -> CGSize {
+
+        return collectionView.sizeForHeader(at: section) ?? .zero
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForFooterInSection section: Int) -> CGSize {
+
+        return collectionView.sizeForFooter(at: section) ?? .zero
     }
 }

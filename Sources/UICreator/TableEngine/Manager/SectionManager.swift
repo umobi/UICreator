@@ -24,12 +24,14 @@ import Foundation
 import UIKit
 
 // swiftlint:disable class_delegate_protocol
+@usableFromInline
 protocol ListSectionDelegate {
     func content(_ section: ListManager.SectionManager.Copy, updateSections: [ListManager.SectionManager])
     func content(updateSection: ListManager.SectionManager)
 }
 
 extension ListManager {
+    @usableFromInline
     final class SectionManager {
         let rows: [RowManager]
         let header: RowManager?
@@ -184,6 +186,7 @@ private extension ListManager.SectionManager {
 }
 
 extension ListManager.SectionManager {
+    @usableFromInline
     struct Copy {
         let header: ListManager.RowManager?
         let footer: ListManager.RowManager?
@@ -215,6 +218,7 @@ extension ListManager.SectionManager {
         }
     }
 
+    @usableFromInline
     var compactCopy: Copy {
         return .init(self)
     }
@@ -314,6 +318,7 @@ extension ListManager.SectionManager: SupportForEach {
             .footer(footer)
     }
 
+    @usableFromInline
     func viewsDidChange(_ placeholderView: UIView!, _ dynamicContent: Relay<[() -> ViewCreator]>) {
         dynamicContent.sync { [compactCopy] contents in
             let sections = contents.compactMap {

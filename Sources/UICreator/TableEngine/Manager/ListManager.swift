@@ -23,7 +23,9 @@
 import Foundation
 import UIKit
 
+@usableFromInline
 class ListManager: ListCollectionManager, ListContentSectionRestore {
+    @usableFromInline
     var sections: [SectionManager] = []
     weak var list: ListSupport!
 

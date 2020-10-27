@@ -38,8 +38,9 @@ internal extension UIView {
 }
 
 extension UIView.RenderState {
+    @inline(__always)
     private static var allCases: [UIView.RenderState] {
-        return [.unset, .notRendered, .rendered, .inTheScene]
+        [.unset, .notRendered, .rendered, .inTheScene]
     }
 
     static func > (left: UIView.RenderState, right: UIView.RenderState) -> Bool {
@@ -99,10 +100,12 @@ extension UIView.RenderState {
         return allCases[leftOffset..<allCases.count].contains(right)
     }
 
+    @inline(__always)
     var prev: UIView.RenderState? {
         Self.allCases.split(separator: self).first?.last
     }
 
+    @inline(__always)
     var next: UIView.RenderState? {
         Self.allCases.split(separator: self).last?.first
     }

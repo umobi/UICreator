@@ -23,10 +23,12 @@
 import Foundation
 import UIKit
 
+@usableFromInline
 struct UICCell {
     let rowManager: ListManager.RowManager
     let identifier: String
 
+    @usableFromInline
     init(_ identifier: String, _ manager: ListManager.RowManager) {
         self.rowManager = manager
         self.identifier = identifier
@@ -34,6 +36,7 @@ struct UICCell {
 }
 
 extension UICCell {
+    @usableFromInline
     struct Loaded {
         let cell: UICCell
         let trailingActions: [RowAction]
@@ -46,6 +49,7 @@ extension UICCell {
         }
     }
 
+    @usableFromInline
     var load: Loaded {
         return .init(self)
     }

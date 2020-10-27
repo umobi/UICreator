@@ -23,6 +23,7 @@
 import Foundation
 import UIKit
 
+@usableFromInline
 protocol ListCollectionManager: class {
     var sections: [ListManager.SectionManager] { get }
 
@@ -32,6 +33,7 @@ protocol ListCollectionManager: class {
 }
 
 extension ListCollectionManager {
+    @usableFromInline
     var headers: [(Int, ListManager.RowManager)] {
         return self.sections.enumerated().compactMap {
             guard let header = $0.element.header else {
@@ -42,6 +44,7 @@ extension ListCollectionManager {
         }
     }
 
+    @usableFromInline
     var footers: [(Int, ListManager.RowManager)] {
         return self.sections.enumerated().compactMap {
             guard let footer = $0.element.footer else {
@@ -52,18 +55,22 @@ extension ListCollectionManager {
         }
     }
 
+    @usableFromInline
     func numberOfRows(in section: ListManager.SectionManager) -> Int {
         return section.rows.count
     }
 
+    @usableFromInline
     var numberOfSections: Int {
         return self.sections.count
     }
 
+    @usableFromInline
     func section(at index: Int) -> ListManager.SectionManager {
         return self.sections[index]
     }
 
+    @usableFromInline
     var rowsIdentifier: [String] {
         return Array(Set(self.sections.map { section in
             section.rows.map {
@@ -72,6 +79,7 @@ extension ListCollectionManager {
         }.reduce([]) { $0 + $1 }))
     }
 
+    @usableFromInline
     var headersIdentifier: [String] {
         return Array(Set(self.sections.compactMap { section in
             guard section.header != nil else {
@@ -82,6 +90,7 @@ extension ListCollectionManager {
         }))
     }
 
+    @usableFromInline
     var footersIdentifier: [String] {
         return Array(Set(self.sections.compactMap { section in
             guard section.footer != nil else {
@@ -92,6 +101,7 @@ extension ListCollectionManager {
         }))
     }
 
+    @usableFromInline
     func row(at indexPath: IndexPath) -> UICCell {
         let section = self.section(at: indexPath.section)
         let row = section.rows[indexPath.row]
@@ -99,6 +109,7 @@ extension ListCollectionManager {
         return .init("\(section.identifier).\(row.identifier).row", row)
     }
 
+    @usableFromInline
     func header(at section: Int) -> UICCell? {
         let section = self.section(at: section)
 
@@ -109,6 +120,7 @@ extension ListCollectionManager {
         return .init("\(section.identifier).header", header)
     }
 
+    @usableFromInline
     func footer(at section: Int) -> UICCell? {
         let section = self.section(at: section)
 

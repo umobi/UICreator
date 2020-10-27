@@ -32,6 +32,7 @@ protocol ListContentSectionRestore: class {
 }
 
 extension ListManager {
+    @usableFromInline
     final class RowManager {
         let payload: Payload
         let identifier: Int
@@ -93,6 +94,7 @@ extension ListManager {
             return forEachEnviroment.isReleased
         }
 
+        @usableFromInline
         static func forEachShared(_ forEachShared: ForEachEnviromentShared) -> RowManager {
             let manager = Payload(row: UICRow {
                 forEachShared
@@ -213,6 +215,7 @@ extension ListManager.RowManager {
 }
 
 extension ListManager.RowManager: SupportForEach {
+    @usableFromInline
     func viewsDidChange(_ placeholderView: UIView!, _ dynamicContent: Relay<[() -> ViewCreator]>) {
         dynamicContent.sync { [compactCopy] in
             compactCopy.listManager

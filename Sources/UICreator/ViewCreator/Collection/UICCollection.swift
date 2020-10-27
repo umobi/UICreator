@@ -24,86 +24,9 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public protocol UICCollectionViewLayoutCreator: UICollectionViewLayout {
-    func provideDelegate() -> UICollectionViewDelegate
-}
-
-class UICCollectionViewDelegate: NSObject, UICollectionViewDelegate {}
-
-class UICCollectionViewLayout: UICollectionViewLayout, UICCollectionViewLayoutCreator {
-    func provideDelegate() -> UICollectionViewDelegate {
-        UICCollectionViewDelegate()
-    }
-}
-
-class UICCollectionView<CollectionLayout>: UICollectionView, ListSupport, UICollectionViewLayoutCreator where CollectionLayout: UICCollectionViewLayoutCreator {
-
-    init(_ layout: CollectionLayout) {
-        super.init(frame: .zero, collectionViewLayout: layout)
-        self.makeSelfImplemented()
-    }
-
-    public func provideDelegate() -> UICollectionViewDelegate {
-        self.castedCollectionViewLayout.provideDelegate()
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override init(frame: CGRect, collectionViewLayout: UICollectionViewLayout) {
-        fatalError("init(frame:, collectionViewLayout:) has not been implemented")
-    }
-
-    override open var isHidden: Bool {
-        get { super.isHidden }
-        set {
-            super.isHidden = newValue
-            self.renderManager.isHidden(newValue)
-        }
-    }
-
-    override open var frame: CGRect {
-        get { super.frame }
-        set {
-            super.frame = newValue
-            self.renderManager.frame(newValue)
-        }
-    }
-
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        self.renderManager.willMove(toSuperview: newSuperview)
-    }
-
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        self.renderManager.didMoveToSuperview()
-    }
-
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        self.renderManager.didMoveToWindow()
-    }
-
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        self.renderManager.layoutSubviews()
-    }
-
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        self.renderManager.traitDidChange()
-    }
-
-    override open func reloadData() {
-        super.reloadData()
-        self.invalidateLayoutMaker()
-    }
-}
-
+@frozen
 public struct UICCollection<Layout>: UIViewCreator where Layout: UICCollectionViewLayoutCreator {
-    public typealias View = UICollectionView
+    public typealias View = Views.CollectionView<Layout>
 
     private let layout: Layout
     private let contents: () -> ViewCreator
@@ -115,34 +38,39 @@ public struct UICCollection<Layout>: UIViewCreator where Layout: UICCollectionVi
         self.contents = contents
     }
 
+    @inline(__always)
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
-        return UICCollectionView(_self.layout)
+        return Views.CollectionView(_self.layout)
             .dynamicData((viewCreator as! Self).contents)
     }
 }
 
 public extension UIViewCreator where View: UICollectionView {
+    @inlinable
     func allowsMultipleSelection(_ flag: Bool) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.allowsMultipleSelection = flag
         }
     }
 
+    @inlinable
     func allowsSelection(_ flag: Bool) -> UICModifiedView<View> {
         self.onRendered {
             ($0 as? View)?.allowsSelection = flag
         }
     }
 
+    @inlinable
     func background<Background: ViewCreator>(_ content: @escaping () -> Background) -> UICModifiedView<View> {
         self.onNotRendered {
-            ($0 as? View)?.backgroundView = ViewAdaptor(content().releaseUIView())
+            ($0 as? View)?.backgroundView = UICAnyView(content).releaseUIView()
         }
     }
 
     #if os(iOS)
+    @inlinable
     func isPaged(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.isPagingEnabled = flag

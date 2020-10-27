@@ -24,15 +24,17 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
+@frozen
 public struct UICNavigation: UIViewControllerCreator {
     public typealias ViewController = UINavigationController
 
-    let content: () -> ViewCreator
+    private let content: () -> ViewCreator
 
     public init(_ content: @escaping () -> ViewCreator) {
         self.content = content
     }
 
+    @inline(__always)
     public static func makeUIViewController(_ viewCreator: ViewCreator) -> UIViewController {
         UINavigationController(
             rootViewController: UICHostingController(content: (viewCreator as! Self).content)
@@ -125,48 +127,5 @@ public extension UIViewCreator {
                 .animated(true)
                 .presentingStyle(.overFullScreen)
         }
-    }
-}
-
-public extension UIView {
-    var navigationItem: UINavigationItem! {
-        guard
-            let viewController = ViewControllerSearch(
-                self,
-                searchFor: UINavigationController.self
-            ).viewNearFromSearch
-        else { return nil }
-
-        if let navigationController = viewController as? UINavigationController {
-            return navigationController.visibleViewController?.navigationItem
-        }
-
-        return viewController.navigationItem
-    }
-}
-
-struct ViewControllerSearch<ViewController: UIViewController> {
-    weak var view: UIView!
-
-    init(_ view: UIView, searchFor type: ViewController.Type) {
-        self.view = view
-    }
-
-    var viewNearFromSearch: UIViewController? {
-        guard let viewController = self.view.viewController else {
-            return nil
-        }
-
-        var viewNearFromNavigation: UIViewController? = viewController
-
-        for viewController in sequence(first: viewController, next: { $0.parent }) {
-            if viewController is ViewController {
-                return viewNearFromNavigation
-            }
-
-            viewNearFromNavigation = viewController
-        }
-
-        return viewNearFromNavigation
     }
 }

@@ -65,6 +65,7 @@ private extension UICViewBuilder {
 }
 
 internal extension ViewCreator {
+    @usableFromInline
     var zip: [ViewCreator] {
         switch self {
         case let views as UICViewBuilder.Combined:

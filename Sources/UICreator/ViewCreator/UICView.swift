@@ -28,6 +28,7 @@ public protocol UICView: UIViewCreator where View == CBView {
 }
 
 public extension UICView {
+    @inline(__always)
     static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         (viewCreator as! Self).body.releaseUIView()
     }

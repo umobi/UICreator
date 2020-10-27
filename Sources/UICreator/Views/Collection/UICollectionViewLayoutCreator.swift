@@ -20,51 +20,18 @@
 // THE SOFTWARE.
 //
 
-import Foundation
 import UIKit
 
-public extension UIView {
-    @frozen
-    struct CreatorKeyframe {
-        @usableFromInline
-        let startTime: TimeInterval
+public protocol UICollectionViewLayoutCreator: UICollectionView {
+    associatedtype CollectionLayout: UICollectionViewLayout
 
-        @usableFromInline
-        let duration: TimeInterval
-        
-        @usableFromInline
-        let animations: (UIView) -> Void
+    func provideDelegate() -> UICollectionViewDelegate
+}
 
-        private init(
-            startAt startTime: TimeInterval,
-            duration: TimeInterval,
-            animations: @escaping (UIView) -> Void) {
+extension UICollectionViewLayoutCreator {
 
-            self.startTime = startTime
-            self.duration = duration
-            self.animations = animations
-        }
-
-        public static func keyframe(
-            startAt startTime: TimeInterval,
-            duration: TimeInterval,
-            animations: @escaping (UIView) -> Void) -> CreatorKeyframe {
-
-            return .init(
-                startAt: startTime,
-                duration: duration,
-                animations: animations
-            )
-        }
-    }
-
-    @frozen
-    struct CreatorKeyframeSequence {
-        @usableFromInline
-        let sequence: [CreatorKeyframe]
-
-        public init(_ sequence: CreatorKeyframe...) {
-            self.sequence = sequence
-        }
+    @inline(__always) @usableFromInline
+    var castedCollectionViewLayout: CollectionLayout {
+        self.collectionViewLayout as! CollectionLayout
     }
 }

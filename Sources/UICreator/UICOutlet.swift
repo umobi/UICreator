@@ -23,8 +23,10 @@
 import Foundation
 
 @propertyWrapper
+@frozen
 public struct UICOutlet<Value: AnyObject> {
-    private class Object {
+    @usableFromInline
+    class Object {
         weak var reference: Value!
     }
 
@@ -45,6 +47,8 @@ public struct UICOutlet<Value: AnyObject> {
         self.object.reference = value
     }
 
+    @inline(__always)
+    @inlinable
     static var empty: UICOutlet<Value> {
         .init()
     }

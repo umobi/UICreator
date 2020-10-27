@@ -23,81 +23,70 @@
 import Foundation
 import UIKit
 
-public extension UIView {
-    var viewController: UIViewController! {
-        sequence(first: self as UIResponder, next: { $0.next }).first(where: {
-            $0 is UIViewController
-        }) as? UIViewController
-    }
-
-    var navigationController: UINavigationController? {
-        self.viewController.navigationController
-    }
-}
-
-public extension UIView {
-    var navigation: NavigationRepresentable? {
-        NavigationRepresentable(view: self)
-    }
-}
-
 #if os(iOS)
 public extension UIViewCreator {
+    @inlinable
     func toolbar(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.onInTheScene {
-            $0.viewController.toolbarItems = contents().zip.map { view in
+            $0.nearVCFromNavigation()?.toolbarItems = contents().zip.map { view in
                 UIBarButtonItem(customView: ViewAdaptor(view.releaseUIView()))
             }
         }
     }
 
+    @inlinable
     func toolbar(isHidden flag: Bool) -> UICModifiedView<View> {
         self.onInTheScene {
-            $0.navigation?.navigationController?.isToolbarHidden = flag
+            $0.navigationController?.isToolbarHidden = flag
         }
     }
 
+    @inlinable
     func toolbar(style: UIBarStyle) -> UICModifiedView<View> {
         self.onInTheScene {
-           $0.navigation?.navigationController?.toolbar.barStyle = style
+           $0.navigationController?.toolbar.barStyle = style
         }
     }
 
+    @inlinable
     func toolbar(tintColor color: UIColor?) -> UICModifiedView<View> {
         self.onInTheScene {
-           $0.navigation?.navigationController?.toolbar.tintColor = color
+           $0.navigationController?.toolbar.tintColor = color
         }
     }
 
+    @inlinable
     func toolbar(barTintColor color: UIColor?) -> UICModifiedView<View> {
         self.onInTheScene {
-           $0.navigation?.navigationController?.toolbar.barTintColor = color
+           $0.navigationController?.toolbar.barTintColor = color
         }
     }
 
+    @inlinable
     func toolbar(delegate: UIToolbarDelegate?) -> UICModifiedView<View> {
         self.onInTheScene {
-           $0.navigation?.navigationController?.toolbar.delegate = delegate
+           $0.navigationController?.toolbar.delegate = delegate
         }
     }
 
+    @inlinable
     func toolbar(isTranslucent flag: Bool) -> UICModifiedView<View> {
         self.onInTheScene {
-           $0.navigation?.navigationController?.toolbar.isTranslucent = flag
+           $0.navigationController?.toolbar.isTranslucent = flag
         }
     }
 
-    @available(iOS 13.0, *)
+    @available(iOS 13.0, *) @inlinable
     func toolbar(standardAppearance appearance: UIToolbarAppearance) -> UICModifiedView<View> {
         self.onInTheScene {
-           $0.navigation?.navigationController?.toolbar.standardAppearance = appearance
+           $0.navigationController?.toolbar.standardAppearance = appearance
         }
     }
 
-    @available(iOS 13.0, *)
+    @available(iOS 13.0, *) @inlinable
     func toolbar(compactAppearance appearance: UIToolbarAppearance?) -> UICModifiedView<View> {
         self.onInTheScene {
-           $0.navigation?.navigationController?.toolbar.compactAppearance = appearance
+           $0.navigationController?.toolbar.compactAppearance = appearance
         }
     }
 }
@@ -105,31 +94,34 @@ public extension UIViewCreator {
 
 public extension UIViewCreator {
 
+    @inlinable
     func navigation(isHidden flag: Bool) -> UICModifiedView<View> {
         self.onInTheScene {
-           $0.navigation?.navigationController?.isNavigationBarHidden = flag
+           $0.navigationController?.isNavigationBarHidden = flag
         }
     }
 
+    @inlinable
     func navigation(title: String?) -> UICModifiedView<View> {
         self.onInTheScene {
             $0.navigationItem.title = title
         }
     }
 
+    @inlinable
     func navigation(titleView content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.onInTheScene {
-            $0.navigationItem.titleView = ViewAdaptor(content().releaseUIView())
+            $0.navigationItem.titleView = UICAnyView(content).releaseUIView()
         }
     }
 
+    @inlinable
     func navigation(
         background image: UICImage?,
         for position: UIBarPosition = .any,
         barMetrics: UIBarMetrics = .default) -> UICModifiedView<View> {
         self.onInTheScene {
-            $0.navigation?
-                .navigationController?
+            $0.navigationController?
                 .navigationBar
                 .setBackgroundImage(
                     image?.uiImage,
@@ -140,6 +132,7 @@ public extension UIViewCreator {
     }
 
     #if os(iOS)
+    @inlinable
     func navigation(backButton content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.onInTheScene {
             $0.navigationItem.backBarButtonItem = .init(
@@ -149,28 +142,30 @@ public extension UIViewCreator {
                 action: nil
             )
 
-            guard ($0.navigation?.navigationController?.viewControllers.count ?? 0) > 1 else {
+            guard ($0.navigationController?.viewControllers.count ?? 0) > 1 else {
                 print("Navigation doesn't accepted backButton, you may try to assign as leftButton")
                 return
             }
 
             $0.navigationItem.setLeftBarButton(
-                .init(customView: ViewAdaptor(content().releaseUIView())),
+                .init(customView: UICAnyView(content).releaseUIView()),
                 animated: false
             )
         }
     }
     #endif
 
+    @inlinable
     func navigation(leftButton content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.onInTheScene {
             $0.navigationItem.setLeftBarButton(
-                .init(customView: ViewAdaptor(content().releaseUIView())),
+                .init(customView: UICAnyView(content).releaseUIView()),
                 animated: false
             )
         }
     }
 
+    @inlinable
     func navigation(@UICViewBuilder leftButtons contents: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.onInTheScene {
             $0.navigationItem
@@ -180,15 +175,17 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func navigation(rightButton content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.onInTheScene {
             $0.navigationItem.setRightBarButton(
-                .init(customView: ViewAdaptor(content().releaseUIView())),
+                .init(customView: UICAnyView(content).releaseUIView()),
                 animated: false
             )
         }
     }
 
+    @inlinable
     func navigation(@UICViewBuilder rightButtons contents: @escaping () -> ViewCreator) -> UICModifiedView<View> {
         self.onInTheScene {
             $0.navigationItem
@@ -199,7 +196,7 @@ public extension UIViewCreator {
     }
 
     #if os(iOS)
-    @available(iOS 11.0, *)
+    @available(iOS 11.0, *) @inlinable
     func navigation(searchController: UISearchController) -> UICModifiedView<View> {
         self.onInTheScene {
             $0.navigationItem.searchController = searchController
@@ -209,9 +206,10 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
+    @inlinable
     func navigation(titleColor color: UIColor) -> UICModifiedView<View> {
         self.onInTheScene {
-           guard let navigationBar = $0.navigation?.navigationController?.navigationBar else {
+           guard let navigationBar = $0.navigationController?.navigationBar else {
                return
            }
 
@@ -222,9 +220,10 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func navigation(titleFont font: UIFont) -> UICModifiedView<View> {
         self.onInTheScene {
-            guard let navigationBar = $0.navigation?.navigationController?.navigationBar else {
+            guard let navigationBar = $0.navigationController?.navigationBar else {
                 return
             }
 
@@ -238,24 +237,24 @@ public extension UIViewCreator {
 
 #if os(iOS)
 public extension UIViewCreator {
-    @available(iOS 11.0, *)
+    @available(iOS 11.0, *) @inlinable
     func navigation(largeTitleMode mode: UINavigationItem.LargeTitleDisplayMode) -> UICModifiedView<View> {
         self.onInTheScene {
             $0.navigationItem.largeTitleDisplayMode = mode
         }
     }
 
-    @available(iOS 11.0, *)
+    @available(iOS 11.0, *) @inlinable
     func navigation(prefersLargeTitles: Bool) -> UICModifiedView<View> {
         self.onInTheScene {
-            $0.navigation?.navigationController?.navigationBar.prefersLargeTitles = prefersLargeTitles
+            $0.navigationController?.navigationBar.prefersLargeTitles = prefersLargeTitles
         }
     }
 
-    @available(iOS 11.0, *)
+    @available(iOS 11.0, *) @inlinable
     func navigation(largeTitleColor color: UIColor) -> UICModifiedView<View> {
         self.onInTheScene {
-            guard let navigationBar = $0.navigation?.navigationController?.navigationBar else {
+            guard let navigationBar = $0.navigationController?.navigationBar else {
                 return
             }
 
@@ -266,10 +265,10 @@ public extension UIViewCreator {
         }
     }
 
-    @available(iOS 11.0, *)
+    @available(iOS 11.0, *) @inlinable
     func navigation(largeTitleFont font: UIFont) -> UICModifiedView<View> {
         self.onInTheScene {
-            guard let navigationBar = $0.navigation?.navigationController?.navigationBar else {
+            guard let navigationBar = $0.navigationController?.navigationBar else {
                 return
             }
 
@@ -280,23 +279,25 @@ public extension UIViewCreator {
         }
     }
 
-    @available(iOS 13.0, *)
+    @available(iOS 13.0, *) @inlinable
     func navigation(largeContentImage image: UICImage?) -> UICModifiedView<View> {
         self.onInTheScene {
-            $0.navigation?.navigationController?.navigationBar.largeContentImage = image?.uiImage
+            $0.navigationController?.navigationBar.largeContentImage = image?.uiImage
         }
     }
 
-    @available(iOS 13.0, *)
+    @available(iOS 13.0, *) @inlinable
     func navigation(largeContentTitle title: String?) -> UICModifiedView<View> {
         self.onInTheScene {
-            $0.navigation?.navigationController?.navigationBar.largeContentTitle = title
+            $0.navigationController?.navigationBar.largeContentTitle = title
         }
     }
 }
 #endif
 
 public extension UIViewCreator {
+
+    @inlinable
     func navigation(title dynamicTitle: Relay<String?>) -> UICModifiedView<View> {
         self.onInTheScene {
             weak var view = $0

@@ -29,15 +29,17 @@ public protocol ViewCreator {
 }
 
 extension ViewCreator {
+
+    @inline(__always) @inlinable
     func operationUIView() -> CBView {
         Self.makeUIView(self)
             .dynamicView
     }
 
+    @inlinable
     func releaseUIView() -> CBView {
         {
             if let viewAdaptor = $0.adaptedByView {
-                viewAdaptor.state($0)
                 return viewAdaptor
             }
 

@@ -42,16 +42,19 @@ private extension UICollectionView {
 }
 
 extension UICollectionView {
+    @inline(__always) @usableFromInline
     var manager: ListCollectionManager? {
         get { self.memory.manager }
         set { self.memory.manager = newValue }
     }
 
+    @inline(__always)
     var layoutManager: UICCollectionLayoutManager? {
         get { self.memory.layoutManager }
         set { self.memory.layoutManager = newValue }
     }
 
+    @inline(__always)
     fileprivate var layoutManagerHandler: (() -> UICCollectionLayoutSectionElement)? {
         get { self.memory.layoutManagerHandler }
         set { self.memory.layoutManagerHandler = newValue }

@@ -23,48 +23,8 @@
 import Foundation
 import UIKit
 
-public extension UIView {
-    @frozen
-    struct CreatorKeyframe {
-        @usableFromInline
-        let startTime: TimeInterval
-
-        @usableFromInline
-        let duration: TimeInterval
-        
-        @usableFromInline
-        let animations: (UIView) -> Void
-
-        private init(
-            startAt startTime: TimeInterval,
-            duration: TimeInterval,
-            animations: @escaping (UIView) -> Void) {
-
-            self.startTime = startTime
-            self.duration = duration
-            self.animations = animations
-        }
-
-        public static func keyframe(
-            startAt startTime: TimeInterval,
-            duration: TimeInterval,
-            animations: @escaping (UIView) -> Void) -> CreatorKeyframe {
-
-            return .init(
-                startAt: startTime,
-                duration: duration,
-                animations: animations
-            )
-        }
-    }
-
-    @frozen
-    struct CreatorKeyframeSequence {
-        @usableFromInline
-        let sequence: [CreatorKeyframe]
-
-        public init(_ sequence: CreatorKeyframe...) {
-            self.sequence = sequence
-        }
+class UICCollectionViewLayout: UICollectionViewLayout, UICCollectionViewLayoutCreator {
+    func provideDelegate() -> UICollectionViewDelegate {
+        UICCollectionViewDelegate()
     }
 }

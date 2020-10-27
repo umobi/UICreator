@@ -24,26 +24,18 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public protocol ViewCreatorNoLayoutConstraints {}
+protocol ViewCreatorNoLayoutConstraints {}
 
+@usableFromInline
 class ViewAdaptor: UIView, ViewCreatorNoLayoutConstraints {
     var adaptedView: Reference<UIView>
 
+    @usableFromInline
     init(_ view: UIView) {
         self.adaptedView = .strong(view)
         super.init(frame: .zero)
         self.makeSelfImplemented()
         view.adaptedByView = self
-    }
-
-    func state(_ view: UIView) {
-        guard view === self.adaptedView.value else {
-            return
-        }
-
-        if !self.adaptedView.isWeak {
-            self.adaptedView = .strong(view)
-        }
     }
 
     override init(frame: CGRect) {
@@ -64,19 +56,19 @@ class ViewAdaptor: UIView, ViewCreatorNoLayoutConstraints {
         }
     }
 
-    public override func sizeToFit() {
+    override func sizeToFit() {
         self.adaptView()
         super.sizeToFit()
     }
 
-    override open func willMove(toSuperview newSuperview: UIView?) {
+    override func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         self.adaptView()
         self.adaptedView.value.renderManager.willMove(toSuperview: self)
         self.renderManager.willMove(toSuperview: newSuperview)
     }
 
-    override open var isHidden: Bool {
+    override var isHidden: Bool {
         get { super.isHidden }
         set {
             super.isHidden = newValue
@@ -85,7 +77,7 @@ class ViewAdaptor: UIView, ViewCreatorNoLayoutConstraints {
         }
     }
 
-    override open var frame: CGRect {
+    override var frame: CGRect {
         get { super.frame }
         set {
             super.frame = newValue
@@ -94,25 +86,25 @@ class ViewAdaptor: UIView, ViewCreatorNoLayoutConstraints {
         }
     }
 
-    override open func didMoveToSuperview() {
+    override func didMoveToSuperview() {
         super.didMoveToSuperview()
         self.adaptedView.value.renderManager.didMoveToSuperview()
         self.renderManager.didMoveToSuperview()
     }
 
-    override open func didMoveToWindow() {
+    override func didMoveToWindow() {
         super.didMoveToWindow()
         self.adaptedView.value.renderManager.didMoveToWindow()
         self.renderManager.didMoveToWindow()
     }
 
-    override open func layoutSubviews() {
+    override func layoutSubviews() {
         super.layoutSubviews()
         self.adaptedView.value.renderManager.layoutSubviews()
         self.renderManager.layoutSubviews()
     }
 
-    override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         self.adaptedView.value.renderManager.traitDidChange()
         self.renderManager.traitDidChange()
@@ -123,13 +115,17 @@ class ViewAdaptor: UIView, ViewCreatorNoLayoutConstraints {
     }
 }
 
+@usableFromInline
 struct UICAdapt<View>: UIViewCreator where View: UIView {
     private let viewHandler: () -> View
 
+    @usableFromInline
     init(_ viewHandler: @escaping () -> View) {
         self.viewHandler = viewHandler
     }
 
+    @inline(__always)
+    @usableFromInline
     static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
         ViewAdaptor((viewCreator as! Self).viewHandler())
     }

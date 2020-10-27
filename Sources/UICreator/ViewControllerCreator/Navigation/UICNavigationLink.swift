@@ -24,11 +24,12 @@ import Foundation
 import ConstraintBuilder
 import UIKit
 
+@frozen
 public struct UICNavigationLink: ViewCreator {
-    @Relay var isPushing: Bool
+    @Relay private var isPushing: Bool
 
-    let destination: () -> ViewCreator
-    let content: () -> ViewCreator
+    private let destination: () -> ViewCreator
+    private let content: () -> ViewCreator
 
     public init(
         _ isPushing: Relay<Bool>,
@@ -49,19 +50,20 @@ public struct UICNavigationLink: ViewCreator {
         self._isPushing = value.projectedValue
         self.destination = destination
         self.content = {
-            AnyView(content())
+            UICAnyView(content())
                 .onTap { _ in
                     value.wrappedValue = true
                 }
         }
     }
 
+    @inline(__always)
     public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
-        return AnyView(_self.content())
+        return UICAnyView(_self.content)
             .onInTheScene {
-                weak var navigationController = $0.viewController.navigationController
+                weak var navigationController = $0.navigationController
                 weak var pushingView: UIViewController?
 
                 _self.$isPushing.distinctSync {
@@ -104,6 +106,8 @@ public struct UICNavigationLink: ViewCreator {
 }
 
 private extension UIViewController {
+
+    @inline(__always)
     var isBeingPoped: Bool {
         !(self.navigationController?.viewControllers.contains(self) ?? false)
     }
