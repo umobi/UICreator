@@ -96,6 +96,7 @@ public protocol UIViewControllerCreator: ViewCreator {
 }
 
 extension UIViewControllerCreator {
+    @usableFromInline
     func releaseCastedViewController() -> ViewController {
         Self.makeUIViewController(self) as! ViewController
     }
@@ -103,11 +104,12 @@ extension UIViewControllerCreator {
 
 public extension UIViewControllerCreator {
     static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
-        ViewControllerAdaptor((viewCreator as! Self).releaseCastedViewController())
+        Views.ViewControllerAdaptor((viewCreator as! Self).releaseCastedViewController())
     }
 }
 
 public extension UIViewControllerCreator {
+    @inlinable
     func onNotRendered(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
         UICModifiedViewController {
             let viewController = self.releaseCastedViewController()
@@ -118,6 +120,7 @@ public extension UIViewControllerCreator {
         }
     }
 
+    @inlinable
     func onRendered(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
         UICModifiedViewController {
             let viewController = self.releaseCastedViewController()
@@ -128,6 +131,7 @@ public extension UIViewControllerCreator {
         }
     }
 
+    @inlinable
     func onInTheScene(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
         UICModifiedViewController {
             let viewController = self.releaseCastedViewController()
@@ -140,6 +144,8 @@ public extension UIViewControllerCreator {
 }
 
 public extension UIViewControllerCreator {
+
+    @inlinable
     func onLayout(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
         UICModifiedViewController {
             let viewController = self.releaseCastedViewController()
@@ -150,6 +156,7 @@ public extension UIViewControllerCreator {
         }
     }
 
+    @inlinable
     func onAppear(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
         UICModifiedViewController {
             let viewController = self.releaseCastedViewController()
@@ -160,6 +167,7 @@ public extension UIViewControllerCreator {
         }
     }
 
+    @inlinable
     func onDisappear(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
         UICModifiedViewController {
             let viewController = self.releaseCastedViewController()
@@ -168,5 +176,23 @@ public extension UIViewControllerCreator {
             }
             return viewController
         }
+    }
+}
+
+public extension UIViewControllerCreator {
+
+    @inlinable
+    func `as`(_ outlet: UICOutlet<ViewController>) -> UICModifiedViewController<ViewController> {
+        self.onInTheScene {
+            outlet.ref($0 as? ViewController)
+        }
+    }
+}
+
+public extension UIViewControllerCreator {
+
+    @inlinable
+    func eraseToAnyView() -> AnyView {
+        AnyView(self)
     }
 }

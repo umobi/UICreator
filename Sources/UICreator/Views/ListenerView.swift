@@ -20,23 +20,37 @@
 // THE SOFTWARE.
 //
 
+import Foundation
 import ConstraintBuilder
+import CoreGraphics
 
-@frozen
-public enum ContentMode {
-    case fill
-    case fit
-}
+internal extension Views {
+    class ListenerView: CBView {
+        let onOutOfWindow: (() -> Void)?
 
-extension ContentMode {
+        init(_ handler: @escaping () -> Void) {
+            self.onOutOfWindow = handler
+            super.init(frame: .zero)
+        }
 
-    @usableFromInline
-    var uiContentMode: CBView.ContentMode {
-        switch self {
-        case .fill:
-            return .scaleAspectFill
-        case .fit:
-            return .scaleAspectFit
+        override init(frame: CGRect) {
+            self.onOutOfWindow = nil
+            super.init(frame: frame)
+        }
+
+        override func didMoveToWindow() {
+            super.didMoveToWindow()
+
+            guard self.window == nil else {
+                return
+            }
+
+            self.onOutOfWindow?()
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError()
         }
     }
 }
+

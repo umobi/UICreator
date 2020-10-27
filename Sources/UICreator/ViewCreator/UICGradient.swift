@@ -20,23 +20,45 @@
 // THE SOFTWARE.
 //
 
+import Foundation
+import UIKit
 import ConstraintBuilder
 
 @frozen
-public enum ContentMode {
-    case fill
-    case fit
+public struct UICGradient: UIViewCreator {
+    public typealias View = Views.GradientView
+
+    private let colors: [UIColor]
+    private let direction: View.Direction
+
+    public init(_ colors: [UIColor], direction: View.Direction = .right) {
+        self.colors = colors
+        self.direction = direction
+    }
+
+    public init(_ colors: UIColor..., direction: View.Direction = .right) {
+        self.colors = colors
+        self.direction = direction
+    }
+
+    @inline(__always)
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return View()
+            .onNotRendered {
+                ($0 as? View)?.direction = _self.direction
+                ($0 as? View)?.colors = _self.colors
+            }
+    }
 }
 
-extension ContentMode {
+public extension UIViewCreator where View: Views.GradientView {
 
-    @usableFromInline
-    var uiContentMode: CBView.ContentMode {
-        switch self {
-        case .fill:
-            return .scaleAspectFill
-        case .fit:
-            return .scaleAspectFit
+    @inlinable
+    func animation(_ layerHandler: @escaping (CAGradientLayer) -> Void) -> UICModifiedView<View> {
+        self.onRendered {
+            ($0 as? View)?.animates(animator: layerHandler)
         }
     }
 }

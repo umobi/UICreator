@@ -20,23 +20,24 @@
 // THE SOFTWARE.
 //
 
+import Foundation
+import UIKit
 import ConstraintBuilder
 
-@frozen
-public enum ContentMode {
-    case fill
-    case fit
-}
+extension Views.ScrollView {
+    class ContentView: CBView {
+        weak var view: CBView!
 
-extension ContentMode {
+        convenience init(_ view: CBView) {
+            self.init(frame: .zero)
+            self.view = view
 
-    @usableFromInline
-    var uiContentMode: CBView.ContentMode {
-        switch self {
-        case .fill:
-            return .scaleAspectFill
-        case .fit:
-            return .scaleAspectFit
+            CBSubview(self).addSubview(view)
+
+            Constraintable.activate {
+                view.cbuild
+                    .edges
+            }
         }
     }
 }

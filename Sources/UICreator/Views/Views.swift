@@ -20,23 +20,6 @@
 // THE SOFTWARE.
 //
 
-import ConstraintBuilder
+import Foundation
 
-@frozen
-public enum ContentMode {
-    case fill
-    case fit
-}
-
-extension ContentMode {
-
-    @usableFromInline
-    var uiContentMode: CBView.ContentMode {
-        switch self {
-        case .fill:
-            return .scaleAspectFill
-        case .fit:
-            return .scaleAspectFit
-        }
-    }
-}
+public enum Views {}

@@ -28,8 +28,8 @@ public struct UICWeakResized {
     weak var superview: UIView!
     weak var subview: UIView!
 
-    fileprivate let height: UILayoutPriority?
-    fileprivate let width: UILayoutPriority?
+    fileprivate let height: CBLayoutPriority?
+    fileprivate let width: CBLayoutPriority?
     fileprivate let addHandler: ((UIView) -> Void)?
 
     init(_ superview: UIView!, subview: UIView!, _ addHandler: ((UIView) -> Void)?) {
@@ -42,8 +42,8 @@ public struct UICWeakResized {
 
     private init(
         _ original: UICWeakResized,
-        height: UILayoutPriority?,
-        width: UILayoutPriority?) {
+        height: CBLayoutPriority?,
+        width: CBLayoutPriority?) {
 
         self.superview = original.superview
         self.subview = original.subview
@@ -52,11 +52,11 @@ public struct UICWeakResized {
         self.addHandler = original.addHandler
     }
 
-    public func height(_ priority: UILayoutPriority) -> Self {
+    public func height(_ priority: CBLayoutPriority) -> Self {
         .init(self, height: priority, width: nil)
     }
 
-    public func width(_ priority: UILayoutPriority) -> Self {
+    public func width(_ priority: CBLayoutPriority) -> Self {
         .init(self, height: nil, width: priority)
     }
 }
@@ -65,8 +65,8 @@ public extension UICWeakResized {
     private struct Copy {
         let subview: UIView
         let superview: UIView
-        let height: UILayoutPriority?
-        let width: UILayoutPriority?
+        let height: CBLayoutPriority?
+        let width: CBLayoutPriority?
         let addHandler: ((UIView) -> Void)?
 
         init?(_ original: UICWeakResized) {

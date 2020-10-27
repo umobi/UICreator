@@ -20,23 +20,25 @@
 // THE SOFTWARE.
 //
 
-import ConstraintBuilder
+import Foundation
+import UIKit
 
-@frozen
-public enum ContentMode {
-    case fill
-    case fit
-}
-
-extension ContentMode {
-
+extension UICAlert {
     @usableFromInline
-    var uiContentMode: CBView.ContentMode {
-        switch self {
-        case .fill:
-            return .scaleAspectFill
-        case .fit:
-            return .scaleAspectFit
+    struct Action {
+        @usableFromInline let title: String
+        @usableFromInline let style: UIAlertAction.Style
+        @usableFromInline let handler: ((UIViewController?) -> Void)?
+
+        @inlinable
+        init(
+            _ title: String,
+            _ style: UIAlertAction.Style,
+            handler: ((UIViewController?) -> Void)?) {
+
+            self.title = title
+            self.style = style
+            self.handler = handler
         }
     }
 }

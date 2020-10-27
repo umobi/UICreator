@@ -20,23 +20,26 @@
 // THE SOFTWARE.
 //
 
+import Foundation
+import UIKit
 import ConstraintBuilder
 
-@frozen
-public enum ContentMode {
-    case fill
-    case fit
+public extension UICStack {
+    @frozen
+    enum Axis {
+        case vertical
+        case horizontal
+    }
 }
 
-extension ContentMode {
-
-    @usableFromInline
-    var uiContentMode: CBView.ContentMode {
+public extension UICStack.Axis {
+    @inlinable
+    var uiAxis: CBLayoutConstraint.Axis {
         switch self {
-        case .fill:
-            return .scaleAspectFill
-        case .fit:
-            return .scaleAspectFit
+        case .horizontal:
+            return .horizontal
+        case .vertical:
+            return .vertical
         }
     }
 }

@@ -20,23 +20,28 @@
 // THE SOFTWARE.
 //
 
-import ConstraintBuilder
+import Foundation
+import UIKit
 
-@frozen
-public enum ContentMode {
-    case fill
-    case fit
-}
+#if os(iOS)
+public extension UICDatePicker {
+    @frozen
+    enum Mode {
+        case date
+        case dateAndTime
+        case time
 
-extension ContentMode {
-
-    @usableFromInline
-    var uiContentMode: CBView.ContentMode {
-        switch self {
-        case .fill:
-            return .scaleAspectFill
-        case .fit:
-            return .scaleAspectFit
+        @usableFromInline
+        var uiPickerMode: UIDatePicker.Mode {
+            switch self {
+            case .date:
+                return .date
+            case .dateAndTime:
+                return .dateAndTime
+            case .time:
+                return .time
+            }
         }
     }
 }
+#endif

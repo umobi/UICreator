@@ -20,23 +20,27 @@
 // THE SOFTWARE.
 //
 
+import Foundation
+import UIKit
 import ConstraintBuilder
 
 @frozen
-public enum ContentMode {
-    case fill
-    case fit
-}
+public struct UICVScroll: UIViewCreator {
+    public typealias View = UIScrollView
 
-extension ContentMode {
+    let content: () -> ViewCreator
 
-    @usableFromInline
-    var uiContentMode: CBView.ContentMode {
-        switch self {
-        case .fill:
-            return .scaleAspectFill
-        case .fit:
-            return .scaleAspectFit
-        }
+    public init(content: @escaping () -> ViewCreator) {
+        self.content = content
+    }
+
+    @inline(__always)
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return Views.ScrollView(.vertical)
+            .onNotRendered {
+                ($0 as? Views.ScrollView)?.addContent(_self.content().releaseUIView())
+            }
     }
 }

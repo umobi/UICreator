@@ -20,23 +20,28 @@
 // THE SOFTWARE.
 //
 
+import Foundation
+import UIKit
 import ConstraintBuilder
 
 @frozen
-public enum ContentMode {
-    case fill
-    case fit
-}
+public struct UICCircle: UIViewCreator {
+    public typealias View = Views.RounderView
 
-extension ContentMode {
+    let content: () -> ViewCreator
 
-    @usableFromInline
-    var uiContentMode: CBView.ContentMode {
-        switch self {
-        case .fill:
-            return .scaleAspectFill
-        case .fit:
-            return .scaleAspectFit
-        }
+    public init(_ content: @escaping () -> ViewCreator) {
+        self.content = content
+    }
+
+    @inline(__always)
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return View()
+            .onNotRendered {
+                ($0 as? View)?.radius = 0.5
+                ($0 as? View)?.addContent(_self.content().releaseUIView())
+            }
     }
 }

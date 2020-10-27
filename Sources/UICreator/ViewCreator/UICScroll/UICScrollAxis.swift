@@ -20,23 +20,40 @@
 // THE SOFTWARE.
 //
 
+import Foundation
+import UIKit
 import ConstraintBuilder
 
-@frozen
-public enum ContentMode {
-    case fill
-    case fit
-}
+//swiftlint:disable file_length
+public extension UICScroll {
+    
+    @frozen
+    enum Axis: Equatable {
+        case vertical
+        case horizontal
+        case auto(vertical: CBLayoutPriority, horizontal: CBLayoutPriority)
 
-extension ContentMode {
+        @inlinable
+        public static func ==(lhs: Axis, rhs: Axis) -> Bool {
+            switch lhs {
+            case .vertical:
+                if case .vertical = rhs {
+                    return true
+                }
 
-    @usableFromInline
-    var uiContentMode: CBView.ContentMode {
-        switch self {
-        case .fill:
-            return .scaleAspectFill
-        case .fit:
-            return .scaleAspectFit
+            case .horizontal:
+                if case .horizontal = rhs {
+                    return true
+                }
+
+            case .auto(let lhsVerticalPriority, let lhsHorizontalPriority):
+                if case .auto(let rhsVerticalPriority, let rhsHorizontalPriority) = rhs {
+                    return lhsVerticalPriority == rhsVerticalPriority
+                        && lhsHorizontalPriority == rhsHorizontalPriority
+                }
+            }
+
+            return false
         }
     }
 }

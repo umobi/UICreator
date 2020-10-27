@@ -23,20 +23,16 @@
 import ConstraintBuilder
 
 @frozen
-public enum ContentMode {
-    case fill
-    case fit
-}
-
-extension ContentMode {
+public struct UICModifiedViewController<ViewController>: UIViewControllerCreator where ViewController: CBViewController {
+    let viewControllerLoader: () -> ViewController
 
     @usableFromInline
-    var uiContentMode: CBView.ContentMode {
-        switch self {
-        case .fill:
-            return .scaleAspectFill
-        case .fit:
-            return .scaleAspectFit
-        }
+    init(_ viewLoader: @escaping () -> ViewController) {
+        self.viewControllerLoader = viewLoader
+    }
+
+    @inline(__always)
+    public static func makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
+        (viewCreator as! Self).viewControllerLoader()
     }
 }

@@ -25,13 +25,19 @@ import UIKit
 import ConstraintBuilder
 
 extension Render {
-    struct Manager {
-        weak var view: CBView!
 
+    @usableFromInline
+    struct Manager {
+
+        @inline(__always)
+        let view: CBView
+
+        @inline(__always)
         init(_ view: CBView) {
             self.view = view
         }
 
+        @inline(__always)
         func willMove(toSuperview newSuperview: CBView?) {
             guard newSuperview != nil else {
                 return
@@ -40,6 +46,7 @@ extension Render {
             view.render.commit(.notRendered)
         }
 
+        @inline(__always)
         func didMoveToSuperview() {
             guard view.superview != nil else {
                 return
@@ -48,6 +55,7 @@ extension Render {
             view.render.commit(.rendered)
         }
 
+        @inline(__always)
         func didMoveToWindow() {
             guard view.window != nil else {
                 view.appear.commit(.disappeared)
@@ -58,15 +66,18 @@ extension Render {
             frame(view.frame)
         }
 
+        @inline(__always)
         func layoutSubviews() {
             view.layout.commit()
             frame(view.frame)
         }
 
+        @inline(__always)
         func traitDidChange() {
             view.trait.commit()
         }
 
+        @inline(__always)
         func frame(_ rect: CGRect) {
             guard view.window != nil, !view.isHidden else {
                 return
@@ -79,6 +90,7 @@ extension Render {
             view.appear.commit(.appeared)
         }
 
+        @inline(__always)
         func isHidden(_ isHidden: Bool) {
             if isHidden {
                 view.appear.commit(.disappeared)
@@ -91,6 +103,8 @@ extension Render {
 }
 
 extension CBView {
+
+    @inline(__always)
     var renderManager: Render.Manager {
         .init(self)
     }

@@ -20,23 +20,32 @@
 // THE SOFTWARE.
 //
 
+import Foundation
+import UIKit
 import ConstraintBuilder
 
 @frozen
-public enum ContentMode {
-    case fill
-    case fit
-}
+public struct UICBottomRight: UIViewCreator {
+    public typealias View = CBView
 
-extension ContentMode {
+    private let priority: CBLayoutPriority
+    private let content: () -> ViewCreator
 
-    @usableFromInline
-    var uiContentMode: CBView.ContentMode {
-        switch self {
-        case .fill:
-            return .scaleAspectFill
-        case .fit:
-            return .scaleAspectFit
-        }
+    public init(
+        _ priority: CBLayoutPriority = .required,
+        content: @escaping () -> ViewCreator) {
+
+        self.priority = priority
+        self.content = content
+    }
+
+    @inline(__always)
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return Views.ContentView(.bottomRight, priority: _self.priority)
+            .onNotRendered {
+                ($0 as? Views.ContentView)?.addContent(_self.content().releaseUIView())
+            }
     }
 }

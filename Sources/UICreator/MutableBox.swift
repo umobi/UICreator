@@ -23,6 +23,7 @@
 import Foundation
 
 @propertyWrapper
+@usableFromInline
 struct MutableBox<Value> {
     private class Box {
         var value: Value
@@ -34,7 +35,7 @@ struct MutableBox<Value> {
 
     private let box: Box
 
-    init(wrappedValue: Value) {
+    @usableFromInline init(wrappedValue: Value) {
         self.box = .init(wrappedValue)
     }
 

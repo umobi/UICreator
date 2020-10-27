@@ -95,12 +95,15 @@ public protocol UIViewCreator: ViewCreator {
 }
 
 extension UIViewCreator {
+    @inline(__always)
+    @usableFromInline
     func releaseOperationCastedView() -> View {
         self.operationUIView().dynamicView as! View
     }
 }
 
 public extension UIViewCreator {
+    @inlinable
     func onNotRendered(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         UICModifiedView {
             self.releaseOperationCastedView()
@@ -108,6 +111,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func onRendered(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         UICModifiedView {
             self.releaseOperationCastedView()
@@ -115,6 +119,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func onInTheScene(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         UICModifiedView {
             self.releaseOperationCastedView()
@@ -124,6 +129,7 @@ public extension UIViewCreator {
 }
 
 public extension UIViewCreator {
+    @inlinable
     func onLayout(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         UICModifiedView {
             self.releaseOperationCastedView()
@@ -131,6 +137,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func onAppear(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         UICModifiedView {
             self.releaseOperationCastedView()
@@ -138,6 +145,7 @@ public extension UIViewCreator {
         }
     }
 
+    @inlinable
     func onDisappear(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         UICModifiedView {
             self.releaseOperationCastedView()

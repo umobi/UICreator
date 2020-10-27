@@ -23,10 +23,11 @@
 import Foundation
 
 @propertyWrapper
-//@dynamicMemberLookup
+@frozen
 public struct Relay<Value> {
     private var storage: Storage
 
+    @usableFromInline
     init(_ reference: ReactiveItemReference) {
         self.storage = .weak(.init(reference: reference))
     }
@@ -66,6 +67,7 @@ public struct Relay<Value> {
         }
     }
 
+    @inline(__always)
     public var projectedValue: Relay<Value> { self }
 
     public func next(_ handler: @escaping (Value) -> Void) {
@@ -107,8 +109,14 @@ public extension Relay {
 }
 
 public extension Relay {
-    private class FlatMapToken {}
+    @usableFromInline
+    internal class FlatMapToken {
 
+        @usableFromInline
+        init() {}
+    }
+
+    @inlinable
     func flatMap<Other>(_ flatHandler: @escaping (Value) -> Relay<Other>) -> Relay<Other> {
         let value = UICreator.Value(wrappedValue: flatHandler(self.wrappedValue).wrappedValue)
         var token = FlatMapToken()
@@ -131,10 +139,12 @@ public extension Relay {
 }
 
 public extension Relay {
+    @inlinable
     func withLatest<Other>(_ otherRelay: Relay<Other>) -> Relay<Other> {
         self.flatMap { _ in otherRelay }
     }
 
+    @inlinable
     func withLatest<Other, Result>(
         _ otherRelay: Relay<Other>,
         _ map: @escaping (Value, Other) -> Result) -> Relay<Result> {
@@ -149,6 +159,7 @@ public extension Relay {
 }
 
 public extension Relay where Value: Equatable {
+    @inlinable
     func distinctSync(_ handler: @escaping (Value) -> Void) {
         var actual = self.wrappedValue
         handler(actual)
@@ -162,217 +173,15 @@ public extension Relay where Value: Equatable {
     }
 }
 
-private extension Relay {
+extension Relay {
+    @usableFromInline
     struct WeakContainer {
         weak var reference: ReactiveItemReference!
     }
 
+    @usableFromInline
     enum Storage {
         case constant(Value)
         case weak(WeakContainer)
-    }
-}
-
-public protocol OptionalType {
-    associatedtype Wrapped
-    var value: Wrapped? { get }
-}
-
-extension Optional: OptionalType {
-    /// Cast `Optional<Wrapped>` to `Wrapped?`
-    public var value: Wrapped? {
-        return self
-    }
-}
-
-public prefix func ! (_ relay: Relay<Bool>) -> Relay<Bool> {
-    relay.map { !$0 }
-}
-
-public func && (_ left: Relay<Bool>, _ right: Relay<Bool>) -> Relay<Bool> {
-    let value = Value(wrappedValue: left.wrappedValue && right.wrappedValue)
-
-    left.next {
-        value.wrappedValue = $0 && right.wrappedValue
-    }
-
-    right.next {
-        value.wrappedValue = left.wrappedValue && $0
-    }
-
-    return value.projectedValue
-}
-
-public func || (_ left: Relay<Bool>, _ right: Relay<Bool>) -> Relay<Bool> {
-    let value = Value(wrappedValue: left.wrappedValue || right.wrappedValue)
-
-    left.next {
-        value.wrappedValue = $0 || right.wrappedValue
-    }
-
-    right.next {
-        value.wrappedValue = left.wrappedValue || $0
-    }
-
-    return value.projectedValue
-}
-
-public func || (_ left: Bool, _ right: Relay<Bool>) -> Relay<Bool> {
-    let value = Value(wrappedValue: left || right.wrappedValue)
-
-    right.next {
-        value.wrappedValue = left || $0
-    }
-
-    return value.projectedValue
-}
-
-public func || (_ left: Relay<Bool>, _ right: Bool) -> Relay<Bool> {
-    let value = Value(wrappedValue: left.wrappedValue || right)
-
-    left.next {
-        value.wrappedValue = $0 || right
-    }
-
-    return value.projectedValue
-}
-
-public func && (_ left: Bool, _ right: Relay<Bool>) -> Relay<Bool> {
-    let value = Value(wrappedValue: left && right.wrappedValue)
-
-    right.next {
-        value.wrappedValue = left && $0
-    }
-
-    return value.projectedValue
-}
-
-public func && (_ left: Relay<Bool>, _ right: Bool) -> Relay<Bool> {
-    let value = Value(wrappedValue: left.wrappedValue && right)
-
-    left.next {
-        value.wrappedValue = $0 && right
-    }
-
-    return value.projectedValue
-}
-
-public func == <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Bool> where Value: Equatable {
-    left.withLatest(right) {
-        $0 == $1
-    }
-}
-
-public func == <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Bool> where Value: Equatable {
-    left.map {
-        $0 == right
-    }
-}
-
-public func != <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Bool> where Value: Equatable {
-    left.withLatest(right) {
-        $0 == $1
-    }
-}
-
-public func != <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Bool> where Value: Equatable {
-    left.map {
-        $0 != right
-    }
-}
-
-public func < <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Bool> where Value: Comparable {
-    left.withLatest(right) {
-        $0 < $1
-    }
-}
-
-public func < <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Bool> where Value: Comparable {
-    left.map {
-        $0 < right
-    }
-}
-
-public func <= <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Bool> where Value: Comparable {
-    left.withLatest(right) {
-        $0 <= $1
-    }
-}
-
-public func <= <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Bool> where Value: Comparable {
-    left.map {
-        $0 <= right
-    }
-}
-
-public func >= <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Bool> where Value: Comparable {
-    left.withLatest(right) {
-        $0 >= $1
-    }
-}
-
-public func >= <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Bool> where Value: Comparable {
-    left.map {
-        $0 >= right
-    }
-}
-
-public func > <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Bool> where Value: Comparable {
-    left.withLatest(right) {
-        $0 > $1
-    }
-}
-
-public func > <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Bool> where Value: Comparable {
-    left.map {
-        $0 > right
-    }
-}
-
-public func + <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Value> where Value: Numeric {
-    left.withLatest(right) {
-        $0 + $1
-    }
-}
-
-public func + <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Value> where Value: Numeric {
-    left.map {
-        $0 + right
-    }
-}
-
-public func - <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Value> where Value: Numeric {
-    left.withLatest(right) {
-        $0 - $1
-    }
-}
-
-public func - <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Value> where Value: Numeric {
-    left.map {
-        $0 - right
-    }
-}
-
-public func * <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Value> where Value: Numeric {
-    left.withLatest(right) {
-        $0 * $1
-    }
-}
-
-public func * <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Value> where Value: Numeric {
-    left.map {
-        $0 * right
-    }
-}
-
-public func / <Value>(_ left: Relay<Value>, _ right: Relay<Value>) -> Relay<Value> where Value: FloatingPoint {
-    left.withLatest(right) {
-        $0 / $1
-    }
-}
-
-public func / <Value>(_ left: Relay<Value>, _ right: Value) -> Relay<Value> where Value: FloatingPoint {
-    left.map {
-        $0 / right
     }
 }

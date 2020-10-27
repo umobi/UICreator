@@ -28,7 +28,7 @@ internal extension UIView {
 
     /// The `add(_:)` function is used internally to add views
     /// inside view and constraint with required priority in all edges.
-    func add(priority: UILayoutPriority = .init(751), _ view: UIView) {
+    func add(priority: CBLayoutPriority = .init(751), _ view: UIView) {
         CBSubview(self).addSubview(view)
 
         Constraintable.activate {

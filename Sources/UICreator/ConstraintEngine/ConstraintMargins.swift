@@ -21,7 +21,8 @@
 //
 
 import Foundation
-import UIKit
+import ConstraintBuilder
+import CoreGraphics
 
 public enum Margin: CaseIterable {
     case top
@@ -32,7 +33,7 @@ public enum Margin: CaseIterable {
 
 public extension UIViewCreator {
     func safeArea(
-        priority: UILayoutPriority = .required,
+        priority: CBLayoutPriority = .required,
         _ margins: Margin...,
         equalTo value: CGFloat = 0) -> UICModifiedView<View> {
 
@@ -52,7 +53,7 @@ public extension UIViewCreator {
     }
 
     func insets(
-        priority: UILayoutPriority = .required,
+        priority: CBLayoutPriority = .required,
         _ margins: Margin...,
         equalTo value: CGFloat = 0) -> UICModifiedView<View> {
 
@@ -72,7 +73,7 @@ public extension UIViewCreator {
     }
 
     func margin(
-        priority: UILayoutPriority = .required,
+        priority: CBLayoutPriority = .required,
         _ margins: Margin...,
         equalTo value: CGFloat = 0) -> UICModifiedView<View> {
 

@@ -24,18 +24,21 @@ import Foundation
 import UIKit
 
 public extension UIViewCreator where View: UIControl {
+    @inlinable
     func isEnabled(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? UIControl)?.isEnabled = flag
         }
     }
 
+    @inlinable
     func contentHorizontal(alignment: UIControl.ContentHorizontalAlignment) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? UIControl)?.contentHorizontalAlignment = alignment
         }
     }
 
+    @inlinable
     func contentVertical(alignment: UIControl.ContentVerticalAlignment) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? UIControl)?.contentVerticalAlignment = alignment
@@ -44,9 +47,11 @@ public extension UIViewCreator where View: UIControl {
 }
 
 public extension UIViewCreator where View: UIControl {
+    @inlinable
     func isEnabled(_ isEnabled: Relay<Bool>) -> UICModifiedView<View> {
         return self.onNotRendered { view in
             weak var weakView = view
+
             isEnabled.sync {
                 (weakView as? View)?.isEnabled = $0
             }
@@ -55,6 +60,7 @@ public extension UIViewCreator where View: UIControl {
 }
 
 extension UIViewCreator where View: UIControl {
+    @usableFromInline
     func onEvent(_ event: UIControl.Event, _ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.onEvent(event, handler)

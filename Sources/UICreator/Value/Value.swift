@@ -22,7 +22,9 @@
 
 import Foundation
 
+@usableFromInline
 class ReactiveItemReference: CustomStringConvertible {
+    @usableFromInline
     struct NSWeakObjectProtocol {
         weak var observable: NSObjectProtocol!
 
@@ -37,10 +39,12 @@ class ReactiveItemReference: CustomStringConvertible {
         "\(ObjectIdentifier(self))"
     }
 
+    @usableFromInline
     var description: String {
         self.identifier
     }
 
+    @usableFromInline
     func append(_ observable: NSObjectProtocol) {
         self.observables.append(.init(observable))
     }
@@ -53,10 +57,11 @@ class ReactiveItemReference: CustomStringConvertible {
 }
 
 @propertyWrapper
+@frozen
 public struct Value<Value> {
     private let mutableBox: Box
 
-    public var projectedValue: Relay<Value> { return .init(self.mutableBox.reference) }
+    public var projectedValue: Relay<Value> { .init(self.mutableBox.reference) }
 
     public var wrappedValue: Value {
         get { self.mutableBox.value }
@@ -69,16 +74,19 @@ public struct Value<Value> {
     }
 }
 
-private extension Value {
+extension Value {
+    @usableFromInline
     class Box {
         let reference = ReactiveItemReference()
 
+        @inline(__always)
         var value: Value {
             didSet {
                 self.reference.reactive.valueDidChange(self.value)
             }
         }
 
+        @usableFromInline
         init(value: Value) {
             self.value = value
 

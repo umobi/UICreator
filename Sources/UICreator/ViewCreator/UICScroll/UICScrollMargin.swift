@@ -20,23 +20,15 @@
 // THE SOFTWARE.
 //
 
+import Foundation
+import UIKit
 import ConstraintBuilder
 
-@frozen
-public enum ContentMode {
-    case fill
-    case fit
-}
-
-extension ContentMode {
-
-    @usableFromInline
-    var uiContentMode: CBView.ContentMode {
-        switch self {
-        case .fill:
-            return .scaleAspectFill
-        case .fit:
-            return .scaleAspectFit
-        }
+public extension UICScroll {
+    
+    @frozen
+    enum Margin {
+        case safeArea
+        case bounds
     }
 }

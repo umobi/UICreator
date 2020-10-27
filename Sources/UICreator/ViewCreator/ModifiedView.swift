@@ -20,23 +20,20 @@
 // THE SOFTWARE.
 //
 
+import UIKit
 import ConstraintBuilder
 
 @frozen
-public enum ContentMode {
-    case fill
-    case fit
-}
-
-extension ContentMode {
+public struct UICModifiedView<View>: UIViewCreator where View: UIView {
+    private let viewLoader: () -> View
 
     @usableFromInline
-    var uiContentMode: CBView.ContentMode {
-        switch self {
-        case .fill:
-            return .scaleAspectFill
-        case .fit:
-            return .scaleAspectFit
-        }
+    internal init(_ viewLoader: @escaping () -> View) {
+        self.viewLoader = viewLoader
+    }
+
+    @inline(__always)
+    public static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
+        (viewCreator as! Self).viewLoader()
     }
 }
