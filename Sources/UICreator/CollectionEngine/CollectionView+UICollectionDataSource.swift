@@ -22,16 +22,17 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 private var kCollectionViewCellLayoutHandler = 0
-private extension UIView {
-    private var collectionLayoutHandler: ((UIView) -> Void)? {
-        get { objc_getAssociatedObject(self, &kCollectionViewCellLayoutHandler) as? ((UIView) -> Void) }
+private extension CBView {
+    private var collectionLayoutHandler: ((CBView) -> Void)? {
+        get { objc_getAssociatedObject(self, &kCollectionViewCellLayoutHandler) as? ((CBView) -> Void) }
         set { objc_setAssociatedObject(self, &kCollectionViewCellLayoutHandler, newValue, .OBJC_ASSOCIATION_COPY) }
     }
 
     @discardableResult
-    func onCellLayout(_ handler: @escaping (UIView) -> Void) -> Self {
+    func onCellLayout(_ handler: @escaping (CBView) -> Void) -> Self {
         guard self.collectionLayoutHandler == nil else {
             self.collectionLayoutHandler = handler
             return self
@@ -128,7 +129,7 @@ extension UICCollectionViewDataSource {
                 let cell = collectionView.dequeueReusableSupplementaryView(
                     ofKind: kind,
                     withReuseIdentifier: header.identifier,
-                    for: indexPath) as? CollectionReusableView
+                    for: indexPath) as? Views.CollectionReusableView
             else {
                 DataSourceFatal.unexpectedHeader(indexPath).die()
             }
@@ -172,7 +173,7 @@ extension UICCollectionViewDataSource {
                 let cell = collectionView.dequeueReusableSupplementaryView(
                     ofKind: kind,
                     withReuseIdentifier: footer.identifier,
-                    for: indexPath) as? CollectionReusableView
+                    for: indexPath) as? Views.CollectionReusableView
             else {
                 DataSourceFatal.unexpectedFooter(indexPath).die()
             }

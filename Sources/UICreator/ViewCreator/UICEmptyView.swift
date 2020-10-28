@@ -26,9 +26,9 @@ import ConstraintBuilder
 
 @frozen
 public struct UICEmptyView: UIViewCreator {
-    public typealias View = UIView
+    public typealias View = CBView
 
-    let view: UIView?
+    let view: CBView?
 
     public init() {
         self.view = nil

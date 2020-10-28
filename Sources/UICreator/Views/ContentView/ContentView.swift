@@ -27,8 +27,8 @@ import ConstraintBuilder
 extension Views {
     // swiftlint:disable file_length type_body_length
     @usableFromInline
-    internal class ContentView: UIView, UICViewContent {
-        weak var view: UIView?
+    internal class ContentView: CBView, UICViewContent {
+        weak var view: CBView?
 
         var priority: CBLayoutPriority {
             didSet {
@@ -99,7 +99,7 @@ extension Views {
         }
 
         @usableFromInline
-        func addContent(_ view: UIView) {
+        func addContent(_ view: CBView) {
             CBSubview(self).addSubview(view)
             self.view = view
 

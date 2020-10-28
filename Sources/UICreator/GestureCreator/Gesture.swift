@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 public protocol GestureCreator {
     static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer
@@ -36,7 +37,7 @@ extension GestureCreator {
 
 public extension GestureCreator {
     @inlinable 
-    func add(_ view: UIView) {
+    func add(_ view: CBView) {
         let gestureRecognizer = self.releaseUIGesture()
         view.addGestureRecognizer(gestureRecognizer)
         gestureRecognizer.addTarget(gestureRecognizer, action: #selector(gestureRecognizer.commit(_:)))

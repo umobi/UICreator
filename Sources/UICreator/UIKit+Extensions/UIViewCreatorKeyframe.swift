@@ -22,8 +22,9 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
-public extension UIView {
+public extension CBView {
     @frozen
     struct CreatorKeyframe {
         @usableFromInline
@@ -33,12 +34,12 @@ public extension UIView {
         let duration: TimeInterval
         
         @usableFromInline
-        let animations: (UIView) -> Void
+        let animations: (CBView) -> Void
 
         private init(
             startAt startTime: TimeInterval,
             duration: TimeInterval,
-            animations: @escaping (UIView) -> Void) {
+            animations: @escaping (CBView) -> Void) {
 
             self.startTime = startTime
             self.duration = duration
@@ -48,7 +49,7 @@ public extension UIView {
         public static func keyframe(
             startAt startTime: TimeInterval,
             duration: TimeInterval,
-            animations: @escaping (UIView) -> Void) -> CreatorKeyframe {
+            animations: @escaping (CBView) -> Void) -> CreatorKeyframe {
 
             return .init(
                 startAt: startTime,

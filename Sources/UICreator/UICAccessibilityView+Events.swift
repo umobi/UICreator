@@ -22,13 +22,14 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 public extension UICAccessibilityView {
     // swiftlint:disable discarded_notification_center_observer
     @inline(__always) @usableFromInline
     internal func notification(
         _ name: NSNotification.Name,
-        _ handler: @escaping (Notification, UIView) -> Void) -> UICAccessibilityView<View> {
+        _ handler: @escaping (Notification, CBView) -> Void) -> UICAccessibilityView<View> {
         self.onNotRendered {
             weak var view = $0
 
@@ -53,14 +54,14 @@ public extension UICAccessibilityView {
     @inline(__always) @usableFromInline
     internal func notification(
         _ notificationName: NSNotification.Name,
-        _ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+        _ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(notificationName) { _, view in
             handler(view)
         }
     }
 
     @available(iOS 11.0, tvOS 11, *) @inlinable
-    func onVoiceOverChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onVoiceOverChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.voiceOverStatusDidChangeNotification,
             handler
@@ -68,7 +69,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable
-    func onElementFocusedChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onElementFocusedChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         var isFocused = false
 
         return self.notification(UIAccessibility.elementFocusedNotification) { notification, view in
@@ -88,7 +89,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable
-    func onBoldTextChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onBoldTextChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.boldTextStatusDidChangeNotification,
             handler
@@ -96,7 +97,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable
-    func onMonoAudioChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onMonoAudioChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.monoAudioStatusDidChangeNotification,
             handler
@@ -104,7 +105,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable
-    func onClosedCaptionChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onClosedCaptionChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.closedCaptioningStatusDidChangeNotification,
             handler
@@ -112,7 +113,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable @available(*, deprecated, message: "Use Property(\\.accessibilityInvertColors)")
-    func onInvertColorsChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onInvertColorsChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.invertColorsStatusDidChangeNotification,
             handler
@@ -120,7 +121,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable
-    func onGuidedAccessChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onGuidedAccessChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.guidedAccessStatusDidChangeNotification,
             handler
@@ -128,7 +129,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable @available(*, deprecated, message: "Use Property(\\.accessibilityGrayscaleEnabled)")
-    func onGrayScaleChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onGrayScaleChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.grayscaleStatusDidChangeNotification,
             handler
@@ -136,7 +137,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable @available(*, deprecated, message: "Use Property(\\.accessibilityReduceTransparency)")
-    func onReduceTransparencyChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onReduceTransparencyChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.reduceTransparencyStatusDidChangeNotification,
             handler
@@ -144,7 +145,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable @available(*, deprecated, message: "Use Property(\\.accessibilityReduceMotion)")
-    func onReduceMotionChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onReduceMotionChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.reduceMotionStatusDidChangeNotification,
             handler
@@ -152,7 +153,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable @available(iOS 13.0, tvOS 13.0, *)
-    func onViewAutoplayChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onViewAutoplayChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.videoAutoplayStatusDidChangeNotification,
             handler
@@ -160,7 +161,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable @available(iOS 13.0, tvOS 13.0, *)
-    func onDarkerSystemColorsChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onDarkerSystemColorsChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.darkerSystemColorsStatusDidChangeNotification,
             handler
@@ -168,7 +169,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable
-    func onSwitchControlChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onSwitchControlChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.switchControlStatusDidChangeNotification,
             handler
@@ -176,7 +177,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable
-    func onSpeakSelectionChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onSpeakSelectionChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.speakSelectionStatusDidChangeNotification,
             handler
@@ -184,7 +185,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable
-    func onSpeakScreenChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onSpeakScreenChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.speakScreenStatusDidChangeNotification,
             handler
@@ -192,7 +193,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable
-    func onShakeToUndoChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onShakeToUndoChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.shakeToUndoDidChangeNotification,
             handler
@@ -200,7 +201,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable
-    func onAssistiveTouchChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onAssistiveTouchChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.assistiveTouchStatusDidChangeNotification,
             handler
@@ -208,7 +209,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable @available(iOS 13.0, tvOS 13.0, *)
-    func onDifferentiateWithoutColorsChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onDifferentiateWithoutColorsChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             NSNotification.Name(rawValue: UIAccessibility.differentiateWithoutColorDidChangeNotification),
             handler
@@ -216,7 +217,7 @@ public extension UICAccessibilityView {
     }
 
     @inlinable @available(iOS 13.0, tvOS 13.0, *)
-    func onOnOffSwitchLabelsChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onOnOffSwitchLabelsChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.onOffSwitchLabelsDidChangeNotification,
             handler
@@ -225,7 +226,7 @@ public extension UICAccessibilityView {
 
     #if os(iOS)
     @inlinable
-    func onHearingDevicePairedEarChanged(_ handler: @escaping (UIView) -> Void) -> UICAccessibilityView<View> {
+    func onHearingDevicePairedEarChanged(_ handler: @escaping (CBView) -> Void) -> UICAccessibilityView<View> {
         self.notification(
             UIAccessibility.hearingDevicePairedEarDidChangeNotification,
             handler

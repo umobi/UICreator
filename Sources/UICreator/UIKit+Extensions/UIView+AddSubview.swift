@@ -24,12 +24,12 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-internal extension UIView {
+internal extension CBView {
 
     /// The `add(_:)` function is used internally to add views
     /// inside view and constraint with required priority in all edges.
     @inlinable
-    func add(priority: CBLayoutPriority = .init(751), _ view: UIView) {
+    func add(priority: CBLayoutPriority = .init(751), _ view: CBView) {
         CBSubview(self).addSubview(view)
 
         Constraintable.activate {

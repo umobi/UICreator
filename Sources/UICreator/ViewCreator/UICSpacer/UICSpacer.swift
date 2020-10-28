@@ -26,7 +26,7 @@ import ConstraintBuilder
 
 @frozen
 public struct UICSpacer: UIViewCreator {
-    public typealias View = UIView
+    public typealias View = CBView
 
     @MutableBox var margin: Edges
     let content: () -> ViewCreator
@@ -138,12 +138,12 @@ public extension UICSpacer {
 public extension UIViewCreator {
 
     @inline(__always)
-    func padding(_ constant: CGFloat) -> UICModifiedView<UIView> {
+    func padding(_ constant: CGFloat) -> UICModifiedView<CBView> {
         self.padding(constant, .all)
     }
 
     @inlinable
-    func padding(_ constant: CGFloat, _ edges: PaddingEdges) -> UICModifiedView<UIView> {
+    func padding(_ constant: CGFloat, _ edges: PaddingEdges) -> UICModifiedView<CBView> {
         UICModifiedView {
             let view = self.releaseUIView()
 

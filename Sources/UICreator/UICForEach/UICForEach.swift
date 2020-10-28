@@ -59,7 +59,7 @@ public struct UICForEach<Content, Value>: ViewCreator, ForEachEnviromentShared w
 extension UICForEach {
     @usableFromInline
     class Enviroment: ForEachEnviromentType {
-        @UICOutlet var view: UIView!
+        @UICOutlet var view: CBView!
         @Relay private var dynamicContent: [() -> ViewCreator]
 
         private weak var manager: SupportForEach!

@@ -26,15 +26,15 @@ import UIKit
 
 @frozen
 public struct ResizeWeakView {
-    weak var superview: UIView!
-    weak var subview: UIView!
+    weak var superview: CBView!
+    weak var subview: CBView!
 
     fileprivate let height: CBLayoutPriority?
     fileprivate let width: CBLayoutPriority?
-    fileprivate let addHandler: ((UIView) -> Void)?
+    fileprivate let addHandler: ((CBView) -> Void)?
 
     @usableFromInline
-    init(_ superview: UIView!, subview: UIView!, _ addHandler: ((UIView) -> Void)?) {
+    init(_ superview: CBView!, subview: CBView!, _ addHandler: ((CBView) -> Void)?) {
         self.superview = superview
         self.subview = subview
         self.height = nil
@@ -65,11 +65,11 @@ public struct ResizeWeakView {
 
 public extension ResizeWeakView {
     private struct Copy {
-        let subview: UIView
-        let superview: UIView
+        let subview: CBView
+        let superview: CBView
         let height: CBLayoutPriority?
         let width: CBLayoutPriority?
-        let addHandler: ((UIView) -> Void)?
+        let addHandler: ((CBView) -> Void)?
 
         init?(_ original: ResizeWeakView) {
             guard let superview = original.superview, let subview = original.subview else {
@@ -98,7 +98,7 @@ public extension ResizeWeakView {
         self.superview = nil
     }
 
-    func watch(in resizableView: UIView!) {
+    func watch(in resizableView: CBView!) {
         var muttable: ResizeWeakView? = self
 
         muttable?.subview.onLayout { [self] in

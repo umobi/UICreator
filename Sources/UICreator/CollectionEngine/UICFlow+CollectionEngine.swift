@@ -40,7 +40,7 @@ extension ListSupport where Self: UICollectionViewLayoutCreator {
 
             manager.headersIdentifier.forEach {
                 collectionView.register(
-                    CollectionReusableView.self,
+                    Views.CollectionReusableView.self,
                     forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                     withReuseIdentifier: $0
                 )
@@ -48,7 +48,7 @@ extension ListSupport where Self: UICollectionViewLayoutCreator {
 
             manager.footersIdentifier.forEach {
                 collectionView.register(
-                    CollectionReusableView.self,
+                    Views.CollectionReusableView.self,
                     forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
                     withReuseIdentifier: $0
                 )

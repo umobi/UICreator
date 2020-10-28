@@ -22,9 +22,10 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 public class CollectionViewCell: UICollectionViewCell, ReusableView {
-    weak var hostedView: UIView!
+    weak var hostedView: CBView!
     var cellLoaded: UICCell.Loaded!
 
     override init(frame: CGRect) {

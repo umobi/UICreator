@@ -33,21 +33,21 @@ enum ReusableViewAxis {
 private var kReusableAxis = 0
 private var kReusableUpdateBatch = 0
 
-private extension UIView {
+private extension CBView {
     var reusableAxis: ReusableViewAxis? {
         get { objc_getAssociatedObject(self, &kReusableAxis) as? ReusableViewAxis }
         set { objc_setAssociatedObject(self, &kReusableAxis, newValue, .OBJC_ASSOCIATION_COPY) }
     }
 
-    var reusableUpdateBatch: ((UIView) -> Void)? {
-        get { objc_getAssociatedObject(self, &kReusableUpdateBatch) as? (UIView) -> Void }
+    var reusableUpdateBatch: ((CBView) -> Void)? {
+        get { objc_getAssociatedObject(self, &kReusableUpdateBatch) as? (CBView) -> Void }
         set { objc_setAssociatedObject(self, &kReusableUpdateBatch, newValue, .OBJC_ASSOCIATION_COPY) }
     }
 }
 
 protocol ReusableView: class {
-    var hostedView: UIView! { get set }
-    var contentView: UIView { get }
+    var hostedView: CBView! { get set }
+    var contentView: CBView { get }
 
     func prepareCell(_ cell: UICCell, axis: ReusableViewAxis)
 
@@ -67,7 +67,7 @@ extension ReusableView {
 
         let host = cellLoaded.cell.rowManager.payload.content()
 
-        let hostedView: UIView! = host.releaseUIView()
+        let hostedView: CBView! = host.releaseUIView()
         self.hostedView = hostedView
 
         if hostedView.reusableAxis != axis {
@@ -76,7 +76,7 @@ extension ReusableView {
                 guard
                     let reusableView = sequence(first: $0, next: { $0.superview })
                         .first(where: { $0 is ReusableView })
-                        as? ReusableView & UIView,
+                        as? ReusableView & CBView,
                     let collectionView = sequence(first: reusableView.contentView, next: { $0.superview })
                         .first(where: { $0 is TableCellType || $0 is CollectionCellType })
                 else {
@@ -113,9 +113,9 @@ extension ReusableView {
     }
 
     static func updateTableViewBatching(
-        listView: UIView,
-        reusableView: UIView & ReusableView,
-        view: UIView) {
+        listView: CBView,
+        reusableView: CBView & ReusableView,
+        view: CBView) {
 
         guard
             let tableView = sequence(first: listView, next: { $0.superview })
@@ -136,7 +136,7 @@ extension ReusableView {
 
         if #available(iOS 11, tvOS 11, *) {
             tableView.addUniqueCallback {
-                UIView.performWithoutAnimation {
+                CBView.performWithoutAnimation {
                     tableView.performBatchUpdates(nil, completion: nil)
                 }
             }
@@ -144,15 +144,15 @@ extension ReusableView {
         }
 
         tableView.addUniqueCallback {
-            UIView.performWithoutAnimation {
+            CBView.performWithoutAnimation {
                 tableView.beginUpdates()
                 tableView.endUpdates()
             }
         }
     }
 
-    private func addConstraints(_ hostedView: UIView, _ axis: ReusableViewAxis) {
-        UIView.CBSubview(self.contentView).addSubview(hostedView)
+    private func addConstraints(_ hostedView: CBView, _ axis: ReusableViewAxis) {
+        CBView.CBSubview(self.contentView).addSubview(hostedView)
         switch axis {
         case .center:
             Constraintable.activate {
@@ -221,7 +221,7 @@ protocol CollectionCellType {
 
 var kTableViewCallbackIsPending = 0
 extension UITableView {
-    func needsToUpdateHeightOf(_ view: UIView, rowManager: ListManager.RowManager) -> Bool {
+    func needsToUpdateHeightOf(_ view: CBView, rowManager: ListManager.RowManager) -> Bool {
         let cellType = rowManager.payload.contentType
         let indexPath = rowManager.indexPath
         switch cellType {
@@ -249,7 +249,7 @@ extension UITableView {
         }
     }
 
-    func itemHeightUpdate(_ view: UIView, rowManager: ListManager.RowManager) {
+    func itemHeightUpdate(_ view: CBView, rowManager: ListManager.RowManager) {
         let cellType = rowManager.payload.contentType
         let indexPath = rowManager.indexPath
         switch cellType {

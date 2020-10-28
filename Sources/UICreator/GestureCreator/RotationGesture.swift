@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 #if os(iOS)
 @frozen
@@ -46,7 +47,7 @@ public extension UIViewCreator {
     }
 
     @inlinable
-    func onRotation(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+    func onRotation(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         self.onRotationMaker {
             Rotation()
                 .onRecognized {

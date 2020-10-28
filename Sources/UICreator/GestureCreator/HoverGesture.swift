@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 #if os(iOS)
 
@@ -48,7 +49,7 @@ public extension UIViewCreator {
     }
 
     @inlinable @available(iOS 13.0, *)
-    func onHover(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+    func onHover(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         self.onHoverMaker {
             Hover()
                 .onRecognized {

@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 class NotificationManager {
     private var observers: [NSObjectProtocol] = []
@@ -37,7 +38,7 @@ class NotificationManager {
 }
 
 private var kNotificationObservable = 0
-internal extension UIView {
+internal extension CBView {
     var notificationObservable: NotificationManager {
         OBJCSet(
             self,

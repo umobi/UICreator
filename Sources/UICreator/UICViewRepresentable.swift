@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 public protocol UICViewRepresentable: UIViewCreator {
     func makeUIView() -> View
@@ -29,7 +30,7 @@ public protocol UICViewRepresentable: UIViewCreator {
 }
 
 public extension UICViewRepresentable {
-    static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
+    static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
         return Views.ViewAdaptor(_self.makeUIView())

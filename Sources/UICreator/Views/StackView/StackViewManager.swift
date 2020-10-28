@@ -22,20 +22,21 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 extension Views.StackView {
     class Manager: SupportForEach {
-        private weak var stackView: UIStackView!
+        private weak var stackView: CBStackView!
 
-        @WeakBox var firstView: UIView!
-        @WeakBox var lastView: UIView!
+        @WeakBox var firstView: CBView!
+        @WeakBox var lastView: CBView!
 
         init(_ stackView: UIStackView) {
             self.stackView = stackView
         }
 
         @usableFromInline
-        func viewsDidChange(_ placeholderView: UIView!, _ dynamicContent: Relay<[() -> ViewCreator]>) {
+        func viewsDidChange(_ placeholderView: CBView!, _ dynamicContent: Relay<[() -> ViewCreator]>) {
             self.firstView = placeholderView
             self.lastView = placeholderView
 
@@ -62,7 +63,7 @@ extension Views.StackView {
                     }
 
                     views.enumerated().forEach {
-                        UIView.CBSubview(stackView).insertArrangedSubview(
+                        CBView.CBSubview(stackView).insertArrangedSubview(
                             $0.element,
                             at: startIndex + $0.offset
                         )

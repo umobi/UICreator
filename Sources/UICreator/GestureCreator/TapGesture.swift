@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 @frozen
 public struct Tap: UIGestureCreator {
@@ -62,7 +63,7 @@ public extension UIViewCreator {
     }
 
     @inlinable
-    func onTap(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+    func onTap(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         self.onTapMaker {
             Tap()
                 .onRecognized {

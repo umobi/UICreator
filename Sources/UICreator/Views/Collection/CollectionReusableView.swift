@@ -25,15 +25,18 @@ import UIKit
 import ConstraintBuilder
 
 extension Views {
-    class TableViewCell: UITableViewCell, ReusableView, TableCellType {
+    class CollectionReusableView: UICollectionReusableView, ReusableView {
         weak var hostedView: CBView!
+
+        var contentView: CBView {
+            return self
+        }
+
         var cellLoaded: UICCell.Loaded!
 
-        override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-            super.init(style: style, reuseIdentifier: reuseIdentifier)
-            self.selectionStyle = .none
+        override init(frame: CGRect) {
+            super.init(frame: frame)
             self.backgroundColor = .clear
-            self.focusStyle = .custom
             self.makeSelfImplemented()
         }
 
@@ -41,7 +44,7 @@ extension Views {
             Fatal.Builder("init(coder:) has not been implemented").die()
         }
 
-        override var isHidden: Bool {
+        override open var isHidden: Bool {
             get { super.isHidden }
             set {
                 super.isHidden = newValue
@@ -49,7 +52,7 @@ extension Views {
             }
         }
 
-        override var frame: CGRect {
+        override open var frame: CGRect {
             get { super.frame }
             set {
                 super.frame = newValue
@@ -57,35 +60,29 @@ extension Views {
             }
         }
 
-        override func willMove(toSuperview newSuperview: UIView?) {
+        override public func willMove(toSuperview newSuperview: UIView?) {
             super.willMove(toSuperview: newSuperview)
             self.renderManager.willMove(toSuperview: newSuperview)
         }
 
-        override func didMoveToSuperview() {
+        override public func didMoveToSuperview() {
             super.didMoveToSuperview()
             self.renderManager.didMoveToSuperview()
         }
 
-        override func didMoveToWindow() {
+        override public func didMoveToWindow() {
             super.didMoveToWindow()
             self.renderManager.didMoveToWindow()
         }
 
-        override func layoutSubviews() {
+        override public func layoutSubviews() {
             super.layoutSubviews()
             self.renderManager.layoutSubviews()
         }
 
-        override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
             super.traitCollectionDidChange(previousTraitCollection)
             self.renderManager.traitDidChange()
-        }
-
-        func prepareCell(_ cell: UICCell, axis: ReusableViewAxis) {
-            self.reuseCell(cell, axis: axis)
-
-            self.accessoryType = cell.rowManager.payload.accessoryType
         }
     }
 }

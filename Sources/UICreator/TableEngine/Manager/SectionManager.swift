@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 // swiftlint:disable class_delegate_protocol
 @usableFromInline
@@ -319,7 +320,7 @@ extension ListManager.SectionManager: SupportForEach {
     }
 
     @usableFromInline
-    func viewsDidChange(_ placeholderView: UIView!, _ dynamicContent: Relay<[() -> ViewCreator]>) {
+    func viewsDidChange(_ placeholderView: CBView!, _ dynamicContent: Relay<[() -> ViewCreator]>) {
         dynamicContent.sync { [compactCopy] contents in
             let sections = contents.compactMap {
                 ($0() as? UICSection)?.contents().zip

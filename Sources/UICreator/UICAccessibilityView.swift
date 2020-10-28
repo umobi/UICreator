@@ -25,7 +25,7 @@ import UIKit
 import ConstraintBuilder
 
 @frozen
-public struct UICAccessibilityView<View>: UIViewCreator where View: UIView {
+public struct UICAccessibilityView<View>: UIViewCreator where View: CBView {
 
     private let viewLoader: () -> View
 

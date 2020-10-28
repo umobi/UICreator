@@ -22,30 +22,31 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 private var kControlMutable: UInt = 0
 internal extension UIControl {
     struct Memory {
-        @MutableBox var touchDownHandler: ((UIView) -> Void)?
-        @MutableBox var touchDownRepeatHandler: ((UIView) -> Void)?
-        @MutableBox var touchDragInsideHandler: ((UIView) -> Void)?
-        @MutableBox var touchDragOutsideHandler: ((UIView) -> Void)?
-        @MutableBox var touchDragEnterHandler: ((UIView) -> Void)?
-        @MutableBox var touchDragExitHandler: ((UIView) -> Void)?
-        @MutableBox var touchUpInsideHandler: ((UIView) -> Void)?
-        @MutableBox var touchUpOutsideHandler: ((UIView) -> Void)?
-        @MutableBox var touchCancelHandler: ((UIView) -> Void)?
-        @MutableBox var editingDidBeginHandler: ((UIView) -> Void)?
-        @MutableBox var valueChangedHandler: ((UIView) -> Void)?
-        @MutableBox var primaryActionTriggeredHandler: ((UIView) -> Void)?
-        @MutableBox var editingChangedHandler: ((UIView) -> Void)?
-        @MutableBox var editingDidEndHandler: ((UIView) -> Void)?
-        @MutableBox var editingDidEndOnExitHandler: ((UIView) -> Void)?
-        @MutableBox var allTouchEventsHandler: ((UIView) -> Void)?
-        @MutableBox var allEditingEventsHandler: ((UIView) -> Void)?
-        @MutableBox var applicationReservedHandler: ((UIView) -> Void)?
-        @MutableBox var systemReservedHandler: ((UIView) -> Void)?
-        @MutableBox var allEventsHandler: ((UIView) -> Void)?
+        @MutableBox var touchDownHandler: ((CBView) -> Void)?
+        @MutableBox var touchDownRepeatHandler: ((CBView) -> Void)?
+        @MutableBox var touchDragInsideHandler: ((CBView) -> Void)?
+        @MutableBox var touchDragOutsideHandler: ((CBView) -> Void)?
+        @MutableBox var touchDragEnterHandler: ((CBView) -> Void)?
+        @MutableBox var touchDragExitHandler: ((CBView) -> Void)?
+        @MutableBox var touchUpInsideHandler: ((CBView) -> Void)?
+        @MutableBox var touchUpOutsideHandler: ((CBView) -> Void)?
+        @MutableBox var touchCancelHandler: ((CBView) -> Void)?
+        @MutableBox var editingDidBeginHandler: ((CBView) -> Void)?
+        @MutableBox var valueChangedHandler: ((CBView) -> Void)?
+        @MutableBox var primaryActionTriggeredHandler: ((CBView) -> Void)?
+        @MutableBox var editingChangedHandler: ((CBView) -> Void)?
+        @MutableBox var editingDidEndHandler: ((CBView) -> Void)?
+        @MutableBox var editingDidEndOnExitHandler: ((CBView) -> Void)?
+        @MutableBox var allTouchEventsHandler: ((CBView) -> Void)?
+        @MutableBox var allEditingEventsHandler: ((CBView) -> Void)?
+        @MutableBox var applicationReservedHandler: ((CBView) -> Void)?
+        @MutableBox var systemReservedHandler: ((CBView) -> Void)?
+        @MutableBox var allEventsHandler: ((CBView) -> Void)?
     }
 
     var memory: Memory {

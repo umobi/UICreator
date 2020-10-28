@@ -28,11 +28,11 @@ protocol ViewCreatorNoLayoutConstraints {}
 
 extension Views {
     @usableFromInline
-    class ViewAdaptor: UIView, ViewCreatorNoLayoutConstraints {
-        var adaptedView: Reference<UIView>
+    class ViewAdaptor: CBView, ViewCreatorNoLayoutConstraints {
+        var adaptedView: Reference<CBView>
 
         @usableFromInline
-        init(_ view: UIView) {
+        init(_ view: CBView) {
             self.adaptedView = .strong(view)
             super.init(frame: .zero)
             self.makeSelfImplemented()

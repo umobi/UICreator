@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 protocol ListContentDelegate: class {
     func content(_ compactCopy: ListManager.RowManager.Copy, updatedWith sequence: [ListManager.RowManager])
@@ -216,7 +217,7 @@ extension ListManager.RowManager {
 
 extension ListManager.RowManager: SupportForEach {
     @usableFromInline
-    func viewsDidChange(_ placeholderView: UIView!, _ dynamicContent: Relay<[() -> ViewCreator]>) {
+    func viewsDidChange(_ placeholderView: CBView!, _ dynamicContent: Relay<[() -> ViewCreator]>) {
         dynamicContent.sync { [compactCopy] in
             compactCopy.listManager
                 .section(at: compactCopy.indexPath.section)

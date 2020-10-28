@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 @propertyWrapper
 @frozen
@@ -47,8 +48,8 @@ public struct Property<Key> {
 private extension Property {
     func notification(
         _ notificationName: NSNotification.Name,
-        _ view: UIView,
-        handler: @escaping (UIView) -> Void) {
+        _ view: CBView,
+        handler: @escaping (CBView) -> Void) {
 
         //swiftlint:disable discarded_notification_center_observer
         view.notificationObservable.append(
@@ -71,7 +72,7 @@ private extension Property {
 internal extension Property {
     //swiftlint:disable function_body_length
     @usableFromInline
-    func assign(_ view: UIView) {
+    func assign(_ view: CBView) {
         switch self.keyPath {
         case \PropertyKey.accessibilityInvertColors:
             notification(

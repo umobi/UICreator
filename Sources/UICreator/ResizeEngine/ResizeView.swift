@@ -28,16 +28,16 @@ import UIKit
 public struct ResizeView {
 
     @usableFromInline
-    let superview: UIView
+    let superview: CBView
     @usableFromInline
-    let addHandler: ((UIView) -> Void)?
+    let addHandler: ((CBView) -> Void)?
 
-    public init(_ superview: UIView) {
+    public init(_ superview: CBView) {
         self.superview = superview
         self.addHandler = nil
     }
 
-    public init(size: CGSize? = nil, superview: UIView? = nil) {
+    public init(size: CGSize? = nil, superview: CBView? = nil) {
         if let superview = superview {
             superview.frame = {
                 if let size = size {
@@ -51,24 +51,24 @@ public struct ResizeView {
             return
         }
 
-        self.superview = UIView(frame: .init(origin: .zero, size: size ?? .zero))
+        self.superview = CBView(frame: .init(origin: .zero, size: size ?? .zero))
         self.addHandler = nil
     }
 
     @usableFromInline
-    init(_ original: ResizeView, addHandler: @escaping (UIView) -> Void) {
+    init(_ original: ResizeView, addHandler: @escaping (CBView) -> Void) {
         self.superview = original.superview
         self.addHandler = addHandler
     }
 
     @inlinable
-    public func onAdd(_ handler: @escaping (UIView) -> Void) -> Self {
+    public func onAdd(_ handler: @escaping (CBView) -> Void) -> Self {
         .init(self, addHandler: handler)
     }
 
     @inlinable
-    public func addSubview(_ subview: UIView) -> ResizeWeakView {
-        UIView.CBSubview(self.superview)?.addSubview(subview)
+    public func addSubview(_ subview: CBView) -> ResizeWeakView {
+        CBView.CBSubview(self.superview)?.addSubview(subview)
 
         self.superview.translatesAutoresizingMaskIntoConstraints = true
         self.superview.autoresizingMask = [.flexibleHeight, .flexibleWidth]

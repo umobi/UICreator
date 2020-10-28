@@ -110,7 +110,7 @@ extension Views {
 
 extension Views.ScrollView {
 
-    func addContent(_ view: UIView) {
+    func addContent(_ view: CBView) {
         let contentView = ContentView(view)
         CBSubview(self).addSubview(contentView)
         self.contentView = contentView

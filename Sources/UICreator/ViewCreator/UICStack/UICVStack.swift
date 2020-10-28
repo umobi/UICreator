@@ -71,7 +71,7 @@ public struct UICVStack: UIViewCreator {
                         forEachShared.enviroment.setManager(stackManager)
                     }
 
-                    UIView.CBSubview(view).addArrangedSubview($0.releaseUIView())
+                    CBView.CBSubview(view).addArrangedSubview($0.releaseUIView())
                 }
             }
     }

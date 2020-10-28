@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 @frozen
 public struct LongPress: UIGestureCreator {
@@ -61,7 +62,7 @@ public extension UIViewCreator {
     }
 
     @inlinable
-    func onLongPress(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+    func onLongPress(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         self.onLongPressMaker {
             LongPress()
                 .onRecognized {

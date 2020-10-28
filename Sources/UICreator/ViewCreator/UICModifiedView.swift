@@ -24,7 +24,7 @@ import UIKit
 import ConstraintBuilder
 
 @frozen
-public struct UICModifiedView<View>: UIViewCreator where View: UIView {
+public struct UICModifiedView<View>: UIViewCreator where View: CBView {
     private let viewLoader: () -> View
 
     @usableFromInline
@@ -33,7 +33,7 @@ public struct UICModifiedView<View>: UIViewCreator where View: UIView {
     }
 
     @inline(__always)
-    public static func makeUIView(_ viewCreator: ViewCreator) -> UIView {
+    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
         (viewCreator as! Self).viewLoader()
     }
 }

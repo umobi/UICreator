@@ -22,17 +22,18 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 @frozen
 public struct PropertyKey {
     @usableFromInline
-    weak var uiView: UIView?
+    weak var uiView: CBView?
 
     internal init() {
         self.uiView = nil
     }
 
-    internal init(_ uiView: UIView) {
+    internal init(_ uiView: CBView) {
         self.uiView = uiView
     }
 

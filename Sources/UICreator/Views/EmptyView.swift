@@ -25,7 +25,7 @@ import UIKit
 import ConstraintBuilder
 
 extension Views {
-    class EmptyView: UIView {
+    class EmptyView: CBView {
 
         init() {
             super.init(frame: .zero)

@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 public extension UIViewCreator where View: UIControl {
     @inlinable
@@ -61,7 +62,7 @@ public extension UIViewCreator where View: UIControl {
 
 extension UIViewCreator where View: UIControl {
     @usableFromInline
-    func onEvent(_ event: UIControl.Event, _ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+    func onEvent(_ event: UIControl.Event, _ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.onEvent(event, handler)
         }

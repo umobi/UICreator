@@ -35,7 +35,7 @@ private extension CBView {
         @MutableBox var isSelfImplemented: Bool
         @WeakBox var adaptedByView: Views.ViewAdaptor!
 
-        init(_ view: UIView) {
+        init(_ view: CBView) {
             self._render = .init(wrappedValue: .create(view))
             self._layout = .init(wrappedValue: .create(view))
             self._appear = .init(wrappedValue: .create(view))

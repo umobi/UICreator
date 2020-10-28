@@ -110,7 +110,7 @@ public extension UIViewCreator where View: UIButton {
 public extension UIViewCreator where View: UIButton {
 
     @inlinable
-    func onTouchInside(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+    func onTouchInside(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         self.onEvent(.touchUpInside, handler)
     }
 }

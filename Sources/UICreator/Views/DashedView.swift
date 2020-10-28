@@ -25,7 +25,7 @@ import UIKit
 import ConstraintBuilder
 
 public extension Views {
-    class DashedView: UIView {
+    class DashedView: CBView {
 
         @usableFromInline
         private(set) var strokeColor: UIColor = .clear
@@ -39,7 +39,7 @@ public extension Views {
         private var shape: CAShapeLayer!
 
         @usableFromInline
-        weak var view: UIView?
+        weak var view: CBView?
 
         init() {
             self.dashPattern = []
@@ -144,7 +144,7 @@ public extension Views {
 extension Views.DashedView: UICViewContent {
 
     @inlinable
-    public func addContent(_ view: UIView) {
+    public func addContent(_ view: CBView) {
         CBSubview(self).addSubview(view)
 
         Constraintable.activate {

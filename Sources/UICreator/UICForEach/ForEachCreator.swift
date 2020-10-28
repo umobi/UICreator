@@ -21,9 +21,9 @@
 //
 
 import Foundation
-import UIKit
+import ConstraintBuilder
 
 @usableFromInline
 protocol SupportForEach: class {
-    func viewsDidChange(_ placeholderView: UIView!, _ dynamicContent: Relay<[() -> ViewCreator]>)
+    func viewsDidChange(_ placeholderView: CBView!, _ dynamicContent: Relay<[() -> ViewCreator]>)
 }

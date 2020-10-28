@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 @frozen
 public struct Swipe: UIGestureCreator {
@@ -45,7 +46,7 @@ public extension UIViewCreator {
     }
 
     @inlinable
-    func onSwipe(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+    func onSwipe(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         self.onSwipeMaker {
             Swipe()
                 .onRecognized {

@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 fileprivate extension UIControl {
     @objc func onTouchDown() {
@@ -108,7 +109,7 @@ fileprivate extension UIControl {
 extension UIControl {
     // swiftlint:disable function_body_length cyclomatic_complexity
     @discardableResult
-    public func onEvent(_ event: UIControl.Event, _ handler: @escaping (UIView) -> Void) -> UIView {
+    public func onEvent(_ event: UIControl.Event, _ handler: @escaping (CBView) -> Void) -> CBView {
         switch event {
         case .touchDown:
             if self.memory.touchDownHandler == nil {
@@ -205,7 +206,7 @@ extension UIControl {
     }
 
     // swiftlint:disable function_body_length cyclomatic_complexity
-    private func appendEvent(_ event: UIControl.Event, _ handler: @escaping (UIView) -> Void) {
+    private func appendEvent(_ event: UIControl.Event, _ handler: @escaping (CBView) -> Void) {
         switch event {
         case .touchDown:
             let old = self.memory.touchDownHandler

@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 #if os(iOS)
 @frozen
@@ -46,7 +47,7 @@ public extension UIViewCreator {
     }
 
     @inlinable
-    func onPinch(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+    func onPinch(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         self.onPinchMaker {
             Pinch()
                 .onRecognized {

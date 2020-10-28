@@ -25,12 +25,12 @@ import UIKit
 import ConstraintBuilder
 
 protocol UICViewContent {
-    func addContent(_ view: UIView)
+    func addContent(_ view: CBView)
     func reloadContentLayout()
 }
 
 extension Views {
-    public class RounderView: UIView {
+    public class RounderView: CBView {
 
         init() {
             self.radius = .zero
@@ -101,7 +101,7 @@ extension Views {
 extension Views.RounderView: UICViewContent {
 
     @inlinable
-    public func addContent(_ view: UIView) {
+    public func addContent(_ view: CBView) {
         CBSubview(self).addSubview(view)
 
         Constraintable.activate {

@@ -22,8 +22,9 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
-internal extension UIView {
+internal extension CBView {
 
     /// `enum Mode` The view rendering mode. It is updated depending on the hierarchy of the view.
     /// To execute each state, the superview should call `commitNotRendered()`,
@@ -37,13 +38,13 @@ internal extension UIView {
     }
 }
 
-extension UIView.RenderState {
+extension CBView.RenderState {
     @inline(__always)
-    private static var allCases: [UIView.RenderState] {
+    private static var allCases: [CBView.RenderState] {
         [.unset, .notRendered, .rendered, .inTheScene]
     }
 
-    static func > (left: UIView.RenderState, right: UIView.RenderState) -> Bool {
+    static func > (left: CBView.RenderState, right: CBView.RenderState) -> Bool {
         let allCases = self.allCases
         guard
             let leftOffset = allCases
@@ -57,7 +58,7 @@ extension UIView.RenderState {
         return allCases[0..<leftOffset].contains(right)
     }
 
-    static func < (left: UIView.RenderState, right: UIView.RenderState) -> Bool {
+    static func < (left: CBView.RenderState, right: CBView.RenderState) -> Bool {
         let allCases = self.allCases
         guard
             let leftOffset = allCases
@@ -71,7 +72,7 @@ extension UIView.RenderState {
         return allCases[(leftOffset+1)..<allCases.count].contains(right)
     }
 
-    static func >= (left: UIView.RenderState, right: UIView.RenderState) -> Bool {
+    static func >= (left: CBView.RenderState, right: CBView.RenderState) -> Bool {
         let allCases = self.allCases
 
         guard
@@ -86,7 +87,7 @@ extension UIView.RenderState {
         return allCases[0...leftOffset].contains(right)
     }
 
-    static func <= (left: UIView.RenderState, right: UIView.RenderState) -> Bool {
+    static func <= (left: CBView.RenderState, right: CBView.RenderState) -> Bool {
         let allCases = self.allCases
         guard
             let leftOffset = allCases
@@ -101,12 +102,12 @@ extension UIView.RenderState {
     }
 
     @inline(__always)
-    var prev: UIView.RenderState? {
+    var prev: CBView.RenderState? {
         Self.allCases.split(separator: self).first?.last
     }
 
     @inline(__always)
-    var next: UIView.RenderState? {
+    var next: CBView.RenderState? {
         Self.allCases.split(separator: self).last?.first
     }
 }

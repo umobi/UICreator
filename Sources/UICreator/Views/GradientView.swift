@@ -25,7 +25,7 @@ import UIKit
 import ConstraintBuilder
 
 public extension Views {
-    class GradientView: UIView {
+    class GradientView: CBView {
         fileprivate let gradientLayer = CAGradientLayer()
 
         public var direction: Direction = .right {

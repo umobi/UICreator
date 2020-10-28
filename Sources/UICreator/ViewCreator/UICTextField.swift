@@ -219,27 +219,27 @@ public extension UIViewCreator where View: UITextField {
 public extension UIViewCreator where View: UITextField {
 
     @inlinable
-    func onEditingDidBegin(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+    func onEditingDidBegin(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         self.onEvent(.editingDidBegin, handler)
     }
 
     @inlinable
-    func onEditingChanged(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+    func onEditingChanged(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         self.onEvent(.editingChanged, handler)
     }
 
     @inlinable
-    func onEditingDidEnd(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+    func onEditingDidEnd(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         self.onEvent(.editingDidEnd, handler)
     }
 
     @inlinable
-    func onEditingDidEndOnExit(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+    func onEditingDidEndOnExit(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         self.onEvent(.editingDidEndOnExit, handler)
     }
 
     @inlinable
-    func onAllEditingEvents(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+    func onAllEditingEvents(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         self.onEvent(.allEditingEvents, handler)
     }
 }

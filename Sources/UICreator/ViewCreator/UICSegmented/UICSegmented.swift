@@ -292,7 +292,7 @@ public extension UIViewCreator where View: UISegmentedControl {
 }
 
 public extension UIViewCreator where View: UISegmentedControl {
-    func onValueChange(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+    func onValueChange(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         self.onEvent(.valueChanged, handler)
     }
 }

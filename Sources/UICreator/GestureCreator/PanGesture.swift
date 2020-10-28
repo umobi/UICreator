@@ -22,6 +22,7 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 @frozen
 public struct Pan: UIGestureCreator {
@@ -63,7 +64,7 @@ public extension UIViewCreator {
     }
 
     @inlinable
-    func onPan(_ handler: @escaping (UIView) -> Void) -> UICModifiedView<View> {
+    func onPan(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
         self.onPanMaker {
             Pan()
                 .onRecognized {

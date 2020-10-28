@@ -22,15 +22,16 @@
 
 import Foundation
 import UIKit
+import ConstraintBuilder
 
 extension Views {
     class TableViewHeaderFooterCell: UITableViewHeaderFooterView, ReusableView, TableCellType {
-        weak var hostedView: UIView!
+        weak var hostedView: CBView!
         var cellLoaded: UICCell.Loaded!
 
         override init(reuseIdentifier: String?) {
             super.init(reuseIdentifier: reuseIdentifier)
-            self.backgroundView = self.backgroundView ?? UIView()
+            self.backgroundView = self.backgroundView ?? CBView()
             self.backgroundView?.backgroundColor = .clear
             self.makeSelfImplemented()
         }
