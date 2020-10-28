@@ -83,28 +83,28 @@ public struct UICAlert {
 
 public extension UICAlert {
 
-    @inline(__always)
+    @inlinable
     func title(_ string: String) -> Self {
         self.edit {
             $0.title = string
         }
     }
 
-    @inline(__always)
+    @inlinable
     func message(_ string: String) -> Self {
         self.edit {
             $0.message = string
         }
     }
 
-    @inline(__always)
+    @inlinable
     func style(_ style: UIAlertController.Style) -> Self {
         self.edit {
             $0.style = style
         }
     }
 
-    @inline(__always)
+    @inlinable
     func cancelButton(
         _ title: String,
         _ handler: @escaping (UIViewController?) -> Void) -> Self {
@@ -114,14 +114,14 @@ public extension UICAlert {
         }
     }
 
-    @inline(__always)
+    @inlinable
     func cancelButton(_ title: String) -> Self {
         self.edit {
             $0.addAction(title, style: .cancel)
         }
     }
 
-    @inline(__always)
+    @inlinable
     func otherButton(
         _ title: String,
         _ handler: @escaping (UIViewController?) -> Void) -> Self {
@@ -130,14 +130,14 @@ public extension UICAlert {
             $0.addAction(title, style: .default, handler)
         }
     }
-    @inline(__always)
+    @inlinable
     func otherButton(_ title: String) -> Self {
         self.edit {
             $0.addAction(title, style: .default)
         }
     }
 
-    @inline(__always)
+    @inlinable
     func destructiveButton(
         _ title: String,
         _ handler: @escaping (UIViewController?) -> Void) -> Self {
@@ -147,7 +147,7 @@ public extension UICAlert {
         }
     }
 
-    @inline(__always)
+    @inlinable
     func destructiveButton(_ title: String) -> Self {
         self.edit {
             $0.addAction(title, style: .destructive)
@@ -158,12 +158,17 @@ public extension UICAlert {
 extension UICAlert {
     @usableFromInline
     struct Editable {
-        @MutableBox var title: String
-        @MutableBox var message: String?
-        @MutableBox var style: UIAlertController.Style
+        @MutableBox @usableFromInline
+        var title: String
+
+        @MutableBox @usableFromInline
+        var message: String?
+
+        @MutableBox @usableFromInline
+        var style: UIAlertController.Style
+        
         @MutableBox var action: [Action]
 
-        @usableFromInline
         init(_ original: UICAlert) {
             self._title = .init(wrappedValue: original.title)
             self._message = .init(wrappedValue: original.title)
@@ -205,7 +210,7 @@ extension UICAlert {
         }
     }
 
-    @inline(__always)
+    @inline(__always) @usableFromInline
     func edit(_ edit: (Editable) -> Void) -> Self {
         let editable = Editable(self)
         edit(editable)
