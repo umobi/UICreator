@@ -28,10 +28,12 @@ import ConstraintBuilder
 public struct UICActivity: UIViewCreator {
     public typealias View = UIActivityIndicatorView
 
+    @Relay var isAnimating: Bool
     private let style: View.Style
 
-    public init(_ style: View.Style) {
+    public init(_ style: View.Style, isAnimating: Relay<Bool>) {
         self.style = style
+        self._isAnimating = isAnimating
     }
 
     @inline(__always)
@@ -41,6 +43,18 @@ public struct UICActivity: UIViewCreator {
         return Views.ActivityIndicatorView()
             .onNotRendered {
                 ($0 as? View)?.style = _self.style
+            }
+            .onNotRendered {
+                weak var view = $0 as? View
+
+                _self.$isAnimating.distinctSync {
+                    if $0 {
+                        view?.startAnimating()
+                        return
+                    }
+
+                    view?.stopAnimating()
+                }
             }
     }
 }
@@ -58,24 +72,6 @@ public extension UIViewCreator where View: UIActivityIndicatorView {
     func hidesWhenStopped(_ flag: Bool) -> UICModifiedView<View> {
         self.onNotRendered {
             ($0 as? View)?.hidesWhenStopped = flag
-        }
-    }
-}
-
-public extension UIViewCreator where View: UIActivityIndicatorView {
-
-    @inlinable
-    func isLoading(_ isLoading: Relay<Bool>) -> UICModifiedView<View> {
-        self.onNotRendered { view in
-            weak var view = view
-            isLoading.sync {
-                if $0 {
-                    (view as? View)?.startAnimating()
-                    return
-                }
-
-                (view as? View)?.stopAnimating()
-            }
         }
     }
 }
