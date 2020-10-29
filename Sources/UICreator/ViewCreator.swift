@@ -25,14 +25,14 @@ import UIKit
 import ConstraintBuilder
 
 public protocol ViewCreator {
-    static func makeUIView(_ viewCreator: ViewCreator) -> CBView
+    static func _makeUIView(_ viewCreator: ViewCreator) -> CBView
 }
 
 extension ViewCreator {
 
     @inline(__always) @inlinable
     func operationUIView() -> CBView {
-        Self.makeUIView(self)
+        Self._makeUIView(self)
             .dynamicView
     }
 
@@ -44,6 +44,6 @@ extension ViewCreator {
             }
 
             return $0
-        }(Self.makeUIView(self))
+        }(Self._makeUIView(self))
     }
 }

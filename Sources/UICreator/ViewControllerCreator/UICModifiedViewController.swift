@@ -32,7 +32,7 @@ public struct UICModifiedViewController<ViewController>: UIViewControllerCreator
     }
 
     @inline(__always)
-    public static func makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
+    public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
         (viewCreator as! Self).viewControllerLoader()
     }
 }

@@ -43,7 +43,7 @@ public struct UICVPageCurl: UIViewControllerCreator {
     }
 
     @inline(__always)
-    public static func makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
+    public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
         let _self = viewCreator as! Self
 
         let pageController = ViewControllers.PageViewController(

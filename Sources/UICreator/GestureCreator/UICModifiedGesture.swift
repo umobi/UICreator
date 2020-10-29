@@ -33,7 +33,7 @@ public struct UICModifiedGesture<Gesture>: UIGestureCreator where Gesture: UIGes
     }
 
     @inline(__always)
-    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+    public static func _makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
         (gestureCreator as! Self).gestureLoader()
     }
 }

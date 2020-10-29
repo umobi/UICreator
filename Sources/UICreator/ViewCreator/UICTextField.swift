@@ -36,16 +36,16 @@ public struct UICTextField: UIViewCreator {
 
     private let content: Content
 
-    public init(placeholder: String, _ dynamicText: Relay<String?>) {
+    public init(_ placeholder: String, _ dynamicText: Relay<String?>) {
         self.content = .text(placeholder, dynamicText)
     }
 
-    public init(placeholder: NSAttributedString, _ dynamicAttributedText: Relay<NSAttributedString?>) {
+    public init(_ placeholder: NSAttributedString, _ dynamicAttributedText: Relay<NSAttributedString?>) {
         self.content = .attributedText(placeholder, dynamicAttributedText)
     }
 
     @inline(__always)
-    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
         switch _self.content {

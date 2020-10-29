@@ -64,7 +64,7 @@ public struct UICRow: ViewCreator {
         return .init(self, editable: editable)
     }
 
-    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         fatalError()
     }
 }

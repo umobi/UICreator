@@ -50,7 +50,7 @@ private extension UICViewBuilder {
             self.children = children
         }
 
-        static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
             fatalError()
         }
     }
@@ -58,7 +58,7 @@ private extension UICViewBuilder {
 
 private extension UICViewBuilder {
     struct Empty: ViewCreator {
-        static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
             fatalError()
         }
     }

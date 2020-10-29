@@ -30,7 +30,7 @@ public protocol UICViewControllerRepresentable: UIViewControllerCreator {
 }
 
 public extension UICViewControllerRepresentable {
-    static func makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
+    static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
         let _self = viewCreator as! Self
 
         let viewController = _self.makeUIViewController()

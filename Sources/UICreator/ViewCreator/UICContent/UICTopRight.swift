@@ -40,7 +40,7 @@ public struct UICTopRight: UIViewCreator {
     }
 
     @inline(__always)
-    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
         return Views.ContentView(.topRight, priority: _self.priority)

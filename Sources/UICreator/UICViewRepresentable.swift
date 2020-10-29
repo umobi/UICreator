@@ -30,7 +30,7 @@ public protocol UICViewRepresentable: UIViewCreator {
 }
 
 public extension UICViewRepresentable {
-    static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+    static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
         return Views.ViewAdaptor(_self.makeUIView())

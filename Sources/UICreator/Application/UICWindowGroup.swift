@@ -24,11 +24,11 @@ import Foundation
 
 #if swift(>=5.3)
 @frozen
-public struct UICWindowGroup: ViewScene {
-    let content: () -> ViewCreator
+public struct UICWindowGroup<Content>: ViewScene where Content: UIViewCreator {
+    public let body: ViewCreator
 
-    public init(content: @escaping () -> ViewCreator) {
-        self.content = content
+    public init(_ content: @escaping () -> Content) {
+        self.body = content()
     }
 }
 #endif

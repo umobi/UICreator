@@ -42,7 +42,7 @@ public struct UICForEach<Content, Value>: ViewCreator, ForEachEnviromentShared w
     }
 
     @inline(__always)
-    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         UICEmptyView()
             .height(equalTo: 0, priority: .defaultHigh)
             .width(equalTo: 0, priority: .defaultHigh)

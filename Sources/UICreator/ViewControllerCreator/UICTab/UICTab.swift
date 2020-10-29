@@ -38,7 +38,7 @@ public struct UICTab: UIViewControllerCreator {
     }
 
     @inline(__always)
-    public static func makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
+    public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
         let _self = viewCreator as! Self
 
         let tabController = UITabBarController()

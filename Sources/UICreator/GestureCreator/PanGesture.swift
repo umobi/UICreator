@@ -31,7 +31,7 @@ public struct Pan: UIGestureCreator {
     public init() {}
 
     @inline(__always)
-    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+    public static func _makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
         Gesture()
     }
 }

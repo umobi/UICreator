@@ -25,13 +25,13 @@ import UIKit
 import ConstraintBuilder
 
 public protocol GestureCreator {
-    static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer
+    static func _makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer
 }
 
 extension GestureCreator {
     @inline(__always) @usableFromInline
     func releaseUIGesture() -> UIGestureRecognizer {
-        Self.makeUIGesture(self)
+        Self._makeUIGesture(self)
     }
 }
 

@@ -24,7 +24,9 @@ import Foundation
 import UIKit
 
 #if swift(>=5.3)
-public protocol ViewScene {}
+public protocol ViewScene {
+    var body: ViewCreator { get }
+}
 
 public extension ViewScene {
     @inlinable

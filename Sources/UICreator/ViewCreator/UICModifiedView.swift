@@ -33,7 +33,7 @@ public struct UICModifiedView<View>: UIViewCreator where View: CBView {
     }
 
     @inline(__always)
-    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         (viewCreator as! Self).viewLoader()
     }
 }

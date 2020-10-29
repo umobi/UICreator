@@ -181,7 +181,7 @@ public struct UICSegmented: UIViewCreator {
         self.segments = segments
     }
 
-    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
         return _self.segments()

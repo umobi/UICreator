@@ -34,7 +34,7 @@ public struct AnyGesture: UIGestureCreator {
     }
 
     @inline(__always)
-    public static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+    public static func _makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
         (gestureCreator as! Self).gestureLoader()
     }
 }

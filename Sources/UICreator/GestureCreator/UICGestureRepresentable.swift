@@ -29,7 +29,7 @@ public protocol UICGestureRepresentable: UIGestureCreator {
 
 public extension UICGestureRepresentable {
     @inline(__always)
-    static func makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
+    static func _makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
         (gestureCreator as! Self).makeUIGesture()
     }
 }

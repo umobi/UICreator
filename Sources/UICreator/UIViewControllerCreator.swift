@@ -27,7 +27,7 @@ import ConstraintBuilder
 public protocol UIViewControllerCreator: ViewCreator {
     associatedtype ViewController: CBViewController
 
-    static func makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController
+    static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController
 
     /**
      This method should be used when it is necessarly to set a property to the view, but only the ones that don't
@@ -98,12 +98,12 @@ public protocol UIViewControllerCreator: ViewCreator {
 extension UIViewControllerCreator {
     @usableFromInline
     func releaseCastedViewController() -> ViewController {
-        Self.makeUIViewController(self) as! ViewController
+        Self._makeUIViewController(self) as! ViewController
     }
 }
 
 public extension UIViewControllerCreator {
-    static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+    static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         Views.ViewControllerAdaptor((viewCreator as! Self).releaseCastedViewController())
     }
 }

@@ -53,7 +53,7 @@ public struct UICLabel: UIViewCreator {
     }
 
     @inline(__always)
-    public static func makeUIView(_ viewCreator: ViewCreator) -> CBView {
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
         return Views.Label()

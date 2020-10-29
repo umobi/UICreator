@@ -63,11 +63,7 @@ internal class UICAppDelegate: NSObject, UIApplicationDelegate {
         self.window = window
         window.makeKey()
 
-        guard let windowGroup = app.body as? UICWindowGroup else {
-            return false
-        }
-
-        window.rootViewController = UICHostingController(content: windowGroup.content)
+        window.rootViewController = UICHostingController(rootView: app.body.body)
 
         if let url = launchOptions?[.url] as? URL {
             self.postURL(url)
