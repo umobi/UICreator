@@ -22,34 +22,23 @@
 
 import Foundation
 
-@propertyWrapper
-@frozen
-public struct UICOutlet<Value: AnyObject> {
-    @usableFromInline
-    class Object {
-        weak var reference: Value!
+@propertyWrapper @frozen
+public struct UICOutlet<Object: NSObject> {
+    @Value private var storedObject: WeakBox<Object>
+
+    public var projectedValue: Relay<Object> { $storedObject.map { $0.wrappedValue } }
+
+    public init(wrappedValue value: Object? = nil) {
+        self._storedObject = .init(wrappedValue: .init(wrappedValue: nil))
     }
 
-    private let object: Object
-
-    public var projectedValue: UICOutlet<Value> { return self }
-
-    public init(wrappedValue value: Value? = nil) {
-        self.object = .init()
-        self.object.reference = value
+    public private(set) var wrappedValue: Object! {
+        get { storedObject.wrappedValue }
+        nonmutating
+        set { storedObject.wrappedValue = newValue }
     }
 
-    public var wrappedValue: Value! {
-        self.object.reference
-    }
-
-    public func ref(_ value: Value?) {
-        self.object.reference = value
-    }
-
-    @inline(__always)
-    @inlinable
-    static var empty: UICOutlet<Value> {
-        .init()
+    public func ref(_ value: Object?) {
+        wrappedValue = value
     }
 }

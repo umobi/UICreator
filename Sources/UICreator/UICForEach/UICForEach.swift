@@ -47,7 +47,7 @@ public struct UICForEach<Content, Value>: ViewCreator, ForEachEnviromentShared w
             .height(equalTo: 0, priority: .defaultHigh)
             .width(equalTo: 0, priority: .defaultHigh)
             .onNotRendered {
-                (viewCreator as! Self).privateEnviroment.$view.ref($0)
+                (viewCreator as! Self).privateEnviroment.ref($0)
             }
             .onRendered { _ in
                 (viewCreator as! Self).privateEnviroment.syncManager()
@@ -98,6 +98,10 @@ extension UICForEach {
             guard !self.isReleased else {
                 return
             }
+        }
+
+        fileprivate func ref(_ view: UIView) {
+            self._view.ref(view)
         }
     }
 }

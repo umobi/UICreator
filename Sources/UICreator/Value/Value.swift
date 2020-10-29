@@ -56,8 +56,7 @@ class ReactiveItemReference: CustomStringConvertible {
     }
 }
 
-@propertyWrapper
-@frozen
+@propertyWrapper @frozen
 public struct Value<Value> {
     private let mutableBox: Box
 
