@@ -2,6 +2,7 @@ import XCTest
 @testable import UICreator
 
 final class UICreatorTests: XCTestCase {
+    @UICOutlet var infoView: UIStackView!
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
@@ -9,7 +10,7 @@ final class UICreatorTests: XCTestCase {
 //        XCTAssertEqual(UICreator().text, "Hello, World!")
         print(UICNavigation {
             Slider()
-        }.releaseUIView())
+        }.eraseToAnyView())
     }
 
     static var allTests = [
