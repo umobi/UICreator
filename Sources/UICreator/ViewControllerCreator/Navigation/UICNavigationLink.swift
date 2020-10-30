@@ -57,6 +57,22 @@ public struct UICNavigationLink: ViewCreator {
         }
     }
 
+    public init(
+        destination: @escaping (Relay<Bool>) -> ViewCreator,
+        content: @escaping () -> ViewCreator) {
+
+        let value = Value(wrappedValue: false)
+
+        self._isPushing = value.projectedValue
+        self.destination = { destination(value.projectedValue) }
+        self.content = {
+            UICAnyView(content())
+                .onTap { _ in
+                    value.wrappedValue = true
+                }
+        }
+    }
+
     @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
