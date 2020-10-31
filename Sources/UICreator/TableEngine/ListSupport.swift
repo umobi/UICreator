@@ -26,6 +26,7 @@ import UIKit
 @usableFromInline
 protocol ListSupport: class {
     func reloadData()
+    var modifier: ListModifier? { get }
     var manager: ListCollectionManager? { get }
 }
 

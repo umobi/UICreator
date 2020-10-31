@@ -75,7 +75,7 @@ extension UICCollectionViewDataSource {
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: row.identifier,
                 for: indexPath
-            ) as? CollectionViewCell
+            ) as? Views.CollectionViewCell
         else {
             DataSourceFatal.unexpectedRow(indexPath).die()
         }

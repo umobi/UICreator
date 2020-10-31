@@ -64,7 +64,7 @@ extension List {
                     let header = viewCreator as? UICHeader
                 else { return nil }
 
-                return Row(header)
+                return Row(header, index)
             }(),
 
             footer: {
@@ -73,7 +73,7 @@ extension List {
                     let footer = viewCreator as? UICFooter
                 else { return nil }
 
-                return Row(footer)
+                return Row(footer, index)
             }(),
 
             rows: {
@@ -84,17 +84,20 @@ extension List {
                             return sum
                         }
 
-                        return sum + [.init(Row(row), .init(row: slice.offset, section: index))]
+                        let indexPath = IndexPath(row: slice.offset, section: index)
+                        return sum + [.init(Row(row, indexPath), indexPath)]
 
                     case .dynamic(let enviroment):
                         let listener = ListForEachListener<UICRow>(enviroment)
 
+                        let indexPath = IndexPath(row: slice.offset, section: index)
+
                         listener.$contents.next { [weak listView] in
-                            Self.rebuild(listView, $0, at: .init(row: slice.offset, section: index))
+                            Self.rebuild(listView, $0, at: indexPath)
                         }
 
-                        return sum + listener.contents.map {
-                            .init(Row($0), .init(row: slice.offset, section: index))
+                        return sum + listener.contents.enumerated().map {
+                            .init(Row($1, .init(row: indexPath.row + $0, section: index)), indexPath)
                         }
                     }
                 }
@@ -210,6 +213,7 @@ struct List {
     let sections: [Frozen<Section, Int>]
 }
 
+@usableFromInline
 struct Section {
     let header: Row?
     let rows: [Frozen<Row, IndexPath>]
@@ -223,6 +227,7 @@ struct Section {
 }
 
 extension Section {
+    @usableFromInline
     enum Content {
         case `static`(Row)
         case dynamic([Row])
@@ -232,41 +237,47 @@ extension Section {
 import UIKit
 
 extension Row {
+    @usableFromInline
     enum ContentType {
-        case headerOrFooter
+        case header(Int)
+        case footer(Int)
 
         case row(
                 trailingActions: [RowAction],
                 leadingActions: [RowAction],
-                accessoryType: UITableViewCell.AccessoryType
+                accessoryType: UITableViewCell.AccessoryType,
+                indexPath: IndexPath
              )
     }
 }
 
+@usableFromInline
 struct Row {
     let content: ViewCreator
     let type: ContentType
 
-    init(_ header: UICHeader) {
+    init(_ header: UICHeader, _ index: Int) {
         self.content = header.content()
-        self.type = .headerOrFooter
+        self.type = .header(index)
     }
 
-    init(_ footer: UICFooter) {
+    init(_ footer: UICFooter, _ index: Int) {
         self.content = footer.content()
-        self.type = .headerOrFooter
+        self.type = .footer(index)
     }
 
-    init(_ row: UICRow) {
+    init(_ row: UICRow, _ indexPath: IndexPath) {
         self.content = row.content()
         self.type = .row(
             trailingActions: row.trailingActions?().zip ?? [],
             leadingActions: row.leadingActions?().zip ?? [],
-            accessoryType: row.accessoryType
+            accessoryType: row.accessoryType,
+            indexPath: indexPath
         )
     }
 }
 
+@usableFromInline
 struct Identifier<ID, Content> {
     let id: ID
     let content: Content
@@ -277,6 +288,7 @@ struct Identifier<ID, Content> {
     }
 }
 
+@usableFromInline
 protocol ListModifier {
     var state: List { get }
 
@@ -285,7 +297,9 @@ protocol ListModifier {
     func row(at indexPath: IndexPath) -> Identifier<String, Row>
 }
 
+@usableFromInline
 struct ListState: ListModifier {
+    @usableFromInline
     let state: List
 
     init(_ listView: ListSupport,_ contents: [ViewCreator]) {
@@ -294,6 +308,7 @@ struct ListState: ListModifier {
 }
 
 extension ListModifier {
+    @usableFromInline
     var headers: [Identifier<String, Row>] {
         self.state.sections.compactMap {
             guard let header = $0.content.header else {
@@ -304,6 +319,7 @@ extension ListModifier {
         }
     }
 
+    @usableFromInline
     var footers: [Identifier<String, Row>] {
         self.state.sections.compactMap {
             guard let footer = $0.content.footer else {
@@ -314,6 +330,7 @@ extension ListModifier {
         }
     }
 
+    @usableFromInline
     var rows: [Identifier<String, Row>] {
         self.state.sections.reduce([]) {
             let section = $1
@@ -326,18 +343,19 @@ extension ListModifier {
 }
 
 extension ListModifier {
-    @inline(__always)
+    @inline(__always) @usableFromInline
     var numberOfSections: Int {
         self.state.sections.count
     }
 
-    @inline(__always)
+    @inline(__always) @usableFromInline
     func numberOfRows(in index: Int) -> Int {
         self.state.sections[index].content.rows.count
     }
 }
 
 extension ListModifier {
+    @usableFromInline
     func header(at index: Int) -> Identifier<String, Row>? {
         let section = self.state.sections[index]
         guard let header = section.content.header else {
@@ -347,6 +365,7 @@ extension ListModifier {
         return Identifier("\(section.index).header", header)
     }
 
+    @usableFromInline
     func footer(at index: Int) -> Identifier<String, Row>? {
         let section = self.state.sections[index]
         guard let footer = section.content.footer else {
@@ -356,6 +375,7 @@ extension ListModifier {
         return Identifier("\(section.index).footer", footer)
     }
 
+    @usableFromInline
     func row(at indexPath: IndexPath) -> Identifier<String, Row> {
         let section = self.state.sections[indexPath.section]
         let row = section.content.rows[indexPath.row]

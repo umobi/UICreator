@@ -33,6 +33,7 @@ extension Views {
         }
 
         var cellLoaded: UICCell.Loaded!
+        var row: Row!
 
         override init(frame: CGRect) {
             super.init(frame: frame)

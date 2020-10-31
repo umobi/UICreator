@@ -67,7 +67,7 @@ extension ListManager: ListSectionDelegate {
 
         case let collection as UICollectionView:
             newRows.forEach {
-                collection.register(CollectionViewCell.self, forCellWithReuseIdentifier: $0)
+                collection.register(Views.CollectionViewCell.self, forCellWithReuseIdentifier: $0)
             }
         default:
             break

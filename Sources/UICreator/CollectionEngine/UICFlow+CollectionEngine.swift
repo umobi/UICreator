@@ -33,7 +33,7 @@ extension ListSupport where Self: UICollectionViewLayoutCreator {
 
             manager.rowsIdentifier.forEach {
                 collectionView.register(
-                    CollectionViewCell.self,
+                    Views.CollectionViewCell.self,
                     forCellWithReuseIdentifier: $0
                 )
             }

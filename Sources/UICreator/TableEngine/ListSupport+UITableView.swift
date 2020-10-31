@@ -27,25 +27,24 @@ extension ListSupport where Self: UITableView {
     @discardableResult
     func dynamicData(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> Self {
         self.onNotRendered {
-            let manager = ListManager(contents: contents().zip)
+            let modifier = ListState(self, contents().zip)
             let tableView: Self! = $0 as? Self
             
-            manager.rowsIdentifier.forEach { [unowned tableView] in
-                tableView?.register(Views.TableViewCell.self, forCellReuseIdentifier: $0)
+            modifier.rows.forEach {
+                tableView.register(Views.TableViewCell.self, forCellReuseIdentifier: $0.id)
             }
 
-            manager.headersIdentifier.forEach { [unowned tableView] in
-                tableView?.register(Views.TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
+            modifier.headers.forEach {
+                tableView.register(Views.TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0.id)
             }
 
-            manager.footersIdentifier.forEach { [unowned tableView] in
-                tableView?.register(Views.TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
+            modifier.footers.forEach {
+                tableView.register(Views.TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0.id)
             }
 
-            tableView.manager = manager
+            tableView.modifier = modifier
             tableView.strongDataSource(UICTableViewDataSource())
             tableView.strongDelegate(UICTableViewDelegate())
-            manager.list = tableView
         }
     }
 }

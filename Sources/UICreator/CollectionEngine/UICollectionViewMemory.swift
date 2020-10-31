@@ -27,6 +27,7 @@ private var kMEMCollectionPayload: UInt = 0
 private extension UICollectionView {
     struct Memory {
         @MutableBox var manager: ListCollectionManager?
+        @MutableBox var modifier: ListModifier?
         @MutableBox var layoutManager: UICCollectionLayoutManager?
         @MutableBox var layoutManagerHandler: (() -> UICCollectionLayoutSectionElement)?
     }
@@ -46,6 +47,12 @@ extension UICollectionView {
     var manager: ListCollectionManager? {
         get { self.memory.manager }
         set { self.memory.manager = newValue }
+    }
+
+    @inline(__always) @usableFromInline
+    var modifier: ListModifier? {
+        get { self.memory.modifier }
+        set { self.memory.modifier = newValue }
     }
 
     @inline(__always)

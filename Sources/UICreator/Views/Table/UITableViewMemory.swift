@@ -37,6 +37,7 @@ extension UITableView {
     struct Memory {
         @MutableBox var reusableCells: [WeakCell] = []
         @MutableBox var manager: ListCollectionManager?
+        @MutableBox var modifier: ListModifier?
         @MutableBox var cellHandler: ((UITableViewCell) -> Void)?
     }
 }
@@ -58,6 +59,12 @@ extension UITableView {
     var manager: ListCollectionManager? {
         get { self.memory.manager }
         set { self.memory.manager = newValue }
+    }
+
+    @inline(__always) @usableFromInline
+    var modifier: ListModifier? {
+        get { self.memory.modifier }
+        set { self.memory.modifier = newValue }
     }
 }
 

@@ -24,58 +24,61 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public class CollectionViewCell: UICollectionViewCell, ReusableView {
-    weak var hostedView: CBView!
-    var cellLoaded: UICCell.Loaded!
+extension Views {
+    class CollectionViewCell: UICollectionViewCell, ReusableView, ListReusableView {
+        weak var hostedView: CBView!
+        var cellLoaded: UICCell.Loaded!
+        var row: Row!
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        self.backgroundColor = .clear
-        self.makeSelfImplemented()
-    }
-
-    required init?(coder: NSCoder) {
-        Fatal.Builder("init(coder:) has not been implemented").die()
-    }
-
-    override open var isHidden: Bool {
-        get { super.isHidden }
-        set {
-            super.isHidden = newValue
-            self.renderManager.isHidden(newValue)
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            self.backgroundColor = .clear
+            self.makeSelfImplemented()
         }
-    }
 
-    override open var frame: CGRect {
-        get { super.frame }
-        set {
-            super.frame = newValue
-            self.renderManager.frame(newValue)
+        required init?(coder: NSCoder) {
+            Fatal.Builder("init(coder:) has not been implemented").die()
         }
-    }
 
-    override public func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        self.renderManager.willMove(toSuperview: newSuperview)
-    }
+        override open var isHidden: Bool {
+            get { super.isHidden }
+            set {
+                super.isHidden = newValue
+                self.renderManager.isHidden(newValue)
+            }
+        }
 
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        self.renderManager.didMoveToSuperview()
-    }
+        override open var frame: CGRect {
+            get { super.frame }
+            set {
+                super.frame = newValue
+                self.renderManager.frame(newValue)
+            }
+        }
 
-    override public func didMoveToWindow() {
-        super.didMoveToWindow()
-        self.renderManager.didMoveToWindow()
-    }
+        override public func willMove(toSuperview newSuperview: UIView?) {
+            super.willMove(toSuperview: newSuperview)
+            self.renderManager.willMove(toSuperview: newSuperview)
+        }
 
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        self.renderManager.layoutSubviews()
-    }
+        override public func didMoveToSuperview() {
+            super.didMoveToSuperview()
+            self.renderManager.didMoveToSuperview()
+        }
 
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        self.renderManager.traitDidChange()
+        override public func didMoveToWindow() {
+            super.didMoveToWindow()
+            self.renderManager.didMoveToWindow()
+        }
+
+        override public func layoutSubviews() {
+            super.layoutSubviews()
+            self.renderManager.layoutSubviews()
+        }
+
+        override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+            super.traitCollectionDidChange(previousTraitCollection)
+            self.renderManager.traitDidChange()
+        }
     }
 }

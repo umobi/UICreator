@@ -25,9 +25,12 @@ import UIKit
 import ConstraintBuilder
 
 extension Views {
-    class TableViewCell: UITableViewCell, ReusableView, TableCellType {
+    class TableViewCell: UITableViewCell, ReusableView, ListReusableView, TableCellType {
+        typealias ID = IndexPath
+        
         weak var hostedView: CBView!
         var cellLoaded: UICCell.Loaded!
+        var row: Row!
 
         override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
             super.init(style: style, reuseIdentifier: reuseIdentifier)
