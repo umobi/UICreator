@@ -131,3 +131,4 @@ extension ListCollectionManager {
         return .init("\(section.identifier).footer", footer)
     }
 }
+
