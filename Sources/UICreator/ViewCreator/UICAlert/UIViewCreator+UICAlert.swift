@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 
 public extension UIViewCreator {
-    func alert(_ isPresenting: Relay<Bool>, _ handler: @escaping () -> UICAlert) -> UICModifiedView<View> {
+    func alert(_ isPresenting: Relay<Bool>, _ handler: @escaping () -> UICAlert) -> UICInTheSceneModifier<View> {
         self.onInTheScene {
             weak var view = $0
             weak var alertView: UIViewController?

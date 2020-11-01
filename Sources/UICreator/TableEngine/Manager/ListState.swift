@@ -21,21 +21,22 @@
 //
 
 import Foundation
-import UIKit
 
-extension ListManager {
+@usableFromInline
+struct ListState: ListModifier {
     @usableFromInline
-    class Append: ListCollectionManager {
-        private let manager: ListManager
+    let state: List
 
-        @usableFromInline
-        var sections: [ListManager.SectionManager] {
-            self.manager.sections
-        }
+    init(_ listView: ListSupport,_ contents: [ViewCreator]) {
+        self.state = .init(listView, contents)
+    }
 
-        @usableFromInline
-        init(_ manager: ListManager) {
-            self.manager = manager
-        }
+    init(_ list: List) {
+        self.state = list
+    }
+
+    @inline(__always) @usableFromInline
+    func update(_ list: List) -> ListState {
+        .init(list)
     }
 }

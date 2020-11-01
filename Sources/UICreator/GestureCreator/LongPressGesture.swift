@@ -40,14 +40,14 @@ public extension UIGestureCreator where Gesture: UILongPressGestureRecognizer {
     @inlinable
     func maximumMovement(_ value: CGFloat) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.allowableMovement = value
+            ($0 as? Gesture)?.allowableMovement = value
         }
     }
 
     @inlinable
     func minimumPressDuration(_ duration: TimeInterval) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.minimumPressDuration = duration
+            ($0 as? Gesture)?.minimumPressDuration = duration
         }
     }
 }
@@ -55,14 +55,14 @@ public extension UIGestureCreator where Gesture: UILongPressGestureRecognizer {
 public extension UIViewCreator {
 
     @inlinable
-    func onLongPressMaker<LongPress>(_ longPressConfigurator: @escaping () -> LongPress) -> UICModifiedView<View> where LongPress: UIGestureCreator, LongPress.Gesture: UILongPressGestureRecognizer {
+    func onLongPressMaker<LongPress>(_ longPressConfigurator: @escaping () -> LongPress) -> UICNotRenderedModifier<View> where LongPress: UIGestureCreator, LongPress.Gesture: UILongPressGestureRecognizer {
         self.onNotRendered {
             longPressConfigurator().add($0)
         }
     }
 
     @inlinable
-    func onLongPress(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+    func onLongPress(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
         self.onLongPressMaker {
             LongPress()
                 .onRecognized {

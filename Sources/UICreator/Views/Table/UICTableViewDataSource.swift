@@ -59,7 +59,7 @@ class UICTableViewDataSource: NSObject, UITableViewDataSource {
         cell.prepare(row.content, axis: .horizontal)
         tableView.commitCell(cell)
 
-        tableView.appendReusable(cell: cell)
+        tableView.append(cell)
         return cell
     }
 
@@ -68,6 +68,10 @@ class UICTableViewDataSource: NSObject, UITableViewDataSource {
             return false
         }
 
-        return !(reusableView.cellLoaded.trailingActions + reusableView.cellLoaded.leadingActions).isEmpty
+        guard case .row(let trailingActions, let leadingActions, _, _) = reusableView.row.type else {
+            return false
+        }
+
+        return !(trailingActions + leadingActions).isEmpty
     }
 }

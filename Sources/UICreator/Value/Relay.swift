@@ -72,8 +72,8 @@ public struct Relay<Value> {
 
     public func next(_ handler: @escaping (Value) -> Void) {
         switch self.storage {
-        case .constant(let value):
-            handler(value)
+        case .constant:
+            break
         case .weak(let container):
             container.reference?.reactive.valueDidChange(handler: handler)
         }
@@ -81,10 +81,8 @@ public struct Relay<Value> {
 
     public func sync(_ handler: @escaping (Value) -> Void) {
         self.next(handler)
-
-        if case .weak(let container) = self.storage {
-            container.reference?.reactive.requestValueGetter(handler: handler)
-        }
+        
+        handler(self.wrappedValue)
     }
 
     public func map<Other>(_ handler: @escaping (Value) -> Other) -> Relay<Other> {

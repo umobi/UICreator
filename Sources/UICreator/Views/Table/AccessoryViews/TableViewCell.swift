@@ -25,12 +25,20 @@ import UIKit
 import ConstraintBuilder
 
 extension Views {
-    class TableViewCell: UITableViewCell, ReusableView, ListReusableView, TableCellType {
+    class TableViewCell: UITableViewCell, ListReusableView, TableCellType {
         typealias ID = IndexPath
         
         weak var hostedView: CBView!
-        var cellLoaded: UICCell.Loaded!
-        var row: Row!
+        var row: Row! {
+            didSet {
+                if case .row(_, _, let accessoryType, _) = self.row.type {
+                    self.accessoryType = accessoryType
+                    return
+                }
+
+                self.accessoryType = .none
+            }
+        }
 
         override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
             super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -83,12 +91,6 @@ extension Views {
         override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
             super.traitCollectionDidChange(previousTraitCollection)
             self.renderManager.traitDidChange()
-        }
-
-        func prepareCell(_ cell: UICCell, axis: ReusableViewAxis) {
-            self.reuseCell(cell, axis: axis)
-
-            self.accessoryType = cell.rowManager.payload.accessoryType
         }
     }
 }

@@ -51,14 +51,14 @@ public struct UICRounder: UIViewCreator {
 public extension UIViewCreator where View: Views.RounderView {
     
     @inlinable
-    func borderColor(_ color: UIColor) -> UICModifiedView<View> {
+    func borderColor(_ color: UIColor) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.border(color: color)
         }
     }
 
     @inlinable
-    func borderColor(_ dynamicColor: Relay<UIColor>) -> UICModifiedView<View> {
+    func borderColor(_ dynamicColor: Relay<UIColor>) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             weak var view = $0 as? View
 
@@ -72,14 +72,14 @@ public extension UIViewCreator where View: Views.RounderView {
 public extension UIViewCreator where View: Views.RounderView {
 
     @inlinable
-    func borderWidth(_ width: CGFloat) -> UICModifiedView<View> {
+    func borderWidth(_ width: CGFloat) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.border(width: width)
         }
     }
 
     @inlinable
-    func borderWidth(_ dynamicWidth: Relay<CGFloat>) -> UICModifiedView<View> {
+    func borderWidth(_ dynamicWidth: Relay<CGFloat>) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             weak var view = $0 as? View
 

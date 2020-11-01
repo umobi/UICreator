@@ -88,14 +88,14 @@ public extension UIViewCreator where View: UIImageView {
 
     @available(iOS 13, tvOS 13.0, *)
     @inlinable
-    func preferredSymbolConfiguration(_ configuration: UIImage.SymbolConfiguration) -> UICModifiedView<View> {
+    func preferredSymbolConfiguration(_ configuration: UIImage.SymbolConfiguration) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.preferredSymbolConfiguration = configuration
         }
     }
 
     @inlinable
-    func isHighlighted(_ dynamicFlag: Relay<Bool>) -> UICModifiedView<View> {
+    func isHighlighted(_ dynamicFlag: Relay<Bool>) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             weak var view = $0 as? View
 
@@ -106,7 +106,7 @@ public extension UIViewCreator where View: UIImageView {
     }
 
     @inlinable
-    func contentMode(_ contentMode: ContentMode) -> UICModifiedView<View> {
+    func contentMode(_ contentMode: ContentMode) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.contentMode = contentMode.uiContentMode
         }
@@ -116,7 +116,7 @@ public extension UIViewCreator where View: UIImageView {
 public extension UIViewCreator where View: UIImageView {
 
     @inlinable
-    func isAnimating(_ dynamicFlag: Relay<Bool>) -> UICModifiedView<View> {
+    func isAnimating(_ dynamicFlag: Relay<Bool>) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             weak var view = $0 as? View
 
@@ -135,9 +135,8 @@ public extension UIViewCreator where View: UIImageView {
 #if os(tvOS)
 public extension UIViewCreator where View: UIImageView {
 
-    @available(tvOS 13, *)
-    @inlinable
-    func adjustsImageWhenAncestorFocused(_ flag: Bool) -> Self {
+    @inlinable @available(tvOS 13, *)
+    func adjustsImageWhenAncestorFocused(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.adjustsImageWhenAncestorFocused = flag
         }

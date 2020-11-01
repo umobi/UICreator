@@ -22,38 +22,44 @@
 
 import Foundation
 import UIKit
-import ConstraintBuilder
 
-#if os(iOS)
-@frozen
-public struct Pinch: UIGestureCreator {
-    public typealias Gesture = UIPinchGestureRecognizer
+@usableFromInline
+struct Row {
+    let content: ViewCreator
+    let type: ContentType
 
-    public init() {}
+    init(_ header: UICHeader, _ index: Int) {
+        self.content = header.content()
+        self.type = .header(index)
+    }
 
-    @inline(__always)
-    public static func _makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
-        Gesture()
+    init(_ footer: UICFooter, _ index: Int) {
+        self.content = footer.content()
+        self.type = .footer(index)
+    }
+
+    init(_ row: UICRow, _ indexPath: IndexPath) {
+        self.content = row.content()
+        self.type = .row(
+            trailingActions: row.trailingActions?().zip ?? [],
+            leadingActions: row.leadingActions?().zip ?? [],
+            accessoryType: row.accessoryType,
+            indexPath: indexPath
+        )
     }
 }
 
-public extension UIViewCreator {
+extension Row {
+    @usableFromInline
+    enum ContentType {
+        case header(Int)
+        case footer(Int)
 
-    @inlinable
-    func onPinchMaker<Pinch>(_ pinchConfigurator: @escaping () -> Pinch) -> UICNotRenderedModifier<View> where Pinch: UIGestureCreator, Pinch.Gesture: UIPinchGestureRecognizer {
-        self.onNotRendered {
-            pinchConfigurator().add($0)
-        }
-    }
-
-    @inlinable
-    func onPinch(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
-        self.onPinchMaker {
-            Pinch()
-                .onRecognized {
-                    handler($0.view!)
-                }
-        }
+        case row(
+                trailingActions: [RowAction],
+                leadingActions: [RowAction],
+                accessoryType: UITableViewCell.AccessoryType,
+                indexPath: IndexPath
+             )
     }
 }
-#endif

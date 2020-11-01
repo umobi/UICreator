@@ -118,21 +118,21 @@ public extension UIViewCreator where View: UIDatePicker {
 
     @available(iOS 13.4, *)
     @inlinable
-    func preferredStyle(_ style: UIDatePickerStyle) -> UICModifiedView<View> {
+    func preferredStyle(_ style: UIDatePickerStyle) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.preferredDatePickerStyle = style
         }
     }
 
     @inlinable
-    func countDownDuration(_ duration: TimeInterval) -> UICModifiedView<View> {
+    func countDownDuration(_ duration: TimeInterval) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.countDownDuration = duration
         }
     }
 
     @inlinable
-    func minuteInterval(_ interval: Int) -> UICModifiedView<View> {
+    func minuteInterval(_ interval: Int) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.minuteInterval = interval
         }

@@ -25,15 +25,19 @@ import UIKit
 
 @frozen
 public struct UICModifiedGesture<Gesture>: UIGestureCreator where Gesture: UIGestureRecognizer {
-    private let gestureLoader: () -> Gesture
+    private let content: GestureCreator
+    private let modifyHandler: (UIGestureRecognizer) -> Void
 
     @usableFromInline
-    init(_ gestureLoader: @escaping () -> Gesture) {
-        self.gestureLoader = gestureLoader
+    init<Content>(_ content: Content, onModify: @escaping (UIGestureRecognizer) -> Void) where Content: UIGestureCreator, Content.Gesture == Gesture {
+        self.content = content
+        self.modifyHandler = onModify
     }
 
     @inline(__always)
     public static func _makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
-        (gestureCreator as! Self).gestureLoader()
+        let gesture = (gestureCreator as! Self).content.releaseUIGesture()
+        (gestureCreator as! Self).modifyHandler(gesture)
+        return gesture
     }
 }

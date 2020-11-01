@@ -77,14 +77,14 @@ public struct UICButton: UIViewCreator {
 public extension UIViewCreator where View: UIButton {
 
     @inlinable
-    func title(_ string: String?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
+    func title(_ string: String?, for state: UIControl.State = .normal) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.setTitle(string, for: state)
         }
     }
 
     @inlinable
-    func title(_ attributedText: NSAttributedString?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
+    func title(_ attributedText: NSAttributedString?, for state: UIControl.State = .normal) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.setTitle(attributedText?.string, for: state)
             ($0 as? View)?.titleLabel?.attributedText = attributedText
@@ -92,14 +92,14 @@ public extension UIViewCreator where View: UIButton {
     }
 
     @inlinable
-    func titleColor(_ color: UIColor?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
+    func titleColor(_ color: UIColor?, for state: UIControl.State = .normal) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.setTitleColor(color, for: state)
         }
     }
 
     @inlinable
-    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> UICModifiedView<View> {
+    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.titleLabel?.font = font
             ($0 as? View)?.titleLabel?.adjustsFontForContentSizeCategory = isDynamicTextSize
@@ -110,7 +110,7 @@ public extension UIViewCreator where View: UIButton {
 public extension UIViewCreator where View: UIButton {
 
     @inlinable
-    func onTouchInside(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+    func onTouchInside(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
         self.onEvent(.touchUpInside, handler)
     }
 }

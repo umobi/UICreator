@@ -24,16 +24,127 @@ import UIKit
 import ConstraintBuilder
 
 @frozen
-public struct UICModifiedView<View>: UIViewCreator where View: CBView {
-    private let viewLoader: () -> View
+public struct UICNotRenderedModifier<View>: UIViewCreator where View: CBView {
+    private let notRenderedHandler: (CBView) -> Void
+    private let content: ViewCreator
 
     @usableFromInline
-    internal init(_ viewLoader: @escaping () -> View) {
-        self.viewLoader = viewLoader
+    internal init<Content>(_ content: Content, onNotRendered: @escaping (CBView) -> Void) where Content: UIViewCreator, Content.View == View {
+        self.content = content
+        self.notRenderedHandler = onNotRendered
     }
 
     @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
-        (viewCreator as! Self).viewLoader()
+        let _self = viewCreator as! Self
+
+        return _self.content
+            .releaseUIView()
+            .onNotRendered(_self.notRenderedHandler)
+    }
+}
+
+@frozen
+public struct UICRenderedModifier<View>: UIViewCreator where View: CBView {
+    private let renderedHandler: (CBView) -> Void
+    private let content: ViewCreator
+
+    @usableFromInline
+    internal init<Content>(_ content: Content, onRendered: @escaping (CBView) -> Void) where Content: UIViewCreator, Content.View == View {
+        self.content = content
+        self.renderedHandler = onRendered
+    }
+
+    @inline(__always)
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return _self.content
+            .releaseUIView()
+            .onRendered(_self.renderedHandler)
+    }
+}
+
+@frozen
+public struct UICInTheSceneModifier<View>: UIViewCreator where View: CBView {
+    private let inTheSceneHandler: (CBView) -> Void
+    private let content: ViewCreator
+
+    @usableFromInline
+    internal init<Content>(_ content: Content, onInTheScene: @escaping (CBView) -> Void) where Content: UIViewCreator, Content.View == View {
+        self.content = content
+        self.inTheSceneHandler = onInTheScene
+    }
+
+    @inline(__always)
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return _self.content
+            .releaseUIView()
+            .onInTheScene(_self.inTheSceneHandler)
+    }
+}
+
+@frozen
+public struct UICLayoutModifier<View>: UIViewCreator where View: CBView {
+    private let layoutHandler: (CBView) -> Void
+    private let content: ViewCreator
+
+    @usableFromInline
+    internal init<Content>(_ content: Content, onLayout: @escaping (CBView) -> Void) where Content: UIViewCreator, Content.View == View {
+        self.content = content
+        self.layoutHandler = onLayout
+    }
+
+    @inline(__always)
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return _self.content
+            .releaseUIView()
+            .onLayout(_self.layoutHandler)
+    }
+}
+
+@frozen
+public struct UICAppearModifier<View>: UIViewCreator where View: CBView {
+    private let appearHandler: (CBView) -> Void
+    private let content: ViewCreator
+
+    @usableFromInline
+    internal init<Content>(_ content: Content, onAppear: @escaping (CBView) -> Void) where Content: UIViewCreator, Content.View == View {
+        self.content = content
+        self.appearHandler = onAppear
+    }
+
+    @inline(__always)
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return _self.content
+            .releaseUIView()
+            .onAppear(_self.appearHandler)
+    }
+}
+
+@frozen
+public struct UICDisappearModifier<View>: UIViewCreator where View: CBView {
+    private let disappearHandler: (CBView) -> Void
+    private let content: ViewCreator
+
+    @usableFromInline
+    internal init<Content>(_ content: Content, onDisappear: @escaping (CBView) -> Void) where Content: UIViewCreator, Content.View == View {
+        self.content = content
+        self.disappearHandler = onDisappear
+    }
+
+    @inline(__always)
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return _self.content
+            .releaseUIView()
+            .onDisappear(_self.disappearHandler)
     }
 }

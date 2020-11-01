@@ -21,39 +21,25 @@
 //
 
 import Foundation
-import UIKit
-import ConstraintBuilder
 
-#if os(iOS)
-@frozen
-public struct Pinch: UIGestureCreator {
-    public typealias Gesture = UIPinchGestureRecognizer
+extension ListState {
+    @usableFromInline
+    struct Append: ListModifier {
+        private let listState: ListState
 
-    public init() {}
-
-    @inline(__always)
-    public static func _makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
-        Gesture()
-    }
-}
-
-public extension UIViewCreator {
-
-    @inlinable
-    func onPinchMaker<Pinch>(_ pinchConfigurator: @escaping () -> Pinch) -> UICNotRenderedModifier<View> where Pinch: UIGestureCreator, Pinch.Gesture: UIPinchGestureRecognizer {
-        self.onNotRendered {
-            pinchConfigurator().add($0)
+        @usableFromInline
+        init(_ listState: ListState) {
+            self.listState = listState
         }
-    }
 
-    @inlinable
-    func onPinch(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
-        self.onPinchMaker {
-            Pinch()
-                .onRecognized {
-                    handler($0.view!)
-                }
+        @inline(__always) @usableFromInline
+        var state: List {
+            self.listState.state
+        }
+
+        @inline(__always) @usableFromInline
+        func update(_ list: List) -> ListState.Append {
+            .init(.init(list))
         }
     }
 }
-#endif

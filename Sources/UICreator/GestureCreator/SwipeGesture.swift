@@ -39,14 +39,14 @@ public struct Swipe: UIGestureCreator {
 public extension UIViewCreator {
 
     @inlinable
-    func onSwipeMaker<Swipe>(_ swipeConfigurator: @escaping () -> Swipe) -> UICModifiedView<View> where Swipe: UIGestureCreator, Swipe.Gesture: UISwipeGestureRecognizer {
+    func onSwipeMaker<Swipe>(_ swipeConfigurator: @escaping () -> Swipe) -> UICNotRenderedModifier<View> where Swipe: UIGestureCreator, Swipe.Gesture: UISwipeGestureRecognizer {
         self.onNotRendered {
             swipeConfigurator().add($0)
         }
     }
 
     @inlinable
-    func onSwipe(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+    func onSwipe(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
         self.onSwipeMaker {
             Swipe()
                 .onRecognized {

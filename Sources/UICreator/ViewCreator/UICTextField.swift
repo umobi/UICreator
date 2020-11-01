@@ -83,14 +83,14 @@ public struct UICTextField: UIViewCreator {
 public extension UIViewCreator where View: UITextField {
 
     @inlinable
-    func textColor(_ color: UIColor?) -> UICModifiedView<View> {
+    func textColor(_ color: UIColor?) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.textColor = color
         }
     }
 
     @inlinable
-    func placeholderColor(_ color: UIColor?) -> UICModifiedView<View> {
+    func placeholderColor(_ color: UIColor?) -> UICRenderedModifier<View> {
         self.onRendered {
             guard let label = $0 as? View else {
                 return
@@ -110,7 +110,7 @@ public extension UIViewCreator where View: UITextField {
     }
 
     @inlinable
-    func placeholderFont(_ font: UIFont) -> UICModifiedView<View> {
+    func placeholderFont(_ font: UIFont) -> UICRenderedModifier<View> {
         self.onRendered {
             guard let label = $0 as? View else {
                 return
@@ -130,7 +130,7 @@ public extension UIViewCreator where View: UITextField {
     }
 
     @inlinable
-    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> UICModifiedView<View> {
+    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.font = font
             ($0 as? View)?.adjustsFontForContentSizeCategory = isDynamicTextSize
@@ -138,7 +138,7 @@ public extension UIViewCreator where View: UITextField {
     }
 
     @inlinable
-    func textScale(_ scale: CGFloat) -> UICModifiedView<View> {
+    func textScale(_ scale: CGFloat) -> UICRenderedModifier<View> {
         self.onRendered {
             guard let font = ($0 as? View)?.font else {
                 print("[warning] text scale cannot be applied without font")
@@ -151,7 +151,7 @@ public extension UIViewCreator where View: UITextField {
     }
 
     @inlinable
-    func textAlignment(_ alignment: NSTextAlignment) -> UICModifiedView<View> {
+    func textAlignment(_ alignment: NSTextAlignment) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.textAlignment = alignment
         }
@@ -161,21 +161,21 @@ public extension UIViewCreator where View: UITextField {
 public extension UIViewCreator where View: UITextField {
 
     @inlinable
-    func adjustsFontForContentSizeCategory(_ flag: Bool) -> UICModifiedView<View> {
+    func adjustsFontForContentSizeCategory(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.adjustsFontForContentSizeCategory = flag
         }
     }
 
     @inlinable
-    func adjustsFontSizeToFitWidth(_ flag: Bool) -> UICModifiedView<View> {
+    func adjustsFontSizeToFitWidth(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.adjustsFontSizeToFitWidth = flag
         }
     }
 
     @inlinable
-    func allowsEditingTextAttributes(_ flag: Bool) -> UICModifiedView<View> {
+    func allowsEditingTextAttributes(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.allowsEditingTextAttributes = flag
         }
@@ -185,7 +185,7 @@ public extension UIViewCreator where View: UITextField {
 public extension UIViewCreator where View: UITextField {
 
     @inlinable
-    func borderStyle(_ style: UITextField.BorderStyle) -> UICModifiedView<View> {
+    func borderStyle(_ style: UITextField.BorderStyle) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.borderStyle = style
         }
@@ -195,21 +195,21 @@ public extension UIViewCreator where View: UITextField {
 public extension UIViewCreator where View: UITextField {
 
     @inlinable
-    func clearButtonMode(_ mode: UITextField.ViewMode) -> UICModifiedView<View> {
+    func clearButtonMode(_ mode: UITextField.ViewMode) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.clearButtonMode = mode
         }
     }
 
     @inlinable
-    func clearsOnBegin(_ flag: Bool) -> UICModifiedView<View> {
+    func clearsOnBegin(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.clearsOnBeginEditing = flag
         }
     }
 
     @inlinable
-    func clearsOnInsertion(_ flag: Bool) -> UICModifiedView<View> {
+    func clearsOnInsertion(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.clearsOnInsertion = flag
         }
@@ -219,27 +219,27 @@ public extension UIViewCreator where View: UITextField {
 public extension UIViewCreator where View: UITextField {
 
     @inlinable
-    func onEditingDidBegin(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+    func onEditingDidBegin(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
         self.onEvent(.editingDidBegin, handler)
     }
 
     @inlinable
-    func onEditingChanged(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+    func onEditingChanged(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
         self.onEvent(.editingChanged, handler)
     }
 
     @inlinable
-    func onEditingDidEnd(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+    func onEditingDidEnd(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
         self.onEvent(.editingDidEnd, handler)
     }
 
     @inlinable
-    func onEditingDidEndOnExit(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+    func onEditingDidEndOnExit(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
         self.onEvent(.editingDidEndOnExit, handler)
     }
 
     @inlinable
-    func onAllEditingEvents(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+    func onAllEditingEvents(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
         self.onEvent(.allEditingEvents, handler)
     }
 }
@@ -249,13 +249,13 @@ public extension UIViewCreator where View: UITextField {
     @inlinable
     func leftView(
         _ mode: UITextField.ViewMode = .always,
-        content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
+        content: @escaping () -> ViewCreator) -> UICRenderedModifier<View> {
 
         self.onRendered { view in
             var needsToAddConstraints = true
 
             (view as? View)?.leftViewMode = mode
-            (view as? View)?.leftView = UICAnyView(content).releaseUIView()
+            (view as? View)?.leftView = UICAnyView(content()).releaseUIView()
                 .onAppear { leftView in
                     guard needsToAddConstraints else {
                         return
@@ -281,13 +281,13 @@ public extension UIViewCreator where View: UITextField {
     @inlinable
     func rightView(
         _ mode: UITextField.ViewMode = .always,
-        content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
+        content: @escaping () -> ViewCreator) -> UICRenderedModifier<View> {
 
         self.onRendered { view in
             var needsToAddConstraints = true
 
             (view as? View)?.rightViewMode = mode
-            (view as? View)?.rightView = UICAnyView(content).releaseUIView()
+            (view as? View)?.rightView = UICAnyView(content()).releaseUIView()
                 .onAppear { rightView in
                     guard needsToAddConstraints else {
                         return
@@ -313,28 +313,28 @@ public extension UIViewCreator where View: UITextField {
 
 public extension UIViewCreator where View: UITextField {
     @inlinable
-    func autocapitalizationType(_ type: UITextAutocapitalizationType) -> UICModifiedView<View> {
+    func autocapitalizationType(_ type: UITextAutocapitalizationType) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.autocapitalizationType = type
         }
     }
 
     @inlinable
-    func autocorrectionType(_ type: UITextAutocorrectionType) -> UICModifiedView<View> {
+    func autocorrectionType(_ type: UITextAutocorrectionType) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.autocorrectionType = type
         }
     }
 
     @inlinable
-    func keyboardType(_ type: UIKeyboardType) -> UICModifiedView<View> {
+    func keyboardType(_ type: UIKeyboardType) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.keyboardType = type
         }
     }
 
     @inlinable
-    func keyboardAppearance(_ appearance: UIKeyboardAppearance) -> UICModifiedView<View> {
+    func keyboardAppearance(_ appearance: UIKeyboardAppearance) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.keyboardAppearance = appearance
         }
@@ -344,14 +344,14 @@ public extension UIViewCreator where View: UITextField {
 public extension UIViewCreator where View: UITextField {
 
     @inlinable
-    func returnKeyType(_ type: UIReturnKeyType) -> UICModifiedView<View> {
+    func returnKeyType(_ type: UIReturnKeyType) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.returnKeyType = type
         }
     }
 
     @inlinable
-    func isSecureTextEntry(_ flag: Bool = true) -> UICModifiedView<View> {
+    func isSecureTextEntry(_ flag: Bool = true) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.isSecureTextEntry = flag
         }
@@ -359,7 +359,7 @@ public extension UIViewCreator where View: UITextField {
 
     @available(iOS 12, tvOS 12, *)
     @inlinable
-    func passwordRules(_ passwordRules: UITextInputPasswordRules?) -> UICModifiedView<View> {
+    func passwordRules(_ passwordRules: UITextInputPasswordRules?) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.passwordRules = passwordRules
         }
@@ -370,21 +370,21 @@ public extension UIViewCreator where View: UITextField {
 public extension UIViewCreator where View: UITextField {
 
     @inlinable
-    func smartDashesType(_ type: UITextSmartDashesType) -> UICModifiedView<View> {
+    func smartDashesType(_ type: UITextSmartDashesType) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.smartDashesType = type
         }
     }
 
     @inlinable
-    func smartQuotesType(_ type: UITextSmartQuotesType) -> UICModifiedView<View> {
+    func smartQuotesType(_ type: UITextSmartQuotesType) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.smartQuotesType = type
         }
     }
 
     @inlinable
-    func smartInsertDeleteType(_ type: UITextSmartInsertDeleteType) -> UICModifiedView<View> {
+    func smartInsertDeleteType(_ type: UITextSmartInsertDeleteType) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.smartInsertDeleteType = type
         }
@@ -394,37 +394,37 @@ public extension UIViewCreator where View: UITextField {
 public extension UIViewCreator where View: UITextField {
 
     @inlinable
-    func textContentType(_ type: UITextContentType) -> UICModifiedView<View> {
+    func textContentType(_ type: UITextContentType) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.textContentType = type
         }
     }
 
     @inlinable
-    func inputView(content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
+    func inputView(content: @escaping () -> ViewCreator) -> UICRenderedModifier<View> {
         self.onRendered {
-            ($0 as? View)?.inputView = UICAnyView(content).releaseUIView()
+            ($0 as? View)?.inputView = UICAnyView(content()).releaseUIView()
             ($0 as? View)?.inputView?.sizeToFit()
         }
     }
 
     @inlinable
-    func inputAccessoryView(content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
+    func inputAccessoryView(content: @escaping () -> ViewCreator) -> UICRenderedModifier<View> {
         self.onRendered {
-            ($0 as? View)?.inputAccessoryView = UICAnyView(content).releaseUIView()
+            ($0 as? View)?.inputAccessoryView = UICAnyView(content()).releaseUIView()
             ($0 as? View)?.inputAccessoryView?.sizeToFit()
         }
     }
 
     @inlinable
-    func inputDelegate(_ delegate: UITextInputDelegate) -> UICModifiedView<View> {
+    func inputDelegate(_ delegate: UITextInputDelegate) -> UICInTheSceneModifier<View> {
         self.onInTheScene {
             ($0 as? View)?.inputDelegate = delegate
         }
     }
 
     @inlinable
-    func typingAttributes(_ attributes: [NSAttributedString.Key: Any]?) -> UICModifiedView<View> {
+    func typingAttributes(_ attributes: [NSAttributedString.Key: Any]?) -> UICNotRenderedModifier<View> {
        self.onNotRendered {
            ($0 as? View)?.typingAttributes = attributes
        }

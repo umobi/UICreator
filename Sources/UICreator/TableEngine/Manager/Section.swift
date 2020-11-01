@@ -21,39 +21,24 @@
 //
 
 import Foundation
-import UIKit
-import ConstraintBuilder
 
-#if os(iOS)
-@frozen
-public struct Pinch: UIGestureCreator {
-    public typealias Gesture = UIPinchGestureRecognizer
+@usableFromInline
+struct Section {
+    let header: Row?
+    let rows: [List.Frozen<Row, IndexPath>]
+    let footer: Row?
 
-    public init() {}
-
-    @inline(__always)
-    public static func _makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
-        Gesture()
+    init(header: Row?, footer: Row?, rows: [List.Frozen<Row, IndexPath>]) {
+        self.header = header
+        self.footer = footer
+        self.rows = rows
     }
 }
 
-public extension UIViewCreator {
-
-    @inlinable
-    func onPinchMaker<Pinch>(_ pinchConfigurator: @escaping () -> Pinch) -> UICNotRenderedModifier<View> where Pinch: UIGestureCreator, Pinch.Gesture: UIPinchGestureRecognizer {
-        self.onNotRendered {
-            pinchConfigurator().add($0)
-        }
-    }
-
-    @inlinable
-    func onPinch(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
-        self.onPinchMaker {
-            Pinch()
-                .onRecognized {
-                    handler($0.view!)
-                }
-        }
+extension Section {
+    @usableFromInline
+    enum Content {
+        case `static`(Row)
+        case dynamic([Row])
     }
 }
-#endif

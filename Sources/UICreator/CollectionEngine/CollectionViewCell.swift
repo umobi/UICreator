@@ -25,9 +25,8 @@ import UIKit
 import ConstraintBuilder
 
 extension Views {
-    class CollectionViewCell: UICollectionViewCell, ReusableView, ListReusableView {
+    class CollectionViewCell: UICollectionViewCell, ListReusableView {
         weak var hostedView: CBView!
-        var cellLoaded: UICCell.Loaded!
         var row: Row!
 
         override init(frame: CGRect) {

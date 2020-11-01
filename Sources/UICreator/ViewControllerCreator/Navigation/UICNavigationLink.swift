@@ -28,12 +28,12 @@ import UIKit
 public struct UICNavigationLink: ViewCreator {
     @Relay private var isPushing: Bool
 
-    private let destination: () -> ViewCreator
+    private let destination: ViewCreator
     private let content: () -> ViewCreator
 
     public init(
         _ isPushing: Relay<Bool>,
-        destination: @escaping () -> ViewCreator,
+        destination: ViewCreator,
         content: @escaping () -> ViewCreator) {
 
         self._isPushing = isPushing
@@ -42,7 +42,7 @@ public struct UICNavigationLink: ViewCreator {
     }
 
     public init(
-        destination: @escaping () -> ViewCreator,
+        destination: ViewCreator,
         content: @escaping () -> ViewCreator) {
 
         let value = Value(wrappedValue: false)
@@ -64,7 +64,7 @@ public struct UICNavigationLink: ViewCreator {
         let value = Value(wrappedValue: false)
 
         self._isPushing = value.projectedValue
-        self.destination = { destination(value.projectedValue) }
+        self.destination = destination(value.projectedValue)
         self.content = {
             UICAnyView(content())
                 .onTap { _ in
@@ -77,7 +77,7 @@ public struct UICNavigationLink: ViewCreator {
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
-        return UICAnyView(_self.content)
+        return UICAnyView(_self.content())
             .onInTheScene {
                 weak var navigationController = $0.navigationController
                 weak var pushingView: UIViewController?
@@ -89,7 +89,7 @@ public struct UICNavigationLink: ViewCreator {
                             pushingView == nil
                         else { return }
 
-                        let viewController = UICHostingController(content: _self.destination)
+                        let viewController = UICHostingController(rootView: _self.destination)
                         pushingView = viewController
                         viewController.onDisappear {
                             if $0.isBeingPoped {

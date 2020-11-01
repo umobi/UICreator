@@ -30,7 +30,7 @@ extension UIViewCreator {
         _ relay: Relay<Bool>,
         animated flag: Bool = true,
         content: @escaping () -> ViewCreator,
-        viewControllerBuilder: ((UIViewController) -> Void)?) -> UICModifiedView<View> {
+        viewControllerBuilder: ((UIViewController) -> Void)?) -> UICInTheSceneModifier<View> {
 
         self.onInTheScene {
             weak var view = $0
@@ -76,7 +76,7 @@ extension UIViewCreator {
 public extension UIViewCreator {
 
     @inline(__always) @inlinable
-    func present(_ relay: Relay<Bool>, content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
+    func present(_ relay: Relay<Bool>, content: @escaping () -> ViewCreator) -> UICInTheSceneModifier<View> {
         self.dynamicPresent(
             relay,
             content: content,
@@ -85,7 +85,7 @@ public extension UIViewCreator {
     }
 
     @inline(__always) @inlinable
-    func presentMaker(_ relay: Relay<Bool>,_ presentMaker: @escaping () -> PresentMaker) -> UICModifiedView<View> {
+    func presentMaker(_ relay: Relay<Bool>,_ presentMaker: @escaping () -> PresentMaker) -> UICInTheSceneModifier<View> {
         let presentMaker = presentMaker()
 
         return self.dynamicPresent(
@@ -97,7 +97,7 @@ public extension UIViewCreator {
     }
 
     @inline(__always) @inlinable
-    func presentModal(_ relay: Relay<Bool>, content: @escaping () -> ViewCreator) -> UICModifiedView<View> {
+    func presentModal(_ relay: Relay<Bool>, content: @escaping () -> ViewCreator) -> UICInTheSceneModifier<View> {
         self.presentMaker(relay) {
             PresentMaker(content)
                 .animated(true)

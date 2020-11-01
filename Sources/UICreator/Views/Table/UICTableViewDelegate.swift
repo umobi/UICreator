@@ -27,35 +27,35 @@ import UIKit
 class UICTableViewDelegate: NSObject, UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = tableView.manager?.header(at: section) else {
+        guard let header = tableView.modifier?.header(at: section) else {
             return nil
         }
 
         guard
             let cell = tableView.dequeueReusableHeaderFooterView(
-                withIdentifier: header.identifier
+                withIdentifier: header.id
             ) as? Views.TableViewHeaderFooterCell
         else {
             Fatal.Builder("UICList can't dequeue header for section at \(section)").die()
         }
 
-        cell.prepareCell(header, axis: .horizontal)
+        cell.prepare(header.content, axis: .horizontal)
         return cell
     }
 
     public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        guard let footer = tableView.manager?.footer(at: section) else {
+        guard let footer = tableView.modifier?.footer(at: section) else {
             return nil
         }
 
         guard let cell = tableView.dequeueReusableHeaderFooterView(
-                withIdentifier: footer.identifier
+                withIdentifier: footer.id
             ) as? Views.TableViewHeaderFooterCell
         else {
             Fatal.Builder("UICList can't dequeue footer for section at \(section)").die()
         }
 
-        cell.prepareCell(footer, axis: .horizontal)
+        cell.prepare(footer.content, axis: .horizontal)
         return cell
     }
 
@@ -64,11 +64,12 @@ class UICTableViewDelegate: NSObject, UITableViewDelegate {
     public func tableView(
         _ tableView: UITableView,
         trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let reusableView = tableView.reusableView(at: indexPath) else {
+
+        guard case .row(let trailingActions, _, _, _)? = tableView.reusableView(at: indexPath)?.row.type else {
             return nil
         }
 
-        let configurator = UISwipeActionsConfiguration(actions: reusableView.cellLoaded.trailingActions.compactMap {
+        let configurator = UISwipeActionsConfiguration(actions: trailingActions.compactMap {
             let contextualAction = $0 as? UICContextualAction
             return contextualAction?
                 .indexPath(indexPath)
@@ -76,7 +77,7 @@ class UICTableViewDelegate: NSObject, UITableViewDelegate {
                 .rowAction
         })
 
-        reusableView.cellLoaded.trailingActions.forEach {
+        trailingActions.forEach {
             ($0 as? UICContextualAction)?.commitConfigurator(configurator)
         }
 
@@ -87,11 +88,12 @@ class UICTableViewDelegate: NSObject, UITableViewDelegate {
     public func tableView(
         _ tableView: UITableView,
         leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let reusableView = tableView.reusableView(at: indexPath) else {
+
+        guard case .row(_, let leadingActions, _, _)? = tableView.reusableView(at: indexPath)?.row.type else {
             return nil
         }
 
-        let configurator = UISwipeActionsConfiguration(actions: reusableView.cellLoaded.leadingActions.compactMap {
+        let configurator = UISwipeActionsConfiguration(actions: leadingActions.compactMap {
             let contextualAction = $0 as? UICContextualAction
             return contextualAction?
                 .indexPath(indexPath)
@@ -99,7 +101,7 @@ class UICTableViewDelegate: NSObject, UITableViewDelegate {
                 .rowAction
         })
 
-        reusableView.cellLoaded.leadingActions.forEach {
+        leadingActions.forEach {
             ($0 as? UICContextualAction)?.commitConfigurator(configurator)
         }
 
@@ -109,11 +111,12 @@ class UICTableViewDelegate: NSObject, UITableViewDelegate {
     public func tableView(
         _ tableView: UITableView,
         editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        guard let reusableView = tableView.reusableView(at: indexPath) else {
+
+        guard case .row(let trailingActions, let leadingActions, _, _)? = tableView.reusableView(at: indexPath)?.row.type else {
             return nil
         }
 
-        return (reusableView.cellLoaded.leadingActions + reusableView.cellLoaded.trailingActions).compactMap {
+        return (leadingActions + trailingActions).compactMap {
             let action = ($0 as? UICRowAction)
             return action?
                 .indexPath(indexPath)
@@ -175,7 +178,7 @@ extension Numeric where Self: Comparable {
 
 extension UITableView {
     func heightForHeader(in section: Int) -> CGFloat? {
-        guard self.manager?.header(at: section) != nil else {
+        guard self.modifier?.header(at: section) != nil else {
             return nil
         }
 
@@ -183,7 +186,7 @@ extension UITableView {
     }
 
     func heightForFooter(in section: Int) -> CGFloat? {
-        guard self.manager?.footer(at: section) != nil else {
+        guard self.modifier?.footer(at: section) != nil else {
             return nil
         }
 
@@ -191,7 +194,7 @@ extension UITableView {
     }
 
     func heightForRow(at indexPath: IndexPath) -> CGFloat? {
-        guard self.manager?.row(at: indexPath) != nil else {
+        guard self.modifier?.row(at: indexPath) != nil else {
             return nil
         }
 

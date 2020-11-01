@@ -60,35 +60,35 @@ public struct UICSwitch: UIViewCreator {
 public extension UIViewCreator where View: UISwitch {
 
     @inlinable
-    func isOn(_ flag: Bool) -> UICModifiedView<View> {
+    func isOn(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.isOn = flag
         }
     }
 
     @inlinable
-    func offImage(_ image: UICImage?) -> UICModifiedView<View> {
+    func offImage(_ image: UICImage?) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.offImage = image?.uiImage
         }
     }
 
     @inlinable
-    func onImage(_ image: UICImage?) -> UICModifiedView<View> {
+    func onImage(_ image: UICImage?) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.onImage = image?.uiImage
         }
     }
 
     @inlinable
-    func onTintColor(_ color: UIColor?) -> UICModifiedView<View> {
+    func onTintColor(_ color: UIColor?) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.onTintColor = color
         }
     }
 
     @inlinable
-    func thumbTintColor(_ color: UIColor?) -> UICModifiedView<View> {
+    func thumbTintColor(_ color: UIColor?) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.thumbTintColor = color
         }

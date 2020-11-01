@@ -24,10 +24,13 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public protocol UIViewControllerCreator: ViewCreator {
-    associatedtype ViewController: CBViewController
+public protocol ViewControllerCreator: ViewCreator {
 
     static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController
+}
+
+public protocol UIViewControllerCreator: ViewControllerCreator {
+    associatedtype ViewController: CBViewController
 
     /**
      This method should be used when it is necessarly to set a property to the view, but only the ones that don't
@@ -95,50 +98,44 @@ public protocol UIViewControllerCreator: ViewCreator {
     func onDisappear(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController>
 }
 
-extension UIViewControllerCreator {
+extension ViewControllerCreator {
     @usableFromInline
-    func releaseCastedViewController() -> ViewController {
-        Self._makeUIViewController(self) as! ViewController
+    func releaseViewController() -> CBViewController {
+        Self._makeUIViewController(self)
     }
 }
 
 public extension UIViewControllerCreator {
     static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
-        Views.ViewControllerAdaptor((viewCreator as! Self).releaseCastedViewController())
+        Views.ViewControllerAdaptor((viewCreator as! Self).releaseViewController())
     }
 }
 
 public extension UIViewControllerCreator {
     @inlinable
     func onNotRendered(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController {
-            let viewController = self.releaseCastedViewController()
-            viewController.view.onNotRendered { [weak viewController] _ in
-                handler(viewController!)
+        UICModifiedViewController(self) {
+            $0.view.onNotRendered {
+                handler($0.next as! CBViewController)
             }
-            return viewController
         }
     }
 
     @inlinable
     func onRendered(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController {
-            let viewController = self.releaseCastedViewController()
-            viewController.view.onRendered { [weak viewController] _ in
-                handler(viewController!)
+        UICModifiedViewController(self) {
+            $0.view.onRendered {
+                handler($0.next as! CBViewController)
             }
-            return viewController
         }
     }
 
     @inlinable
     func onInTheScene(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController {
-            let viewController = self.releaseCastedViewController()
-            viewController.view.onInTheScene { [weak viewController] _ in
-                handler(viewController!)
+        UICModifiedViewController(self) {
+            $0.view.onInTheScene {
+                handler($0.next as! CBViewController)
             }
-            return viewController
         }
     }
 }
@@ -147,34 +144,28 @@ public extension UIViewControllerCreator {
 
     @inlinable
     func onLayout(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController {
-            let viewController = self.releaseCastedViewController()
-            viewController.view.onLayout { [weak viewController] _ in
-                handler(viewController!)
+        UICModifiedViewController(self) {
+            $0.view.onLayout {
+                handler($0.next as! CBViewController)
             }
-            return viewController
         }
     }
 
     @inlinable
     func onAppear(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController {
-            let viewController = self.releaseCastedViewController()
-            viewController.view.onAppear { [weak viewController] _ in
-                handler(viewController!)
+        UICModifiedViewController(self) {
+            $0.view.onAppear {
+                handler($0.next as! CBViewController)
             }
-            return viewController
         }
     }
 
     @inlinable
     func onDisappear(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController {
-            let viewController = self.releaseCastedViewController()
-            viewController.view.onDisappear { [weak viewController] _ in
-                handler(viewController!)
+        UICModifiedViewController(self) {
+            $0.view.onDisappear {
+                handler($0.next as! CBViewController)
             }
-            return viewController
         }
     }
 }

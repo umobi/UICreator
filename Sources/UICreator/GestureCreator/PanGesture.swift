@@ -41,14 +41,14 @@ public extension UIGestureCreator where Gesture: UIPanGestureRecognizer {
     @inlinable
     func maximumNumber(ofTouches number: Int) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.maximumNumberOfTouches = number
+            ($0 as? Gesture)?.maximumNumberOfTouches = number
         }
     }
 
     @inlinable
     func minimumNumber(ofTouches number: Int) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.minimumNumberOfTouches = number
+            ($0 as? Gesture)?.minimumNumberOfTouches = number
         }
     }
 }
@@ -57,14 +57,14 @@ public extension UIGestureCreator where Gesture: UIPanGestureRecognizer {
 public extension UIViewCreator {
 
     @inlinable
-    func onPanMaker<Pan>(_ panConfigurator: @escaping () -> Pan) -> UICModifiedView<View> where Pan: UIGestureCreator, Pan.Gesture: UIPanGestureRecognizer {
+    func onPanMaker<Pan>(_ panConfigurator: @escaping () -> Pan) -> UICNotRenderedModifier<View> where Pan: UIGestureCreator, Pan.Gesture: UIPanGestureRecognizer {
         self.onNotRendered {
             panConfigurator().add($0)
         }
     }
 
     @inlinable
-    func onPan(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+    func onPan(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
         self.onPanMaker {
             Pan()
                 .onRecognized {

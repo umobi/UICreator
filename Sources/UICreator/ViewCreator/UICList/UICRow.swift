@@ -187,19 +187,18 @@ public class UICContextualAction: RowAction {
         with animation: UITableView.RowAnimation,
         onCompletion handler: @escaping (IndexPath) -> Void) -> Self {
         self.onAction { [weak self] indexPath in
-            guard let manager = self?.tableView?.manager as? ListManager else {
+            guard let listState = self?.tableView?.modifier as? ListState else {
                 UICList.Fatal.deleteRows([indexPath]).warning()
                 return false
             }
 
-            self?.tableView.manager = ListManager.Delete(manager)
-                .disableIndexPath(indexPath)
+            self?.tableView.modifier = ListState.Delete(listState, disable: [indexPath])
 
             self?.tableView?.performBatchUpdates({
                 self?.tableView.deleteRows(at: [indexPath], with: animation)
             }, completion: { didEnd in
                 if didEnd {
-                    self?.tableView.manager = manager
+                    self?.tableView.modifier = listState
                     handler(indexPath)
                 }
             })
@@ -255,20 +254,19 @@ public class UICRowAction: RowAction {
         with animation: UITableView.RowAnimation,
         onCompletion handler: @escaping (IndexPath) -> Void) -> Self {
         self.onAction { [weak self] indexPath in
-            guard let manager = self?.tableView?.manager as? ListManager else {
+            guard let listState = self?.tableView?.modifier as? ListState else {
                 UICList.Fatal.deleteRows([indexPath]).warning()
                 return
             }
 
-            self?.tableView.manager = ListManager.Delete(manager)
-                .disableIndexPath(indexPath)
+            self?.tableView.modifier = ListState.Delete(listState, disable: [indexPath])
 
             if #available(iOS 11.0, tvOS 11.0, *) {
                 self?.tableView?.performBatchUpdates({
                     self?.tableView.deleteRows(at: [indexPath], with: animation)
                 }, completion: { didEnd in
                     if didEnd {
-                        self?.tableView.manager = manager
+                        self?.tableView.modifier = listState
                         handler(indexPath)
                     }
                 })
@@ -280,7 +278,7 @@ public class UICRowAction: RowAction {
             self?.tableView?.deleteRows(at: [indexPath], with: animation)
             self?.tableView?.endUpdates()
 
-            self?.tableView?.manager = manager
+            self?.tableView?.modifier = listState
             handler(indexPath)
         }
     }

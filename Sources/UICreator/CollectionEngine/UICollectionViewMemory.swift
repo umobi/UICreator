@@ -26,7 +26,6 @@ import UIKit
 private var kMEMCollectionPayload: UInt = 0
 private extension UICollectionView {
     struct Memory {
-        @MutableBox var manager: ListCollectionManager?
         @MutableBox var modifier: ListModifier?
         @MutableBox var layoutManager: UICCollectionLayoutManager?
         @MutableBox var layoutManagerHandler: (() -> UICCollectionLayoutSectionElement)?
@@ -43,12 +42,6 @@ private extension UICollectionView {
 }
 
 extension UICollectionView {
-    @inline(__always) @usableFromInline
-    var manager: ListCollectionManager? {
-        get { self.memory.manager }
-        set { self.memory.manager = newValue }
-    }
-
     @inline(__always) @usableFromInline
     var modifier: ListModifier? {
         get { self.memory.modifier }
@@ -80,7 +73,7 @@ extension UICollectionView {
 public extension UIViewCreator where View: UICollectionView {
     func layoutMaker(
         @UICCollectionLayoutSectionBuilder content:
-            @escaping () -> UICCollectionLayoutSectionElement) -> UICModifiedView<View> {
+            @escaping () -> UICCollectionLayoutSectionElement) -> UICInTheSceneModifier<View> {
 
         self.onInTheScene {
             ($0 as? View)?.layoutManagerHandler = content

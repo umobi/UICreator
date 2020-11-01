@@ -24,15 +24,20 @@ import ConstraintBuilder
 
 @frozen
 public struct UICModifiedViewController<ViewController>: UIViewControllerCreator where ViewController: CBViewController {
-    let viewControllerLoader: () -> ViewController
+    private let modifyHandler: (CBViewController) -> Void
+    private let content: ViewControllerCreator
 
     @usableFromInline
-    init(_ viewLoader: @escaping () -> ViewController) {
-        self.viewControllerLoader = viewLoader
+    init<Content>(_ content: Content, onModify: @escaping (CBViewController) -> Void) where Content: UIViewControllerCreator, Content.ViewController == ViewController {
+        self.content = content
+        self.modifyHandler = onModify
     }
 
     @inline(__always)
     public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
-        (viewCreator as! Self).viewControllerLoader()
+        let _self = viewCreator as! Self
+        let viewController = _self.content.releaseViewController()
+        _self.modifyHandler(viewController)
+        return viewController
     }
 }

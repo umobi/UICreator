@@ -36,10 +36,10 @@ public extension UIViewCreator {
     func safeArea(
         priority: CBLayoutPriority = .required,
         _ margins: Margin...,
-        equalTo value: CGFloat = 0) -> UICModifiedView<View> {
+        equalTo value: CGFloat = 0) -> UICInTheSceneModifier<View> {
 
         Set(margins.isEmpty ? Margin.allCases : margins)
-            .reduce(UICModifiedView { self.releaseOperationCastedView() }) {
+            .reduce(UICInTheSceneModifier<View>(self, onInTheScene: { _ in })) {
                 switch $1 {
                 case .top:
                     return $0.safeArea(topEqualTo: value, priority: priority)
@@ -57,10 +57,10 @@ public extension UIViewCreator {
     func insets(
         priority: CBLayoutPriority = .required,
         _ margins: Margin...,
-        equalTo value: CGFloat = 0) -> UICModifiedView<View> {
+        equalTo value: CGFloat = 0) -> UICInTheSceneModifier<View> {
 
         Set(margins.isEmpty ? Margin.allCases : margins)
-            .reduce(UICModifiedView { self.releaseOperationCastedView() }) {
+            .reduce(UICInTheSceneModifier<View>(self, onInTheScene: { _ in })) {
                 switch $1 {
                 case .top:
                     return $0.top(equalTo: value, priority: priority)
@@ -78,10 +78,10 @@ public extension UIViewCreator {
     func margin(
         priority: CBLayoutPriority = .required,
         _ margins: Margin...,
-        equalTo value: CGFloat = 0) -> UICModifiedView<View> {
+        equalTo value: CGFloat = 0) -> UICInTheSceneModifier<View> {
 
         Set(margins.isEmpty ? Margin.allCases : margins)
-            .reduce(UICModifiedView { self.releaseOperationCastedView() }) {
+            .reduce(UICInTheSceneModifier<View>(self, onInTheScene: { _ in })) {
                 switch $1 {
                 case .top:
                     return $0.topMargin(equalTo: value, priority: priority)

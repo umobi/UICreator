@@ -29,35 +29,34 @@ extension ListSupport where Self: UICollectionViewLayoutCreator {
         self.onNotRendered {
             let collectionView: Self! = $0 as? Self
 
-            let manager = ListManager(contents: contents().zip)
+            let modifier = ListState(collectionView, contents().zip)
 
-            manager.rowsIdentifier.forEach {
+            modifier.rows.forEach {
                 collectionView.register(
                     Views.CollectionViewCell.self,
-                    forCellWithReuseIdentifier: $0
+                    forCellWithReuseIdentifier: $0.id
                 )
             }
 
-            manager.headersIdentifier.forEach {
+            modifier.headers.forEach {
                 collectionView.register(
                     Views.CollectionReusableView.self,
                     forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                    withReuseIdentifier: $0
+                    withReuseIdentifier: $0.id
                 )
             }
 
-            manager.footersIdentifier.forEach {
+            modifier.footers.forEach {
                 collectionView.register(
                     Views.CollectionReusableView.self,
                     forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-                    withReuseIdentifier: $0
+                    withReuseIdentifier: $0.id
                 )
             }
 
-            collectionView.manager = manager
+            collectionView.modifier = modifier
             collectionView.strongDataSource(UICCollectionViewDataSource())
             collectionView.strongDelegate(collectionView.provideDelegate())
-            manager.list = collectionView
         }
     }
 }

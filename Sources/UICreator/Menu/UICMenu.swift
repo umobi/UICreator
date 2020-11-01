@@ -190,7 +190,7 @@ extension UICMenu.Options {
 #if os(iOS)
 public extension UIViewCreator {
     @inlinable @available(iOS 13, *)
-    func contextMenu(_ content: @escaping () -> UICMenu) -> UICModifiedView<View> {
+    func contextMenu(_ content: @escaping () -> UICMenu) -> UICInTheSceneModifier<View> {
         self.onInTheScene {
             $0.addInteraction(UIContextMenuInteraction.interaction(
                 UICMenu.Delegate(content())

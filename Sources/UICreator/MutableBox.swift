@@ -53,7 +53,7 @@ struct MutableBox<Value> {
 @propertyWrapper
 struct WeakBox<Value> where Value: AnyObject {
     private class Box {
-        var value: Value?
+        weak var value: Value?
 
         init(_ value: Value?) {
             self.value = value

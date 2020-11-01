@@ -56,7 +56,7 @@ public struct UICGradient: UIViewCreator {
 public extension UIViewCreator where View: Views.GradientView {
 
     @inlinable
-    func animation(_ layerHandler: @escaping (CAGradientLayer) -> Void) -> UICModifiedView<View> {
+    func animation(_ layerHandler: @escaping (CAGradientLayer) -> Void) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.animates(animator: layerHandler)
         }

@@ -79,7 +79,7 @@ public struct UICInput: UIViewCreator {
 public extension UIViewCreator where View: UIInputView {
 
     @inlinable
-    func allowsSelfsSizing(_ flag: Bool) -> UICModifiedView<View> {
+    func allowsSelfsSizing(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.allowsSelfSizing = flag
         }

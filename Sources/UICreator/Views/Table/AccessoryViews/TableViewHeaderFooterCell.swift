@@ -25,9 +25,9 @@ import UIKit
 import ConstraintBuilder
 
 extension Views {
-    class TableViewHeaderFooterCell: UITableViewHeaderFooterView, ReusableView, TableCellType {
+    class TableViewHeaderFooterCell: UITableViewHeaderFooterView, TableCellType, ListReusableView {
         weak var hostedView: CBView!
-        var cellLoaded: UICCell.Loaded!
+        var row: Row!
 
         override init(reuseIdentifier: String?) {
             super.init(reuseIdentifier: reuseIdentifier)

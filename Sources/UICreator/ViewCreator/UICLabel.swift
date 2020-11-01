@@ -75,14 +75,14 @@ public struct UICLabel: UIViewCreator {
 public extension UIViewCreator where View: UILabel {
 
     @inlinable
-    func textColor(_ color: UIColor?) -> UICModifiedView<View> {
+    func textColor(_ color: UIColor?) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.textColor = color
         }
     }
 
     @inlinable
-    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> UICModifiedView<View> {
+    func font(_ font: UIFont, isDynamicTextSize: Bool = false) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.font = font
             ($0 as? View)?.adjustsFontForContentSizeCategory = isDynamicTextSize
@@ -90,7 +90,7 @@ public extension UIViewCreator where View: UILabel {
     }
 
     @inlinable
-    func textScale(_ scale: CGFloat) -> UICModifiedView<View> {
+    func textScale(_ scale: CGFloat) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.minimumScaleFactor = scale
             ($0 as? View)?.adjustsFontSizeToFitWidth = scale != 1
@@ -98,14 +98,14 @@ public extension UIViewCreator where View: UILabel {
     }
 
     @inlinable
-    func textAlignment(_ alignment: NSTextAlignment) -> UICModifiedView<View> {
+    func textAlignment(_ alignment: NSTextAlignment) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.textAlignment = alignment
         }
     }
 
     @inlinable
-    func numberOfLines(_ number: Int) -> UICModifiedView<View> {
+    func numberOfLines(_ number: Int) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.numberOfLines = number
         }
@@ -115,14 +115,14 @@ public extension UIViewCreator where View: UILabel {
 public extension UIViewCreator where View: UILabel {
 
     @inlinable
-    func adjustsFontForContentSizeCategory(_ flag: Bool) -> UICModifiedView<View> {
+    func adjustsFontForContentSizeCategory(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.adjustsFontForContentSizeCategory = flag
         }
     }
 
     @inlinable
-    func adjustsFontSizeToFitWidth(_ flag: Bool) -> UICModifiedView<View> {
+    func adjustsFontSizeToFitWidth(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.adjustsFontSizeToFitWidth = flag
         }
@@ -132,7 +132,7 @@ public extension UIViewCreator where View: UILabel {
 public extension UIViewCreator where View: UILabel {
 
     @inlinable
-    func lineBreakMode(_ mode: NSLineBreakMode) -> UICModifiedView<View> {
+    func lineBreakMode(_ mode: NSLineBreakMode) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.lineBreakMode = mode
         }
@@ -142,7 +142,7 @@ public extension UIViewCreator where View: UILabel {
 public extension UIViewCreator where View: UILabel {
 
     @inlinable
-    func textColor(_ relay: Relay<UIColor>) -> UICModifiedView<View> {
+    func textColor(_ relay: Relay<UIColor>) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             weak var view = $0 as? View
             relay.sync {
@@ -155,7 +155,7 @@ public extension UIViewCreator where View: UILabel {
 public extension UIViewCreator where View: UILabel {
 
     @inlinable
-    func font(_ relay: Relay<UIFont>) -> UICModifiedView<View> {
+    func font(_ relay: Relay<UIFont>) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             weak var view = $0 as? View
             relay.sync {

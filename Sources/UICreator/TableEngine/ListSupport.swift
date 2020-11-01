@@ -26,17 +26,23 @@ import UIKit
 @usableFromInline
 protocol ListSupport: class {
     func reloadData()
-    var modifier: ListModifier? { get }
-    var manager: ListCollectionManager? { get }
+    var modifier: ListModifier? { get set }
 }
 
 extension ListSupport {
     @usableFromInline
     func setNeedsReloadData() {
-        guard manager == nil || !(manager is ListManager.Append) else {
+        guard modifier == nil || !(modifier is ListState.Append) else {
             return
         }
 
         self.reloadData()
+    }
+}
+
+extension ListSupport {
+    func invalidateState(_ newState: List) {
+        self.modifier = self.modifier?.update(newState)
+        self.setNeedsReloadData()
     }
 }

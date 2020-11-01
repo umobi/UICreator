@@ -21,39 +21,22 @@
 //
 
 import Foundation
-import UIKit
 import ConstraintBuilder
 
-#if os(iOS)
-@frozen
-public struct Pinch: UIGestureCreator {
-    public typealias Gesture = UIPinchGestureRecognizer
+class ListForEachListener<Content>: SupportForEach {
+    @Relay var contents: [Content]
 
-    public init() {}
-
-    @inline(__always)
-    public static func _makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
-        Gesture()
+    init(_ forEachEnviroment: ForEachEnviromentType) {
+        _contents = .constant([])
+        forEachEnviroment.setManager(self)
+        forEachEnviroment.syncManager()
     }
 }
 
-public extension UIViewCreator {
-
-    @inlinable
-    func onPinchMaker<Pinch>(_ pinchConfigurator: @escaping () -> Pinch) -> UICNotRenderedModifier<View> where Pinch: UIGestureCreator, Pinch.Gesture: UIPinchGestureRecognizer {
-        self.onNotRendered {
-            pinchConfigurator().add($0)
-        }
-    }
-
-    @inlinable
-    func onPinch(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
-        self.onPinchMaker {
-            Pinch()
-                .onRecognized {
-                    handler($0.view!)
-                }
+extension ListForEachListener {
+    func viewsDidChange(_ placeholderView: CBView!, _ dynamicContent: Relay<[() -> ViewCreator]>) {
+        _contents = dynamicContent.map {
+            $0.reduce([]) { $0 + [$1() as! Content] }
         }
     }
 }
-#endif

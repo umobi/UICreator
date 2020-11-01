@@ -90,14 +90,14 @@ public struct UICStack: UIViewCreator {
 public extension UIViewCreator where View: UIStackView {
 
     @inlinable
-    func distribution(_ distribution: View.Distribution) -> UICModifiedView<View> {
-        return self.onNotRendered {
+    func distribution(_ distribution: View.Distribution) -> UICNotRenderedModifier<View> {
+        self.onNotRendered {
             ($0 as? View)?.distribution = distribution
         }
     }
 
     @inlinable
-    func alignment(_ alignment: View.Alignment) -> UICModifiedView<View> {
+    func alignment(_ alignment: View.Alignment) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.alignment = alignment
         }

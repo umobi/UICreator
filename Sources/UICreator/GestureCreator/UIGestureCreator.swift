@@ -26,24 +26,13 @@ import UIKit
 public protocol UIGestureCreator: GestureCreator {
     associatedtype Gesture: UIGestureRecognizer
 
-    func onModify(_ handler: @escaping (Gesture) -> Void) -> UICModifiedGesture<Gesture>
-}
-
-extension UIGestureCreator {
-    @inline(__always) @usableFromInline
-    func releaseCastedGesture() -> Gesture {
-        self.releaseUIGesture() as! Gesture
-    }
+    func onModify(_ handler: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture>
 }
 
 public extension UIGestureCreator {
-    @inlinable
-    func onModify(_ handler: @escaping (Gesture) -> Void) -> UICModifiedGesture<Gesture> {
-        UICModifiedGesture {
-            let gesture = self.releaseCastedGesture()
-            handler(gesture)
-            return gesture
-        }
+    @inline(__always) @inlinable
+    func onModify(_ onModify: @escaping (UIGestureRecognizer) -> Void) -> UICModifiedGesture<Gesture> {
+        UICModifiedGesture(self, onModify: onModify)
     }
 }
 
@@ -51,7 +40,7 @@ public extension UIGestureCreator {
     @inlinable
     func `as`(_ outlet: UICOutlet<Gesture>) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            outlet.ref($0)
+            outlet.ref($0 as? Gesture)
         }
     }
 

@@ -40,14 +40,14 @@ public struct Rotation: UIGestureCreator {
 public extension UIViewCreator {
 
     @inlinable
-    func onRotationMaker<Rotation>(_ rotationConfigurator: @escaping () -> Rotation) -> UICModifiedView<View> where Rotation: UIGestureCreator, Rotation.Gesture: UIRotationGestureRecognizer {
+    func onRotationMaker<Rotation>(_ rotationConfigurator: @escaping () -> Rotation) -> UICNotRenderedModifier<View> where Rotation: UIGestureCreator, Rotation.Gesture: UIRotationGestureRecognizer {
         self.onNotRendered {
             rotationConfigurator().add($0)
         }
     }
 
     @inlinable
-    func onRotation(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+    func onRotation(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
         self.onRotationMaker {
             Rotation()
                 .onRecognized {
