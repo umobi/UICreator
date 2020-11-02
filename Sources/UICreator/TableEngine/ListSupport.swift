@@ -27,6 +27,12 @@ import UIKit
 protocol ListSupport: class {
     func reloadData()
     var modifier: ListModifier? { get set }
+
+    func register(
+        _ rows: [List.Identifier<String, Row>],
+        _ headers: [List.Identifier<String, Row>],
+        _ footers: [List.Identifier<String, Row>]
+    )
 }
 
 extension ListSupport {
@@ -42,7 +48,26 @@ extension ListSupport {
 
 extension ListSupport {
     func invalidateState(_ newState: List) {
+        let footers = self.modifier?.footers ?? []
+        let headers = self.modifier?.headers ?? []
+        let rows = self.modifier?.rows ?? []
+
         self.modifier = self.modifier?.update(newState)
+
+        self.register({
+            self.modifier?.rows.filter { row in
+                !rows.contains(where: { $0.id == row.id })
+            } ?? []
+        }(), {
+            self.modifier?.headers.filter { header in
+                !headers.contains(where: { $0.id == header.id })
+            } ?? []
+        }(), {
+            self.modifier?.footers.filter { footer in
+                !footers.contains(where: { $0.id == footer.id })
+            } ?? []
+        }())
+        
         self.setNeedsReloadData()
     }
 }

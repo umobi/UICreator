@@ -53,3 +53,27 @@ public struct UICAnyView: UIViewCreator {
         }
     }
 }
+
+@frozen
+public struct UICModifiedView<View>: UIViewCreator where View: CBView {
+
+    private let viewCreator: ViewCreator
+
+    @inline(__always)
+    fileprivate init<Content>(_ viewCreator: Content) where Content: UIViewCreator, Content.View == View {
+        self.viewCreator = viewCreator
+    }
+
+    @inline(__always)
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        (viewCreator as! Self).viewCreator.releaseUIView()
+    }
+}
+
+public extension UIViewCreator {
+    @inline(__always)
+    func eraseToModifiedView() -> UICModifiedView<View> {
+        UICModifiedView(self)
+    }
+}
+

@@ -41,7 +41,7 @@ public protocol UIViewControllerCreator: ViewControllerCreator {
 
      - Returns: Returns a self reference to compose the declarative programming.
      */
-    func onNotRendered(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController>
+    func onNotRendered(_ handler: @escaping (CBViewController) -> Void) -> UICNotRenderedModifierController<ViewController>
 
     /**
      This method should be used when the view is in the local hierarchy and it's needed to set
@@ -52,7 +52,7 @@ public protocol UIViewControllerCreator: ViewControllerCreator {
 
      - Returns: Returns a self reference to compose the declarative programming.
      */
-    func onRendered(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController>
+    func onRendered(_ handler: @escaping (CBViewController) -> Void) -> UICRenderedModifierController<ViewController>
 
     /**
      This method should be used when the view is in the window hierarchy, accessing view controllers
@@ -63,7 +63,7 @@ public protocol UIViewControllerCreator: ViewControllerCreator {
 
      - Returns: Returns a self reference to compose the declarative programming.
      */
-    func onInTheScene(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController>
+    func onInTheScene(_ handler: @escaping (CBViewController) -> Void) -> UICInTheSceneModifierController<ViewController>
 
     /**
      This method calls the handler parameter when the UIView calls `layoutSubviews`.
@@ -73,7 +73,7 @@ public protocol UIViewControllerCreator: ViewControllerCreator {
 
      - Returns: Returns a self reference to compose the declarative programming.
      */
-    func onLayout(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController>
+    func onLayout(_ handler: @escaping (CBViewController) -> Void) -> UICLayoutModifierController<ViewController>
 
     /**
      This method calls the handler parameter when the UIView is hidden, moved from heirarchy or when the frame changes
@@ -84,7 +84,7 @@ public protocol UIViewControllerCreator: ViewControllerCreator {
 
      - Returns: Returns a self reference to compose the declarative programming.
      */
-    func onAppear(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController>
+    func onAppear(_ handler: @escaping (CBViewController) -> Void) -> UICAppearModifierController<ViewController>
 
     /**
      This method calls the handler parameter when the UIView is hidden, moved from heirarchy or when the frame changes
@@ -95,7 +95,7 @@ public protocol UIViewControllerCreator: ViewControllerCreator {
 
      - Returns: Returns a self reference to compose the declarative programming.
      */
-    func onDisappear(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController>
+    func onDisappear(_ handler: @escaping (CBViewController) -> Void) -> UICDisappearModifierController<ViewController>
 }
 
 extension ViewControllerCreator {
@@ -112,68 +112,44 @@ public extension UIViewControllerCreator {
 }
 
 public extension UIViewControllerCreator {
-    @inlinable
-    func onNotRendered(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController(self) {
-            $0.view.onNotRendered {
-                handler($0.next as! CBViewController)
-            }
-        }
+    @inline(__always) @inlinable
+    func onNotRendered(_ handler: @escaping (CBViewController) -> Void) -> UICNotRenderedModifierController<ViewController> {
+        UICNotRenderedModifierController(self, onNotRendered: handler)
     }
 
-    @inlinable
-    func onRendered(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController(self) {
-            $0.view.onRendered {
-                handler($0.next as! CBViewController)
-            }
-        }
+    @inline(__always) @inlinable
+    func onRendered(_ handler: @escaping (CBViewController) -> Void) -> UICRenderedModifierController<ViewController> {
+        UICRenderedModifierController(self, onRendered: handler)
     }
 
-    @inlinable
-    func onInTheScene(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController(self) {
-            $0.view.onInTheScene {
-                handler($0.next as! CBViewController)
-            }
-        }
+    @inline(__always) @inlinable
+    func onInTheScene(_ handler: @escaping (CBViewController) -> Void) -> UICInTheSceneModifierController<ViewController> {
+        UICInTheSceneModifierController(self, onInTheScene: handler)
+    }
+}
+
+public extension UIViewControllerCreator {
+
+    @inline(__always) @inlinable
+    func onLayout(_ handler: @escaping (CBViewController) -> Void) -> UICLayoutModifierController<ViewController> {
+        UICLayoutModifierController(self, onLayout: handler)
+    }
+
+    @inline(__always) @inlinable
+    func onAppear(_ handler: @escaping (CBViewController) -> Void) -> UICAppearModifierController<ViewController> {
+        UICAppearModifierController(self, onAppear: handler)
+    }
+
+    @inline(__always) @inlinable
+    func onDisappear(_ handler: @escaping (CBViewController) -> Void) -> UICDisappearModifierController<ViewController> {
+        UICDisappearModifierController(self, onDisappear: handler)
     }
 }
 
 public extension UIViewControllerCreator {
 
     @inlinable
-    func onLayout(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController(self) {
-            $0.view.onLayout {
-                handler($0.next as! CBViewController)
-            }
-        }
-    }
-
-    @inlinable
-    func onAppear(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController(self) {
-            $0.view.onAppear {
-                handler($0.next as! CBViewController)
-            }
-        }
-    }
-
-    @inlinable
-    func onDisappear(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController(self) {
-            $0.view.onDisappear {
-                handler($0.next as! CBViewController)
-            }
-        }
-    }
-}
-
-public extension UIViewControllerCreator {
-
-    @inlinable
-    func `as`(_ outlet: UICOutlet<ViewController>) -> UICModifiedViewController<ViewController> {
+    func `as`(_ outlet: UICOutlet<ViewController>) -> UICInTheSceneModifierController<ViewController> {
         self.onInTheScene {
             outlet.ref($0 as? ViewController)
         }

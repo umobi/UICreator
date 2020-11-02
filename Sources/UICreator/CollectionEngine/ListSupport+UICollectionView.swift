@@ -31,32 +31,47 @@ extension ListSupport where Self: UICollectionViewLayoutCreator {
 
             let modifier = ListState(collectionView, contents().zip)
 
-            modifier.rows.forEach {
-                collectionView.register(
-                    Views.CollectionViewCell.self,
-                    forCellWithReuseIdentifier: $0.id
-                )
-            }
-
-            modifier.headers.forEach {
-                collectionView.register(
-                    Views.CollectionReusableView.self,
-                    forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                    withReuseIdentifier: $0.id
-                )
-            }
-
-            modifier.footers.forEach {
-                collectionView.register(
-                    Views.CollectionReusableView.self,
-                    forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-                    withReuseIdentifier: $0.id
-                )
-            }
+            collectionView.register(
+                modifier.rows,
+                modifier.headers,
+                modifier.footers
+            )
 
             collectionView.modifier = modifier
             collectionView.strongDataSource(UICCollectionViewDataSource())
             collectionView.strongDelegate(collectionView.provideDelegate())
+        }
+    }
+}
+
+extension ListSupport where Self: UICollectionView {
+    @usableFromInline
+    func register(
+        _ rows: [List.Identifier<String, Row>],
+        _ headers: [List.Identifier<String, Row>],
+        _ footers: [List.Identifier<String, Row>]) {
+
+        rows.forEach {
+            self.register(
+                Views.CollectionViewCell.self,
+                forCellWithReuseIdentifier: $0.id
+            )
+        }
+
+        headers.forEach {
+            self.register(
+                Views.CollectionReusableView.self,
+                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                withReuseIdentifier: $0.id
+            )
+        }
+
+        footers.forEach {
+            self.register(
+                Views.CollectionReusableView.self,
+                forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+                withReuseIdentifier: $0.id
+            )
         }
     }
 }

@@ -23,21 +23,233 @@
 import ConstraintBuilder
 
 @frozen
-public struct UICModifiedViewController<ViewController>: UIViewControllerCreator where ViewController: CBViewController {
-    private let modifyHandler: (CBViewController) -> Void
+public struct UICNotRenderedModifierController<ViewController>: UIViewControllerCreator where ViewController: CBViewController {
+    private let notRenderedHandler: (CBViewController) -> Void
     private let content: ViewControllerCreator
 
     @usableFromInline
-    init<Content>(_ content: Content, onModify: @escaping (CBViewController) -> Void) where Content: UIViewControllerCreator, Content.ViewController == ViewController {
-        self.content = content
-        self.modifyHandler = onModify
+    init<Content>(_ content: Content, onNotRendered: @escaping (CBViewController) -> Void) where Content: UIViewControllerCreator, Content.ViewController == ViewController {
+        guard let modified = content as? Self else {
+            self.content = content
+            self.notRenderedHandler = onNotRendered
+            return
+        }
+
+        self.content = modified.content
+        self.notRenderedHandler = {
+            modified.notRenderedHandler($0)
+            onNotRendered($0)
+        }
     }
 
     @inline(__always)
     public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
+        (viewCreator as! Self).content.releaseViewController()
+    }
+
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
-        let viewController = _self.content.releaseViewController()
-        _self.modifyHandler(viewController)
-        return viewController
+        
+        return Views.ViewControllerAdaptor((viewCreator as! Self).releaseViewController())
+            .onNotRendered {
+                _self.notRenderedHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
+            }
+    }
+}
+
+@frozen
+public struct UICRenderedModifierController<ViewController>: UIViewControllerCreator where ViewController: CBViewController {
+    private let renderedHandler: (CBViewController) -> Void
+    private let content: ViewControllerCreator
+
+    @usableFromInline
+    init<Content>(_ content: Content, onRendered: @escaping (CBViewController) -> Void) where Content: UIViewControllerCreator, Content.ViewController == ViewController {
+        guard let modified = content as? Self else {
+            self.content = content
+            self.renderedHandler = onRendered
+            return
+        }
+
+        self.content = modified.content
+        self.renderedHandler = {
+            modified.renderedHandler($0)
+            onRendered($0)
+        }
+    }
+
+    @inline(__always)
+    public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
+        (viewCreator as! Self).content.releaseViewController()
+    }
+
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return Views.ViewControllerAdaptor((viewCreator as! Self).releaseViewController())
+            .onRendered {
+                _self.renderedHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
+            }
+    }
+}
+
+@frozen
+public struct UICInTheSceneModifierController<ViewController>: UIViewControllerCreator where ViewController: CBViewController {
+    private let inTheSceneHandler: (CBViewController) -> Void
+    private let content: ViewControllerCreator
+
+    @usableFromInline
+    init<Content>(_ content: Content, onInTheScene: @escaping (CBViewController) -> Void) where Content: UIViewControllerCreator, Content.ViewController == ViewController {
+        guard let modified = content as? Self else {
+            self.content = content
+            self.inTheSceneHandler = onInTheScene
+            return
+        }
+
+        self.content = modified.content
+        self.inTheSceneHandler = {
+            modified.inTheSceneHandler($0)
+            onInTheScene($0)
+        }
+    }
+
+    @inline(__always)
+    public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
+        (viewCreator as! Self).content.releaseViewController()
+    }
+
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return Views.ViewControllerAdaptor((viewCreator as! Self).releaseViewController())
+            .onInTheScene {
+                _self.inTheSceneHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
+            }
+    }
+}
+
+@frozen
+public struct UICLayoutModifierController<ViewController>: UIViewControllerCreator where ViewController: CBViewController {
+    private let layoutHandler: (CBViewController) -> Void
+    private let content: ViewControllerCreator
+
+    @usableFromInline
+    init<Content>(_ content: Content, onLayout: @escaping (CBViewController) -> Void) where Content: UIViewControllerCreator, Content.ViewController == ViewController {
+        guard let modified = content as? Self else {
+            self.content = content
+            self.layoutHandler = onLayout
+            return
+        }
+
+        self.content = modified.content
+        self.layoutHandler = {
+            modified.layoutHandler($0)
+            onLayout($0)
+        }
+    }
+
+    @inline(__always)
+    public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
+        (viewCreator as! Self).content.releaseViewController()
+    }
+
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return Views.ViewControllerAdaptor((viewCreator as! Self).releaseViewController())
+            .onLayout {
+                _self.layoutHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
+            }
+    }
+}
+
+@frozen
+public struct UICAppearModifierController<ViewController>: UIViewControllerCreator where ViewController: CBViewController {
+    private let appearHandler: (CBViewController) -> Void
+    private let content: ViewControllerCreator
+
+    @usableFromInline
+    init<Content>(_ content: Content, onAppear: @escaping (CBViewController) -> Void) where Content: UIViewControllerCreator, Content.ViewController == ViewController {
+        guard let modified = content as? Self else {
+            self.content = content
+            self.appearHandler = onAppear
+            return
+        }
+
+        self.content = modified.content
+        self.appearHandler = {
+            modified.appearHandler($0)
+            onAppear($0)
+        }
+    }
+
+    @inline(__always)
+    public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
+        (viewCreator as! Self).content.releaseViewController()
+    }
+
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return Views.ViewControllerAdaptor((viewCreator as! Self).releaseViewController())
+            .onAppear {
+                _self.appearHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
+            }
+    }
+}
+
+@frozen
+public struct UICDisappearModifierController<ViewController>: UIViewControllerCreator where ViewController: CBViewController {
+    private let disappearHandler: (CBViewController) -> Void
+    private let content: ViewControllerCreator
+
+    @usableFromInline
+    init<Content>(_ content: Content, onDisappear: @escaping (CBViewController) -> Void) where Content: UIViewControllerCreator, Content.ViewController == ViewController {
+        guard let modified = content as? Self else {
+            self.content = content
+            self.disappearHandler = onDisappear
+            return
+        }
+
+        self.content = modified.content
+        self.disappearHandler = {
+            modified.disappearHandler($0)
+            onDisappear($0)
+        }
+    }
+
+    @inline(__always)
+    public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
+        (viewCreator as! Self).content.releaseViewController()
+    }
+
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return Views.ViewControllerAdaptor((viewCreator as! Self).releaseViewController())
+            .onDisappear {
+                _self.disappearHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
+            }
+    }
+}
+
+@frozen
+public struct UICModifiedViewController<ViewController>: UIViewControllerCreator where ViewController: CBViewController {
+    private let viewControllerCreator: ViewControllerCreator
+
+    @inline(__always)
+    fileprivate init<Content>(_ viewControllerCreator: Content) where Content: UIViewControllerCreator, Content.ViewController == ViewController {
+        self.viewControllerCreator = viewControllerCreator
+    }
+
+    @inline(__always)
+    public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
+        (viewCreator as! Self).viewControllerCreator.releaseViewController()
+    }
+}
+
+public extension UIViewControllerCreator {
+    @inline(__always)
+    func eraseToModifiedViewController() -> UICModifiedViewController<ViewController> {
+        UICModifiedViewController(self)
     }
 }

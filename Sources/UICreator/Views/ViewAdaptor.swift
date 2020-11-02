@@ -36,7 +36,6 @@ extension Views {
             self.adaptedView = .strong(view)
             super.init(frame: .zero)
             self.makeSelfImplemented()
-            view.adaptedByView = self
         }
 
         override init(frame: CGRect) {

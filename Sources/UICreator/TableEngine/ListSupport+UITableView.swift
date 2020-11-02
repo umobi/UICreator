@@ -29,22 +29,37 @@ extension ListSupport where Self: UITableView {
         self.onNotRendered {
             let modifier = ListState(self, contents().zip)
             let tableView: Self! = $0 as? Self
-            
-            modifier.rows.forEach {
-                tableView.register(Views.TableViewCell.self, forCellReuseIdentifier: $0.id)
-            }
 
-            modifier.headers.forEach {
-                tableView.register(Views.TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0.id)
-            }
-
-            modifier.footers.forEach {
-                tableView.register(Views.TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0.id)
-            }
+            tableView.register(
+                modifier.rows,
+                modifier.headers,
+                modifier.footers
+            )
 
             tableView.modifier = modifier
             tableView.strongDataSource(UICTableViewDataSource())
             tableView.strongDelegate(UICTableViewDelegate())
+        }
+    }
+}
+
+extension ListSupport where Self: UITableView {
+    @usableFromInline
+    func register(
+        _ rows: [List.Identifier<String, Row>],
+        _ headers: [List.Identifier<String, Row>],
+        _ footers: [List.Identifier<String, Row>]) {
+
+        rows.forEach {
+            self.register(Views.TableViewCell.self, forCellReuseIdentifier: $0.id)
+        }
+
+        headers.forEach {
+            self.register(Views.TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0.id)
+        }
+
+        footers.forEach {
+            self.register(Views.TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0.id)
         }
     }
 }

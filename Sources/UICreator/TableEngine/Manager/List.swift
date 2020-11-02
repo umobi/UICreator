@@ -27,6 +27,11 @@ struct List {
     let sections: [List.Frozen<Section, Int>]
 
     @inline(__always)
+    fileprivate init(_ frozenSections: [List.Frozen<Section, Int>]) {
+        self.sections = frozenSections
+    }
+
+    @inline(__always)
     private init(_ listView: ListSupport, rows: [List.Content<ViewCreator>]) {
         self.sections = [.init(Self.section(listView, rows, at: .zero), Int.zero)]
     }
@@ -189,7 +194,32 @@ extension List {
 
 extension List {
     static func rebuild(_ listView: ListSupport!, _ contents: [UICRow], at indexPath: IndexPath) {
-        print("RowsDidChange")
+        guard let oldList = listView.modifier?.state else {
+            fatalError()
+        }
+
+        let sectionThatNeedsToBeUpdated = oldList.sections[indexPath.section]
+        let leftRows = sectionThatNeedsToBeUpdated.content.rows[0..<indexPath.row]
+        let rightRows = sectionThatNeedsToBeUpdated.content.rows[indexPath.row..<sectionThatNeedsToBeUpdated.content.rows.count].filter { $0.index != indexPath }
+
+        let rowsToUpdate = List(listView, contents).sections.first?.content.rows.map {
+            Frozen($0.content, indexPath)
+        } ?? []
+
+        let updatedSection = Frozen(
+            Section(
+                header: sectionThatNeedsToBeUpdated.content.header,
+                footer: sectionThatNeedsToBeUpdated.content.footer,
+                rows: leftRows + rowsToUpdate + rightRows
+            ),
+            sectionThatNeedsToBeUpdated.index
+        )
+
+        let updatedSections = oldList.sections[0..<indexPath.section]
+            + [updatedSection]
+            + oldList.sections[indexPath.section+1..<oldList.sections.count]
+
+        listView.invalidateState(.init(Array(updatedSections)))
     }
 
     static func rebuild(_ listView: ListSupport!, _ sections: [UICSection], at index: Int) {

@@ -20,24 +20,37 @@
 // THE SOFTWARE.
 //
 
-import Foundation
 import UIKit
 import ConstraintBuilder
 
-public extension UIViewControllerCreator where ViewController: ViewControllers.PageViewController {
-    #if os(iOS)
-    @inlinable
-    func spineLocation(_ handler: @escaping (UIInterfaceOrientation) -> UIPageViewController.SpineLocation) -> UICInTheSceneModifierController<ViewController> {
-        self.onInTheScene {
-            ($0 as? ViewController)?.spineLocationHandler = handler
+@frozen
+public struct UICRenderedModifier<View>: UIViewCreator where View: CBView {
+    private let renderedHandler: (CBView) -> Void
+    private let content: ViewCreator
+
+    @usableFromInline
+    internal init<Content>(_ content: Content, onRendered: @escaping (CBView) -> Void) where Content: UIViewCreator, Content.View == View {
+        guard let modified = content as? Self else {
+            self.content = content
+            self.renderedHandler = onRendered
+            return
+        }
+
+        self.content = modified.content
+        self.renderedHandler = {
+            modified.renderedHandler($0)
+            onRendered($0)
         }
     }
-    #endif
 
-    @inlinable
-    func isInfinityScroll(_ flag: Bool) -> UICInTheSceneModifierController<ViewController> {
-        self.onInTheScene {
-            ($0 as? ViewController)?.isInfinityScroll = flag
-        }
+    @inline(__always)
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return _self.content
+            .releaseUIView()
+            .orDynamic(View.self)
+            .onRendered(_self.renderedHandler)
+            .reset()
     }
 }

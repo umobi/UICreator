@@ -30,20 +30,8 @@ public protocol ViewCreator {
 
 extension ViewCreator {
 
-    @inline(__always) @inlinable
-    func operationUIView() -> CBView {
-        Self._makeUIView(self)
-            .dynamicView
-    }
-
     @inlinable
     func releaseUIView() -> CBView {
-        {
-            if let viewAdaptor = $0.adaptedByView {
-                return viewAdaptor
-            }
-
-            return $0
-        }(Self._makeUIView(self))
+        Self._makeUIView(self)
     }
 }
