@@ -26,7 +26,7 @@ import UIKit
 extension ListSupport where Self: UITableView {
     @discardableResult
     func dynamicData(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> Self {
-        self.onNotRendered {
+        self.onInTheScene {
             let modifier = ListState(self, contents().zip)
             let tableView: Self! = $0 as? Self
 

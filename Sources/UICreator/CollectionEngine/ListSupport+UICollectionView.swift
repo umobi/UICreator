@@ -26,7 +26,7 @@ import UIKit
 extension ListSupport where Self: UICollectionViewLayoutCreator {
     @discardableResult
     func dynamicData(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> Self {
-        self.onNotRendered {
+        self.onInTheScene {
             let collectionView: Self! = $0 as? Self
 
             let modifier = ListState(collectionView, contents().zip)
