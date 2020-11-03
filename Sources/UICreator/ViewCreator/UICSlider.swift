@@ -49,30 +49,34 @@ public struct UICSlider: UIViewCreator {
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let minimumValue = _self.$minimumValue
+        let maximumValue = _self.$maximumValue
+        let value = _self.$value
+
         return View()
             .onNotRendered {
                 weak var view = $0 as? View
 
-                _self.$minimumValue.sync {
+                minimumValue.sync {
                     view?.minimumValue = Float($0)
                 }
             }
             .onNotRendered {
                 weak var view = $0 as? View
 
-                _self.$maximumValue.sync {
+                maximumValue.sync {
                     view?.maximumValue = Float($0)
                 }
             }
             .onNotRendered {
                 weak var view = $0 as? View
 
-                _self.$value.distinctSync {
+                value.distinctSync {
                     view?.value = Float($0)
                 }
             }
             .onEvent(.valueChanged) {
-                _self.value = Double(($0 as! View).value)
+                value.wrappedValue = Double(($0 as! View).value)
             }
     }
 }

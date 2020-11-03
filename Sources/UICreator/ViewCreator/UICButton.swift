@@ -30,7 +30,7 @@ public struct UICButton: UIViewCreator {
 
     @usableFromInline
     enum Content {
-        case `dynamic`(() -> ViewCreator)
+        case `dynamic`(ViewCreator)
         case title(String)
         case style(UIButton.ButtonType)
     }
@@ -46,8 +46,8 @@ public struct UICButton: UIViewCreator {
         self.content = .style(style)
     }
 
-    public init(content: @escaping () -> ViewCreator) {
-        self.content = .dynamic(content)
+    public init(content: () -> ViewCreator) {
+        self.content = .dynamic(content())
     }
 
     @inline(__always)
@@ -58,7 +58,7 @@ public struct UICButton: UIViewCreator {
         case .dynamic(let content):
             return Views.Button()
                 .onNotRendered {
-                    $0.add(content().releaseUIView())
+                    $0.add(content.releaseUIView())
                 }
 
         case .style(let style):

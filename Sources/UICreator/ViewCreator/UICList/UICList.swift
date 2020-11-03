@@ -91,15 +91,17 @@ public extension UIViewCreator where View: UITableView {
     }
 
     @inlinable
-    func background(_ content: @escaping () -> ViewCreator) -> UICInTheSceneModifier<View> {
-        self.onInTheScene { tableView in
+    func background(_ content: () -> ViewCreator) -> UICInTheSceneModifier<View> {
+        let content = content()
+
+        return self.onInTheScene { tableView in
             weak var tableView = tableView
 
             ResizeView(superview: (tableView as? View)?.backgroundView)
                 .onAdd {
                     (tableView as? View)?.backgroundView = $0
                 }.addSubview(
-                    UICAnyView(content()).releaseUIView()
+                    UICAnyView(content).releaseUIView()
                 )
                 .height(.required)
                 .width(.required)
@@ -146,15 +148,17 @@ public extension UIViewCreator where View: UITableView {
     }
 
     @inlinable
-    func header(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> UICInTheSceneModifier<View> {
-        self.onInTheScene { tableView in
+    func header(size: CGSize? = nil, _ content: () -> ViewCreator) -> UICInTheSceneModifier<View> {
+        let content = content()
+
+        return self.onInTheScene { tableView in
             weak var tableView = tableView
 
             ResizeView(size: size, superview: (tableView as? View)?.tableHeaderView)
                 .onAdd {
                     (tableView as? View)?.tableHeaderView = $0
                 }.addSubview(
-                    UICAnyView(content()).releaseUIView()
+                    UICAnyView(content).releaseUIView()
                 )
                 .width(.required)
                 .watch(in: tableView)
@@ -162,15 +166,17 @@ public extension UIViewCreator where View: UITableView {
     }
 
     @inlinable
-    func footer(size: CGSize? = nil, _ content: @escaping () -> ViewCreator) -> UICInTheSceneModifier<View> {
-        self.onInTheScene { tableView in
+    func footer(size: CGSize? = nil, _ content: () -> ViewCreator) -> UICInTheSceneModifier<View> {
+        let content = content()
+
+        return self.onInTheScene { tableView in
             weak var tableView = tableView
 
             ResizeView(size: size, superview: (tableView as? View)?.tableFooterView)
                 .onAdd {
                     (tableView as? View)?.tableFooterView = $0
                 }.addSubview(
-                    UICAnyView(content()).releaseUIView()
+                    UICAnyView(content).releaseUIView()
                 )
                 .width(.required)
                 .watch(in: tableView)

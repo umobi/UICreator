@@ -26,9 +26,11 @@ import UIKit
 #if os(iOS)
 public extension UIViewCreator {
     @inlinable
-    func toolbar(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> UICInTheSceneModifier<View> {
-        self.onInTheScene {
-            $0.nearVCFromNavigation()?.toolbarItems = contents().zip.map { view in
+    func toolbar(@UICViewBuilder _ contents: () -> ViewCreator) -> UICInTheSceneModifier<View> {
+        let contents = contents().zip
+
+        return self.onInTheScene {
+            $0.nearVCFromNavigation()?.toolbarItems = contents.map { view in
                 UIBarButtonItem(customView: UICAnyView(view).releaseUIView())
             }
         }
@@ -109,9 +111,11 @@ public extension UIViewCreator {
     }
 
     @inlinable
-    func navigation(titleView content: @escaping () -> ViewCreator) -> UICInTheSceneModifier<View> {
-        self.onInTheScene {
-            $0.navigationItem.titleView = UICAnyView(content()).releaseUIView()
+    func navigation(titleView content: () -> ViewCreator) -> UICInTheSceneModifier<View> {
+        let content = content()
+
+        return self.onInTheScene {
+            $0.navigationItem.titleView = UICAnyView(content).releaseUIView()
         }
     }
 
@@ -133,8 +137,10 @@ public extension UIViewCreator {
 
     #if os(iOS)
     @inlinable
-    func navigation(backButton content: @escaping () -> ViewCreator) -> UICInTheSceneModifier<View> {
-        self.onInTheScene {
+    func navigation(backButton content: () -> ViewCreator) -> UICInTheSceneModifier<View> {
+        let content = content()
+
+        return self.onInTheScene {
             $0.navigationItem.backBarButtonItem = .init(
                 title: "",
                 style: .plain,
@@ -148,7 +154,7 @@ public extension UIViewCreator {
             }
 
             $0.navigationItem.setLeftBarButton(
-                .init(customView: UICAnyView(content()).releaseUIView()),
+                .init(customView: UICAnyView(content).releaseUIView()),
                 animated: false
             )
         }
@@ -156,40 +162,48 @@ public extension UIViewCreator {
     #endif
 
     @inlinable
-    func navigation(leftButton content: @escaping () -> ViewCreator) -> UICInTheSceneModifier<View> {
-        self.onInTheScene {
+    func navigation(leftButton content: () -> ViewCreator) -> UICInTheSceneModifier<View> {
+        let content = content()
+
+        return self.onInTheScene {
             $0.navigationItem.setLeftBarButton(
-                .init(customView: UICAnyView(content()).releaseUIView()),
+                .init(customView: UICAnyView(content).releaseUIView()),
                 animated: false
             )
         }
     }
 
     @inlinable
-    func navigation(@UICViewBuilder leftButtons contents: @escaping () -> ViewCreator) -> UICInTheSceneModifier<View> {
-        self.onInTheScene {
+    func navigation(@UICViewBuilder leftButtons contents: () -> ViewCreator) -> UICInTheSceneModifier<View> {
+        let contents = contents().zip
+
+        return self.onInTheScene {
             $0.navigationItem
-                .setLeftBarButtonItems(contents().zip.map { view in
+                .setLeftBarButtonItems(contents.map { view in
                     .init(customView: UICAnyView(view).releaseUIView())
                 }, animated: false)
         }
     }
 
     @inlinable
-    func navigation(rightButton content: @escaping () -> ViewCreator) -> UICInTheSceneModifier<View> {
-        self.onInTheScene {
+    func navigation(rightButton content: () -> ViewCreator) -> UICInTheSceneModifier<View> {
+        let content = content()
+
+        return self.onInTheScene {
             $0.navigationItem.setRightBarButton(
-                .init(customView: UICAnyView(content()).releaseUIView()),
+                .init(customView: UICAnyView(content).releaseUIView()),
                 animated: false
             )
         }
     }
 
     @inlinable
-    func navigation(@UICViewBuilder rightButtons contents: @escaping () -> ViewCreator) -> UICInTheSceneModifier<View> {
-        self.onInTheScene {
+    func navigation(@UICViewBuilder rightButtons contents: () -> ViewCreator) -> UICInTheSceneModifier<View> {
+        let contents = contents().zip
+
+        return self.onInTheScene {
             $0.navigationItem
-                .setRightBarButtonItems(contents().zip.map { view in
+                .setRightBarButtonItems(contents.map { view in
                     .init(customView: UICAnyView(view).releaseUIView())
                 }, animated: false)
         }

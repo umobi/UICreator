@@ -51,20 +51,23 @@ public struct UICPageControl: UIViewCreator {
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let numberOfPages = _self.$numberOfPages
+        let currentPage = _self.$currentPage
+
         return Views.PageControl()
             .onNotRendered {
                 weak var view = $0 as? View
 
-                _self.$numberOfPages.sync {
+                numberOfPages.sync {
                     view?.numberOfPages = $0
                 }
 
-                _self.$currentPage.distinctSync {
+                currentPage.distinctSync {
                     view?.currentPage = $0
                 }
             }
             .onEvent(.valueChanged) {
-                _self.currentPage = ($0 as? View)?.currentPage ?? .zero
+                currentPage.wrappedValue = ($0 as? View)?.currentPage ?? .zero
             }
     }
 }

@@ -43,14 +43,16 @@ public struct UICSwitch: UIViewCreator {
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let isOn = _self.$isOn
+
         return Views.Switch()
             .onEvent(.valueChanged) {
-                _self.isOn = ($0 as? View)?.isOn ?? false
+                isOn.wrappedValue = ($0 as? View)?.isOn ?? false
             }
             .onNotRendered {
                 weak var view = $0 as? View
 
-                _self.$isOn.distinctSync {
+                isOn.distinctSync {
                     view?.isOn = $0
                 }
             }

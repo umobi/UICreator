@@ -29,11 +29,11 @@ public struct UICRounder: UIViewCreator {
     public typealias View = Views.RounderView
 
     let radius: CGFloat
-    let content: () -> ViewCreator
+    let content: ViewCreator
 
-    public init(radius: CGFloat, content: @escaping () -> ViewCreator) {
+    public init(radius: CGFloat, content: () -> ViewCreator) {
         self.radius = radius
-        self.content = content
+        self.content = content()
     }
 
     @inline(__always)
@@ -43,7 +43,7 @@ public struct UICRounder: UIViewCreator {
         return View()
             .onNotRendered {
                 ($0 as? View)?.radius = _self.radius
-                ($0 as? View)?.addContent(_self.content().releaseUIView())
+                ($0 as? View)?.addContent(_self.content.releaseUIView())
             }
     }
 }

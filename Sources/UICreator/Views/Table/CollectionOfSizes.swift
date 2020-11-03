@@ -186,7 +186,7 @@ struct CollectionOfSizes {
 }
 
 private extension Array {
-    func binaryInsert(_ searchItemHandler: @escaping (Element) -> ComparisonResult) -> Int {
+    func binaryInsert(_ searchItemHandler: (Element) -> ComparisonResult) -> Int {
         var start = self.startIndex
         var end = self.endIndex
         while start < end {
@@ -202,7 +202,7 @@ private extension Array {
         return start
     }
 
-    func binarySearch(_ searchItemHandler: @escaping (Element) -> ComparisonResult) -> Element? {
+    func binarySearch(_ searchItemHandler: (Element) -> ComparisonResult) -> Element? {
         var lowerIndex = 0
         var upperIndex = self.count - 1
 

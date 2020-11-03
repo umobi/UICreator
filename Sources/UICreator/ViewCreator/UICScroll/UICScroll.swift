@@ -29,13 +29,13 @@ public struct UICScroll: UIViewCreator {
     public typealias View = UIScrollView
 
     @Relay var axis: Axis
-    let content: () -> ViewCreator
+    let content: ViewCreator
 
     public init(
         axis: Relay<Axis>,
-        content: @escaping () -> ViewCreator) {
+        content: () -> ViewCreator) {
 
-        self.content = content
+        self.content = content()
         self._axis = axis
     }
 
@@ -45,7 +45,7 @@ public struct UICScroll: UIViewCreator {
 
         return Views.ScrollView(_self.axis)
             .onNotRendered {
-                ($0 as? Views.ScrollView)?.addContent(_self.content().releaseUIView())
+                ($0 as? Views.ScrollView)?.addContent(_self.content.releaseUIView())
             }
             .onNotRendered {
                 weak var view = $0 as? Views.ScrollView

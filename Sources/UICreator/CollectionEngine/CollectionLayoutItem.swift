@@ -50,7 +50,7 @@ struct UICCollectionLayoutModifiedItem: CollectionLayoutConstraintable {
         self.delegate = original.delegate
     }
 
-    private func edit(_ edit: @escaping (Editable) -> Void) -> Self {
+    private func edit(_ edit: (Editable) -> Void) -> Self {
         let editable = Editable(self)
         edit(editable)
         return .init(self, editable: editable)

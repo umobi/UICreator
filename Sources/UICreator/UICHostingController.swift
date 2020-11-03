@@ -12,7 +12,7 @@ import ConstraintBuilder
 public class UICHostingController: UIViewController {
     private let viewCreator: ViewCreator
 
-    public init(content: @escaping () -> ViewCreator) {
+    public init(content: () -> ViewCreator) {
         self.viewCreator = content()
         super.init(nibName: nil, bundle: nil)
     }

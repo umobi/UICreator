@@ -31,7 +31,7 @@ public struct UICTabItem {
     let selectedImage: UIImage?
     let tabSystem: UITabBarItem.SystemItem?
     let tag: Int
-    let content: () -> ViewCreator
+    let content: ViewCreator
 
     private let collection: [UICTabItem]?
 
@@ -46,18 +46,16 @@ public struct UICTabItem {
     init(_ collection: [UICTabItem]) {
         self.collection = collection
         self.title = nil
-        self.content = {
-            fatalError()
-        }
+        self.content = UICEmptyView()
         self.image = nil
         self.selectedImage = nil
         self.tabSystem = nil
         self.tag = 0
     }
 
-    public init(content: @escaping () -> ViewCreator) {
+    public init(content: () -> ViewCreator) {
         self.title = nil
-        self.content = content
+        self.content = content()
         self.image = nil
         self.selectedImage = nil
         self.tabSystem = nil
@@ -65,9 +63,9 @@ public struct UICTabItem {
         self.collection = nil
     }
 
-    public init(_ title: String, content: @escaping () -> ViewCreator) {
+    public init(_ title: String, content: () -> ViewCreator) {
         self.title = title
-        self.content = content
+        self.content = content()
         self.image = nil
         self.selectedImage = nil
         self.tabSystem = nil
@@ -75,9 +73,9 @@ public struct UICTabItem {
         self.collection = nil
     }
 
-    public init(_ image: UICImage, content: @escaping () -> ViewCreator) {
+    public init(_ image: UICImage, content: () -> ViewCreator) {
         self.title = nil
-        self.content = content
+        self.content = content()
         self.image = image.uiImage
         self.selectedImage = nil
         self.tabSystem = nil
@@ -182,7 +180,7 @@ extension UICTabItem {
     }
 
     @inline(__always) @usableFromInline
-    func edit(_ edit: @escaping (Editable) -> Void) -> Self {
+    func edit(_ edit: (Editable) -> Void) -> Self {
         let editable = Editable(self)
         edit(editable)
         return .init(self, editable: editable)

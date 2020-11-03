@@ -31,7 +31,7 @@ public struct UICMenu: UICMenuElement {
     let title: String?
     let image: UIImage?
     let options: Set<Options>
-    let provider: (() -> ViewCreator)?
+    let provider: ViewCreator?
 
     @frozen
     public enum Options {
@@ -96,7 +96,7 @@ extension UICMenu {
         var options: Set<Options>
 
         @MutableBox @usableFromInline
-        var provider: (() -> ViewCreator)?
+        var provider: ViewCreator?
 
         @usableFromInline
         init(_ original: UICMenu) {
@@ -142,16 +142,16 @@ public extension UICMenu {
     }
 
     @inlinable
-    func provider(_ content: @escaping () -> ViewCreator) -> Self {
+    func provider(_ content: () -> ViewCreator) -> Self {
         self.edit {
-            $0.provider = content
+            $0.provider = content()
         }
     }
 }
 
 public extension UICMenu {
     @inlinable
-    func children(@UICMenuBuilder _ contents: @escaping () -> UICMenuElement) -> Self {
+    func children(@UICMenuBuilder _ contents: () -> UICMenuElement) -> Self {
         self.edit {
             $0.children = contents().zip
         }
@@ -190,10 +190,12 @@ extension UICMenu.Options {
 #if os(iOS)
 public extension UIViewCreator {
     @inlinable @available(iOS 13, *)
-    func contextMenu(_ content: @escaping () -> UICMenu) -> UICInTheSceneModifier<View> {
-        self.onInTheScene {
+    func contextMenu(_ content: () -> UICMenu) -> UICInTheSceneModifier<View> {
+        let content = content()
+
+        return self.onInTheScene {
             $0.addInteraction(UIContextMenuInteraction.interaction(
-                UICMenu.Delegate(content())
+                UICMenu.Delegate(content)
             ))
         }
     }

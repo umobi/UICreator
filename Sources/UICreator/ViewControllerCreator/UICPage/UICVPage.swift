@@ -35,7 +35,7 @@ public struct UICVPage: UIViewControllerCreator {
     public init(
         currentPage: Relay<Int>,
         spacing: CGFloat = .zero,
-        @UICViewBuilder contents: @escaping () -> ViewCreator) {
+        @UICViewBuilder contents: () -> ViewCreator) {
 
         self._currentPage = currentPage
         self.spacing = spacing
@@ -46,6 +46,8 @@ public struct UICVPage: UIViewControllerCreator {
     public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
         let _self = viewCreator as! Self
 
+        let currentPage = _self.$currentPage
+
         let pageController = ViewControllers.PageViewController(
             transitionStyle: .scroll,
             navigationOrientation: .vertical,
@@ -55,10 +57,10 @@ public struct UICVPage: UIViewControllerCreator {
                     UICHostingController(rootView: $0)
                 }
             }(),
-            onPageChanged: { _self.currentPage = $0 }
+            onPageChanged: { currentPage.wrappedValue = $0 }
         )
 
-        _self.$currentPage.distinctSync { [weak pageController] in
+        currentPage.distinctSync { [weak pageController] in
             pageController?.currentPage = $0
         }
 

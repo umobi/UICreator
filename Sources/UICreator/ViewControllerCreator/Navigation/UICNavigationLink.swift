@@ -29,31 +29,28 @@ public struct UICNavigationLink: ViewCreator {
     @Relay private var isPushing: Bool
 
     private let destination: ViewCreator
-    private let content: () -> ViewCreator
+    private let content: ViewCreator
 
     public init(
         _ isPushing: Relay<Bool>,
         destination: ViewCreator,
-        content: @escaping () -> ViewCreator) {
+        content: () -> ViewCreator) {
 
         self._isPushing = isPushing
         self.destination = destination
-        self.content = content
+        self.content = content()
     }
 
     public init(
         destination: ViewCreator,
-        content: @escaping () -> ViewCreator) {
+        content: () -> ViewCreator) {
 
         let value = Value(wrappedValue: false)
 
         self._isPushing = value.projectedValue
         self.destination = destination
-        self.content = {
-            UICAnyView(content())
-                .onTap { _ in
-                    value.wrappedValue = true
-                }
+        self.content = UICAnyView(content()).onTap { _ in
+            value.wrappedValue = true
         }
     }
 
@@ -65,11 +62,8 @@ public struct UICNavigationLink: ViewCreator {
 
         self._isPushing = value.projectedValue
         self.destination = destination(value.projectedValue)
-        self.content = {
-            UICAnyView(content())
-                .onTap { _ in
-                    value.wrappedValue = true
-                }
+        self.content = UICAnyView(content()).onTap { _ in
+            value.wrappedValue = true
         }
     }
 
@@ -77,23 +71,26 @@ public struct UICNavigationLink: ViewCreator {
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
-        return UICAnyView(_self.content())
+        let isPushing = _self.$isPushing
+        let destination = _self.destination
+
+        return UICAnyView(_self.content)
             .onInTheScene {
                 weak var navigationController = $0.navigationController
                 weak var pushingView: UIViewController?
 
-                _self.$isPushing.distinctSync {
+                isPushing.distinctSync {
                     if $0 {
                         guard
                             let navigationController = navigationController,
                             pushingView == nil
                         else { return }
 
-                        let viewController = UICHostingController(rootView: _self.destination)
+                        let viewController = UICHostingController(rootView: destination)
                         pushingView = viewController
                         viewController.onDisappear {
                             if $0.isBeingPoped {
-                                _self.isPushing = false
+                                isPushing.wrappedValue = false
                             }
                         }
 

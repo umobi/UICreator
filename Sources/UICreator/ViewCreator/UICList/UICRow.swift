@@ -26,16 +26,16 @@ import ConstraintBuilder
 
 @frozen
 public struct UICRow: ViewCreator {
-    let content: () -> ViewCreator
+    let content: ViewCreator
 
-    let trailingActions: (() -> RowAction)?
-    let leadingActions: (() -> RowAction)?
+    let trailingActions: [RowAction]
+    let leadingActions: [RowAction]
     let accessoryType: UITableViewCell.AccessoryType
 
-    public init(content: @escaping () -> ViewCreator) {
-        self.content = content
-        self.trailingActions = nil
-        self.leadingActions = nil
+    public init(content: () -> ViewCreator) {
+        self.content = content()
+        self.trailingActions = []
+        self.leadingActions = []
         self.accessoryType = .none
     }
 
@@ -47,8 +47,8 @@ public struct UICRow: ViewCreator {
     }
 
     fileprivate class Editable {
-        var trailingActions: (() -> RowAction)?
-        var leadingActions: (() -> RowAction)?
+        var trailingActions: [RowAction]
+        var leadingActions: [RowAction]
         var accessoryType: UITableViewCell.AccessoryType
 
         init(_ original: UICRow) {
@@ -72,13 +72,13 @@ public struct UICRow: ViewCreator {
 public extension UICRow {
     func trailingActions(@RowActionBuilder _ actions: @escaping () -> RowAction) -> Self {
         self.edit {
-            $0.trailingActions = actions
+            $0.trailingActions = actions().zip
         }
     }
 
     func leadingActions(@RowActionBuilder _ actions: @escaping () -> RowAction) -> Self {
         self.edit {
-            $0.leadingActions = actions
+            $0.leadingActions = actions().zip
         }
     }
 

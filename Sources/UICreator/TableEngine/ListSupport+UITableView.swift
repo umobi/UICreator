@@ -25,20 +25,24 @@ import UIKit
 
 extension ListSupport where Self: UITableView {
     @discardableResult
-    func dynamicData(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> Self {
-        self.onInTheScene {
-            let modifier = ListState(self, contents().zip)
-            let tableView: Self! = $0 as? Self
+    func dynamicData(@UICViewBuilder _ contents: () -> ViewCreator) -> Self {
+        let contents = contents().zip
 
-            tableView.register(
-                modifier.rows,
-                modifier.headers,
-                modifier.footers
-            )
+        return self.onInTheScene { view in
+            OperationQueue.main.addOperation {
+                let modifier = ListState(self, contents)
+                let tableView: Self! = view as? Self
 
-            tableView.modifier = modifier
-            tableView.strongDataSource(UICTableViewDataSource())
-            tableView.strongDelegate(UICTableViewDelegate())
+                tableView.register(
+                    modifier.rows,
+                    modifier.headers,
+                    modifier.footers
+                )
+
+                tableView.modifier = modifier
+                tableView.strongDelegate(UICTableViewDelegate())
+                tableView.strongDataSource(UICTableViewDataSource())
+            }
         }
     }
 }

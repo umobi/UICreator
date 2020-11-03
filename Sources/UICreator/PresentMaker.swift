@@ -32,10 +32,10 @@ public struct PresentMaker {
     @usableFromInline
     let animated: Bool
     @usableFromInline
-    let viewToPresent: () -> ViewCreator
+    let viewToPresent: ViewCreator
 
-    public init(_ content: @escaping () -> ViewCreator) {
-        self.viewToPresent = content
+    public init(_ content: () -> ViewCreator) {
+        self.viewToPresent = content()
         self.onCompletion = nil
         if #available(iOS 13, tvOS 13, *) {
             self.presentingStyle = .automatic
@@ -115,7 +115,7 @@ extension PresentMaker {
     }
 
     @usableFromInline @inline(__always)
-    func edit(_ edit: @escaping (Editable) -> Void) -> Self {
+    func edit(_ edit: (Editable) -> Void) -> Self {
         let editable = Editable(self)
         edit(editable)
         return .init(self, editable: editable)

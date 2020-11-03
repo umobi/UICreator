@@ -49,10 +49,12 @@ public struct UICNotRenderedModifierController<ViewController>: UIViewController
 
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
-        
+
+        let notRenderedHandler = _self.notRenderedHandler
+
         return Views.ViewControllerAdaptor((viewCreator as! Self).releaseViewController())
             .onNotRendered {
-                _self.notRenderedHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
+                notRenderedHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
             }
     }
 }
@@ -85,9 +87,10 @@ public struct UICRenderedModifierController<ViewController>: UIViewControllerCre
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let renderedHandler = _self.renderedHandler
         return Views.ViewControllerAdaptor((viewCreator as! Self).releaseViewController())
             .onRendered {
-                _self.renderedHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
+                renderedHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
             }
     }
 }
@@ -120,9 +123,11 @@ public struct UICInTheSceneModifierController<ViewController>: UIViewControllerC
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let inTheSceneHandler = _self.inTheSceneHandler
+
         return Views.ViewControllerAdaptor((viewCreator as! Self).releaseViewController())
             .onInTheScene {
-                _self.inTheSceneHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
+                inTheSceneHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
             }
     }
 }
@@ -155,9 +160,11 @@ public struct UICLayoutModifierController<ViewController>: UIViewControllerCreat
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let layoutHandler = _self.layoutHandler
+
         return Views.ViewControllerAdaptor((viewCreator as! Self).releaseViewController())
             .onLayout {
-                _self.layoutHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
+                layoutHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
             }
     }
 }
@@ -190,9 +197,10 @@ public struct UICAppearModifierController<ViewController>: UIViewControllerCreat
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let appearHandler = _self.appearHandler
         return Views.ViewControllerAdaptor((viewCreator as! Self).releaseViewController())
             .onAppear {
-                _self.appearHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
+                appearHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
             }
     }
 }
@@ -225,9 +233,10 @@ public struct UICDisappearModifierController<ViewController>: UIViewControllerCr
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let disappearHandler = _self.disappearHandler
         return Views.ViewControllerAdaptor((viewCreator as! Self).releaseViewController())
             .onDisappear {
-                _self.disappearHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
+                disappearHandler(($0 as! Views.ViewControllerAdaptor).dynamicViewController)
             }
     }
 }

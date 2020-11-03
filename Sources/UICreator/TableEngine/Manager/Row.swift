@@ -29,20 +29,20 @@ struct Row {
     let type: ContentType
 
     init(_ header: UICHeader, _ index: Int) {
-        self.content = header.content()
+        self.content = header.content
         self.type = .header(index)
     }
 
     init(_ footer: UICFooter, _ index: Int) {
-        self.content = footer.content()
+        self.content = footer.content
         self.type = .footer(index)
     }
 
     init(_ row: UICRow, _ indexPath: IndexPath) {
-        self.content = row.content()
+        self.content = row.content
         self.type = .row(
-            trailingActions: row.trailingActions?().zip ?? [],
-            leadingActions: row.leadingActions?().zip ?? [],
+            trailingActions: row.trailingActions,
+            leadingActions: row.leadingActions,
             accessoryType: row.accessoryType,
             indexPath: indexPath
         )

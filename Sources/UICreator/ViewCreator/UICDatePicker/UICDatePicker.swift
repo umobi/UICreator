@@ -78,6 +78,10 @@ public struct UICDatePicker: UIViewCreator {
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let minimumDate = _self.$minimumDate
+        let maximumDate = _self.$maximumDate
+        let selectedDate = _self.$selectedDate
+
         return Views.DatePicker()
             .onNotRendered {
                 if #available(iOS 13.4, *) {
@@ -92,15 +96,15 @@ public struct UICDatePicker: UIViewCreator {
             .onNotRendered {
                 weak var view = $0 as? View
 
-                _self.$minimumDate.sync {
+                minimumDate.sync {
                     view?.minimumDate = $0
                 }
 
-                _self.$maximumDate.sync {
+                maximumDate.sync {
                     view?.maximumDate = $0
                 }
 
-                _self.$maximumDate.distinctSync {
+                selectedDate.distinctSync {
                     guard let date = $0 else {
                         return
                     }
@@ -109,7 +113,7 @@ public struct UICDatePicker: UIViewCreator {
                 }
             }
             .onEvent(.valueChanged) {
-                _self.selectedDate = ($0 as? View)?.date
+                selectedDate.wrappedValue = ($0 as? View)?.date
             }
     }
 }

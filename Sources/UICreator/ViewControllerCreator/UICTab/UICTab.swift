@@ -44,12 +44,14 @@ public struct UICTab: UIViewControllerCreator {
         let tabController = UITabBarController()
         tabController.setViewControllers(_self.contents)
 
-        _self.$selectedItem.distinctSync { [weak tabController] in
+        let selectedItem = _self.$selectedItem
+
+        selectedItem.distinctSync { [weak tabController] in
             tabController?.selectedIndex($0)
         }
 
         tabController.onDidSelect {
-            _self.selectedItem = $0.selectedIndex
+            selectedItem.wrappedValue = $0.selectedIndex
         }
 
         return tabController

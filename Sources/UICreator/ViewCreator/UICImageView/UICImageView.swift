@@ -66,6 +66,8 @@ public struct UICImageView: UIViewCreator {
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let placeholder = _self.placeholder
+
         return Views.ImageView()
             .onNotRendered {
                 weak var view = $0 as? View
@@ -78,7 +80,7 @@ public struct UICImageView: UIViewCreator {
                 weak var view = $0 as? View
 
                 _self.$image.sync {
-                    view?.image = ($0 ?? _self.placeholder)?.uiImage
+                    view?.image = ($0 ?? placeholder)?.uiImage
                 }
             }
     }

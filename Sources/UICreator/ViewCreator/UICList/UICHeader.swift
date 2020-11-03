@@ -26,11 +26,11 @@ import UIKit
 
 @frozen
 public struct UICHeader: ViewCreator {
-    let content: () -> ViewCreator
+    let content: ViewCreator
     let height: CGFloat?
 
-    public init(content: @escaping () -> ViewCreator) {
-        self.content = content
+    public init(content: () -> ViewCreator) {
+        self.content = content()
         self.height = nil
     }
 

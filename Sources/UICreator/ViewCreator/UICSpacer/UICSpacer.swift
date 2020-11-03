@@ -29,11 +29,11 @@ public struct UICSpacer: UIViewCreator {
     public typealias View = CBView
 
     let margin: Edges
-    let content: () -> ViewCreator
+    let content: ViewCreator
 
-    public init(margin: Edges, content: @escaping () -> ViewCreator) {
+    public init(margin: Edges, content: () -> ViewCreator) {
         self.margin = margin
-        self.content = content
+        self.content = content()
     }
 
     @inline(__always)
@@ -41,11 +41,11 @@ public struct UICSpacer: UIViewCreator {
         let _self = viewCreator as! Self
 
         if _self.margin == .zero {
-            return _self.content().releaseUIView()
+            return _self.content.releaseUIView()
         }
 
         return Views.SpacerView()
-            .addContent(_self.content().releaseUIView())
+            .addContent(_self.content.releaseUIView())
             .setMargin(_self.margin)
     }
 }
@@ -96,7 +96,7 @@ public extension UICSpacer {
         bottom: CGFloat,
         leading: CGFloat,
         trailing: CGFloat,
-        content: @escaping () -> ViewCreator) {
+        content: () -> ViewCreator) {
 
         self.init(
             margin: .init(
@@ -110,27 +110,27 @@ public extension UICSpacer {
     }
 
     @inline(__always)
-    init(vertical: CGFloat, horizontal: CGFloat, content: @escaping () -> ViewCreator) {
+    init(vertical: CGFloat, horizontal: CGFloat, content: () -> ViewCreator) {
         self.init(margin: .init(vertical: vertical, horizontal: horizontal), content: content)
     }
 
     @inline(__always)
-    init(vertical: CGFloat, content: @escaping () -> ViewCreator) {
+    init(vertical: CGFloat, content: () -> ViewCreator) {
         self.init(margin: .init(vertical: vertical, horizontal: 0), content: content)
     }
 
     @inline(__always)
-    init(horizontal: CGFloat, content: @escaping () -> ViewCreator) {
+    init(horizontal: CGFloat, content: () -> ViewCreator) {
         self.init(margin: .init(vertical: 0, horizontal: horizontal), content: content)
     }
 
     @inline(__always)
-    init(spacing: CGFloat, content: @escaping () -> ViewCreator) {
+    init(spacing: CGFloat, content: () -> ViewCreator) {
         self.init(margin: .init(spacing: spacing), content: content)
     }
 
     @inline(__always)
-    init(content: @escaping () -> ViewCreator) {
+    init(content: () -> ViewCreator) {
         self.init(margin: .init(spacing: 0), content: content)
     }
 }
@@ -274,7 +274,7 @@ public extension UIViewCreator {
 public extension UICSpacer {
     @inline(__always)
     func padding(_ constant: CGFloat) -> UICSpacer {
-        UICSpacer(margin: .init(spacing: constant), content: self.content)
+        UICSpacer(margin: .init(spacing: constant), content: { content })
     }
 }
 
@@ -290,6 +290,6 @@ public extension UICSpacer {
                 leading: margin.leading == constant ? margin.leading : self.margin.leading,
                 trailing: margin.trailing == constant ? margin.trailing : self.margin.trailing
             )
-        }(), content: self.content)
+        }(), content: { content })
     }
 }

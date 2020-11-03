@@ -63,9 +63,11 @@ public extension UIViewCreator where View: UICollectionView {
     }
 
     @inlinable
-    func background<Background: ViewCreator>(_ content: @escaping () -> Background) -> UICNotRenderedModifier<View> {
-        self.onNotRendered {
-            ($0 as? View)?.backgroundView = UICAnyView(content()).releaseUIView()
+    func background<Background: ViewCreator>(_ content: () -> Background) -> UICNotRenderedModifier<View> {
+        let content = content()
+
+        return self.onNotRendered {
+            ($0 as? View)?.backgroundView = UICAnyView(content).releaseUIView()
         }
     }
 

@@ -99,3 +99,58 @@ extension Value {
         }
     }
 }
+
+public protocol DynamicObject: class {}
+
+@propertyWrapper
+public struct WatchObject<Object> where Object: DynamicObject {
+    struct Strong {
+        let object: Object
+    }
+
+    struct Weak {
+        weak var object: Object!
+    }
+
+    enum Reference {
+        case strong(Strong)
+        case weak(Weak)
+    }
+
+    class Box {
+        var object: Object
+
+        init(_ object: Object) {
+            self.object = object
+        }
+
+        deinit {
+            print(object)
+        }
+    }
+
+    class OtherBox {
+        deinit {
+            print("deinit")
+        }
+    }
+
+    let reference: Box
+    let otherBox: OtherBox
+
+    public var wrappedValue: Object {
+        reference.object
+//        switch reference {
+//        case .strong(let reference):
+////            self.reference = .weak(.init(object: reference.object))
+//            return reference.object
+//        case .weak(let reference):
+//            return reference.object
+//        }
+    }
+
+    public init(wrappedValue: Object) {
+        self.reference = .init(wrappedValue)
+        self.otherBox = .init()
+    }
+}

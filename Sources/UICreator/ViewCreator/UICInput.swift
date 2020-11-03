@@ -30,7 +30,7 @@ public struct UICInput: UIViewCreator {
 
     private let frame: CGRect
     private let style: UIInputView.Style
-    private let content: () -> ViewCreator
+    private let content: ViewCreator
 
     public init(
         x: CGFloat = .zero,
@@ -38,11 +38,11 @@ public struct UICInput: UIViewCreator {
         height: CGFloat = .zero,
         width: CGFloat = .zero,
         style: UIInputView.Style = .keyboard,
-        content: @escaping () -> ViewCreator) {
+        content: () -> ViewCreator) {
 
         self.frame = .init(x: x, y: y, width: width, height: height)
         self.style = style
-        self.content = content
+        self.content = content()
     }
 
     @inline(__always)
@@ -50,7 +50,7 @@ public struct UICInput: UIViewCreator {
         let _self = viewCreator as! Self
 
         if _self.frame.height == .zero || _self.frame.width == .zero {
-            let contentView = _self.content().releaseUIView()
+            let contentView = _self.content.releaseUIView()
 
             return Views.InputView(
                 frame: {
@@ -71,7 +71,7 @@ public struct UICInput: UIViewCreator {
 
         return Views.InputView(frame: _self.frame, style: _self.style)
             .onNotRendered {
-                $0.add(_self.content().releaseUIView())
+                $0.add(_self.content.releaseUIView())
             }
     }
 }

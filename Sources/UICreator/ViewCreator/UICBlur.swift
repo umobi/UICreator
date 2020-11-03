@@ -42,11 +42,13 @@ public struct UICBlur: UIViewCreator {
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let style = _self.$style
+
         return View()
             .onNotRendered {
                 weak var view = $0 as? View
 
-                _self.$style.sync {
+                style.sync {
                     view?.apply(blurEffect: $0)
                 }
             }

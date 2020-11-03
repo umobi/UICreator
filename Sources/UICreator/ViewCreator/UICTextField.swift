@@ -249,13 +249,15 @@ public extension UIViewCreator where View: UITextField {
     @inlinable
     func leftView(
         _ mode: UITextField.ViewMode = .always,
-        content: @escaping () -> ViewCreator) -> UICRenderedModifier<View> {
+        content: () -> ViewCreator) -> UICRenderedModifier<View> {
 
-        self.onRendered { view in
+        let content = content()
+
+        return self.onRendered { view in
             var needsToAddConstraints = true
 
             (view as? View)?.leftViewMode = mode
-            (view as? View)?.leftView = UICAnyView(content()).releaseUIView()
+            (view as? View)?.leftView = UICAnyView(content).releaseUIView()
                 .onAppear { leftView in
                     guard needsToAddConstraints else {
                         return
@@ -281,13 +283,15 @@ public extension UIViewCreator where View: UITextField {
     @inlinable
     func rightView(
         _ mode: UITextField.ViewMode = .always,
-        content: @escaping () -> ViewCreator) -> UICRenderedModifier<View> {
+        content: () -> ViewCreator) -> UICRenderedModifier<View> {
 
-        self.onRendered { view in
+        let content = content()
+
+        return self.onRendered { view in
             var needsToAddConstraints = true
 
             (view as? View)?.rightViewMode = mode
-            (view as? View)?.rightView = UICAnyView(content()).releaseUIView()
+            (view as? View)?.rightView = UICAnyView(content).releaseUIView()
                 .onAppear { rightView in
                     guard needsToAddConstraints else {
                         return
@@ -401,17 +405,21 @@ public extension UIViewCreator where View: UITextField {
     }
 
     @inlinable
-    func inputView(content: @escaping () -> ViewCreator) -> UICRenderedModifier<View> {
-        self.onRendered {
-            ($0 as? View)?.inputView = UICAnyView(content()).releaseUIView()
+    func inputView(content: () -> ViewCreator) -> UICRenderedModifier<View> {
+        let content = content()
+
+        return self.onRendered {
+            ($0 as? View)?.inputView = UICAnyView(content).releaseUIView()
             ($0 as? View)?.inputView?.sizeToFit()
         }
     }
 
     @inlinable
-    func inputAccessoryView(content: @escaping () -> ViewCreator) -> UICRenderedModifier<View> {
-        self.onRendered {
-            ($0 as? View)?.inputAccessoryView = UICAnyView(content()).releaseUIView()
+    func inputAccessoryView(content: () -> ViewCreator) -> UICRenderedModifier<View> {
+        let content = content()
+
+        return self.onRendered {
+            ($0 as? View)?.inputAccessoryView = UICAnyView(content).releaseUIView()
             ($0 as? View)?.inputAccessoryView?.sizeToFit()
         }
     }

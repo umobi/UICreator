@@ -48,6 +48,8 @@ public struct UICTimeCounter: UIViewCreator {
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let selectedTimeInterval = _self.$selectedTimeInterval
+
         return Views.DatePicker()
             .onNotRendered {
                 if #available(iOS 13.4, *) {
@@ -61,7 +63,7 @@ public struct UICTimeCounter: UIViewCreator {
             .onNotRendered {
                 weak var view = $0 as? View
 
-                _self.$selectedTimeInterval.distinctSync {
+                selectedTimeInterval.distinctSync {
                     view?.countDownDuration = $0
                 }
             }
@@ -70,7 +72,7 @@ public struct UICTimeCounter: UIViewCreator {
                     return
                 }
 
-                _self.selectedTimeInterval = time
+                selectedTimeInterval.wrappedValue = time
             }
     }
 }

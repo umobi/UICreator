@@ -46,7 +46,7 @@ struct List {
 
                 return sum + [.init(Self.section(
                     listView,
-                    Self.castAndReturnRows(section.contents().zip)!,
+                    Self.castAndReturnRows(section.contents)!,
                     at: slice.offset
                 ), slice.offset)]
 
@@ -59,7 +59,7 @@ struct List {
 
                 return sum + listener.contents.map {
                     .init(
-                        Self.section(listView, Self.castAndReturnRows($0.contents().zip)!, at: slice.offset),
+                        Self.section(listView, Self.castAndReturnRows($0.contents)!, at: slice.offset),
                         slice.offset
                     )
                 }
@@ -223,6 +223,32 @@ extension List {
     }
 
     static func rebuild(_ listView: ListSupport!, _ sections: [UICSection], at index: Int) {
-        print("SectionsDidChange")
+        guard let oldList = listView.modifier?.state else {
+            fatalError()
+        }
+
+        var leftSections: [List.Frozen<Section, Int>] = []
+        var rightSections: [List.Frozen<Section, Int>] = []
+        var sectionsThatNeedsToBeUpdated: [List.Frozen<Section, Int>] = []
+
+        for section in oldList.sections {
+            if section.index == index {
+                sectionsThatNeedsToBeUpdated.append(section)
+            } else if sectionsThatNeedsToBeUpdated.isEmpty {
+                leftSections.append(section)
+            } else {
+                rightSections.append(section)
+            }
+        }
+
+        let sectionsToUpdate = List(listView, sections).sections.map {
+            Frozen($0.content, index)
+        }
+
+        let updatedSections = leftSections
+            + sectionsToUpdate
+            + rightSections
+
+        listView.invalidateState(.init(Array(updatedSections)))
     }
 }

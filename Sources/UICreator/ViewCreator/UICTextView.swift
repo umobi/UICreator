@@ -63,7 +63,7 @@ public struct UICTextView: UIViewCreator {
                 }
 
         case .attributedText(let dynamicValue):
-            return View()
+            return Views.TextView()
                 .onDidChanged {
                     dynamicValue.wrappedValue = $0.attributedText
                 }
@@ -241,16 +241,20 @@ public extension UIViewCreator where View: UITextView {
     }
 
     @inlinable
-    func inputView(content: @escaping () -> ViewCreator) -> UICRenderedModifier<View> {
-        self.onRendered {
-            ($0 as? View)?.inputView = UICAnyView(content()).releaseUIView()
+    func inputView(content: () -> ViewCreator) -> UICRenderedModifier<View> {
+        let content = content()
+
+        return self.onRendered {
+            ($0 as? View)?.inputView = UICAnyView(content).releaseUIView()
         }
     }
 
     @inlinable
-    func inputAccessoryView(content: @escaping () -> ViewCreator) -> UICRenderedModifier<View> {
-        self.onRendered {
-            ($0 as? View)?.inputAccessoryView = UICAnyView(content()).releaseUIView()
+    func inputAccessoryView(content: () -> ViewCreator) -> UICRenderedModifier<View> {
+        let content = content()
+
+        return self.onRendered {
+            ($0 as? View)?.inputAccessoryView = UICAnyView(content).releaseUIView()
         }
     }
 

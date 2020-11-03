@@ -28,16 +28,16 @@ import ConstraintBuilder
 public struct UICNavigation: UIViewControllerCreator {
     public typealias ViewController = UINavigationController
 
-    private let content: () -> ViewCreator
+    private let content: ViewCreator
 
-    public init(_ content: @escaping () -> ViewCreator) {
-        self.content = content
+    public init(_ content: () -> ViewCreator) {
+        self.content = content()
     }
 
     @inline(__always)
     public static func _makeUIViewController(_ viewCreator: ViewCreator) -> UIViewController {
         UINavigationController(
-            rootViewController: UICHostingController(content: (viewCreator as! Self).content)
+            rootViewController: UICHostingController(rootView: (viewCreator as! Self).content)
         )
     }
 }

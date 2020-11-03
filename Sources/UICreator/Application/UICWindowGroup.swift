@@ -27,7 +27,7 @@ import Foundation
 public struct UICWindowGroup<Content>: ViewScene where Content: UIViewCreator {
     public let body: ViewCreator
 
-    public init(_ content: @escaping () -> Content) {
+    public init(_ content: () -> Content) {
         self.body = content()
     }
 }
