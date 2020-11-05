@@ -22,74 +22,73 @@
 
 import Foundation
 
-@propertyWrapper
-@frozen
+@propertyWrapper @frozen
 public struct Relay<Value> {
-    private var storage: Storage
-
     @usableFromInline
-    init(_ reference: ReactiveItemReference) {
-        self.storage = .weak(.init(reference: reference))
+    enum Content {
+        case getAndSet(get: () -> Value, set: (Value) -> Void)
+        case dynamic(ObjectIdentifier)
     }
 
-    fileprivate init(_ value: Value) {
-        self.storage = .constant(value)
+    let content: Content
+
+    public init(get: @escaping () -> Value, set: @escaping (Value) -> Void) {
+        self.content = .getAndSet(get: get, set: set)
+    }
+
+    public static func constant(_ value: Value) -> Relay<Value> {
+        .init(get: { value }, set: { _ in })
+    }
+
+    internal init(_ id: ObjectIdentifier) {
+        self.content = .dynamic(id)
     }
 
     public var wrappedValue: Value {
         get {
-            switch self.storage {
-            case .constant(let value):
-                return value
-            case .weak(let container):
-                let dispatchGroup = DispatchGroup()
-                dispatchGroup.enter()
-
-                var value: Value!
-
-                container.reference?.reactive.requestValueGetter(handler: { (requestedValue: Value) in
-                    value = requestedValue
-                    dispatchGroup.leave()
-                })
-
-                dispatchGroup.wait()
-                return value
+            switch content {
+            case .getAndSet(let get, _):
+                return get()
+            case .dynamic(let id):
+                return (StateRegistered.shared[id] as! UICreator.Value<Value>.Box).get()
             }
         }
         nonmutating
         set {
-            switch self.storage {
-            case .constant:
-                return
-            case .weak(let container):
-                container.reference?.reactive.requestValueSetter(newValue)
+            switch content {
+            case .getAndSet(_, let set):
+                return set(newValue)
+            case .dynamic(let id):
+                (StateRegistered.shared[id] as! UICreator.Value<Value>.Box).set(newValue)
             }
         }
     }
 
-    @inline(__always)
     public var projectedValue: Relay<Value> { self }
 
-    public func next(_ handler: @escaping (Value) -> Void) {
-        switch self.storage {
-        case .constant:
-            break
-        case .weak(let container):
-            container.reference?.reactive.valueDidChange(handler: handler)
+    public func sync(_ syncHandler: @escaping (Value) -> Void) {
+        syncHandler(wrappedValue)
+
+        guard case .dynamic(let id) = content else {
+            return
         }
+
+        (StateRegistered.shared[id] as! UICreator.Value<Value>.Box).onNext(syncHandler)
     }
 
-    public func sync(_ handler: @escaping (Value) -> Void) {
-        self.next(handler)
-        
-        handler(self.wrappedValue)
+    public func next(_ nextHandler: @escaping (Value) -> Void) {
+        guard case .dynamic(let id) = content else {
+            return
+        }
+
+        (StateRegistered.shared[id] as! UICreator.Value<Value>.Box).onNext(nextHandler)
     }
 
     public func map<Other>(_ handler: @escaping (Value) -> Other) -> Relay<Other> {
-        switch self.storage {
-        case .constant(let value):
-            return .constant(handler(value))
-        case .weak:
+        switch content {
+        case .getAndSet(let get, _):
+            return .constant(handler(get()))
+        case .dynamic:
             let value = UICreator.Value<Other>(wrappedValue: handler(self.wrappedValue))
             self.next {
                 value.wrappedValue = handler($0)
@@ -97,12 +96,6 @@ public struct Relay<Value> {
 
             return value.projectedValue
         }
-    }
-}
-
-public extension Relay {
-    static func constant(_ value: Value) -> Relay<Value> {
-        .init(value)
     }
 }
 
@@ -168,18 +161,5 @@ public extension Relay where Value: Equatable {
                 handler($0)
             }
         }
-    }
-}
-
-extension Relay {
-    @usableFromInline
-    struct WeakContainer {
-        weak var reference: ReactiveItemReference!
-    }
-
-    @usableFromInline
-    enum Storage {
-        case constant(Value)
-        case weak(WeakContainer)
     }
 }

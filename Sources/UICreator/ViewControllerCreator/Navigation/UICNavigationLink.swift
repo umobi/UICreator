@@ -28,12 +28,12 @@ import UIKit
 public struct UICNavigationLink: ViewCreator {
     @Relay private var isPushing: Bool
 
-    private let destination: ViewCreator
+    private let destination: () -> ViewCreator
     private let content: ViewCreator
 
     public init(
         _ isPushing: Relay<Bool>,
-        destination: ViewCreator,
+        destination: @escaping () -> ViewCreator,
         content: () -> ViewCreator) {
 
         self._isPushing = isPushing
@@ -42,7 +42,7 @@ public struct UICNavigationLink: ViewCreator {
     }
 
     public init(
-        destination: ViewCreator,
+        destination: @escaping () -> ViewCreator,
         content: () -> ViewCreator) {
 
         let value = Value(wrappedValue: false)
@@ -61,7 +61,7 @@ public struct UICNavigationLink: ViewCreator {
         let value = Value(wrappedValue: false)
 
         self._isPushing = value.projectedValue
-        self.destination = destination(value.projectedValue)
+        self.destination = { destination(value.projectedValue) }
         self.content = UICAnyView(content()).onTap { _ in
             value.wrappedValue = true
         }
@@ -86,7 +86,7 @@ public struct UICNavigationLink: ViewCreator {
                             pushingView == nil
                         else { return }
 
-                        let viewController = UICHostingController(rootView: destination)
+                        let viewController = UICHostingController(rootView: destination())
                         pushingView = viewController
                         viewController.onDisappear {
                             if $0.isBeingPoped {
