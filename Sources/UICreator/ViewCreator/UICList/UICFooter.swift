@@ -31,7 +31,6 @@ public struct UICFooter: ViewCreator {
         self.content = content()
     }
 
-//    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         fatalError()
     }

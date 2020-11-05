@@ -23,13 +23,13 @@
 import Foundation
 import ConstraintBuilder
 
-public protocol UICView: UIViewCreator where View == CBView {
+public protocol UICView: class, UIViewCreator where View == CBView {
     var body: ViewCreator { get }
 }
 
 public extension UICView {
-    @inline(__always)
+
     static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
-        (viewCreator as! Self).body.releaseUIView()
+        (viewCreator as! Self).body.releaseUIView().append(viewCreator)
     }
 }

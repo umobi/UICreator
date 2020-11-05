@@ -50,7 +50,7 @@ public struct Relay<Value> {
             case .getAndSet(let get, _):
                 return get()
             case .dynamic(let id):
-                return (StateRegistered.shared[id] as! UICreator.Value<Value>.Box).get()
+                return (StateRegistered.shared[id]?.object as! UICreator.Value<Value>.Box).get()
             }
         }
         nonmutating
@@ -59,7 +59,7 @@ public struct Relay<Value> {
             case .getAndSet(_, let set):
                 return set(newValue)
             case .dynamic(let id):
-                (StateRegistered.shared[id] as! UICreator.Value<Value>.Box).set(newValue)
+                (StateRegistered.shared[id]?.object as! UICreator.Value<Value>.Box).set(newValue)
             }
         }
     }
@@ -73,7 +73,7 @@ public struct Relay<Value> {
             return
         }
 
-        (StateRegistered.shared[id] as! UICreator.Value<Value>.Box).onNext(syncHandler)
+        (StateRegistered.shared[id]?.object as! UICreator.Value<Value>.Box).onNext(syncHandler)
     }
 
     public func next(_ nextHandler: @escaping (Value) -> Void) {
@@ -81,7 +81,7 @@ public struct Relay<Value> {
             return
         }
 
-        (StateRegistered.shared[id] as! UICreator.Value<Value>.Box).onNext(nextHandler)
+        (StateRegistered.shared[id]?.object as! UICreator.Value<Value>.Box).onNext(nextHandler)
     }
 
     public func map<Other>(_ handler: @escaping (Value) -> Other) -> Relay<Other> {

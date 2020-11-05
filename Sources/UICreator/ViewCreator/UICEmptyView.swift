@@ -34,7 +34,6 @@ public struct UICEmptyView: UIViewCreator {
         self.view = nil
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         (viewCreator as! Self).view ?? Views.EmptyView()
     }

@@ -46,7 +46,6 @@ public struct UICVStack: UIViewCreator {
         self._spacing = spacing
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 

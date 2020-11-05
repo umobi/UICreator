@@ -30,7 +30,6 @@ public struct UICSection: ViewCreator {
         self.contents = contents().zip
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         fatalError()
     }

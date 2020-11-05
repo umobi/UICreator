@@ -62,7 +62,6 @@ public struct UICImageView: UIViewCreator {
         self.placeholder = placeholder
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 

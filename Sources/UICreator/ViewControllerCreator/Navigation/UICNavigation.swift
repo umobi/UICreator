@@ -34,7 +34,6 @@ public struct UICNavigation: UIViewControllerCreator {
         self.content = content()
     }
 
-    @inline(__always)
     public static func _makeUIViewController(_ viewCreator: ViewCreator) -> UIViewController {
         UINavigationController(
             rootViewController: UICHostingController(rootView: (viewCreator as! Self).content)

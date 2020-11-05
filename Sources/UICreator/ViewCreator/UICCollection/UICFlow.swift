@@ -34,7 +34,6 @@ public struct UICFlow: UIViewCreator {
         self.contents = contents
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         Views.FlowView()
             .dynamicData((viewCreator as! Self).contents)

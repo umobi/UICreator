@@ -50,7 +50,6 @@ public struct UICButton: UIViewCreator {
         self.content = .dynamic(content())
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 

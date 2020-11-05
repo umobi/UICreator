@@ -39,7 +39,6 @@ public struct UICHeader: ViewCreator {
         self.height = editable.height
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         fatalError()
     }

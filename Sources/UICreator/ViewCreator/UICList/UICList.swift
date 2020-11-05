@@ -39,7 +39,6 @@ public struct UICList: UIViewCreator {
         self.contents = contents
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
         

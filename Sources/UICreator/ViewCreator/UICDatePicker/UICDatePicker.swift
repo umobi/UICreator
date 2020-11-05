@@ -74,7 +74,6 @@ public struct UICDatePicker: UIViewCreator {
         self.locale = locale
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 

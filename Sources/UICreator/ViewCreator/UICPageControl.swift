@@ -47,7 +47,6 @@ public struct UICPageControl: UIViewCreator {
         self._currentPage = currentPage
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 

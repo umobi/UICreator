@@ -33,7 +33,6 @@ public struct UICAccessibilityView<View>: UIViewCreator where View: CBView {
         self.content = content
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         (viewCreator as! Self).content.releaseUIView()
     }

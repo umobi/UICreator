@@ -41,7 +41,6 @@ public struct UICForEach<Content, Value>: ViewCreator, ForEachEnviromentShared w
         self.privateEnviroment = .init(.constant(value), content: content)
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         UICEmptyView()
             .height(equalTo: 0, priority: .defaultHigh)

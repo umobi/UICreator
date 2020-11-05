@@ -37,7 +37,6 @@ public struct UICTab: UIViewControllerCreator {
         self.contents = contents
     }
 
-    @inline(__always)
     public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
         let _self = viewCreator as! Self
 

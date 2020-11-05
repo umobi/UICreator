@@ -52,7 +52,6 @@ public struct UICLabel: UIViewCreator {
         self._text = attributedText.map { .attributed($0) }
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 

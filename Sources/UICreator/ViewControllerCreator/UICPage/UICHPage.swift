@@ -42,7 +42,6 @@ public struct UICHPage: UIViewControllerCreator {
         self.contents = contents().zip
     }
 
-    @inline(__always)
     public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
         let _self = viewCreator as! Self
 

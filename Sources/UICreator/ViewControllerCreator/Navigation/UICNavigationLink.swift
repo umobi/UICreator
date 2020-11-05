@@ -67,7 +67,6 @@ public struct UICNavigationLink: ViewCreator {
         }
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 

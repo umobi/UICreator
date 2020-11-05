@@ -39,7 +39,6 @@ public struct UICScroll: UIViewCreator {
         self._axis = axis
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 

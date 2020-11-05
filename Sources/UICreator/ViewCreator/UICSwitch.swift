@@ -39,7 +39,6 @@ public struct UICSwitch: UIViewCreator {
         self._isOn = isOn
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 

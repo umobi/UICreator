@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public protocol UICViewControllerRepresentable: UIViewControllerCreator {
+public protocol UICViewControllerRepresentable: class, UIViewControllerCreator {
     func makeUIViewController() -> ViewController
     func updateUIViewController(_ uiViewController: ViewController)
 }
@@ -34,9 +34,11 @@ public extension UICViewControllerRepresentable {
         let _self = viewCreator as! Self
 
         let viewController = _self.makeUIViewController()
-        viewController.view.onInTheScene { [weak viewController] _ in
-            _self.updateUIViewController(viewController!)
-        }
+        viewController.view
+            .append(viewCreator)
+            .onInTheScene { [weak viewController] _ in
+                _self.updateUIViewController(viewController!)
+            }
 
         return viewController
     }

@@ -44,7 +44,6 @@ public struct UICTextView: UIViewCreator {
         self.content = .attributedText(value)
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 

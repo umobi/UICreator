@@ -33,6 +33,7 @@ private extension CBView {
         @MutableBox var trait: Trait
 
         @MutableBox var isSelfImplemented: Bool
+        @MutableBox var dynamicViews: [ViewCreator]
 
         init(_ view: CBView) {
             self._render = .init(wrappedValue: .create(view))
@@ -41,6 +42,7 @@ private extension CBView {
             self._trait = .init(wrappedValue: .create(view))
 
             self._isSelfImplemented = .init(wrappedValue: false)
+            self._dynamicViews = .init(wrappedValue: [])
         }
     }
 
@@ -79,7 +81,20 @@ extension CBView {
         return sequence(first: superview, next: { $0.adaptorOrView.superview })
             .first(where: { !($0 is ViewCreatorNoLayoutConstraints)})
     }
+
+    fileprivate var dynamicViews: [ViewCreator] {
+        get { memory.dynamicViews }
+        set { memory.dynamicViews = newValue }
+    }
 }
+
+extension CBView {
+    func append(_ dynamicView: ViewCreator) -> Self {
+        self.dynamicViews.append(dynamicView)
+        return self
+    }
+}
+
 
 extension CBView {
 

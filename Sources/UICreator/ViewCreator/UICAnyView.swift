@@ -43,7 +43,6 @@ public struct UICAnyView: UIViewCreator {
         self.content = .view(view)
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         switch (viewCreator as! Self).content {
         case .viewCreator(let viewCreator):
@@ -64,7 +63,6 @@ public struct UICModifiedView<View>: UIViewCreator where View: CBView {
         self.viewCreator = viewCreator
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         (viewCreator as! Self).viewCreator.releaseUIView()
     }

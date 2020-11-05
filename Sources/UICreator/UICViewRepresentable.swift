@@ -24,7 +24,7 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public protocol UICViewRepresentable: UIViewCreator {
+public protocol UICViewRepresentable: class, UIViewCreator {
     func makeUIView() -> View
     func updateUIView(_ uiView: View)
 }
@@ -34,6 +34,7 @@ public extension UICViewRepresentable {
         let _self = viewCreator as! Self
 
         return Views.ViewAdaptor(_self.makeUIView())
+            .append(viewCreator)
             .onNotRendered {
                 _self.updateUIView($0.dynamicView as! View)
             }

@@ -26,23 +26,24 @@ import Foundation
 public struct Value<Value> {
 
     let id: ObjectIdentifier
-    let ref: Reference
+    let deinitable: Reference
 
     public init(wrappedValue: Value) {
-        let ref = Reference()
+        let ref = StateRegistered.Reference()
         let id = ObjectIdentifier(ref)
-        StateRegistered.shared[id] = Box(wrappedValue)
+        StateRegistered.shared[id] = .init(ref: ref, object: Box(wrappedValue))
 
         self.id = id
-        self.ref = ref
+        self.deinitable = .init(id)
     }
 
     public var wrappedValue: Value {
-        get { (StateRegistered.shared[id] as! Box).get() }
+        get { (StateRegistered.shared[id]?.object as! Box).get() }
         nonmutating
-        set { (StateRegistered.shared[id] as! Box).set(newValue) }
+        set { (StateRegistered.shared[id]?.object as! Box).set(newValue) }
     }
 
+    @inline(__always)
     public var projectedValue: Relay<Value> {
         .init(id)
     }
@@ -51,8 +52,13 @@ public struct Value<Value> {
 extension Value {
     @usableFromInline
     class Reference {
+        let id: ObjectIdentifier
+
+        init(_ id: ObjectIdentifier) {
+            self.id = id
+        }
+
         deinit {
-            let id = ObjectIdentifier(self)
             DispatchQueue.concurrent.async(flags: .barrier) { [id] in
                 StateRegistered.shared[id] = nil
             }
@@ -101,11 +107,17 @@ struct StateObservable {
 }
 
 class StateRegistered {
+    class Reference {}
+    struct Payload {
+        let ref: Reference
+        let object: AnyObject
+    }
+
     static var shared: StateRegistered = .init()
 
-    private var registered: [ObjectIdentifier: AnyObject] = [:]
+    private var registered: [ObjectIdentifier: Payload] = [:]
 
-    subscript(_ key: ObjectIdentifier) -> AnyObject? {
+    subscript(_ key: ObjectIdentifier) -> Payload? {
         get { registered[key] }
         set { registered[key] = newValue }
     }
@@ -152,7 +164,7 @@ class StateSource<Value> {
     }
 
     static func restore(_ identifier: ObjectIdentifier) -> StateSource? {
-        StateRegistered.shared[identifier] as? StateSource
+        StateRegistered.shared[identifier]?.object as? StateSource
     }
 
     deinit {
@@ -171,108 +183,5 @@ extension StateObservable {
                 ReactiveCenter.shared.removeObserver(observable)
             }
         }
-    }
-}
-
-@propertyWrapper
-public struct _Value<Value> {
-    let reference: Reference
-
-    public init(wrappedValue: Value) {
-        self.reference = .init()
-        StateRegistered.shared[reference.id] = StateSource(value: wrappedValue)
-    }
-
-    public var wrappedValue: Value {
-        get { (StateRegistered.shared[reference.id] as! StateSource).value }
-        nonmutating
-        set { (StateRegistered.shared[reference.id] as? StateSource)?.value = newValue }
-    }
-
-    public var projectedValue: Relay<Value> {
-        .init(self.reference.id)
-    }
-}
-
-extension _Value {
-    class Reference {
-        var id: ObjectIdentifier {
-            ObjectIdentifier(self)
-        }
-
-        deinit {
-            StateRegistered.shared[id] = nil
-        }
-    }
-}
-
-public protocol DynamicObject: class {}
-
-class ObjectRegistered {
-    static var shared: ObjectRegistered = .init()
-
-    private var registered: [ObjectIdentifier: AnyObject] = [:]
-
-    subscript(_ key: ObjectIdentifier) -> AnyObject? {
-        get { registered[key] }
-        set { registered[key] = newValue }
-    }
-}
-
-@propertyWrapper @frozen
-public struct WatchObject<Object> where Object: DynamicObject {
-    @usableFromInline
-    class Reference {
-        deinit {
-            ObjectRegistered.shared[ObjectIdentifier(self)] = nil
-        }
-    }
-
-    private let reference: Reference
-
-    public var wrappedValue: Object {
-        get { ObjectRegistered.shared[ObjectIdentifier(reference)] as! Object }
-        set { ObjectRegistered.shared[ObjectIdentifier(reference)] = newValue }
-    }
-
-    public init(wrappedValue: Object) {
-        reference = .init()
-        ObjectRegistered.shared[.init(reference)] = wrappedValue
-    }
-
-    @dynamicMemberLookup
-    public struct Wrapped {
-        private let reference: ObjectIdentifier
-
-        fileprivate init(_ reference: ObjectIdentifier) {
-            self.reference = reference
-        }
-
-        public subscript<Value>(dynamicMember dynamicMember: KeyPath<Object, Value>) -> Value {
-            (ObjectRegistered.shared[reference] as! Object)[keyPath: dynamicMember]
-        }
-    }
-
-    public var projectedValue: WatchObject.Wrapped {
-        .init(.init(reference))
-    }
-}
-
-@propertyWrapper
-public struct Release<Object> {
-    @MutableBox var box: Object!
-
-    public init(wrappedValue: Object) {
-        self._box = .init(wrappedValue: wrappedValue)
-    }
-
-    public var wrappedValue: Object {
-        get {
-            let value: Object! = box
-            box = nil
-            return value
-        }
-
-        set { box = newValue }
     }
 }

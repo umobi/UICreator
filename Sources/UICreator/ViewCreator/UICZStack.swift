@@ -35,7 +35,6 @@ public struct UICZStack: UIViewCreator {
         self.contents = contents().zip
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 

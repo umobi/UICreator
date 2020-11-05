@@ -34,7 +34,6 @@ public struct UICHScroll: UIViewCreator {
         self.content = content()
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 

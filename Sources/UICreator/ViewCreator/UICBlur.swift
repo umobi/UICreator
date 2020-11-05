@@ -38,7 +38,6 @@ public struct UICBlur: UIViewCreator {
         self._style = dynamicStyle
     }
 
-    @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 

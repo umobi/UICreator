@@ -42,7 +42,6 @@ public struct UICNotRenderedModifierController<ViewController>: UIViewController
         }
     }
 
-    @inline(__always)
     public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
         (viewCreator as! Self).content.releaseViewController()
     }
@@ -79,7 +78,6 @@ public struct UICRenderedModifierController<ViewController>: UIViewControllerCre
         }
     }
 
-    @inline(__always)
     public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
         (viewCreator as! Self).content.releaseViewController()
     }
@@ -115,7 +113,6 @@ public struct UICInTheSceneModifierController<ViewController>: UIViewControllerC
         }
     }
 
-    @inline(__always)
     public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
         (viewCreator as! Self).content.releaseViewController()
     }
@@ -152,7 +149,6 @@ public struct UICLayoutModifierController<ViewController>: UIViewControllerCreat
         }
     }
 
-    @inline(__always)
     public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
         (viewCreator as! Self).content.releaseViewController()
     }
@@ -189,7 +185,6 @@ public struct UICAppearModifierController<ViewController>: UIViewControllerCreat
         }
     }
 
-    @inline(__always)
     public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
         (viewCreator as! Self).content.releaseViewController()
     }
@@ -225,7 +220,6 @@ public struct UICDisappearModifierController<ViewController>: UIViewControllerCr
         }
     }
 
-    @inline(__always)
     public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
         (viewCreator as! Self).content.releaseViewController()
     }
@@ -250,7 +244,6 @@ public struct UICModifiedViewController<ViewController>: UIViewControllerCreator
         self.viewControllerCreator = viewControllerCreator
     }
 
-    @inline(__always)
     public static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController {
         (viewCreator as! Self).viewControllerCreator.releaseViewController()
     }
