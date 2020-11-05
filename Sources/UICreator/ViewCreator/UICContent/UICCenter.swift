@@ -29,14 +29,14 @@ public struct UICCenter: UIViewCreator {
     public typealias View = CBView
 
     private let priority: CBLayoutPriority
-    private let content: () -> ViewCreator
+    private let content: ViewCreator
 
     public init(
         _ priority: CBLayoutPriority = .required,
-        content: @escaping () -> ViewCreator) {
+        content: () -> ViewCreator) {
 
         self.priority = priority
-        self.content = content
+        self.content = content()
     }
 
     @inline(__always)
@@ -45,7 +45,7 @@ public struct UICCenter: UIViewCreator {
 
         return Views.ContentView(.center, priority: _self.priority)
             .onNotRendered {
-                ($0 as? Views.ContentView)?.addContent(_self.content().releaseUIView())
+                ($0 as? Views.ContentView)?.addContent(_self.content.releaseUIView())
             }
     }
 }

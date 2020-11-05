@@ -41,7 +41,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         topEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -63,7 +63,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         topGreaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -85,7 +85,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         topLessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -107,7 +107,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         bottomEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -129,7 +129,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         bottomGreaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -151,7 +151,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         bottomLessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -173,7 +173,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         leadingEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -195,7 +195,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         leadingGreaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -217,7 +217,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         leadingLessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -239,7 +239,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         trailingEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -261,7 +261,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         trailingGreaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -283,7 +283,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         trailingLessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -304,7 +304,7 @@ public extension UIViewCreator {
     @inline(__always) @inlinable
     func safeAreaInsets(
         equalTo value: CGFloat = 0,
-        priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
+        priority: CBLayoutPriority = .required) -> UICInTheSceneModifier<View> {
 
         self.safeArea(topEqualTo: value, priority: priority)
             .safeArea(bottomEqualTo: value, priority: priority)
@@ -316,7 +316,7 @@ public extension UIViewCreator {
     func top<OtherView>(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -338,7 +338,7 @@ public extension UIViewCreator {
     func top<OtherView>(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -360,7 +360,7 @@ public extension UIViewCreator {
     func top<OtherView>(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -382,7 +382,7 @@ public extension UIViewCreator {
     func bottom<OtherView>(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -404,7 +404,7 @@ public extension UIViewCreator {
     func bottom<OtherView>(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -426,7 +426,7 @@ public extension UIViewCreator {
     func bottom<OtherView>(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -448,7 +448,7 @@ public extension UIViewCreator {
     func leading<OtherView>(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -470,7 +470,7 @@ public extension UIViewCreator {
     func leading<OtherView>(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -492,7 +492,7 @@ public extension UIViewCreator {
     func leading<OtherView>(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -514,7 +514,7 @@ public extension UIViewCreator {
     func trailing<OtherView>(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -536,7 +536,7 @@ public extension UIViewCreator {
     func trailing<OtherView>(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -558,7 +558,7 @@ public extension UIViewCreator {
     func trailing<OtherView>(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -580,7 +580,7 @@ public extension UIViewCreator {
     func height<OtherView>(
         equalToSuperview multiplier: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -602,7 +602,7 @@ public extension UIViewCreator {
     func height<OtherView>(
         greaterThanOrEqualToSuperview multiplier: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -624,7 +624,7 @@ public extension UIViewCreator {
     func height<OtherView>(
         lessThanOrEqualToSuperview multiplier: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -646,7 +646,7 @@ public extension UIViewCreator {
     func width<OtherView>(
         equalToSuperview multiplier: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -668,7 +668,7 @@ public extension UIViewCreator {
     func width<OtherView>(
         greaterThanOrEqualToSuperview multiplier: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -690,7 +690,7 @@ public extension UIViewCreator {
     func width<OtherView>(
         lessThanOrEqualToSuperview multiplier: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -715,7 +715,7 @@ public extension UIViewCreator {
     func insets<OtherView>(
         equalTo value: CGFloat = .zero,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.top(equalTo: value, priority: priority, outlet)
             .bottom(equalTo: value, priority: priority, outlet)
@@ -729,7 +729,7 @@ public extension UIViewCreator {
     @inline(__always) @inlinable
     func aspectRatio(
         equalTo multiplier: CGFloat = 1,
-        priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
+        priority: CBLayoutPriority = .required) -> UICNotRenderedModifier<View> {
 
         self.aspectRatio(heightEqualTo: multiplier, priority: priority)
     }
@@ -737,7 +737,7 @@ public extension UIViewCreator {
     @inlinable
     func aspectRatio(
         heightEqualTo multiplier: CGFloat,
-        priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
+        priority: CBLayoutPriority = .required) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered { view in
             let superview = view.dynamicView
@@ -756,7 +756,7 @@ public extension UIViewCreator {
     @inlinable
     func aspectRatio(
         heightGreaterThanOrEqualTo multiplier: CGFloat,
-        priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
+        priority: CBLayoutPriority = .required) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered { view in
             let superview = view.dynamicView
@@ -775,7 +775,7 @@ public extension UIViewCreator {
     @inlinable
     func aspectRatio(
         heightLessThanOrEqualTo multiplier: CGFloat,
-        priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
+        priority: CBLayoutPriority = .required) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered { view in
             let superview = view.dynamicView
@@ -794,7 +794,7 @@ public extension UIViewCreator {
     @inlinable
     func aspectRatio(
         widthEqualTo multiplier: CGFloat,
-        priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
+        priority: CBLayoutPriority = .required) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered { view in
             let superview = view.dynamicView
@@ -813,7 +813,7 @@ public extension UIViewCreator {
     @inlinable
     func aspectRatio(
         widthGreaterThanOrEqualTo multiplier: CGFloat,
-        priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
+        priority: CBLayoutPriority = .required) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered { view in
             let superview = view.dynamicView
@@ -832,7 +832,7 @@ public extension UIViewCreator {
     @inlinable
     func aspectRatio(
         widthLessThanOrEqualTo multiplier: CGFloat,
-        priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
+        priority: CBLayoutPriority = .required) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered { view in
             let superview = view.dynamicView
@@ -854,7 +854,7 @@ public extension UIViewCreator {
     @inlinable
     func height(
         equalTo constant: CGFloat,
-        priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
+        priority: CBLayoutPriority = .required) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered { view in
             Constraintable.update {
@@ -871,7 +871,7 @@ public extension UIViewCreator {
     @inlinable
     func height(
         greaterThanOrEqualTo constant: CGFloat,
-        priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
+        priority: CBLayoutPriority = .required) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered { view in
             Constraintable.update {
@@ -888,7 +888,7 @@ public extension UIViewCreator {
     @inlinable
     func height(
         lessThanOrEqualTo constant: CGFloat,
-        priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
+        priority: CBLayoutPriority = .required) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered { view in
             Constraintable.update {
@@ -905,7 +905,7 @@ public extension UIViewCreator {
     @inlinable
     func width(
         equalTo constant: CGFloat,
-        priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
+        priority: CBLayoutPriority = .required) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered { view in
             Constraintable.update {
@@ -922,7 +922,7 @@ public extension UIViewCreator {
     @inlinable
     func width(
         greaterThanOrEqualTo constant: CGFloat,
-        priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
+        priority: CBLayoutPriority = .required) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered { view in
             Constraintable.update {
@@ -939,7 +939,7 @@ public extension UIViewCreator {
     @inlinable
     func width(
         lessThanOrEqualTo constant: CGFloat,
-        priority: CBLayoutPriority = .required) -> UICModifiedView<View> {
+        priority: CBLayoutPriority = .required) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered { view in
             Constraintable.update {
@@ -960,7 +960,7 @@ public extension UIViewCreator {
     func center<OtherView>(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -982,7 +982,7 @@ public extension UIViewCreator {
     func center<OtherView>(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1004,7 +1004,7 @@ public extension UIViewCreator {
     func center<OtherView>(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1026,7 +1026,7 @@ public extension UIViewCreator {
     func centerX<OtherView>(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1048,7 +1048,7 @@ public extension UIViewCreator {
     func centerX<OtherView>(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1070,7 +1070,7 @@ public extension UIViewCreator {
     func centerX<OtherView>(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1092,7 +1092,7 @@ public extension UIViewCreator {
     func centerY<OtherView>(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1114,7 +1114,7 @@ public extension UIViewCreator {
     func centerY<OtherView>(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1136,7 +1136,7 @@ public extension UIViewCreator {
     func centerY<OtherView>(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1161,7 +1161,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         centerEqualTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1183,7 +1183,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         centerGreaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1205,7 +1205,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         centerLessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1227,7 +1227,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         centerXEqualTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1249,7 +1249,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         centerXGreaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1271,7 +1271,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         centerXLessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1293,7 +1293,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         centerYEqualTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1315,7 +1315,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         centerYGreaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1337,7 +1337,7 @@ public extension UIViewCreator {
     func safeArea<OtherView>(
         centerYLessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1361,7 +1361,7 @@ public extension UIViewCreator {
     @inlinable
     func hugging(
         vertical verticalPriority: CBLayoutPriority = .defaultLow,
-        horizontal horizontalPriority: CBLayoutPriority = .defaultLow) -> UICModifiedView<View> {
+        horizontal horizontalPriority: CBLayoutPriority = .defaultLow) -> UICNotRenderedModifier<View> {
         
         self.onNotRendered {
             $0.dynamicView
@@ -1382,7 +1382,7 @@ public extension UIViewCreator {
     @inlinable
     func compression(
         vertical verticalPriority: CBLayoutPriority = .defaultHigh,
-        horizontal horizontalPriority: CBLayoutPriority = .defaultHigh) -> UICModifiedView<View> {
+        horizontal horizontalPriority: CBLayoutPriority = .defaultHigh) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered {
             $0.dynamicView
@@ -1402,7 +1402,7 @@ public extension UIViewCreator {
     @inlinable
     func vertical(
         hugging huggingPriority: CBLayoutPriority = .defaultLow,
-        compression compressionPriority: CBLayoutPriority = .defaultHigh) -> UICModifiedView<View> {
+        compression compressionPriority: CBLayoutPriority = .defaultHigh) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered {
             $0.dynamicView
@@ -1422,7 +1422,7 @@ public extension UIViewCreator {
     @inlinable
     func horizontal(
         hugging huggingPriority: CBLayoutPriority = .defaultLow,
-        compression compressionPriority: CBLayoutPriority = .defaultHigh) -> UICModifiedView<View> {
+        compression compressionPriority: CBLayoutPriority = .defaultHigh) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered {
             $0.dynamicView
@@ -1446,7 +1446,7 @@ public extension UIViewCreator {
     func topMargin<OtherView>(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1468,7 +1468,7 @@ public extension UIViewCreator {
     func topMargin<OtherView>(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1490,7 +1490,7 @@ public extension UIViewCreator {
     func topMargin<OtherView>(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1512,7 +1512,7 @@ public extension UIViewCreator {
     func bottomMargin<OtherView>(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1534,7 +1534,7 @@ public extension UIViewCreator {
     func bottomMargin<OtherView>(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1556,7 +1556,7 @@ public extension UIViewCreator {
     func bottomMargin<OtherView>(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1578,7 +1578,7 @@ public extension UIViewCreator {
     func leadingMargin<OtherView>(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1600,7 +1600,7 @@ public extension UIViewCreator {
     func leadingMargin<OtherView>(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1622,7 +1622,7 @@ public extension UIViewCreator {
     func leadingMargin<OtherView>(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1644,7 +1644,7 @@ public extension UIViewCreator {
     func trailingMargin<OtherView>(
         equalTo constant: CGFloat = 0,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1666,7 +1666,7 @@ public extension UIViewCreator {
     func trailingMargin<OtherView>(
         greaterThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {
@@ -1688,7 +1688,7 @@ public extension UIViewCreator {
     func trailingMargin<OtherView>(
         lessThanOrEqualTo constant: CGFloat,
         priority: CBLayoutPriority = .required,
-        _ outlet: UICOutlet<OtherView>? = nil) -> UICModifiedView<View> where OtherView: UIView {
+        _ outlet: UICOutlet<OtherView>? = nil) -> UICInTheSceneModifier<View> where OtherView: UIView {
 
         self.onInTheScene { view in
             guard let superview = outlet?.wrappedValue ?? view.layoutSuperview else {

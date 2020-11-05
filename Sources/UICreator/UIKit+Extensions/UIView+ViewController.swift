@@ -122,9 +122,9 @@ extension CBView {
 }
 
 public extension UITabBarController {
-    func setViewControllers(@UICTabItemBuilder _ contents: @escaping () -> UICTabItem) {
+    func setViewControllers(@UICTabItemBuilder _ contents: () -> UICTabItem) {
         let viewControllers: [UIViewController] = contents().zip.map {
-            let controller = UICHostingController(content: $0.content)
+            let controller = UICHostingController(rootView: $0.content)
             controller.tabBarItem = $0.tabItem
             return controller
         }

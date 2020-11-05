@@ -32,78 +32,63 @@ private class ReactiveToken: CustomStringConvertible, Equatable {
     }
 }
 
-private let _reactive = ReactiveCenter()
-private final class ReactiveCenter: NotificationCenter {
-    static var shared: ReactiveCenter {
-        return _reactive
-    }
+final class ReactiveCenter: NotificationCenter {
+    static let shared = ReactiveCenter()
 }
 
-struct ReactiveReferenceCenter {
-    fileprivate let reactiveCenter: ReactiveCenter
-    fileprivate let reference: ReactiveItemReference
+struct ReactiveReferenceCenter<Value> {
+    fileprivate let reference: StateSource<Value>
 
-    fileprivate init(reference: ReactiveItemReference, _ center: ReactiveCenter) {
-        self.reactiveCenter = center
+    fileprivate init(_ reference: StateSource<Value>) {
         self.reference = reference
     }
+}
 
-    func unregister(_ observable: NSObjectProtocol) {
-        self.reactiveCenter.removeObserver(observable)
+extension StateSource {
+    var reactive: ReactiveReferenceCenter<Value> {
+        .init(self)
     }
 }
 
-extension ReactiveCenter {
-    fileprivate func referenceCenter(_ reference: ReactiveItemReference) -> ReactiveReferenceCenter {
-        .init(reference: reference, self)
-    }
-}
-
-extension ReactiveItemReference {
-    var reactive: ReactiveReferenceCenter {
-        ReactiveCenter.shared.referenceCenter(self)
-    }
-}
+private let kNotificationNewValue = "kNotificationNewValue"
+private let kNotificationToken = "kNotificationToken"
 
 private extension ReactiveReferenceCenter {
-    static let kNotificationNewValue = "kNotificationNewValue"
-    static let kNotificationToken = "kNotificationToken"
-
     var valueChangedNotification: Notification.Name {
-        .init(rawValue: "\(self.reference).valueChanged")
+        .init(rawValue: "\(self.reference.id).valueChanged")
     }
 
     var valueGetterNotification: Notification.Name {
-        .init("\(self.reference).getter.value")
+        .init("\(self.reference.id).getter.value")
     }
 
     var requestValueGetterNotification: Notification.Name {
-        .init("\(self.reference).request.getter.value")
+        .init("\(self.reference.id).request.getter.value")
     }
 
     var valueSetterNotification: Notification.Name {
-        .init("\(self.reference).request.setter.value")
+        .init("\(self.reference.id).request.setter.value")
     }
 }
 
 extension ReactiveReferenceCenter {
 
-    func valueDidChange<Value>(_ newValue: Value) {
-        self.reactiveCenter.post(
+    func valueDidChange(_ newValue: Value) {
+        ReactiveCenter.shared.post(
             name: self.valueChangedNotification,
             object: nil,
             userInfo: [
-                Self.kNotificationNewValue: newValue
+                kNotificationNewValue: newValue
             ])
     }
 
-    func valueDidChange<Value>(handler: @escaping (Value) -> Void) {
-        self.reference.append(self.reactiveCenter.addObserver(
+    func valueDidChange(handler: @escaping (Value) -> Void) {
+        self.reference.append(ReactiveCenter.shared.addObserver(
             forName: self.valueChangedNotification,
             object: nil,
             queue: nil,
             using: { notification in
-                guard let value = notification.userInfo?[Self.kNotificationNewValue] as? Value else {
+                guard let value = notification.userInfo?[kNotificationNewValue] as? Value else {
                     Fatal.Builder("ReactiveCenter couldn't cast value to type of \(Value.self)").die()
                 }
 
@@ -113,22 +98,22 @@ extension ReactiveReferenceCenter {
 }
 
 extension ReactiveReferenceCenter {
-    func requestValueSetter<Value>(_ newValue: Value) {
-        self.reactiveCenter.post(
+    func requestValueSetter(_ newValue: Value) {
+        ReactiveCenter.shared.post(
             name: self.valueSetterNotification,
             object: nil,
             userInfo: [
-                Self.kNotificationNewValue: newValue
+                kNotificationNewValue: newValue
             ])
     }
 
-    func valueSetter<Value>(_ handler: @escaping (Value) -> Void) {
-        self.reference.append(self.reactiveCenter.addObserver(
+    func valueSetter(_ handler: @escaping (Value) -> Void) {
+        self.reference.append(ReactiveCenter.shared.addObserver(
             forName: self.valueSetterNotification,
             object: nil,
             queue: nil,
             using: {
-                guard let value = $0.userInfo?[Self.kNotificationNewValue] as? Value else {
+                guard let value = $0.userInfo?[kNotificationNewValue] as? Value else {
                     Fatal.Builder("ReactiveCenter couldn't cast value to type of \(Value.self)").die()
                 }
 
@@ -139,54 +124,55 @@ extension ReactiveReferenceCenter {
 
 extension ReactiveReferenceCenter {
     func valueGetter<Value>(handler: @escaping () -> Value) {
-        self.reference.append(self.reactiveCenter.addObserver(
+        self.reference.append(ReactiveCenter.shared.addObserver(
             forName: self.requestValueGetterNotification,
             object: nil,
             queue: nil,
-            using: { [weak reactiveCenter, valueGetterNotification] in
-                guard let token = $0.userInfo?[Self.kNotificationToken] as? ReactiveToken else {
+            using: { [valueGetterNotification] in
+                guard let token = $0.userInfo?[kNotificationToken] as? ReactiveToken else {
                     return
                 }
 
-                reactiveCenter?.post(
+                ReactiveCenter.shared.post(
                     name: valueGetterNotification,
                     object: nil,
                     userInfo: [
-                        Self.kNotificationNewValue: handler(),
-                        Self.kNotificationToken: token
+                        kNotificationNewValue: handler(),
+                        kNotificationToken: token
                     ]
                 )
             }))
     }
 
-    func requestValueGetter<Value>(handler: @escaping (Value) -> Void) {
+    func requestValueGetter(handler: @escaping (Value) -> Void) {
         let token = ReactiveToken()
-        let observable: NSObjectProtocol = self.reactiveCenter.addObserver(
+        let observable: NSObjectProtocol = ReactiveCenter.shared.addObserver(
             forName: self.valueGetterNotification,
             object: nil,
             queue: nil,
             using: {
                 guard
-                    let notificationToken = $0.userInfo?[Self.kNotificationToken] as? ReactiveToken,
+                    let notificationToken = $0.userInfo?[kNotificationToken] as? ReactiveToken,
                     notificationToken == token
                     else {
                         return
                     }
 
-                guard let value = $0.userInfo?[Self.kNotificationNewValue] as? Value else {
-                    Fatal.Builder("ReactiveCenter couldn't cast value to type of \(Value.self)").die()
+                let valueOfUserInfo = $0.userInfo?[kNotificationNewValue]
+                guard let value = valueOfUserInfo as? Value else {
+                    Fatal.Builder("ReactiveCenter couldn't cast \(valueOfUserInfo ?? "nil") to type of \(Value.self)").die()
                 }
 
                 handler(value)
         })
 
-        self.reactiveCenter.post(
+        ReactiveCenter.shared.post(
             name: self.requestValueGetterNotification,
             object: nil,
             userInfo: [
-                Self.kNotificationToken: token
+                kNotificationToken: token
             ])
 
-        self.reactiveCenter.removeObserver(observable)
+        ReactiveCenter.shared.removeObserver(observable)
     }
 }

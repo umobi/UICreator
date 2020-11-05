@@ -44,28 +44,28 @@ public struct UICFlow: UIViewCreator {
 public extension UIViewCreator where View: UICollectionViewLayoutCreator, View.CollectionLayout: UICollectionViewFlowLayout {
 
     @inlinable
-    func line(minimumSpacing: CGFloat) -> UICModifiedView<View> {
+    func line(minimumSpacing: CGFloat) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.castedCollectionViewLayout.minimumLineSpacing = minimumSpacing
         }
     }
 
     @inlinable
-    func interItem(minimumSpacing: CGFloat) -> UICModifiedView<View> {
+    func interItem(minimumSpacing: CGFloat) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.castedCollectionViewLayout.minimumInteritemSpacing = minimumSpacing
         }
     }
 
     @inlinable
-    func item(size: CGSize) -> UICModifiedView<View> {
+    func item(size: CGSize) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.castedCollectionViewLayout.itemSize = size
         }
     }
 
     @inlinable
-    func item(relativeHeight height: CGFloat) -> UICModifiedView<View> {
+    func item(relativeHeight height: CGFloat) -> UICLayoutModifier<View> {
         self.onLayout {
             let collectionLayout: View.CollectionLayout! = ($0 as? View)?.castedCollectionViewLayout
 
@@ -78,7 +78,7 @@ public extension UIViewCreator where View: UICollectionViewLayoutCreator, View.C
     }
 
     @inlinable
-    func item(relativeWidth width: CGFloat) -> UICModifiedView<View> {
+    func item(relativeWidth width: CGFloat) -> UICLayoutModifier<View> {
         self.onLayout {
             let collectionLayout: View.CollectionLayout! = ($0 as? View)?.castedCollectionViewLayout
 
@@ -91,7 +91,7 @@ public extension UIViewCreator where View: UICollectionViewLayoutCreator, View.C
     }
 
     @inlinable
-    func item(height: CGFloat) -> UICModifiedView<View> {
+    func item(height: CGFloat) -> UICLayoutModifier<View> {
         self.onLayout {
             let collectionLayout: View.CollectionLayout! = ($0 as? View)?.castedCollectionViewLayout
 
@@ -104,7 +104,7 @@ public extension UIViewCreator where View: UICollectionViewLayoutCreator, View.C
     }
 
     @inlinable
-    func item(width: CGFloat) -> UICModifiedView<View> {
+    func item(width: CGFloat) -> UICLayoutModifier<View> {
         self.onLayout {
             let collectionLayout: View.CollectionLayout! = ($0 as? View)?.castedCollectionViewLayout
 
@@ -117,7 +117,7 @@ public extension UIViewCreator where View: UICollectionViewLayoutCreator, View.C
     }
 
     @inlinable
-    func item(aspectRatioHeight constant: CGFloat) -> UICModifiedView<View> {
+    func item(aspectRatioHeight constant: CGFloat) -> UICLayoutModifier<View> {
         self.onLayout {
             ($0 as? View)?.castedCollectionViewLayout.itemSize = .init(
                 width: $0.bounds.height * constant,
@@ -127,7 +127,7 @@ public extension UIViewCreator where View: UICollectionViewLayoutCreator, View.C
     }
 
     @inlinable
-    func item(aspectRatioWidth constant: CGFloat) -> UICModifiedView<View> {
+    func item(aspectRatioWidth constant: CGFloat) -> UICLayoutModifier<View> {
         self.onLayout {
             ($0 as? View)?.castedCollectionViewLayout.itemSize = .init(
                 width: $0.bounds.width,
@@ -137,56 +137,56 @@ public extension UIViewCreator where View: UICollectionViewLayoutCreator, View.C
     }
 
     @inlinable
-    func item(estimatedSize: CGSize) -> UICModifiedView<View> {
+    func item(estimatedSize: CGSize) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.castedCollectionViewLayout.estimatedItemSize = estimatedSize
         }
     }
 
     @inlinable
-    func scroll(direction: UICollectionView.ScrollDirection) -> UICModifiedView<View> {
+    func scroll(direction: UICollectionView.ScrollDirection) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.castedCollectionViewLayout.scrollDirection = direction
         }
     }
 
     @inlinable
-    func header(referenceSize size: CGSize) -> UICModifiedView<View> {
+    func header(referenceSize size: CGSize) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.castedCollectionViewLayout.headerReferenceSize = size
         }
     }
 
     @inlinable
-    func footer(referenceSize size: CGSize) -> UICModifiedView<View> {
+    func footer(referenceSize size: CGSize) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.castedCollectionViewLayout.footerReferenceSize = size
         }
     }
 
     @inlinable
-    func section(inset: UIEdgeInsets) -> UICModifiedView<View> {
+    func section(inset: UIEdgeInsets) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.castedCollectionViewLayout.sectionInset = inset
         }
     }
 
     @available(iOS 11.0, tvOS 11.0, *) @inlinable
-    func section(insetReference: UICollectionViewFlowLayout.SectionInsetReference) -> UICModifiedView<View> {
+    func section(insetReference: UICollectionViewFlowLayout.SectionInsetReference) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.castedCollectionViewLayout.sectionInsetReference = insetReference
         }
     }
 
     @inlinable
-    func section(headersPinToVisibleBounds flag: Bool) -> UICModifiedView<View> {
+    func section(headersPinToVisibleBounds flag: Bool) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.castedCollectionViewLayout.sectionHeadersPinToVisibleBounds = flag
         }
     }
 
     @inlinable
-    func section(footersPinToVisibleBounds flag: Bool) -> UICModifiedView<View> {
+    func section(footersPinToVisibleBounds flag: Bool) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.castedCollectionViewLayout.sectionFootersPinToVisibleBounds = flag
         }

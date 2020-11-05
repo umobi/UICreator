@@ -78,6 +78,10 @@ public struct UICDatePicker: UIViewCreator {
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let minimumDate = _self.$minimumDate
+        let maximumDate = _self.$maximumDate
+        let selectedDate = _self.$selectedDate
+
         return Views.DatePicker()
             .onNotRendered {
                 if #available(iOS 13.4, *) {
@@ -92,15 +96,15 @@ public struct UICDatePicker: UIViewCreator {
             .onNotRendered {
                 weak var view = $0 as? View
 
-                _self.$minimumDate.sync {
+                minimumDate.sync {
                     view?.minimumDate = $0
                 }
 
-                _self.$maximumDate.sync {
+                maximumDate.sync {
                     view?.maximumDate = $0
                 }
 
-                _self.$maximumDate.distinctSync {
+                selectedDate.distinctSync {
                     guard let date = $0 else {
                         return
                     }
@@ -109,7 +113,7 @@ public struct UICDatePicker: UIViewCreator {
                 }
             }
             .onEvent(.valueChanged) {
-                _self.selectedDate = ($0 as? View)?.date
+                selectedDate.wrappedValue = ($0 as? View)?.date
             }
     }
 }
@@ -118,21 +122,21 @@ public extension UIViewCreator where View: UIDatePicker {
 
     @available(iOS 13.4, *)
     @inlinable
-    func preferredStyle(_ style: UIDatePickerStyle) -> UICModifiedView<View> {
+    func preferredStyle(_ style: UIDatePickerStyle) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.preferredDatePickerStyle = style
         }
     }
 
     @inlinable
-    func countDownDuration(_ duration: TimeInterval) -> UICModifiedView<View> {
+    func countDownDuration(_ duration: TimeInterval) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.countDownDuration = duration
         }
     }
 
     @inlinable
-    func minuteInterval(_ interval: Int) -> UICModifiedView<View> {
+    func minuteInterval(_ interval: Int) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.minuteInterval = interval
         }

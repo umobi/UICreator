@@ -29,10 +29,10 @@ import ConstraintBuilder
 public struct UICZStack: UIViewCreator {
     public typealias View = CBView
 
-    private let contents: () -> ViewCreator
+    private let contents: [ViewCreator]
 
-    public init(@UICViewBuilder _ contents: @escaping () -> ViewCreator) {
-        self.contents = contents
+    public init(@UICViewBuilder _ contents: () -> ViewCreator) {
+        self.contents = contents().zip
     }
 
     @inline(__always)
@@ -41,7 +41,7 @@ public struct UICZStack: UIViewCreator {
 
         return Views.ZStackView()
             .onNotRendered { view in
-                _self.contents().zip.forEach {
+                _self.contents.forEach {
                     view.add(priority: .fittingSizeLevel, $0.releaseUIView())
                 }
             }

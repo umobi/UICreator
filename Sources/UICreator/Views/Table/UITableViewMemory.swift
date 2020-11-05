@@ -24,19 +24,9 @@ import Foundation
 import UIKit
 
 extension UITableView {
-    struct WeakCell {
-        private(set) weak var view: ReusableView!
-
-        init(_ view: ReusableView) {
-            self.view = view
-        }
-    }
-}
-
-extension UITableView {
     struct Memory {
-        @MutableBox var reusableCells: [WeakCell] = []
-        @MutableBox var manager: ListCollectionManager?
+        @MutableBox var reusableCells: [WeakBox<AnyObject>] = []
+        @MutableBox var modifier: ListModifier?
         @MutableBox var cellHandler: ((UITableViewCell) -> Void)?
     }
 }
@@ -55,33 +45,37 @@ extension UITableView {
 
 extension UITableView {
     @inline(__always) @usableFromInline
-    var manager: ListCollectionManager? {
-        get { self.memory.manager }
-        set { self.memory.manager = newValue }
+    var modifier: ListModifier? {
+        get { self.memory.modifier }
+        set { self.memory.modifier = newValue }
     }
 }
 
 extension UITableView {
     @inline(__always)
-    private var reusableCells: [WeakCell] {
+    private var reusableViews: [WeakBox<AnyObject>] {
         get { self.memory.reusableCells }
         set { self.memory.reusableCells = newValue }
     }
 
-    func appendReusable(cell: ReusableView) {
-        guard !self.reusableCells.contains(where: { $0.view === cell }) else {
+    func append(_ reusableView: ListReusableView) {
+        guard !self.reusableViews.contains(where: { $0.wrappedValue === reusableView }) else {
             return
         }
 
-        self.reusableCells.append(.init(cell))
-        self.reusableCells = self.reusableCells.filter {
-            $0.view != nil
+        self.reusableViews.append(.init(wrappedValue: reusableView))
+        self.reusableViews = self.reusableViews.filter {
+            $0.wrappedValue != nil
         }
     }
 
-    func reusableView(at indexPath: IndexPath) -> ReusableView? {
-        self.reusableCells.first(where: {
-            $0.view?.cellLoaded.cell.rowManager.indexPath == indexPath
-        })?.view
+    func reusableView(at indexPath: IndexPath) -> ListReusableView? {
+        self.reusableViews.first(where: {
+            guard case .row(_, _, _, let rowIndexPath)? = ($0.wrappedValue as? ListReusableView)?.row.type else {
+                return false
+            }
+
+            return rowIndexPath == indexPath
+        })?.wrappedValue as? ListReusableView
     }
 }

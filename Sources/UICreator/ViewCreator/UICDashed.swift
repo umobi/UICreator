@@ -32,15 +32,15 @@ public struct UICDashed: UIViewCreator {
     @Relay var width: CGFloat
     @Relay var pattern: [NSNumber]
 
-    let content: () -> ViewCreator
+    let content: ViewCreator
 
     public init(
         color: UIColor,
         width: CGFloat = 1,
         pattern: [NSNumber] = [2, 3],
-        content: @escaping () -> ViewCreator) {
+        content: () -> ViewCreator) {
 
-        self.content = content
+        self.content = content()
         self._color = .constant(color)
         self._width = .constant(width)
         self._pattern = .constant(pattern)
@@ -50,9 +50,9 @@ public struct UICDashed: UIViewCreator {
         color: Relay<UIColor>,
         width: Relay<CGFloat> = .constant(1),
         pattern: Relay<[NSNumber]> = .constant([2, 3]),
-        content: @escaping () -> ViewCreator) {
+        content: () -> ViewCreator) {
 
-        self.content = content
+        self.content = content()
         self._color = color
         self._width = width
         self._pattern = pattern
@@ -64,7 +64,7 @@ public struct UICDashed: UIViewCreator {
 
         return View()
             .onNotRendered {
-                ($0 as? View)?.addContent(_self.content().releaseUIView())
+                ($0 as? View)?.addContent(_self.content.releaseUIView())
             }
             .onNotRendered {
                 weak var view = $0 as? View

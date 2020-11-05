@@ -28,21 +28,21 @@ public struct UICVStack: UIViewCreator {
     public typealias View = UIStackView
 
     @Relay private var spacing: CGFloat
-    private let content: () -> ViewCreator
+    private let content: [ViewCreator]
 
     public init(
         spacing: CGFloat = .zero,
-        @UICViewBuilder _ content: @escaping () -> ViewCreator) {
+        @UICViewBuilder _ content: () -> ViewCreator) {
 
-        self.content = content
+        self.content = content().zip
         self._spacing = .constant(spacing)
     }
 
     public init(
         spacing: Relay<CGFloat>,
-        @UICViewBuilder _ content: @escaping () -> ViewCreator) {
+        @UICViewBuilder _ content: () -> ViewCreator) {
 
-        self.content = content
+        self.content = content().zip
         self._spacing = spacing
     }
 
@@ -64,7 +64,7 @@ public struct UICVStack: UIViewCreator {
             .onNotRendered {
                 weak var view: Views.StackView! = $0 as? Views.StackView
 
-                _self.content().zip.forEach {
+                _self.content.forEach {
                     if let forEachShared = $0 as? ForEachEnviromentShared {
                         let stackManager = Views.StackView.Manager(view)
                         view.strongStackManager(stackManager)

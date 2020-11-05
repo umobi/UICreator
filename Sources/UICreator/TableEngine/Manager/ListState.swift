@@ -20,20 +20,23 @@
 // THE SOFTWARE.
 //
 
-import UIKit
-import ConstraintBuilder
+import Foundation
 
-@frozen
-public struct UICModifiedView<View>: UIViewCreator where View: CBView {
-    private let viewLoader: () -> View
-
+@usableFromInline
+struct ListState: ListModifier {
     @usableFromInline
-    internal init(_ viewLoader: @escaping () -> View) {
-        self.viewLoader = viewLoader
+    let state: List
+
+    init(_ listView: ListSupport,_ contents: [ViewCreator]) {
+        self.state = .init(listView, contents)
     }
 
-    @inline(__always)
-    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
-        (viewCreator as! Self).viewLoader()
+    init(_ list: List) {
+        self.state = list
+    }
+
+    @inline(__always) @usableFromInline
+    func update(_ list: List) -> ListState {
+        .init(list)
     }
 }

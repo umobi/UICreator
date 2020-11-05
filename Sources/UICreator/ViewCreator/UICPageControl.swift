@@ -51,20 +51,23 @@ public struct UICPageControl: UIViewCreator {
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let numberOfPages = _self.$numberOfPages
+        let currentPage = _self.$currentPage
+
         return Views.PageControl()
             .onNotRendered {
                 weak var view = $0 as? View
 
-                _self.$numberOfPages.sync {
+                numberOfPages.sync {
                     view?.numberOfPages = $0
                 }
 
-                _self.$currentPage.distinctSync {
+                currentPage.distinctSync {
                     view?.currentPage = $0
                 }
             }
             .onEvent(.valueChanged) {
-                _self.currentPage = ($0 as? View)?.currentPage ?? .zero
+                currentPage.wrappedValue = ($0 as? View)?.currentPage ?? .zero
             }
     }
 }
@@ -72,35 +75,35 @@ public struct UICPageControl: UIViewCreator {
 public extension UIViewCreator where View: UIPageControl {
 
     @inlinable
-    func currentPageIndicatorTintColor(_ color: UIColor?) -> UICModifiedView<View> {
+    func currentPageIndicatorTintColor(_ color: UIColor?) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.currentPageIndicatorTintColor = color
         }
     }
 
     @inlinable
-    func defersCurrentPageDisplay(_ flag: Bool) -> UICModifiedView<View> {
+    func defersCurrentPageDisplay(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.defersCurrentPageDisplay = flag
         }
     }
 
     @inlinable
-    func hidesForSinglePage(_ flag: Bool) -> UICModifiedView<View> {
+    func hidesForSinglePage(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.hidesForSinglePage = flag
         }
     }
 
     @inlinable
-    func numberOfPages(_ pages: Int) -> UICModifiedView<View> {
+    func numberOfPages(_ pages: Int) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.numberOfPages = pages
         }
     }
 
     @inlinable
-    func pageIndicatorTintColor(_ color: UIColor?) -> UICModifiedView<View> {
+    func pageIndicatorTintColor(_ color: UIColor?) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.pageIndicatorTintColor = color
         }

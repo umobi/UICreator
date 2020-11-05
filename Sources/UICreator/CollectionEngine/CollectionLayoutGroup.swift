@@ -44,26 +44,26 @@ public class UICCollectionLayoutGroup: UICCollectionLayoutSectionElement, UICCol
     convenience public init(
         vertical: CollectionLayoutSizeConstraint,
         horizontal: CollectionLayoutSizeConstraint,
-        @UICCollectionLayoutBuilder _ contents: @escaping () -> UICCollectionLayoutElement) {
+        @UICCollectionLayoutBuilder _ contents: () -> UICCollectionLayoutElement) {
 
         self.init(vertical, horizontal, contents().zip)
     }
 
     convenience public init(
         horizontal: CollectionLayoutSizeConstraint,
-        @UICCollectionLayoutBuilder _ contents: @escaping () -> UICCollectionLayoutElement) {
+        @UICCollectionLayoutBuilder _ contents: () -> UICCollectionLayoutElement) {
 
         self.init(nil, horizontal, contents().zip)
     }
 
     convenience public init(
         vertical: CollectionLayoutSizeConstraint,
-        @UICCollectionLayoutBuilder _ contents: @escaping () -> UICCollectionLayoutElement) {
+        @UICCollectionLayoutBuilder _ contents: () -> UICCollectionLayoutElement) {
 
         self.init(vertical, nil, contents().zip)
     }
 
-    convenience public init(@UICCollectionLayoutBuilder _ contents: @escaping () -> UICCollectionLayoutElement) {
+    convenience public init(@UICCollectionLayoutBuilder _ contents: () -> UICCollectionLayoutElement) {
         self.init(nil, nil, contents().zip)
     }
 

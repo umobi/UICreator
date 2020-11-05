@@ -25,39 +25,55 @@ import UIKit
 
 extension ListSupport where Self: UICollectionViewLayoutCreator {
     @discardableResult
-    func dynamicData(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> Self {
-        self.onNotRendered {
+    func dynamicData(@UICViewBuilder _ contents: () -> ViewCreator) -> Self {
+        let contents = contents().zip
+
+        return self.onInTheScene {
             let collectionView: Self! = $0 as? Self
 
-            let manager = ListManager(contents: contents().zip)
+            let modifier = ListState(collectionView, contents)
 
-            manager.rowsIdentifier.forEach {
-                collectionView.register(
-                    CollectionViewCell.self,
-                    forCellWithReuseIdentifier: $0
-                )
-            }
+            collectionView.register(
+                modifier.rows,
+                modifier.headers,
+                modifier.footers
+            )
 
-            manager.headersIdentifier.forEach {
-                collectionView.register(
-                    Views.CollectionReusableView.self,
-                    forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                    withReuseIdentifier: $0
-                )
-            }
-
-            manager.footersIdentifier.forEach {
-                collectionView.register(
-                    Views.CollectionReusableView.self,
-                    forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-                    withReuseIdentifier: $0
-                )
-            }
-
-            collectionView.manager = manager
+            collectionView.modifier = modifier
             collectionView.strongDataSource(UICCollectionViewDataSource())
             collectionView.strongDelegate(collectionView.provideDelegate())
-            manager.list = collectionView
+        }
+    }
+}
+
+extension ListSupport where Self: UICollectionView {
+    @usableFromInline
+    func register(
+        _ rows: [List.Identifier<String, Row>],
+        _ headers: [List.Identifier<String, Row>],
+        _ footers: [List.Identifier<String, Row>]) {
+
+        rows.forEach {
+            self.register(
+                Views.CollectionViewCell.self,
+                forCellWithReuseIdentifier: $0.id
+            )
+        }
+
+        headers.forEach {
+            self.register(
+                Views.CollectionReusableView.self,
+                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                withReuseIdentifier: $0.id
+            )
+        }
+
+        footers.forEach {
+            self.register(
+                Views.CollectionReusableView.self,
+                forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+                withReuseIdentifier: $0.id
+            )
         }
     }
 }

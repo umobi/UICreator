@@ -24,10 +24,13 @@ import Foundation
 import UIKit
 import ConstraintBuilder
 
-public protocol UIViewControllerCreator: ViewCreator {
-    associatedtype ViewController: CBViewController
+public protocol ViewControllerCreator: ViewCreator {
 
     static func _makeUIViewController(_ viewCreator: ViewCreator) -> CBViewController
+}
+
+public protocol UIViewControllerCreator: ViewControllerCreator {
+    associatedtype ViewController: CBViewController
 
     /**
      This method should be used when it is necessarly to set a property to the view, but only the ones that don't
@@ -38,7 +41,7 @@ public protocol UIViewControllerCreator: ViewCreator {
 
      - Returns: Returns a self reference to compose the declarative programming.
      */
-    func onNotRendered(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController>
+    func onNotRendered(_ handler: @escaping (CBViewController) -> Void) -> UICNotRenderedModifierController<ViewController>
 
     /**
      This method should be used when the view is in the local hierarchy and it's needed to set
@@ -49,7 +52,7 @@ public protocol UIViewControllerCreator: ViewCreator {
 
      - Returns: Returns a self reference to compose the declarative programming.
      */
-    func onRendered(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController>
+    func onRendered(_ handler: @escaping (CBViewController) -> Void) -> UICRenderedModifierController<ViewController>
 
     /**
      This method should be used when the view is in the window hierarchy, accessing view controllers
@@ -60,7 +63,7 @@ public protocol UIViewControllerCreator: ViewCreator {
 
      - Returns: Returns a self reference to compose the declarative programming.
      */
-    func onInTheScene(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController>
+    func onInTheScene(_ handler: @escaping (CBViewController) -> Void) -> UICInTheSceneModifierController<ViewController>
 
     /**
      This method calls the handler parameter when the UIView calls `layoutSubviews`.
@@ -70,7 +73,7 @@ public protocol UIViewControllerCreator: ViewCreator {
 
      - Returns: Returns a self reference to compose the declarative programming.
      */
-    func onLayout(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController>
+    func onLayout(_ handler: @escaping (CBViewController) -> Void) -> UICLayoutModifierController<ViewController>
 
     /**
      This method calls the handler parameter when the UIView is hidden, moved from heirarchy or when the frame changes
@@ -81,7 +84,7 @@ public protocol UIViewControllerCreator: ViewCreator {
 
      - Returns: Returns a self reference to compose the declarative programming.
      */
-    func onAppear(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController>
+    func onAppear(_ handler: @escaping (CBViewController) -> Void) -> UICAppearModifierController<ViewController>
 
     /**
      This method calls the handler parameter when the UIView is hidden, moved from heirarchy or when the frame changes
@@ -92,97 +95,61 @@ public protocol UIViewControllerCreator: ViewCreator {
 
      - Returns: Returns a self reference to compose the declarative programming.
      */
-    func onDisappear(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController>
+    func onDisappear(_ handler: @escaping (CBViewController) -> Void) -> UICDisappearModifierController<ViewController>
 }
 
-extension UIViewControllerCreator {
+extension ViewControllerCreator {
     @usableFromInline
-    func releaseCastedViewController() -> ViewController {
-        Self._makeUIViewController(self) as! ViewController
+    func releaseViewController() -> CBViewController {
+        Self._makeUIViewController(self)
     }
 }
 
 public extension UIViewControllerCreator {
     static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
-        Views.ViewControllerAdaptor((viewCreator as! Self).releaseCastedViewController())
+        Views.ViewControllerAdaptor((viewCreator as! Self).releaseViewController())
     }
 }
 
 public extension UIViewControllerCreator {
-    @inlinable
-    func onNotRendered(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController {
-            let viewController = self.releaseCastedViewController()
-            viewController.view.onNotRendered { [weak viewController] _ in
-                handler(viewController!)
-            }
-            return viewController
-        }
+    @inline(__always) @inlinable
+    func onNotRendered(_ handler: @escaping (CBViewController) -> Void) -> UICNotRenderedModifierController<ViewController> {
+        UICNotRenderedModifierController(self, onNotRendered: handler)
     }
 
-    @inlinable
-    func onRendered(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController {
-            let viewController = self.releaseCastedViewController()
-            viewController.view.onRendered { [weak viewController] _ in
-                handler(viewController!)
-            }
-            return viewController
-        }
+    @inline(__always) @inlinable
+    func onRendered(_ handler: @escaping (CBViewController) -> Void) -> UICRenderedModifierController<ViewController> {
+        UICRenderedModifierController(self, onRendered: handler)
     }
 
-    @inlinable
-    func onInTheScene(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController {
-            let viewController = self.releaseCastedViewController()
-            viewController.view.onInTheScene { [weak viewController] _ in
-                handler(viewController!)
-            }
-            return viewController
-        }
+    @inline(__always) @inlinable
+    func onInTheScene(_ handler: @escaping (CBViewController) -> Void) -> UICInTheSceneModifierController<ViewController> {
+        UICInTheSceneModifierController(self, onInTheScene: handler)
     }
 }
 
 public extension UIViewControllerCreator {
 
-    @inlinable
-    func onLayout(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController {
-            let viewController = self.releaseCastedViewController()
-            viewController.view.onLayout { [weak viewController] _ in
-                handler(viewController!)
-            }
-            return viewController
-        }
+    @inline(__always) @inlinable
+    func onLayout(_ handler: @escaping (CBViewController) -> Void) -> UICLayoutModifierController<ViewController> {
+        UICLayoutModifierController(self, onLayout: handler)
     }
 
-    @inlinable
-    func onAppear(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController {
-            let viewController = self.releaseCastedViewController()
-            viewController.view.onAppear { [weak viewController] _ in
-                handler(viewController!)
-            }
-            return viewController
-        }
+    @inline(__always) @inlinable
+    func onAppear(_ handler: @escaping (CBViewController) -> Void) -> UICAppearModifierController<ViewController> {
+        UICAppearModifierController(self, onAppear: handler)
     }
 
-    @inlinable
-    func onDisappear(_ handler: @escaping (CBViewController) -> Void) -> UICModifiedViewController<ViewController> {
-        UICModifiedViewController {
-            let viewController = self.releaseCastedViewController()
-            viewController.view.onDisappear { [weak viewController] _ in
-                handler(viewController!)
-            }
-            return viewController
-        }
+    @inline(__always) @inlinable
+    func onDisappear(_ handler: @escaping (CBViewController) -> Void) -> UICDisappearModifierController<ViewController> {
+        UICDisappearModifierController(self, onDisappear: handler)
     }
 }
 
 public extension UIViewControllerCreator {
 
     @inlinable
-    func `as`(_ outlet: UICOutlet<ViewController>) -> UICModifiedViewController<ViewController> {
+    func `as`(_ outlet: UICOutlet<ViewController>) -> UICInTheSceneModifierController<ViewController> {
         self.onInTheScene {
             outlet.ref($0 as? ViewController)
         }

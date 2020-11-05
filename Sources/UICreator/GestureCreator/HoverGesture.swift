@@ -42,14 +42,14 @@ public struct Hover: UIGestureCreator {
 public extension UIViewCreator {
 
     @inlinable @available(iOS 13.0, *)
-    func onHoverMaker<Hover>(_ hoverConfigurator: @escaping () -> Hover) -> UICModifiedView<View> where Hover: UIGestureCreator, Hover.Gesture: UIHoverGestureRecognizer {
+    func onHoverMaker<Hover>(_ hoverConfigurator: @escaping () -> Hover) -> UICNotRenderedModifier<View> where Hover: UIGestureCreator, Hover.Gesture: UIHoverGestureRecognizer {
         self.onNotRendered {
             hoverConfigurator().add($0)
         }
     }
 
     @inlinable @available(iOS 13.0, *)
-    func onHover(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+    func onHover(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
         self.onHoverMaker {
             Hover()
                 .onRecognized {

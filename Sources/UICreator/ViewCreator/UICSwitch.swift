@@ -43,14 +43,16 @@ public struct UICSwitch: UIViewCreator {
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let isOn = _self.$isOn
+
         return Views.Switch()
             .onEvent(.valueChanged) {
-                _self.isOn = ($0 as? View)?.isOn ?? false
+                isOn.wrappedValue = ($0 as? View)?.isOn ?? false
             }
             .onNotRendered {
                 weak var view = $0 as? View
 
-                _self.$isOn.distinctSync {
+                isOn.distinctSync {
                     view?.isOn = $0
                 }
             }
@@ -60,35 +62,35 @@ public struct UICSwitch: UIViewCreator {
 public extension UIViewCreator where View: UISwitch {
 
     @inlinable
-    func isOn(_ flag: Bool) -> UICModifiedView<View> {
+    func isOn(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.isOn = flag
         }
     }
 
     @inlinable
-    func offImage(_ image: UICImage?) -> UICModifiedView<View> {
+    func offImage(_ image: UICImage?) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.offImage = image?.uiImage
         }
     }
 
     @inlinable
-    func onImage(_ image: UICImage?) -> UICModifiedView<View> {
+    func onImage(_ image: UICImage?) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.onImage = image?.uiImage
         }
     }
 
     @inlinable
-    func onTintColor(_ color: UIColor?) -> UICModifiedView<View> {
+    func onTintColor(_ color: UIColor?) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.onTintColor = color
         }
     }
 
     @inlinable
-    func thumbTintColor(_ color: UIColor?) -> UICModifiedView<View> {
+    func thumbTintColor(_ color: UIColor?) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.thumbTintColor = color
         }

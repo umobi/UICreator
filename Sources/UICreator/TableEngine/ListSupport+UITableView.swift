@@ -25,27 +25,45 @@ import UIKit
 
 extension ListSupport where Self: UITableView {
     @discardableResult
-    func dynamicData(@UICViewBuilder _ contents: @escaping () -> ViewCreator) -> Self {
-        self.onNotRendered {
-            let manager = ListManager(contents: contents().zip)
-            let tableView: Self! = $0 as? Self
-            
-            manager.rowsIdentifier.forEach { [unowned tableView] in
-                tableView?.register(Views.TableViewCell.self, forCellReuseIdentifier: $0)
-            }
+    func dynamicData(@UICViewBuilder _ contents: () -> ViewCreator) -> Self {
+        let contents = contents().zip
 
-            manager.headersIdentifier.forEach { [unowned tableView] in
-                tableView?.register(Views.TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-            }
+        return self.onInTheScene { view in
+            OperationQueue.main.addOperation {
+                let modifier = ListState(self, contents)
+                let tableView: Self! = view as? Self
 
-            manager.footersIdentifier.forEach { [unowned tableView] in
-                tableView?.register(Views.TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0)
-            }
+                tableView.register(
+                    modifier.rows,
+                    modifier.headers,
+                    modifier.footers
+                )
 
-            tableView.manager = manager
-            tableView.strongDataSource(UICTableViewDataSource())
-            tableView.strongDelegate(UICTableViewDelegate())
-            manager.list = tableView
+                tableView.modifier = modifier
+                tableView.strongDelegate(UICTableViewDelegate())
+                tableView.strongDataSource(UICTableViewDataSource())
+            }
+        }
+    }
+}
+
+extension ListSupport where Self: UITableView {
+    @usableFromInline
+    func register(
+        _ rows: [List.Identifier<String, Row>],
+        _ headers: [List.Identifier<String, Row>],
+        _ footers: [List.Identifier<String, Row>]) {
+
+        rows.forEach {
+            self.register(Views.TableViewCell.self, forCellReuseIdentifier: $0.id)
+        }
+
+        headers.forEach {
+            self.register(Views.TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0.id)
+        }
+
+        footers.forEach {
+            self.register(Views.TableViewHeaderFooterCell.self, forHeaderFooterViewReuseIdentifier: $0.id)
         }
     }
 }

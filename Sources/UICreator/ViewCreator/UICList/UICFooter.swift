@@ -25,10 +25,10 @@ import ConstraintBuilder
 
 @frozen
 public struct UICFooter: ViewCreator {
-    let content: () -> ViewCreator
+    let content: ViewCreator
 
-    public init(content: @escaping () -> ViewCreator) {
-        self.content = content
+    public init(content: () -> ViewCreator) {
+        self.content = content()
     }
 
 //    @inline(__always)

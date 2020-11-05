@@ -28,12 +28,12 @@ import ConstraintBuilder
 public struct UICSpacer: UIViewCreator {
     public typealias View = CBView
 
-    @MutableBox var margin: Edges
-    let content: () -> ViewCreator
+    let margin: Edges
+    let content: ViewCreator
 
-    public init(margin: Edges, content: @escaping () -> ViewCreator) {
-        self._margin = .init(wrappedValue: margin)
-        self.content = content
+    public init(margin: Edges, content: () -> ViewCreator) {
+        self.margin = margin
+        self.content = content()
     }
 
     @inline(__always)
@@ -41,11 +41,11 @@ public struct UICSpacer: UIViewCreator {
         let _self = viewCreator as! Self
 
         if _self.margin == .zero {
-            return _self.content().releaseUIView()
+            return _self.content.releaseUIView()
         }
 
         return Views.SpacerView()
-            .addContent(_self.content().releaseUIView())
+            .addContent(_self.content.releaseUIView())
             .setMargin(_self.margin)
     }
 }
@@ -96,7 +96,7 @@ public extension UICSpacer {
         bottom: CGFloat,
         leading: CGFloat,
         trailing: CGFloat,
-        content: @escaping () -> ViewCreator) {
+        content: () -> ViewCreator) {
 
         self.init(
             margin: .init(
@@ -110,122 +110,186 @@ public extension UICSpacer {
     }
 
     @inline(__always)
-    init(vertical: CGFloat, horizontal: CGFloat, content: @escaping () -> ViewCreator) {
+    init(vertical: CGFloat, horizontal: CGFloat, content: () -> ViewCreator) {
         self.init(margin: .init(vertical: vertical, horizontal: horizontal), content: content)
     }
 
     @inline(__always)
-    init(vertical: CGFloat, content: @escaping () -> ViewCreator) {
+    init(vertical: CGFloat, content: () -> ViewCreator) {
         self.init(margin: .init(vertical: vertical, horizontal: 0), content: content)
     }
 
     @inline(__always)
-    init(horizontal: CGFloat, content: @escaping () -> ViewCreator) {
+    init(horizontal: CGFloat, content: () -> ViewCreator) {
         self.init(margin: .init(vertical: 0, horizontal: horizontal), content: content)
     }
 
     @inline(__always)
-    init(spacing: CGFloat, content: @escaping () -> ViewCreator) {
+    init(spacing: CGFloat, content: () -> ViewCreator) {
         self.init(margin: .init(spacing: spacing), content: content)
     }
 
     @inline(__always)
-    init(content: @escaping () -> ViewCreator) {
+    init(content: () -> ViewCreator) {
         self.init(margin: .init(spacing: 0), content: content)
+    }
+}
+
+extension Set where Element == PaddingEdges {
+    func `if`(_ actualElement: PaddingEdges, contains element: PaddingEdges, and otherElement: PaddingEdges, return thisElement: PaddingEdges, elseUnionWith unionThisElement: PaddingEdges) -> Set<Element> {
+        if self.contains(element) {
+            if self.contains(otherElement) {
+                return [thisElement]
+            }
+
+            return self.filter { $0 == element }.union([unionThisElement])
+        }
+
+        return self.union([actualElement])
+    }
+
+    @usableFromInline
+    func margin(_ constant: CGFloat) -> UICSpacer.Edges {
+        self.reduce(.zero) {
+            switch $1 {
+            case .all:
+                return UICSpacer.Edges(spacing: constant)
+            case .vertical:
+                return UICSpacer.Edges(
+                    top: constant,
+                    bottom: constant,
+                    leading: $0.leading,
+                    trailing: $0.trailing
+                )
+            case .horizontal:
+                return UICSpacer.Edges(
+                    top: $0.top,
+                    bottom: $0.bottom,
+                    leading: constant,
+                    trailing: constant
+                )
+            case .top:
+                return UICSpacer.Edges(
+                    top: constant,
+                    bottom: $0.bottom,
+                    leading: $0.leading,
+                    trailing: $0.trailing
+                )
+            case .bottom:
+                return UICSpacer.Edges(
+                    top: $0.top,
+                    bottom: constant,
+                    leading: $0.leading,
+                    trailing: $0.trailing
+                )
+            case .left:
+                return UICSpacer.Edges(
+                    top: $0.top,
+                    bottom: $0.bottom,
+                    leading: constant,
+                    trailing: $0.trailing
+                )
+            case .right:
+                return UICSpacer.Edges(
+                    top: $0.top,
+                    bottom: $0.bottom,
+                    leading: $0.leading,
+                    trailing: constant
+                )
+            }
+        }
+    }
+}
+
+extension Array where Element == PaddingEdges {
+
+    @usableFromInline
+    var reduced: Set<PaddingEdges> {
+        Set(self).reduce(Set<PaddingEdges>()) {
+            switch $1 {
+            case .all:
+                return .init(arrayLiteral: $1)
+            case .bottom:
+                return $0.if(
+                    .bottom,
+                    contains: .top,
+                    and: .horizontal,
+                    return: .all,
+                    elseUnionWith: .vertical
+                )
+            case .top:
+                return $0.if(
+                    .top,
+                    contains: .bottom,
+                    and: .horizontal,
+                    return: .all,
+                    elseUnionWith: .vertical
+                )
+            case .left:
+                return $0.if(
+                    .left,
+                    contains: .right,
+                    and: .vertical,
+                    return: .all,
+                    elseUnionWith: .horizontal
+                )
+            case .right:
+                return $0.if(
+                    .right,
+                    contains: .left,
+                    and: .vertical,
+                    return: .all,
+                    elseUnionWith: .horizontal
+                )
+            case .vertical:
+                if $0.contains(.horizontal) {
+                    return [.all]
+                }
+
+                return $0.filter { $0 == .top || $0 == .bottom }.union([.vertical])
+            case .horizontal:
+                if $0.contains(.vertical) {
+                    return [.all]
+                }
+
+                return $0.filter { $0 == .left || $0 == .right }.union([.horizontal])
+            }
+        }
     }
 }
 
 public extension UIViewCreator {
 
-    @inline(__always)
-    func padding(_ constant: CGFloat) -> UICModifiedView<CBView> {
-        self.padding(constant, .all)
+    @inline(__always) @inlinable
+    func padding(_ constant: CGFloat) -> UICSpacer {
+        UICSpacer(margin: .init(spacing: constant), content: { self })
     }
 
     @inlinable
-    func padding(_ constant: CGFloat, _ edges: PaddingEdges) -> UICModifiedView<CBView> {
-        UICModifiedView {
-            let view = self.releaseUIView()
+    func padding(_ constant: CGFloat, _ edges: PaddingEdges...) -> UICSpacer {
+        UICSpacer(margin: edges.reduced.margin(constant), content: { self })
+    }
+}
 
-            if let spacerView = view as? Views.SpacerView {
-                spacerView.updatePaddingEdges(constant, edges)
-                return spacerView
-            }
+public extension UICSpacer {
+    @inline(__always)
+    func padding(_ constant: CGFloat) -> UICSpacer {
+        UICSpacer(margin: .init(spacing: constant), content: { content })
+    }
+}
 
-            switch edges {
-            case .all:
-                return UICSpacer(spacing: constant) {
-                    UICAnyView {
-                        view
-                    }
-                }.releaseOperationCastedView()
+public extension UICSpacer {
+    @inline(__always)
+    func padding(_ constant: CGFloat, _ edges: PaddingEdges...) -> UICSpacer {
+        let margin = edges.reduced.margin(constant)
 
-            case .vertical:
-                return UICSpacer(vertical: constant) {
-                    UICAnyView {
-                        view
-                    }
-                }.releaseOperationCastedView()
-
-            case .horizontal:
-                return UICSpacer(horizontal: constant) {
-                    UICAnyView {
-                        view
-                    }
-                }.releaseOperationCastedView()
-
-            case .top:
-                return UICSpacer(
-                    top: constant,
-                    bottom: .zero,
-                    leading: .zero,
-                    trailing: .zero,
-                    content: {
-                        UICAnyView {
-                            view
-                        }
-                    }
-                ).releaseOperationCastedView()
-
-            case .bottom:
-                return UICSpacer(
-                    top: .zero,
-                    bottom: constant,
-                    leading: .zero,
-                    trailing: .zero,
-                    content: {
-                        UICAnyView {
-                            view
-                        }
-                    }
-                ).releaseOperationCastedView()
-
-            case .left:
-                return UICSpacer(
-                    top: .zero,
-                    bottom: .zero,
-                    leading: constant,
-                    trailing: .zero,
-                    content: {
-                        UICAnyView {
-                            view
-                        }
-                    }
-                ).releaseOperationCastedView()
-
-            case .right:
-                return UICSpacer(
-                    top: .zero,
-                    bottom: .zero,
-                    leading: .zero,
-                    trailing: constant,
-                    content: {
-                        UICAnyView {
-                            view
-                        }
-                    }
-                ).releaseOperationCastedView()
-            }
-        }
+        return UICSpacer(margin: {
+            .init(
+                top: margin.top == constant ? margin.top : self.margin.top,
+                bottom: margin.bottom == constant ? margin.bottom : self.margin.bottom,
+                leading: margin.leading == constant ? margin.leading : self.margin.leading,
+                trailing: margin.trailing == constant ? margin.trailing : self.margin.trailing
+            )
+        }(), content: { content })
     }
 }

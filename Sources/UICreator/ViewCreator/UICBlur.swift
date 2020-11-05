@@ -42,11 +42,13 @@ public struct UICBlur: UIViewCreator {
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let style = _self.$style
+
         return View()
             .onNotRendered {
                 weak var view = $0 as? View
 
-                _self.$style.sync {
+                style.sync {
                     view?.apply(blurEffect: $0)
                 }
             }
@@ -55,14 +57,14 @@ public struct UICBlur: UIViewCreator {
 
 public extension UIViewCreator where View: UICBlur.View {
     @inlinable
-    func blurStyle(_ style: UIBlurEffect.Style) -> UICModifiedView<View> {
+    func blurStyle(_ style: UIBlurEffect.Style) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.apply(blurEffect: style)
         }
     }
 
     @inlinable
-    func blurStyle(_ dynamicStyle: Relay<UIBlurEffect.Style>) -> UICModifiedView<View> {
+    func blurStyle(_ dynamicStyle: Relay<UIBlurEffect.Style>) -> UICRenderedModifier<View> {
         self.onRendered {
             weak var view = $0 as? View
 
@@ -77,14 +79,14 @@ public extension UIViewCreator where View: UICBlur.View {
 @available(iOS 13, *)
 public extension UIViewCreator where View: UICBlur.View {
     @inlinable
-    func vibrancyEffect(_ effect: UIVibrancyEffectStyle) -> UICModifiedView<View> {
+    func vibrancyEffect(_ effect: UIVibrancyEffectStyle) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.apply(vibrancyEffect: effect)
         }
     }
 
     @inlinable
-    func vibrancyEffect(_ dynamicEffect: Relay<UIVibrancyEffectStyle>) -> UICModifiedView<View> {
+    func vibrancyEffect(_ dynamicEffect: Relay<UIVibrancyEffectStyle>) -> UICRenderedModifier<View> {
         self.onRendered {
             weak var view = $0 as? View
 

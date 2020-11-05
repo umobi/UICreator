@@ -24,10 +24,10 @@ import ConstraintBuilder
 
 @frozen
 public struct UICSection: ViewCreator {
-    public let contents: () -> ViewCreator
+    public let contents: [ViewCreator]
 
-    public init(@UICViewBuilder _ contents: @escaping () -> ViewCreator) {
-        self.contents = contents
+    public init(@UICViewBuilder _ contents: () -> ViewCreator) {
+        self.contents = contents().zip
     }
 
     @inline(__always)

@@ -140,12 +140,10 @@ internal extension Property {
 
 #if swift(>=5.3)
 public extension UIViewCreator {
-    func openURL(_ urlHandler: @escaping (URL) -> Void) -> UICModifiedView<View> {
+    func openURL(_ urlHandler: @escaping (URL) -> Void) -> UICNotRenderedModifier<View> {
         guard UIApplication.shared.delegate is UICAppDelegate else {
             Fatal.Builder("openURL(_:) is only available for apps that are implemented with UICApp").warning()
-            return UICModifiedView {
-                self.releaseOperationCastedView()
-            }
+            return UICNotRenderedModifier(self, onNotRendered: { _ in })
         }
 
         return self.onNotRendered {
@@ -171,12 +169,10 @@ public extension UIViewCreator {
     }
 
     #if os(iOS)
-    func performShortcut(_ shortcutHandler: @escaping (UIApplicationShortcutItem) -> Void) -> UICModifiedView<View> {
+    func performShortcut(_ shortcutHandler: @escaping (UIApplicationShortcutItem) -> Void) -> UICNotRenderedModifier<View> {
         guard UIApplication.shared.delegate is UICAppDelegate else {
             Fatal.Builder("openURL(_:) is only available for apps that are implemented with UICApp").warning()
-            return UICModifiedView {
-                self.releaseOperationCastedView()
-            }
+            return UICNotRenderedModifier(self, onNotRendered: { _ in })
         }
 
         return self.onNotRendered {
@@ -207,7 +203,7 @@ public extension UIViewCreator {
 //swiftlint:disable function_parameter_count identifier_name
 public extension UIViewCreator {
     @inlinable
-    func dynamicProperty<P0>(_ p0: Property<P0>) -> UICModifiedView<View> {
+    func dynamicProperty<P0>(_ p0: Property<P0>) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             p0.assign($0)
         }
@@ -216,7 +212,7 @@ public extension UIViewCreator {
     @inlinable
     func dynamicProperty<P0, P1>(
         _ p0: Property<P0>,
-        _ p1: Property<P1>) -> UICModifiedView<View> {
+        _ p1: Property<P1>) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered {
             p0.assign($0)
@@ -228,7 +224,7 @@ public extension UIViewCreator {
     func dynamicProperty<P0, P1, P2>(
         _ p0: Property<P0>,
         _ p1: Property<P1>,
-        _ p2: Property<P2>) -> UICModifiedView<View> {
+        _ p2: Property<P2>) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered {
             p0.assign($0)
@@ -242,7 +238,7 @@ public extension UIViewCreator {
         _ p0: Property<P0>,
         _ p1: Property<P1>,
         _ p2: Property<P2>,
-        _ p3: Property<P3>) -> UICModifiedView<View> {
+        _ p3: Property<P3>) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered {
             p0.assign($0)
@@ -258,7 +254,7 @@ public extension UIViewCreator {
         _ p1: Property<P1>,
         _ p2: Property<P2>,
         _ p3: Property<P3>,
-        _ p4: Property<P4>) -> UICModifiedView<View> {
+        _ p4: Property<P4>) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered {
             p0.assign($0)
@@ -276,7 +272,7 @@ public extension UIViewCreator {
         _ p2: Property<P2>,
         _ p3: Property<P3>,
         _ p4: Property<P4>,
-        _ p5: Property<P5>) -> UICModifiedView<View> {
+        _ p5: Property<P5>) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered {
             p0.assign($0)
@@ -296,7 +292,7 @@ public extension UIViewCreator {
         _ p3: Property<P3>,
         _ p4: Property<P4>,
         _ p5: Property<P5>,
-        _ p6: Property<P6>) -> UICModifiedView<View> {
+        _ p6: Property<P6>) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered {
             p0.assign($0)
@@ -318,7 +314,7 @@ public extension UIViewCreator {
         _ p4: Property<P4>,
         _ p5: Property<P5>,
         _ p6: Property<P6>,
-        _ p7: Property<P7>) -> UICModifiedView<View> {
+        _ p7: Property<P7>) -> UICNotRenderedModifier<View> {
 
         self.onNotRendered {
             p0.assign($0)

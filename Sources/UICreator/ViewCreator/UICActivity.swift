@@ -62,14 +62,14 @@ public struct UICActivity: UIViewCreator {
 public extension UIViewCreator where View: UIActivityIndicatorView {
 
     @inlinable
-    func color(_ color: UIColor) -> UICModifiedView<View> {
+    func color(_ color: UIColor) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.color = color
         }
     }
 
     @inlinable
-    func hidesWhenStopped(_ flag: Bool) -> UICModifiedView<View> {
+    func hidesWhenStopped(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.hidesWhenStopped = flag
         }
@@ -79,7 +79,7 @@ public extension UIViewCreator where View: UIActivityIndicatorView {
 public extension UIViewCreator where View: UIActivityIndicatorView {
 
     @inlinable
-    func color(_ color: Relay<UIColor>) -> UICModifiedView<View> {
+    func color(_ color: Relay<UIColor>) -> UICNotRenderedModifier<View> {
         self.onNotRendered { view in
             weak var view = view
             color.sync {

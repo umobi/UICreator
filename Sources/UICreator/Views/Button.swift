@@ -36,7 +36,8 @@ extension Views {
         }
 
         override public init(frame: CGRect) {
-            fatalError("init(frame:) has not been implemented")
+            super.init(frame: frame)
+            self.makeSelfImplemented()
         }
 
         override open var isHidden: Bool {

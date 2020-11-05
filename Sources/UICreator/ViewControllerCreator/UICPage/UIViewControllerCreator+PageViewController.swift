@@ -27,7 +27,7 @@ import ConstraintBuilder
 public extension UIViewControllerCreator where ViewController: ViewControllers.PageViewController {
     #if os(iOS)
     @inlinable
-    func spineLocation(_ handler: @escaping (UIInterfaceOrientation) -> UIPageViewController.SpineLocation) -> UICModifiedViewController<ViewController> {
+    func spineLocation(_ handler: @escaping (UIInterfaceOrientation) -> UIPageViewController.SpineLocation) -> UICInTheSceneModifierController<ViewController> {
         self.onInTheScene {
             ($0 as? ViewController)?.spineLocationHandler = handler
         }
@@ -35,7 +35,7 @@ public extension UIViewControllerCreator where ViewController: ViewControllers.P
     #endif
 
     @inlinable
-    func isInfinityScroll(_ flag: Bool) -> UICModifiedViewController<ViewController> {
+    func isInfinityScroll(_ flag: Bool) -> UICInTheSceneModifierController<ViewController> {
         self.onInTheScene {
             ($0 as? ViewController)?.isInfinityScroll = flag
         }

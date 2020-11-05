@@ -192,7 +192,7 @@ public class UICCollectionLayoutSection: UICCollectionLayoutSectionElement {
 
     public convenience init(
         numberOfSections: Int? = nil,
-        @UICCollectionLayoutSectionBuilder _ contents: @escaping () -> UICCollectionLayoutSectionElement) {
+        @UICCollectionLayoutSectionBuilder _ contents: () -> UICCollectionLayoutSectionElement) {
 
         self.init(numberOfSections: numberOfSections, contents().zip)
     }

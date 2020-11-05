@@ -26,17 +26,16 @@ import ConstraintBuilder
 
 @frozen
 public struct UICAccessibilityView<View>: UIViewCreator where View: CBView {
-
-    private let viewLoader: () -> View
+    private let content: ViewCreator
 
     @usableFromInline
-    init(_ viewCreatorLoader: @escaping () -> View) {
-        self.viewLoader = viewCreatorLoader
+    init<Content>(_ content: Content) where Content: UIViewCreator, Content.View == View {
+        self.content = content
     }
 
     @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
-        UICAnyView((viewCreator as! Self).viewLoader).releaseUIView()
+        (viewCreator as! Self).content.releaseUIView()
     }
 }
 

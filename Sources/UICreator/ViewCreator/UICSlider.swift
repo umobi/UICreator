@@ -49,30 +49,34 @@ public struct UICSlider: UIViewCreator {
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
         let _self = viewCreator as! Self
 
+        let minimumValue = _self.$minimumValue
+        let maximumValue = _self.$maximumValue
+        let value = _self.$value
+
         return View()
             .onNotRendered {
                 weak var view = $0 as? View
 
-                _self.$minimumValue.sync {
+                minimumValue.sync {
                     view?.minimumValue = Float($0)
                 }
             }
             .onNotRendered {
                 weak var view = $0 as? View
 
-                _self.$maximumValue.sync {
+                maximumValue.sync {
                     view?.maximumValue = Float($0)
                 }
             }
             .onNotRendered {
                 weak var view = $0 as? View
 
-                _self.$value.distinctSync {
+                value.distinctSync {
                     view?.value = Float($0)
                 }
             }
             .onEvent(.valueChanged) {
-                _self.value = Double(($0 as! View).value)
+                value.wrappedValue = Double(($0 as! View).value)
             }
     }
 }
@@ -80,63 +84,63 @@ public struct UICSlider: UIViewCreator {
 public extension UIViewCreator where View: UISlider {
 
     @inlinable
-    func isContinuous(_ flag: Bool) -> UICModifiedView<View> {
+    func isContinuous(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.isContinuous = flag
         }
     }
 
     @inlinable
-    func maximumTrackTintColor(_ tintColor: UIColor) -> UICModifiedView<View> {
+    func maximumTrackTintColor(_ tintColor: UIColor) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.maximumTrackTintColor = tintColor
         }
     }
 
     @inlinable
-    func minimumTrackTintColor(_ tintColor: UIColor) -> UICModifiedView<View> {
+    func minimumTrackTintColor(_ tintColor: UIColor) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.minimumTrackTintColor = tintColor
         }
     }
 
     @inlinable
-    func maximumValueImage(_ image: UICImage?) -> UICModifiedView<View> {
+    func maximumValueImage(_ image: UICImage?) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.maximumValueImage = image?.uiImage
         }
     }
 
     @inlinable
-    func minimumValueImage(_ image: UICImage?) -> UICModifiedView<View> {
+    func minimumValueImage(_ image: UICImage?) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.minimumValueImage = image?.uiImage
         }
     }
 
     @inlinable
-    func maximumTrackImage(_ image: UICImage?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
+    func maximumTrackImage(_ image: UICImage?, for state: UIControl.State = .normal) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.setMaximumTrackImage(image?.uiImage, for: state)
         }
     }
 
     @inlinable
-    func minimumTrackImage(_ image: UICImage?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
+    func minimumTrackImage(_ image: UICImage?, for state: UIControl.State = .normal) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.setMinimumTrackImage(image?.uiImage, for: state)
         }
     }
 
     @inlinable
-    func thumbImage(_ image: UICImage?, for state: UIControl.State = .normal) -> UICModifiedView<View> {
+    func thumbImage(_ image: UICImage?, for state: UIControl.State = .normal) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.setThumbImage(image?.uiImage, for: state)
         }
     }
 
     @inlinable
-    func thumbTintColor(_ color: UIColor?) -> UICModifiedView<View> {
+    func thumbTintColor(_ color: UIColor?) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.thumbTintColor = color
         }

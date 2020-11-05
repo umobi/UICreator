@@ -26,16 +26,16 @@ import ConstraintBuilder
 
 @frozen
 public struct UICRow: ViewCreator {
-    let content: () -> ViewCreator
+    let content: ViewCreator
 
-    let trailingActions: (() -> RowAction)?
-    let leadingActions: (() -> RowAction)?
+    let trailingActions: [RowAction]
+    let leadingActions: [RowAction]
     let accessoryType: UITableViewCell.AccessoryType
 
-    public init(content: @escaping () -> ViewCreator) {
-        self.content = content
-        self.trailingActions = nil
-        self.leadingActions = nil
+    public init(content: () -> ViewCreator) {
+        self.content = content()
+        self.trailingActions = []
+        self.leadingActions = []
         self.accessoryType = .none
     }
 
@@ -47,8 +47,8 @@ public struct UICRow: ViewCreator {
     }
 
     fileprivate class Editable {
-        var trailingActions: (() -> RowAction)?
-        var leadingActions: (() -> RowAction)?
+        var trailingActions: [RowAction]
+        var leadingActions: [RowAction]
         var accessoryType: UITableViewCell.AccessoryType
 
         init(_ original: UICRow) {
@@ -72,13 +72,13 @@ public struct UICRow: ViewCreator {
 public extension UICRow {
     func trailingActions(@RowActionBuilder _ actions: @escaping () -> RowAction) -> Self {
         self.edit {
-            $0.trailingActions = actions
+            $0.trailingActions = actions().zip
         }
     }
 
     func leadingActions(@RowActionBuilder _ actions: @escaping () -> RowAction) -> Self {
         self.edit {
-            $0.leadingActions = actions
+            $0.leadingActions = actions().zip
         }
     }
 
@@ -187,19 +187,18 @@ public class UICContextualAction: RowAction {
         with animation: UITableView.RowAnimation,
         onCompletion handler: @escaping (IndexPath) -> Void) -> Self {
         self.onAction { [weak self] indexPath in
-            guard let manager = self?.tableView?.manager as? ListManager else {
+            guard let listState = self?.tableView?.modifier as? ListState else {
                 UICList.Fatal.deleteRows([indexPath]).warning()
                 return false
             }
 
-            self?.tableView.manager = ListManager.Delete(manager)
-                .disableIndexPath(indexPath)
+            self?.tableView.modifier = ListState.Delete(listState, disable: [indexPath])
 
             self?.tableView?.performBatchUpdates({
                 self?.tableView.deleteRows(at: [indexPath], with: animation)
             }, completion: { didEnd in
                 if didEnd {
-                    self?.tableView.manager = manager
+                    self?.tableView.modifier = listState
                     handler(indexPath)
                 }
             })
@@ -255,20 +254,19 @@ public class UICRowAction: RowAction {
         with animation: UITableView.RowAnimation,
         onCompletion handler: @escaping (IndexPath) -> Void) -> Self {
         self.onAction { [weak self] indexPath in
-            guard let manager = self?.tableView?.manager as? ListManager else {
+            guard let listState = self?.tableView?.modifier as? ListState else {
                 UICList.Fatal.deleteRows([indexPath]).warning()
                 return
             }
 
-            self?.tableView.manager = ListManager.Delete(manager)
-                .disableIndexPath(indexPath)
+            self?.tableView.modifier = ListState.Delete(listState, disable: [indexPath])
 
             if #available(iOS 11.0, tvOS 11.0, *) {
                 self?.tableView?.performBatchUpdates({
                     self?.tableView.deleteRows(at: [indexPath], with: animation)
                 }, completion: { didEnd in
                     if didEnd {
-                        self?.tableView.manager = manager
+                        self?.tableView.modifier = listState
                         handler(indexPath)
                     }
                 })
@@ -280,7 +278,7 @@ public class UICRowAction: RowAction {
             self?.tableView?.deleteRows(at: [indexPath], with: animation)
             self?.tableView?.endUpdates()
 
-            self?.tableView?.manager = manager
+            self?.tableView?.modifier = listState
             handler(indexPath)
         }
     }

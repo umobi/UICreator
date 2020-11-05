@@ -29,13 +29,13 @@ public struct UICScroll: UIViewCreator {
     public typealias View = UIScrollView
 
     @Relay var axis: Axis
-    let content: () -> ViewCreator
+    let content: ViewCreator
 
     public init(
         axis: Relay<Axis>,
-        content: @escaping () -> ViewCreator) {
+        content: () -> ViewCreator) {
 
-        self.content = content
+        self.content = content()
         self._axis = axis
     }
 
@@ -45,7 +45,7 @@ public struct UICScroll: UIViewCreator {
 
         return Views.ScrollView(_self.axis)
             .onNotRendered {
-                ($0 as? Views.ScrollView)?.addContent(_self.content().releaseUIView())
+                ($0 as? Views.ScrollView)?.addContent(_self.content.releaseUIView())
             }
             .onNotRendered {
                 weak var view = $0 as? Views.ScrollView
@@ -60,21 +60,21 @@ public struct UICScroll: UIViewCreator {
 public extension UIViewCreator where View: UIScrollView {
     @available(iOS 11.0, tvOS 11.0, *)
     @inlinable
-    func insetsBehavior(_ behavior: UIScrollView.ContentInsetAdjustmentBehavior) -> UICModifiedView<View> {
+    func insetsBehavior(_ behavior: UIScrollView.ContentInsetAdjustmentBehavior) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.contentInsetAdjustmentBehavior = behavior
         }
     }
 
     @inlinable
-    func alwaysBounceVertical(_ flag: Bool) -> UICModifiedView<View> {
+    func alwaysBounceVertical(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.alwaysBounceVertical = flag
         }
     }
 
     @inlinable
-    func alwaysBounceHorizontal(_ flag: Bool) -> UICModifiedView<View> {
+    func alwaysBounceHorizontal(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.alwaysBounceHorizontal = flag
         }
@@ -82,35 +82,35 @@ public extension UIViewCreator where View: UIScrollView {
 
     @available(iOS 13, tvOS 13.0, *)
     @inlinable
-    func automaticallyAdjustsScroll(indicatorInsets flag: Bool) -> UICModifiedView<View> {
+    func automaticallyAdjustsScroll(indicatorInsets flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.automaticallyAdjustsScrollIndicatorInsets = flag
         }
     }
 
     @inlinable
-    func bounces(_ flag: Bool) -> UICModifiedView<View> {
+    func bounces(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.bounces = flag
         }
     }
 
     @inlinable
-    func canCancelContentTouches(_ flag: Bool) -> UICModifiedView<View> {
+    func canCancelContentTouches(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.canCancelContentTouches = flag
         }
     }
 
     @inlinable
-    func contentInsets(_ insets: UIEdgeInsets) -> UICModifiedView<View> {
+    func contentInsets(_ insets: UIEdgeInsets) -> UICInTheSceneModifier<View> {
         self.onInTheScene {
             ($0 as? View)?.contentInset = insets
         }
     }
 
     @inlinable
-    func contentSize(_ size: CGSize) -> UICModifiedView<View> {
+    func contentSize(_ size: CGSize) -> UICInTheSceneModifier<View> {
         self.onInTheScene {
             ($0 as? View)?.contentSize = size
         }
@@ -118,7 +118,7 @@ public extension UIViewCreator where View: UIScrollView {
 
     #if os(iOS)
     @inlinable
-    func isPagingEnabled(_ flag: Bool) -> UICModifiedView<View> {
+    func isPagingEnabled(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.isPagingEnabled = flag
         }
@@ -126,35 +126,35 @@ public extension UIViewCreator where View: UIScrollView {
     #endif
 
     @inlinable
-    func isDirectionalLockEnabled(_ flag: Bool) -> UICModifiedView<View> {
+    func isDirectionalLockEnabled(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.isDirectionalLockEnabled = flag
         }
     }
 
     @inlinable
-    func isScrollEnabled(_ flag: Bool) -> UICModifiedView<View> {
+    func isScrollEnabled(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.isScrollEnabled = flag
         }
     }
 
     @inlinable
-    func showsVerticalScrollIndicator(_ flag: Bool) -> UICModifiedView<View> {
+    func showsVerticalScrollIndicator(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.showsVerticalScrollIndicator = flag
         }
     }
 
     @inlinable
-    func showsHorizontalScrollIndicator(_ flag: Bool) -> UICModifiedView<View> {
+    func showsHorizontalScrollIndicator(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.showsHorizontalScrollIndicator = flag
         }
     }
 
     @inlinable
-    func indicator(style: View.IndicatorStyle) -> UICModifiedView<View> {
+    func indicator(style: View.IndicatorStyle) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.indicatorStyle = style
         }
@@ -162,7 +162,7 @@ public extension UIViewCreator where View: UIScrollView {
 
     @available(iOS 11.1, tvOS 11.1, *)
     @inlinable
-    func verticalScroll(indicatorInsets: UIEdgeInsets) -> UICModifiedView<View> {
+    func verticalScroll(indicatorInsets: UIEdgeInsets) -> UICInTheSceneModifier<View> {
         self.onInTheScene {
             ($0 as? View)?.verticalScrollIndicatorInsets = indicatorInsets
         }
@@ -170,7 +170,7 @@ public extension UIViewCreator where View: UIScrollView {
 
     @available(iOS 11.1, tvOS 11.1, *)
     @inlinable
-    func horizontalScroll(indicatorInsets: UIEdgeInsets) -> UICModifiedView<View> {
+    func horizontalScroll(indicatorInsets: UIEdgeInsets) -> UICInTheSceneModifier<View> {
         self.onInTheScene {
             ($0 as? View)?.horizontalScrollIndicatorInsets = indicatorInsets
         }
@@ -178,7 +178,7 @@ public extension UIViewCreator where View: UIScrollView {
 
     @available(*, deprecated, message: "use verticalScroll(indicatorInsets:) and horizontalScroll(indicatorInsets:)")
     @inlinable
-    func scroll(indicatorInsets: UIEdgeInsets) -> UICModifiedView<View> {
+    func scroll(indicatorInsets: UIEdgeInsets) -> UICInTheSceneModifier<View> {
         self.onInTheScene {
             ($0 as? View)?.scrollIndicatorInsets = indicatorInsets
         }
@@ -187,7 +187,7 @@ public extension UIViewCreator where View: UIScrollView {
 
 public extension UIViewCreator where View: UIScrollView {
     @inlinable
-    func contentInsets(_ relay: Relay<UIEdgeInsets>) -> UICModifiedView<View> {
+    func contentInsets(_ relay: Relay<UIEdgeInsets>) -> UICInTheSceneModifier<View> {
         self.onInTheScene {
             weak var view = $0 as? View
 
@@ -199,7 +199,7 @@ public extension UIViewCreator where View: UIScrollView {
 
     @available(iOS 11.1, tvOS 11.1, *)
     @inlinable
-    func verticalScrollIndicatorInsets(_ relay: Relay<UIEdgeInsets>) -> UICModifiedView<View> {
+    func verticalScrollIndicatorInsets(_ relay: Relay<UIEdgeInsets>) -> UICInTheSceneModifier<View> {
         self.onInTheScene {
             weak var view = $0 as? View
 
@@ -211,7 +211,7 @@ public extension UIViewCreator where View: UIScrollView {
 
     @available(iOS 11.1, tvOS 11.1, *)
     @inlinable
-    func horizontalScrollIndicatorInsets(_ relay: Relay<UIEdgeInsets>) -> UICModifiedView<View> {
+    func horizontalScrollIndicatorInsets(_ relay: Relay<UIEdgeInsets>) -> UICInTheSceneModifier<View> {
         self.onInTheScene {
             weak var view = $0 as? View
 

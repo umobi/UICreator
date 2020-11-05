@@ -49,29 +49,31 @@ public struct UICCollection<Layout>: UIViewCreator where Layout: UICCollectionVi
 
 public extension UIViewCreator where View: UICollectionView {
     @inlinable
-    func allowsMultipleSelection(_ flag: Bool) -> UICModifiedView<View> {
+    func allowsMultipleSelection(_ flag: Bool) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.allowsMultipleSelection = flag
         }
     }
 
     @inlinable
-    func allowsSelection(_ flag: Bool) -> UICModifiedView<View> {
+    func allowsSelection(_ flag: Bool) -> UICRenderedModifier<View> {
         self.onRendered {
             ($0 as? View)?.allowsSelection = flag
         }
     }
 
     @inlinable
-    func background<Background: ViewCreator>(_ content: @escaping () -> Background) -> UICModifiedView<View> {
-        self.onNotRendered {
+    func background<Background: ViewCreator>(_ content: () -> Background) -> UICNotRenderedModifier<View> {
+        let content = content()
+
+        return self.onNotRendered {
             ($0 as? View)?.backgroundView = UICAnyView(content).releaseUIView()
         }
     }
 
     #if os(iOS)
     @inlinable
-    func isPaged(_ flag: Bool) -> UICModifiedView<View> {
+    func isPaged(_ flag: Bool) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.isPagingEnabled = flag
         }

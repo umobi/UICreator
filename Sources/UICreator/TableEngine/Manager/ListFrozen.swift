@@ -21,36 +21,15 @@
 //
 
 import Foundation
-import UIKit
 
-@usableFromInline
-struct UICCell {
-    let rowManager: ListManager.RowManager
-    let identifier: String
-
-    @usableFromInline
-    init(_ identifier: String, _ manager: ListManager.RowManager) {
-        self.rowManager = manager
-        self.identifier = identifier
-    }
-}
-
-extension UICCell {
-    @usableFromInline
-    struct Loaded {
-        let cell: UICCell
-        let trailingActions: [RowAction]
-        let leadingActions: [RowAction]
-
-        fileprivate init(_ cell: UICCell) {
-            self.cell = cell
-            self.trailingActions = cell.rowManager.payload.trailingActions?().zip ?? []
-            self.leadingActions = cell.rowManager.payload.leadingActions?().zip ?? []
+extension List {
+    struct Frozen<Content, Index> {
+        let content: Content
+        let index: Index
+        
+        init(_ content: Content,_ index: Index) {
+            self.content = content
+            self.index = index
         }
-    }
-
-    @usableFromInline
-    var load: Loaded {
-        return .init(self)
     }
 }

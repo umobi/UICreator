@@ -40,14 +40,14 @@ public struct Pinch: UIGestureCreator {
 public extension UIViewCreator {
 
     @inlinable
-    func onPinchMaker<Pinch>(_ pinchConfigurator: @escaping () -> Pinch) -> UICModifiedView<View> where Pinch: UIGestureCreator, Pinch.Gesture: UIPinchGestureRecognizer {
+    func onPinchMaker<Pinch>(_ pinchConfigurator: @escaping () -> Pinch) -> UICNotRenderedModifier<View> where Pinch: UIGestureCreator, Pinch.Gesture: UIPinchGestureRecognizer {
         self.onNotRendered {
             pinchConfigurator().add($0)
         }
     }
 
     @inlinable
-    func onPinch(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+    func onPinch(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
         self.onPinchMaker {
             Pinch()
                 .onRecognized {

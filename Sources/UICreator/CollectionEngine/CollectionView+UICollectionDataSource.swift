@@ -52,46 +52,46 @@ extension UICCollectionViewDataSource {
     internal typealias DataSourceFatal = UICollectionView.DataSourceFatal
 
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        collectionView.manager?.numberOfSections ?? 0
+        collectionView.modifier?.numberOfSections ?? 0
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let manager = collectionView.manager else {
+        guard let modifier = collectionView.modifier else {
             return 0
         }
 
-        return manager.numberOfRows(in: manager.section(at: section))
+        return modifier.numberOfRows(in: section)
     }
 
     func collectionView(
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 
-        guard let row = collectionView.manager?.row(at: indexPath) else {
+        guard let row = collectionView.modifier?.row(at: indexPath) else {
             DataSourceFatal.unexpectedRow(indexPath).die()
         }
 
         guard
             let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: row.identifier,
+                withReuseIdentifier: row.id,
                 for: indexPath
-            ) as? CollectionViewCell
+            ) as? Views.CollectionViewCell
         else {
             DataSourceFatal.unexpectedRow(indexPath).die()
         }
 
-        cell.prepareCell(row, axis: .horizontal)
+        cell.prepare(row.content, axis: .horizontal)
 
         guard
             let item = collectionView.layoutManager?
                 .item(at: indexPath),
             item.isDynamic,
-            let loaded = cell.cellLoaded
+            case .row(_, _, _, let rowIndexPath) = row.content.type
         else {
             return cell
         }
 
-        cell.hostedView.onCellLayout { [weak collectionView, loaded] view in
+        cell.hostedView.onCellLayout { [weak collectionView] view in
             guard view.frame.size != .zero else {
                 return
             }
@@ -100,7 +100,7 @@ extension UICCollectionViewDataSource {
                 return
             }
 
-            guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath)
+            guard item.modified(item.modify(at: rowIndexPath)
                 .horizontal(.equalTo(view.frame.width))
                 .vertical(.equalTo(view.frame.height))) else {
                     return
@@ -121,31 +121,31 @@ extension UICCollectionViewDataSource {
         switch kind {
         // MARK: - Section Header
         case UICollectionView.elementKindSectionHeader:
-            guard let header = collectionView.manager?.header(at: indexPath.section) else {
+            guard let header = collectionView.modifier?.header(at: indexPath.section) else {
                 DataSourceFatal.unexpectedHeader(indexPath).die()
             }
 
             guard
                 let cell = collectionView.dequeueReusableSupplementaryView(
                     ofKind: kind,
-                    withReuseIdentifier: header.identifier,
+                    withReuseIdentifier: header.id,
                     for: indexPath) as? Views.CollectionReusableView
             else {
                 DataSourceFatal.unexpectedHeader(indexPath).die()
             }
 
-            cell.prepareCell(header, axis: .center)
+            cell.prepare(header.content, axis: .center)
 
             guard
                 let item = collectionView.layoutManager?
                     .header(at: indexPath.section),
                 item.isDynamic,
-                let loaded = cell.cellLoaded
+                case .header(let headerIndex) = header.content.type
             else {
                 return cell
             }
 
-            cell.hostedView.onCellLayout { [weak collectionView, loaded] view in
+            cell.hostedView.onCellLayout { [weak collectionView] view in
                 guard view.frame.size != .zero else {
                     return
                 }
@@ -154,7 +154,7 @@ extension UICCollectionViewDataSource {
                     return
                 }
 
-                guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath.section)
+                guard item.modified(item.modify(at: headerIndex)
                     .horizontal(.equalTo(view.frame.width))
                     .vertical(.equalTo(view.frame.height))) else { return }
 
@@ -165,30 +165,30 @@ extension UICCollectionViewDataSource {
 
         // MARK: - Section Footer
         case UICollectionView.elementKindSectionFooter:
-            guard let footer = collectionView.manager?.footer(at: indexPath.section) else {
+            guard let footer = collectionView.modifier?.footer(at: indexPath.section) else {
                 DataSourceFatal.unexpectedFooter(indexPath).die()
             }
 
             guard
                 let cell = collectionView.dequeueReusableSupplementaryView(
                     ofKind: kind,
-                    withReuseIdentifier: footer.identifier,
+                    withReuseIdentifier: footer.id,
                     for: indexPath) as? Views.CollectionReusableView
             else {
                 DataSourceFatal.unexpectedFooter(indexPath).die()
             }
 
-            cell.prepareCell(footer, axis: .horizontal)
+            cell.prepare(footer.content, axis: .horizontal)
 
             guard
                 let item = collectionView.layoutManager?.footer(at: indexPath.section),
                 item.isDynamic,
-                let loaded = cell.cellLoaded
+                case .footer(let footerIndex) = footer.content.type
             else {
                 return cell
             }
 
-            cell.hostedView.onCellLayout { [weak collectionView, loaded] view in
+            cell.hostedView.onCellLayout { [weak collectionView] view in
                 guard view.frame.size != .zero else {
                     return
                 }
@@ -197,7 +197,7 @@ extension UICCollectionViewDataSource {
                     return
                 }
 
-                guard item.modified(item.modify(at: loaded.cell.rowManager.indexPath.section)
+                guard item.modified(item.modify(at: footerIndex)
                     .horizontal(.equalTo(view.frame.width))
                     .vertical(.equalTo(view.frame.height))) else { return }
 

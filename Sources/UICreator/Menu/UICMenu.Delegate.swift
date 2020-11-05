@@ -62,7 +62,7 @@ extension UICMenu {
                         return nil
                     }
 
-                    return { UICHostingController(content: provider )}
+                    return { UICHostingController(rootView: provider)}
                 }(),
                 actionProvider: { [weak self] _ in
                     self?.menu.uiMenu

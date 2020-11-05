@@ -40,14 +40,14 @@ public struct ScreenEdgePan: UIGestureCreator {
 public extension UIViewCreator {
 
     @inlinable
-    func onScreenEdgePanMaker<ScreenEdgePan>(_ screenEdgePanConfigurator: @escaping () -> ScreenEdgePan) -> UICModifiedView<View> where ScreenEdgePan: UIGestureCreator, ScreenEdgePan.Gesture: UIScreenEdgePanGestureRecognizer {
+    func onScreenEdgePanMaker<ScreenEdgePan>(_ screenEdgePanConfigurator: @escaping () -> ScreenEdgePan) -> UICNotRenderedModifier<View> where ScreenEdgePan: UIGestureCreator, ScreenEdgePan.Gesture: UIScreenEdgePanGestureRecognizer {
         self.onNotRendered {
             screenEdgePanConfigurator().add($0)
         }
     }
 
     @inlinable
-    func onScreenEdgePan(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+    func onScreenEdgePan(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
         self.onScreenEdgePanMaker {
             ScreenEdgePan()
                 .onRecognized {

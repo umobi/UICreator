@@ -40,7 +40,7 @@ public extension UIGestureCreator where Gesture: UITapGestureRecognizer {
     @inlinable
     func number(ofTapsRequired number: Int) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.numberOfTapsRequired = number
+            ($0 as? Gesture)?.numberOfTapsRequired = number
         }
     }
 
@@ -48,7 +48,7 @@ public extension UIGestureCreator where Gesture: UITapGestureRecognizer {
     @inlinable
     func number(ofTouchesRequired number: Int) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.numberOfTouchesRequired = number
+            ($0 as? Gesture)?.numberOfTouchesRequired = number
         }
     }
     #endif
@@ -56,14 +56,14 @@ public extension UIGestureCreator where Gesture: UITapGestureRecognizer {
 
 public extension UIViewCreator {
     @inlinable
-    func onTapMaker<Tap>(_ tapConfigurator: @escaping () -> Tap) -> UICModifiedView<View> where Tap: UIGestureCreator, Tap.Gesture: UITapGestureRecognizer {
+    func onTapMaker<Tap>(_ tapConfigurator: @escaping () -> Tap) -> UICNotRenderedModifier<View> where Tap: UIGestureCreator, Tap.Gesture: UITapGestureRecognizer {
         self.onNotRendered {
             tapConfigurator().add($0)
         }
     }
 
     @inlinable
-    func onTap(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+    func onTap(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
         self.onTapMaker {
             Tap()
                 .onRecognized {

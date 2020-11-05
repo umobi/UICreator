@@ -30,25 +30,25 @@ public struct UICStack: UIViewCreator {
 
     @Relay private var axis: Axis
     @Relay private var spacing: CGFloat
-    private let content: () -> ViewCreator
+    private let content: [ViewCreator]
 
     public init(
         axis: Relay<Axis>,
         spacing: CGFloat = .zero,
-        @UICViewBuilder _ content: @escaping () -> ViewCreator) {
+        @UICViewBuilder _ content: () -> ViewCreator) {
 
         self._axis = axis
-        self.content = content
+        self.content = content().zip
         self._spacing = .constant(spacing)
     }
 
     public init(
         axis: Relay<Axis>,
         spacing: Relay<CGFloat>,
-        @UICViewBuilder _ content: @escaping () -> ViewCreator) {
+        @UICViewBuilder _ content: () -> ViewCreator) {
 
         self._axis = axis
-        self.content = content
+        self.content = content().zip
         self._spacing = spacing
     }
 
@@ -74,7 +74,7 @@ public struct UICStack: UIViewCreator {
             .onNotRendered {
                 weak var view: Views.StackView! = $0 as? Views.StackView
 
-                _self.content().zip.forEach {
+                _self.content.forEach {
                     if let forEachShared = $0 as? ForEachEnviromentShared {
                         let stackManager = Views.StackView.Manager(view)
                         view.strongStackManager(stackManager)
@@ -90,14 +90,14 @@ public struct UICStack: UIViewCreator {
 public extension UIViewCreator where View: UIStackView {
 
     @inlinable
-    func distribution(_ distribution: View.Distribution) -> UICModifiedView<View> {
-        return self.onNotRendered {
+    func distribution(_ distribution: View.Distribution) -> UICNotRenderedModifier<View> {
+        self.onNotRendered {
             ($0 as? View)?.distribution = distribution
         }
     }
 
     @inlinable
-    func alignment(_ alignment: View.Alignment) -> UICModifiedView<View> {
+    func alignment(_ alignment: View.Alignment) -> UICNotRenderedModifier<View> {
         self.onNotRendered {
             ($0 as? View)?.alignment = alignment
         }

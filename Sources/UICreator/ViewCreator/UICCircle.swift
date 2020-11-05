@@ -28,10 +28,10 @@ import ConstraintBuilder
 public struct UICCircle: UIViewCreator {
     public typealias View = Views.RounderView
 
-    let content: () -> ViewCreator
+    let content: ViewCreator
 
-    public init(_ content: @escaping () -> ViewCreator) {
-        self.content = content
+    public init(_ content: () -> ViewCreator) {
+        self.content = content()
     }
 
     @inline(__always)
@@ -41,7 +41,7 @@ public struct UICCircle: UIViewCreator {
         return View()
             .onNotRendered {
                 ($0 as? View)?.radius = 0.5
-                ($0 as? View)?.addContent(_self.content().releaseUIView())
+                ($0 as? View)?.addContent(_self.content.releaseUIView())
             }
     }
 }

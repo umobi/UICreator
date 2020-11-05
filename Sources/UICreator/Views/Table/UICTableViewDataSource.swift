@@ -26,40 +26,40 @@ import UIKit
 class UICTableViewDataSource: NSObject, UITableViewDataSource {
 
     public func numberOfSections(in tableView: UITableView) -> Int {
-        let numberOfSections = tableView.manager?.numberOfSections ?? 0
+        let numberOfSections = tableView.modifier?.numberOfSections ?? 0
         tableView.sizeManager.sections(count: numberOfSections)
         return numberOfSections
     }
 
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let manager = tableView.manager else {
+        guard let modifier = tableView.modifier else {
             tableView.sizeManager.rows(count: .zero, in: section)
             return 0
         }
 
-        let numberOfRows = manager.numberOfRows(in: manager.section(at: section))
+        let numberOfRows = modifier.numberOfRows(in: section)
         tableView.sizeManager.rows(count: numberOfRows, in: section)
         return numberOfRows
     }
 
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let row = tableView.manager?.row(at: indexPath) else {
+        guard let row = tableView.modifier?.row(at: indexPath) else {
             Fatal.Builder("UICList can't load row for indexPath at \(indexPath)").die()
         }
 
         guard
             let cell = tableView.dequeueReusableCell(
-                withIdentifier: row.identifier,
+                withIdentifier: row.id,
                 for: indexPath
             ) as? Views.TableViewCell
         else {
             Fatal.Builder("UICList can't dequeue cell for indexPath at \(indexPath)").die()
         }
 
-        cell.prepareCell(row, axis: .horizontal)
+        cell.prepare(row.content, axis: .horizontal)
         tableView.commitCell(cell)
 
-        tableView.appendReusable(cell: cell)
+        tableView.append(cell)
         return cell
     }
 
@@ -68,6 +68,10 @@ class UICTableViewDataSource: NSObject, UITableViewDataSource {
             return false
         }
 
-        return !(reusableView.cellLoaded.trailingActions + reusableView.cellLoaded.leadingActions).isEmpty
+        guard case .row(let trailingActions, let leadingActions, _, _) = reusableView.row.type else {
+            return false
+        }
+
+        return !(trailingActions + leadingActions).isEmpty
     }
 }

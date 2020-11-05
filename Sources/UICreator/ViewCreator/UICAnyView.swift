@@ -27,35 +27,53 @@ import ConstraintBuilder
 public struct UICAnyView: UIViewCreator {
     public typealias View = CBView
 
-    private let viewLoader: () -> CBView
+    @usableFromInline
+    enum Content {
+        case viewCreator(ViewCreator)
+        case view(CBView)
+    }
+
+    private let content: Content
 
     public init(_ viewCreator: ViewCreator) {
-        self.viewLoader = {
-            viewCreator.releaseUIView()
-        }
+        self.content = .viewCreator(viewCreator)
     }
 
-    @usableFromInline
-    init(_ viewCreator: @escaping () -> ViewCreator) {
-        self.viewLoader = {
-            viewCreator().releaseUIView()
-        }
-    }
-
-    @usableFromInline
-    init(_ viewLoader: @escaping () -> CBView) {
-        self.viewLoader = viewLoader
-    }
-
-    @usableFromInline
-    init(_ view:  CBView) {
-        self.viewLoader = {
-            view
-        }
+    internal init(_ view: CBView) {
+        self.content = .view(view)
     }
 
     @inline(__always)
     public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
-        (viewCreator as! Self).viewLoader()
+        switch (viewCreator as! Self).content {
+        case .viewCreator(let viewCreator):
+            return viewCreator.releaseUIView()
+        case .view(let view):
+            return view
+        }
     }
 }
+
+@frozen
+public struct UICModifiedView<View>: UIViewCreator where View: CBView {
+
+    private let viewCreator: ViewCreator
+
+    @inline(__always)
+    fileprivate init<Content>(_ viewCreator: Content) where Content: UIViewCreator, Content.View == View {
+        self.viewCreator = viewCreator
+    }
+
+    @inline(__always)
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        (viewCreator as! Self).viewCreator.releaseUIView()
+    }
+}
+
+public extension UIViewCreator {
+    @inline(__always)
+    func eraseToModifiedView() -> UICModifiedView<View> {
+        UICModifiedView(self)
+    }
+}
+

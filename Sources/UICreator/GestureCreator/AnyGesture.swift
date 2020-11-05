@@ -27,14 +27,14 @@ import UIKit
 public struct AnyGesture: UIGestureCreator {
     public typealias Gesture = UIGestureRecognizer
 
-    let gestureLoader: () -> Gesture
+    let content: GestureCreator
 
-    init(_ gestureLoader: @escaping () -> Gesture) {
-        self.gestureLoader = gestureLoader
+    init(_ content: GestureCreator) {
+        self.content = content
     }
 
     @inline(__always)
     public static func _makeUIGesture(_ gestureCreator: GestureCreator) -> UIGestureRecognizer {
-        (gestureCreator as! Self).gestureLoader()
+        (gestureCreator as! Self).content.releaseUIGesture()
     }
 }

@@ -45,114 +45,19 @@ private extension CBView {
     }
 }
 
-protocol ReusableView: class {
+protocol ListReusableView: class {
     var hostedView: CBView! { get set }
     var contentView: CBView { get }
 
-    func prepareCell(_ cell: UICCell, axis: ReusableViewAxis)
+    func prepare(_ row: Row, axis: ReusableViewAxis)
 
-    var cellLoaded: UICCell.Loaded! { get set }
+    var row: Row! { get set }
 }
 
-extension ReusableView {
-
-    func addView(_ axis: ReusableViewAxis) {
-        guard let cellLoaded = self.cellLoaded else {
-            return
-        }
-
-        self.contentView.subviews.forEach {
-            $0.removeFromSuperview()
-        }
-
-        let host = cellLoaded.cell.rowManager.payload.content()
-
-        let hostedView: CBView! = host.releaseUIView()
-        self.hostedView = hostedView
-
-        if hostedView.reusableAxis != axis {
-            hostedView.reusableAxis = axis
-            hostedView.reusableUpdateBatch = {
-                guard
-                    let reusableView = sequence(first: $0, next: { $0.superview })
-                        .first(where: { $0 is ReusableView })
-                        as? ReusableView & CBView,
-                    let collectionView = sequence(first: reusableView.contentView, next: { $0.superview })
-                        .first(where: { $0 is TableCellType || $0 is CollectionCellType })
-                else {
-                    return
-                }
-
-                switch collectionView {
-                //swiftlint:disable colon
-                case is TableCellType:
-                    Self.updateTableViewBatching(
-                        listView: collectionView,
-                        reusableView: reusableView,
-                        view: $0
-                    )
-
-                case is CollectionCellType:
-                    guard
-                        let collectionView = sequence(first: collectionView, next: { $0.superview })
-                            .first(where: { $0 is UICollectionView }) as? UICollectionView
-                    else { return }
-
-                    // TO-DO: CollectionView layout
-                default:
-                    return
-                }
-            }
-
-            hostedView.onLayout {
-                $0.reusableUpdateBatch?($0)
-            }
-        }
-
-        self.addConstraints(hostedView, axis)
-    }
-
-    static func updateTableViewBatching(
-        listView: CBView,
-        reusableView: CBView & ReusableView,
-        view: CBView) {
-
-        guard
-            let tableView = sequence(first: listView, next: { $0.superview })
-                .first(where: { $0 is UITableView }) as? UITableView
-        else { return }
-
-        guard
-            tableView.needsToUpdateHeightOf(
-                view, rowManager:
-                reusableView.cellLoaded.cell.rowManager
-            )
-            else { return }
-
-        tableView.itemHeightUpdate(
-            view,
-            rowManager: reusableView.cellLoaded.cell.rowManager
-        )
-
-        if #available(iOS 11, tvOS 11, *) {
-            tableView.addUniqueCallback {
-                CBView.performWithoutAnimation {
-                    tableView.performBatchUpdates(nil, completion: nil)
-                }
-            }
-            return
-        }
-
-        tableView.addUniqueCallback {
-            CBView.performWithoutAnimation {
-                tableView.beginUpdates()
-                tableView.endUpdates()
-            }
-        }
-    }
-
+extension ListReusableView {
     private func addConstraints(_ hostedView: CBView, _ axis: ReusableViewAxis) {
         CBView.CBSubview(self.contentView).addSubview(hostedView)
+
         switch axis {
         case .center:
             Constraintable.activate {
@@ -190,24 +95,120 @@ extension ReusableView {
             }
         }
     }
+}
 
-    func reuseCell(_ cell: UICCell, axis: ReusableViewAxis) {
-        if self.cellLoaded == nil {
-            self.cellLoaded = cell.load
+extension ListReusableView {
+    func addView(_ axis: ReusableViewAxis) {
+        guard let row = self.row else {
+            return
+        }
+
+        self.contentView.subviews.forEach {
+            $0.removeFromSuperview()
+        }
+
+        let host = row.content
+
+        let hostedView: CBView! = host.releaseUIView()
+        self.hostedView = hostedView
+
+        if hostedView.reusableAxis != axis {
+            hostedView.reusableAxis = axis
+            hostedView.reusableUpdateBatch = {
+                guard
+                    let reusableView = sequence(first: $0, next: { $0.superview })
+                        .first(where: { $0 is ListReusableView })
+                        as? ListReusableView & CBView,
+                    let collectionView = sequence(first: reusableView.contentView, next: { $0.superview })
+                        .first(where: { $0 is TableCellType || $0 is CollectionCellType })
+                else {
+                    return
+                }
+
+                switch collectionView {
+                //swiftlint:disable colon
+                case is TableCellType:
+                    Self.updateTableViewBatching(
+                        listView: collectionView,
+                        reusableView: reusableView,
+                        view: $0
+                    )
+
+                case is CollectionCellType:
+                    guard
+                        let collectionView = sequence(first: collectionView, next: { $0.superview })
+                            .first(where: { $0 is UICollectionView }) as? UICollectionView
+                    else { return }
+
+                    // TO-DO: CollectionView layout
+                default:
+                    return
+                }
+            }
+
+            hostedView.onLayout {
+                $0.reusableUpdateBatch?($0)
+            }
+        }
+
+        self.addConstraints(hostedView, axis)
+    }
+}
+
+extension ListReusableView {
+    func prepare(_ row: Row, axis: ReusableViewAxis) {
+        if self.row == nil {
+            self.row = row
             self.addView(axis)
             return
         }
 
-        guard self.cellLoaded?.cell.rowManager !== cell.rowManager else {
+//        guard self.row.content != cell.rowManager else {
+//            return
+//        }
+
+        self.row = row
+        self.addView(axis)
+    }
+}
+
+extension ListReusableView {
+    static func updateTableViewBatching(
+        listView: CBView,
+        reusableView: CBView & ListReusableView,
+        view: CBView) {
+
+        guard
+            let tableView = sequence(first: listView, next: { $0.superview })
+                .first(where: { $0 is UITableView }) as? UITableView
+        else { return }
+
+        guard
+            tableView.needsToUpdateHeightOf(
+                view, reusableView.row
+            )
+            else { return }
+
+        tableView.itemHeightUpdate(
+            view,
+            reusableView.row
+        )
+
+        if #available(iOS 11, tvOS 11, *) {
+            tableView.addUniqueCallback {
+                CBView.performWithoutAnimation {
+                    tableView.performBatchUpdates(nil, completion: nil)
+                }
+            }
             return
         }
 
-        self.cellLoaded = cell.load
-        self.addView(axis)
-    }
-
-    func prepareCell(_ cell: UICCell, axis: ReusableViewAxis) {
-        self.reuseCell(cell, axis: axis)
+        tableView.addUniqueCallback {
+            CBView.performWithoutAnimation {
+                tableView.beginUpdates()
+                tableView.endUpdates()
+            }
+        }
     }
 }
 
@@ -219,27 +220,24 @@ protocol CollectionCellType {
 
 }
 
-var kTableViewCallbackIsPending = 0
 extension UITableView {
-    func needsToUpdateHeightOf(_ view: CBView, rowManager: ListManager.RowManager) -> Bool {
-        let cellType = rowManager.payload.contentType
-        let indexPath = rowManager.indexPath
-        switch cellType {
-        case .footer:
+    func needsToUpdateHeightOf(_ view: CBView, _ row: Row) -> Bool {
+        switch row.type {
+        case .footer(let index):
             guard
-                let sizeCache = self.sizeManager.footer(at: indexPath.section),
+                let sizeCache = self.sizeManager.footer(at: index),
                 sizeCache.size.height == view.frame.height
                 else { return true }
 
             return false
-        case .header:
+        case .header(let index):
             guard
-                let sizeCache = self.sizeManager.header(at: indexPath.section),
+                let sizeCache = self.sizeManager.header(at: index),
                 sizeCache.size.height == view.frame.height
                 else { return true }
 
             return false
-        case .row:
+        case .row(_, _, _, let indexPath):
             guard
                 let sizeCache = self.sizeManager.row(at: indexPath),
                 sizeCache.size.height == view.frame.height
@@ -249,23 +247,24 @@ extension UITableView {
         }
     }
 
-    func itemHeightUpdate(_ view: CBView, rowManager: ListManager.RowManager) {
-        let cellType = rowManager.payload.contentType
-        let indexPath = rowManager.indexPath
-        switch cellType {
-        case .footer:
-            let sizeCache = self.sizeManager.footer(at: indexPath.section) ?? .headerFooter(indexPath.section)
+    func itemHeightUpdate(_ view: CBView, _ row: Row) {
+        switch row.type {
+        case .footer(let index):
+            let sizeCache = self.sizeManager.footer(at: index) ?? .headerFooter(index)
             self.sizeManager.updateFooter(sizeCache.height(view.frame.height))
-        case .header:
-            let sizeCache = self.sizeManager.header(at: indexPath.section) ?? .headerFooter(indexPath.section)
+        case .header(let index):
+            let sizeCache = self.sizeManager.header(at: index) ?? .headerFooter(index)
             self.sizeManager.updateHeader(sizeCache.height(view.frame.height))
-        case .row:
+        case .row(_, _, _, let indexPath):
             let sizeCache = self.sizeManager.row(at: indexPath) ?? .cell(indexPath)
             self.sizeManager.updateRow(sizeCache.height(view.frame.height))
         }
     }
+}
 
-    var callbackIsPending: Bool {
+var kTableViewCallbackIsPending = 0
+extension UITableView {
+    private var callbackIsPending: Bool {
         get { objc_getAssociatedObject(self, &kTableViewCallbackIsPending) as? Bool ?? false }
         set { objc_setAssociatedObject(self, &kTableViewCallbackIsPending, newValue, .OBJC_ASSOCIATION_COPY) }
     }

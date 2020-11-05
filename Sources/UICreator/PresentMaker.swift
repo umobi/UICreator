@@ -115,7 +115,7 @@ extension PresentMaker {
     }
 
     @usableFromInline @inline(__always)
-    func edit(_ edit: @escaping (Editable) -> Void) -> Self {
+    func edit(_ edit: (Editable) -> Void) -> Self {
         let editable = Editable(self)
         edit(editable)
         return .init(self, editable: editable)

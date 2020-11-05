@@ -28,10 +28,10 @@ import ConstraintBuilder
 public struct UICVScroll: UIViewCreator {
     public typealias View = UIScrollView
 
-    let content: () -> ViewCreator
+    let content: ViewCreator
 
-    public init(content: @escaping () -> ViewCreator) {
-        self.content = content
+    public init(content: () -> ViewCreator) {
+        self.content = content()
     }
 
     @inline(__always)
@@ -40,7 +40,7 @@ public struct UICVScroll: UIViewCreator {
 
         return Views.ScrollView(.vertical)
             .onNotRendered {
-                ($0 as? Views.ScrollView)?.addContent(_self.content().releaseUIView())
+                ($0 as? Views.ScrollView)?.addContent(_self.content.releaseUIView())
             }
     }
 }

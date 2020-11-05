@@ -41,14 +41,14 @@ public extension UIGestureCreator where Gesture: Gestures.TouchGestureRecognizer
     @inlinable
     func number(ofTouchesRequired number: Int) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.numberOfTouchedRequired = number
+            ($0 as? Gesture)?.numberOfTouchedRequired = number
         }
     }
 
     @inlinable
     func cancelWhenTouchMoves(_ flag: Bool) -> UICModifiedGesture<Gesture> {
         self.onModify {
-            $0.cancelWhenTouchMoves = flag
+            ($0 as? Gesture)?.cancelWhenTouchMoves = flag
         }
     }
 }
@@ -56,14 +56,14 @@ public extension UIGestureCreator where Gesture: Gestures.TouchGestureRecognizer
 
 public extension UIViewCreator {
     @inlinable
-    func onTouchMaker<Touch>(_ touchConfigurator: @escaping () -> Touch) -> UICModifiedView<View> where Touch: UIGestureCreator, Touch.Gesture: Gestures.TouchGestureRecognizer {
+    func onTouchMaker<Touch>(_ touchConfigurator: @escaping () -> Touch) -> UICNotRenderedModifier<View> where Touch: UIGestureCreator, Touch.Gesture: Gestures.TouchGestureRecognizer {
         self.onNotRendered {
             touchConfigurator().add($0)
         }
     }
 
     @inlinable
-    func onTouch(_ handler: @escaping (CBView) -> Void) -> UICModifiedView<View> {
+    func onTouch(_ handler: @escaping (CBView) -> Void) -> UICNotRenderedModifier<View> {
         self.onTouchMaker {
             Touch()
                 .onRecognized {

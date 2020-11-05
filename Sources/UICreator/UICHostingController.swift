@@ -12,7 +12,7 @@ import ConstraintBuilder
 public class UICHostingController: UIViewController {
     private let viewCreator: ViewCreator
 
-    public init(content: @escaping () -> ViewCreator) {
+    public init(content: () -> ViewCreator) {
         self.viewCreator = content()
         super.init(nibName: nil, bundle: nil)
     }
@@ -50,11 +50,6 @@ public class UICHostingController: UIViewController {
                 handler()
             }
         }
-    }
-
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-//        (self.view as? ViewAdaptor)?.adaptView()
     }
 
     override public func viewDidDisappear(_ animated: Bool) {

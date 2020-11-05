@@ -33,7 +33,6 @@ private extension CBView {
         @MutableBox var trait: Trait
 
         @MutableBox var isSelfImplemented: Bool
-        @WeakBox var adaptedByView: Views.ViewAdaptor!
 
         init(_ view: CBView) {
             self._render = .init(wrappedValue: .create(view))
@@ -60,12 +59,6 @@ extension CBView {
     @inline(__always) @usableFromInline
     @objc var dynamicView: CBView {
         self
-    }
-
-    @inline(__always) @usableFromInline
-    var adaptedByView: Views.ViewAdaptor! {
-        get { self.memory.adaptedByView }
-        set { self.memory.adaptedByView = newValue }
     }
 
     @inline(__always)

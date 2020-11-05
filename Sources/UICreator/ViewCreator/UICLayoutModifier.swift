@@ -20,22 +20,37 @@
 // THE SOFTWARE.
 //
 
-import Foundation
 import UIKit
+import ConstraintBuilder
 
-extension ListManager {
+@frozen
+public struct UICLayoutModifier<View>: UIViewCreator where View: CBView {
+    private let layoutHandler: (CBView) -> Void
+    private let content: ViewCreator
+
     @usableFromInline
-    class Append: ListCollectionManager {
-        private let manager: ListManager
-
-        @usableFromInline
-        var sections: [ListManager.SectionManager] {
-            self.manager.sections
+    internal init<Content>(_ content: Content, onLayout: @escaping (CBView) -> Void) where Content: UIViewCreator, Content.View == View {
+        guard let modified = content as? Self else {
+            self.content = content
+            self.layoutHandler = onLayout
+            return
         }
 
-        @usableFromInline
-        init(_ manager: ListManager) {
-            self.manager = manager
+        self.content = modified.content
+        self.layoutHandler = {
+            modified.layoutHandler($0)
+            onLayout($0)
         }
+    }
+
+    @inline(__always)
+    public static func _makeUIView(_ viewCreator: ViewCreator) -> CBView {
+        let _self = viewCreator as! Self
+
+        return _self.content
+            .releaseUIView()
+            .orDynamic(View.self)
+            .onLayout(_self.layoutHandler)
+            .reset()
     }
 }
